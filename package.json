@@ -1,0 +1,20 @@
+{
+  "name": "lipi_parivartan",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "test": "vitest",
+    "convert": "tsx src/load_xlsx.ts"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.1.0",
+    "exceljs": "^4.4.0",
+    "js-yaml": "^4.1.0",
+    "tsx": "^4.16.5",
+    "typescript": "^5.5.4",
+    "vite": "^5.3.5",
+    "vite-tsconfig-paths": "^4.3.2",
+    "vitest": "^2.0.5"
+  }
+}
