@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import ExcelJS from 'exceljs';
 
 	let file: File | null = null;
@@ -29,11 +28,11 @@
 					console.log([i, v.value]);
 				});
 
-				const buffer = await workbook.xlsx.writeBuffer();
-				const blob = new Blob([buffer], {
-					type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-				});
-				downloadLink = URL.createObjectURL(blob);
+				// const buffer = await workbook.xlsx.writeBuffer();
+				// const blob = new Blob([buffer], {
+				// 	type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+				// });
+				// downloadLink = URL.createObjectURL(blob);
 			}
 		};
 

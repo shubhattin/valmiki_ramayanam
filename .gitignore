@@ -23,5 +23,8 @@ vite.config.ts.timestamp-*
 
 *~$*.xlsx
 kAraH/dattAMsh/ascii
-src/tests/data/valmiki_ramayan_out.xlsx
+src/tests/data/nAradavAkyam_out.xlsx
 __pycache__
+a.ts
+.~lock.*
+a.xlsx
