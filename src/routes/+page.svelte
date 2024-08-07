@@ -3,5 +3,9 @@
 	import App from './App.svelte';
 </script>
 
-<MainAppBar>j</MainAppBar>
-<App />
+<MainAppBar>
+	<div slot="start" class="font-bold">Lipi Parivartak</div>
+</MainAppBar>
+<div class="mt-3">
+	<App />
+</div>
