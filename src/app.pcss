@@ -1,0 +1,16 @@
+/* Write your global styles here, in PostCSS syntax */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@base {
+	/* body {
+     font-family: 'Roboto', 'Nirmala UI', sans-serif;
+  } */
+	/* the above approach dos'nt work as Skeleton UI overrides these behaviours */
+}
+
+:root [data-theme='gold-nouveau'] {
+	--theme-font-family-base: 'Roboto', 'Nirmala UI', sans-serif;
+	--theme-font-family-heading: 'Roboto', 'Nirmala UI', sans-serif;
+}

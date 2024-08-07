@@ -1,40 +1,9 @@
-from dattAMsh import a, root
-import shubhlipi as sh, json
-from time import time
 import unicodedata
+import json
 
-if sh.args(0) == "update":
-    import deta, shubhlipi as sh, os
-    from getpass import getpass
+from dattAMsh import a
+import shubhlipi as sh
 
-    if input("Are you sure to update dattAMsh database? ") != "astu":
-        exit()
-    rq = sh.post(f'{sh.env("link")}/api/deta_key', json={"key": getpass("key = ")})
-    res = rq.json()
-    if rq.status_code != 200:
-        print(res["detail"])
-        exit()
-    aks = deta.Deta(res["value"]).Base("akSharAH")
-    key = deta.Deta(res["value"]).Base("keys")
-    b = "\\".join(__file__.split("\\")[:-2]) + r"\src\resources\dattAMsh"
-    lang = ["Normal"]
-    t1 = time()
-    for x in os.listdir(b):
-        if x[-5:] != ".json":
-            continue
-        db = sh.load_json(sh.read(b + "\\" + x))
-        nm = x[:-5]
-        lang.append(nm)
-        t = time()
-        aks.delete(nm)
-        aks.put([db], nm)
-        print(nm, f"done {round(time()-t,6)}s")
-    aks.put(lang, "lang_list")
-    print(f"Updated All in {round(time() - t1,4)}s")
-    ln = sh.lang_list
-    key.delete("display_list")
-    key.put([sh.dict_rev(ln)], "display_list")
-    exit()
 c = 0
 
 
@@ -383,20 +352,6 @@ for lang in akSharAH:
         sarve_bhAShA.append(aplph)
         for varna in akSharAH[lang][aplph]:
             sarve_bhAShA.append(varna)
-sarve_bhAShA = set("".join(sarve_bhAShA) + ";")
-sarve_bhAShA.remove("?")
-s = ""
-for x in sarve_bhAShA:
-    s += x
-s = "".join(sorted(s))
-d = sh.read(f"{root}\\saGgaNakAnuprayogaH\\src\\kuJjikopalambhan.py").split(
-    "# sarve_bhAShA"
-)
-data = f'sarve_bhAShA = "{s}"'
-sh.write(
-    f"{root}\\saGgaNakAnuprayogaH\\src\\kuJjikopalambhan.py",
-    d[0] + "# sarve_bhAShA\n" + data + "\n# sarve_bhAShA" + d[2],
-)
 if True:
     from anukAraH import anukarah
 
@@ -435,8 +390,7 @@ for x in akSharAH:
     }
     for y in chng:
         d = d.replace(y, chng[y])
-    sh.write(f"{root}\\jAlAnuprayogaH\\src\\src\\dattAMsh\\{x}.json", d)
-    sh.write(f"{root}\\saGgaNakAnuprayogaH\\src\\resources\\dattAMsh\\{x}.json", d)
+    sh.write(f"../src/tools/converter/resources/dattAMsh/{x}.json", d)
     # only ASCII databases
     d = json.dumps(akSharAH[x], indent=4)
     chng = {
@@ -448,63 +402,12 @@ for x in akSharAH:
     }
     for y in chng:
         d = d.replace(y, chng[y])
-    sh.write(f"dattAMsh\\ascii\\{x}.json", d)
+    sh.write(f"dattAMsh/ascii/{x}.json", d)
     # sh.write(
     #     f"dattAMsh\\ascii\\{x}.json",
     #     d.encode("ascii", "backslashreplace").decode("utf-8"),
     # )
-    # Complete lang Tables
-    try:
-        if sh.args(0) != "table":
-            continue
-        if x == "Urdu":
-            akSharAH[x]["range"] = [
-                [0x600, 0x6FF],
-                [0x750, 0x77F],
-                [0x8A0, 0x8BD],
-                [0x8D4, 0x8FF],
-                [0xFB50, 0xFBFF],
-                [0xFC5E, 0xFC63],
-                [0xFCF2, 0xFCF4],
-                [0xFD3C, 0xFD3F],
-                [0xFDF2, 0xFDFD],
-                [0xFE70, 0xFEFF],
-            ]
-        t = akSharAH[x]["range"]
-        ind = []
-        r = {}
-        for y in t:
-            for s in range(y[0], y[1] + 1):
-                try:
-                    cd = str(hex(s)).upper()[2:]
-                    if len(cd) == 3:
-                        cd = "0" + cd
-                    r[chr(s)] = unicodedata.name(chr(s)) + " | U+" + cd
-                except ValueError:
-                    pass
-        d = sh.dump_json(r)
-        sh.write(f"{root}\\jAlAnuprayogaH\\src\\src\\dattAMsh\\table\\{x}.json", d)
-        sh.write(
-            f"{root}\\saGgaNakAnuprayogaH\\src\\resources\\dattAMsh\\table\\{x}.json",
-            d,
-        )
-    except KeyError:
-        pass
 main = akSharAH
-if sh.args(0) == "langs":
-    sh.write(
-        root + r"\lok_srota\lipi\langs.json",
-        sh.dump_json(list(akSharAH.keys()), sort=True),
-    )
-    ln = {}
-    exec(
-        sh.read(sh.env("sthAnam") + r"\saGgaNakAnuprayogaH\anuvad\anuvad.py").split(
-            "# lang_list"
-        )[1]
-    )
-    sh.write(root + r"\lok_srota\lipi\i\display_langs.json", sh.dump_json(ln))
-
-    exit()
 
 
 class VAL:

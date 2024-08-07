@@ -1,0 +1,10 @@
+# Package Managers
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+node_modules
+.venv
+.svelte-kit
+build
+
+src/tools/converter/resources/dattAMsh/

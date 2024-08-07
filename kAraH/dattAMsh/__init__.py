@@ -1,7 +1,6 @@
 import os, shubhlipi as sh
 from importlib import import_module
 
-root = sh.env("sthAnam")
 a = {}
 
 
