@@ -1,6 +1,6 @@
 <script lang="ts">
 	import MainAppBar from '@components/MainAppBar.svelte';
-	import { FileButton, Accordion, AccordionItem } from '@skeletonlabs/skeleton';
+	import { FileButton, Accordion, AccordionItem, popup } from '@skeletonlabs/skeleton';
 	import type { ModalSettings } from '@skeletonlabs/skeleton';
 	import { slide, scale, fly } from 'svelte/transition';
 	import { LANG_LIST } from '@tools/lang_list';
@@ -12,15 +12,19 @@
 	import { FiCircle } from 'svelte-icons-pack/fi';
 	import { TiTick } from 'svelte-icons-pack/ti';
 	import { BiSolidDownload } from 'svelte-icons-pack/bi';
+	import { SiConvertio } from '@components/icons/icons';
 	import { getModalStore } from '@skeletonlabs/skeleton';
 	import ExcelJS from 'exceljs';
 	import { delay } from '@tools/delay';
 	import { transliterate_xlxs_file } from './xlsx_parivartak';
+	import { writable } from 'svelte/store';
+	import Preview from './Preview.svelte';
 
 	export const modalStore = getModalStore();
 
 	let file_list: FileList;
 	let file_download_links: string[] = [];
+	let file_workbooks: ExcelJS.Workbook[] = [];
 	// let file_list = [{ name: 'vAlamIki.xlsx' }, { name: 'nArada.xlxs' }]; // @warn
 
 	// default options
@@ -32,6 +36,11 @@
 	let transliterated_atleast_once = false;
 	let now_processing = false;
 
+	let file_preview_opened = writable(false);
+	let current_workbook: ExcelJS.Workbook;
+	let current_file_preview_link: string;
+	let current_file_name: string;
+
 	function clear_file_list() {
 		const modal: ModalSettings = {
 			type: 'confirm',
@@ -40,6 +49,10 @@
 			response: (resp: boolean) => {
 				if (!resp) return;
 				file_list = null!;
+				$file_preview_opened = false;
+				current_workbook = null!;
+				current_file_name = null!;
+				current_file_preview_link = null!;
 				transliterated_atleast_once = false;
 			}
 		};
@@ -64,6 +77,7 @@
 		};
 		now_processing = true;
 		file_download_links = [];
+		file_workbooks = [];
 		for (let file of file_list) {
 			if (!file) continue;
 			const workbook = await get_workbook_obj_from_file(file);
@@ -75,6 +89,7 @@
 				text_row_start_index,
 				base_lang_code
 			);
+			file_workbooks.push(workbook);
 			const buffer = await workbook.xlsx.writeBuffer();
 			const blob = new Blob([buffer], {
 				type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -105,7 +120,24 @@
 	<title>Lipi Parivartan</title>
 </svelte:head>
 <MainAppBar>
-	<div slot="start" class="font-bold">Lipi Parivartan for Excel Files</div>
+	<span slot="start" class="font-bold">Lipi Parivartan for Excel Files</span>
+	<span slot="end">
+		<a
+			class="text-xl"
+			href="/convert"
+			use:popup={{
+				event: 'hover',
+				target: 'convert_popup',
+				placement: 'bottom'
+			}}
+		>
+			<Icon src={SiConvertio} class="text-2xl hover:fill-red-700 dark:hover:fill-sky-500" />
+			<div data-popup="convert_popup" class="variant-ghost-tertiary px-1 text-base">
+				Lipi Parivartak
+				<div class="bg-surface-100-800-token arrow" />
+			</div>
+		</a>
+	</span>
 </MainAppBar>
 <div class="mt-3 space-y-4">
 	{#if !file_list}
@@ -191,7 +223,15 @@
 										class="text-xl dark:hover:text-gray-400 hover:text-gray-500 active:text-green-600"
 									/></button
 								>
-								<button class="btn p-0 m-0" disabled={now_processing}
+								<button
+									class="btn p-0 m-0"
+									disabled={now_processing}
+									on:click={() => {
+										current_workbook = file_workbooks[file_index];
+										current_file_preview_link = file_download_links[file_index];
+										current_file_name = `${file.name.substring(0, file.name.length - 5)}_transliterated.xlsx`;
+										$file_preview_opened = true;
+									}}
 									><Icon
 										src={VscPreview}
 										class="text-xl dark:hover:text-slate-400 hover:text-slate-500 active:text-blue-600"
@@ -204,6 +244,7 @@
 				</li>
 			{/each}
 		</ul>
+
 		<button
 			on:click={start_transliteration}
 			disabled={now_processing}
@@ -212,5 +253,13 @@
 			<Icon src={VscDebugStart} class="text-2xl mr-1" />
 			Start Transliteration
 		</button>
+		{#if $file_preview_opened}
+			<Preview
+				workbook={current_workbook}
+				{file_preview_opened}
+				file_name={current_file_name}
+				file_link={current_file_preview_link}
+			/>
+		{/if}
 	{/if}
 </div>
