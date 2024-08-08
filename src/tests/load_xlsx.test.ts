@@ -30,7 +30,7 @@ async function processExcelFile() {
 				await LipiLekhikA.k.load_lang(lang_code);
 				for (let i = 0; i < texts.length; i++) {
 					const text = texts[i];
-					const out = LipiLekhikA.parivartak(text, 'de', lang_code);
+					const out = LipiLekhikA.convert(text, 'de', lang_code);
 					worksheet.getCell(i + 2, col_i).value = out;
 				}
 			}

@@ -476,7 +476,7 @@ class lipi_parivartak {
 			this.store_last_of_3 = '';
 		}
 	}
-	parivartak(val, from, to, html = false, norm = true) {
+	_parivartak(val, from, to, html = false, norm = true) {
 		if (norm) {
 			from = this.k.normalize(from);
 			to = this.k.normalize(to);
@@ -672,6 +672,14 @@ class lipi_parivartak {
 		if (to == 'Tamil-Extended') return tamil_ex(res, 'to');
 		else if (l.in([from, to], 'Urdu') || l.in([from, to], 'Romanized')) return convert(to, res);
 		return res;
+	}
+	convert(val, from, to) {
+		let out = this._parivartak(val, from, to);
+		if (to === 'Normal' || to === 'Romanized') {
+			// Doing this type of a patch here, for now because its better not touch the main lipi parivartak codebase
+			for (let i = 0; i < 10; i++) out = out.replaceAll(`.${i}`, i);
+		}
+		return out;
 	}
 }
 const lipi_hlp = new lipi_helper();

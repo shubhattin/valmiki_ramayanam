@@ -43,7 +43,7 @@ export const transliterate_xlxs_file = async (
 					for (let val_pair of texts) {
 						const text = val_pair[1];
 						const i = val_pair[0];
-						const out = LipiLekhikA.parivartak(text, base_lang_code, lang_code);
+						const out = LipiLekhikA.convert(text, base_lang_code, lang_code);
 						worksheet.getCell(i, col_i).value = out;
 					}
 				}

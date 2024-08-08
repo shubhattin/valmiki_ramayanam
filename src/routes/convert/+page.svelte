@@ -26,7 +26,7 @@
 		source_lang: string,
 		target_lang: string
 	) {
-		target.set(LipiLekhikA.parivartak(source_text, source_lang, target_lang));
+		target.set(LipiLekhikA.convert(source_text, source_lang, target_lang));
 	}
 </script>
 
@@ -50,7 +50,7 @@
 				<div class="bg-surface-100-800-token arrow" />
 			</div>
 		</a>
-		<span class="ml-2 font-bold text-xl">Lipi Parivartak</span>
+		<span class="ml-2 text-xl font-bold">Lipi Parivartak</span>
 	</span>
 </MainAppBar>
 
@@ -73,7 +73,7 @@
 			on:click={() => convert_text($to_text, from_text, to_lang, from_lang)}
 			><Icon
 				src={FaCircleUp}
-				class="text-3xl dark:hover:text-gray-400 hover:text-gray-500"
+				class="text-3xl hover:text-gray-500 dark:hover:text-gray-400"
 			/></button
 		>
 		<button
@@ -81,7 +81,7 @@
 			on:click={() => convert_text($from_text, to_text, from_lang, to_lang)}
 			><Icon
 				src={FaCircleDown}
-				class="text-3xl dark:hover:text-gray-400 hover:text-gray-500"
+				class="text-3xl hover:text-gray-500 dark:hover:text-gray-400"
 			/></button
 		>
 	</div>

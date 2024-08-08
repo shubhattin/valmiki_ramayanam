@@ -18,14 +18,14 @@
 <div
 	in:slide
 	out:scale
-	class="h-11/12 min-h-[80%] max-h-[94%] fixed block left-2 top-2 z-10 w-11/12 rounded-lg border-2 border-blue-700 dark:border-blue-500 bg-[aliceblue] p-2 dark:bg-slate-800"
+	class="h-11/12 fixed left-2 top-2 z-10 block max-h-[94%] min-h-[80%] w-11/12 overflow-scroll rounded-lg border-2 border-blue-700 bg-[aliceblue] p-2 dark:border-blue-500 dark:bg-slate-800"
 >
 	<div class="ml-4 flex" style="justify-content: space-between;">
 		<span class="text-2xl">
 			<a href={file_link} class="ml-2" download={file_name}>
 				<Icon
 					src={RiSystemDownloadLine}
-					class="text-blue-800 dark:text-blue-400 dark:hover:text-blue-500 hover:text-blue-700"
+					class="text-blue-800 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-500"
 				/>
 			</a>
 		</span>
@@ -36,7 +36,7 @@
 		>
 			<Icon
 				src={CgClose}
-				class="text-4xl text-red-500 dark:text-red-400 cursor-button active:text-black dark:active:text-white"
+				class="cursor-button text-4xl text-red-500 active:text-black dark:text-red-400 dark:active:text-white"
 			/>
 		</button>
 	</div>
@@ -48,7 +48,7 @@
 		{/each}
 		<div slot="panel" class="overflow-scroll">
 			{@const worksheet = workbook.worksheets[sheet_number]}
-			<table class="table table-cell-fit table-hover">
+			<table class="table table-hover table-compact table-cell-fit">
 				<thead>
 					<tr>
 						{#each Array(worksheet.columnCount) as _, i}
@@ -62,7 +62,7 @@
 						<tr>
 							{#each Array(worksheet.columnCount) as _, column_i}
 								{@const row_value = worksheet.getCell(row_i + 2, column_i + 1).value}
-								<td>{row_value ?? ''}</td>
+								<td><pre>{row_value ?? ''}</pre></td>
 							{/each}
 						</tr>
 					{/each}

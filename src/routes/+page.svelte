@@ -194,13 +194,13 @@
 				</svelte:fragment>
 			</AccordionItem>
 		</Accordion>
-		<button class="btn variant-filled-error flex" on:click={clear_file_list}>
-			<Icon src={AiOutlineDelete} class="text-2xl mr-1" />
+		<button class="variant-filled-error btn flex" on:click={clear_file_list}>
+			<Icon src={AiOutlineDelete} class="mr-1 text-2xl" />
 			Clear File List
 		</button>
 		<ul
 			transition:slide
-			class="list border-2 border-amber-800 dark:border-yellow-600 rounded-lg p-2"
+			class="list rounded-lg border-2 border-amber-800 p-2 dark:border-yellow-600"
 		>
 			{#each file_list as file, file_index (file.name)}
 				<li class="font-bold">
@@ -210,21 +210,21 @@
 						{:else if !transliterated_atleast_once}
 							<Icon src={FiCircle} class="text-xl text-zinc-500" />
 						{:else}
-							<Icon src={TiTick} class="text-xl dark:text-green-500 text-green-600" />
+							<Icon src={TiTick} class="text-xl text-green-600 dark:text-green-500" />
 						{/if}
 						{#if transliterated_atleast_once}
 							<span in:fly>
 								<button
-									class="btn p-0 m-0"
+									class="btn m-0 p-0"
 									disabled={now_processing}
 									on:click={() => download_file(file_index)}
 									><Icon
 										src={BiSolidDownload}
-										class="text-xl dark:hover:text-gray-400 hover:text-gray-500 active:text-green-600"
+										class="text-xl hover:text-gray-500 active:text-green-600 dark:hover:text-gray-400"
 									/></button
 								>
 								<button
-									class="btn p-0 m-0"
+									class="btn m-0 p-0"
 									disabled={now_processing}
 									on:click={() => {
 										current_workbook = file_workbooks[file_index];
@@ -234,7 +234,7 @@
 									}}
 									><Icon
 										src={VscPreview}
-										class="text-xl dark:hover:text-slate-400 hover:text-slate-500 active:text-blue-600"
+										class="text-xl hover:text-slate-500 active:text-blue-600 dark:hover:text-slate-400"
 									/></button
 								>
 							</span>
@@ -248,9 +248,9 @@
 		<button
 			on:click={start_transliteration}
 			disabled={now_processing}
-			class="btn variant-outline-success font-bold dark:text-white text-green-700 flex"
+			class="variant-outline-success btn flex font-bold text-green-700 dark:text-white"
 		>
-			<Icon src={VscDebugStart} class="text-2xl mr-1" />
+			<Icon src={VscDebugStart} class="mr-1 text-2xl" />
 			Start Transliteration
 		</button>
 		{#if $file_preview_opened}

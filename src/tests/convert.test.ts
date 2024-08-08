@@ -20,7 +20,7 @@ describe('Basic Conversions', () => {
 			for (let lang in data) {
 				if (lang === 'de') continue;
 				const expected = data[lang];
-				const out_data = LipiLekhikA.parivartak(main_data, 'de', lang);
+				const out_data = LipiLekhikA.convert(main_data, 'de', lang);
 				expect(out_data).toBe(expected);
 			}
 		}
