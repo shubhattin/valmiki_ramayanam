@@ -8,8 +8,8 @@
 		<slot name="start" />
 	</svelte:fragment>
 	<!-- <svelte:fragment slot="headline">
-    <slot name="headline"><span></span></slot>
-  </svelte:fragment> -->
+		<slot name="headline"><span></span></slot>
+	</svelte:fragment> -->
 	<svelte:fragment slot="trail">
 		<slot name="end"></slot>
 		<ThemeChanger />

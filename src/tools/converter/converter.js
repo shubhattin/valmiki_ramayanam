@@ -62,8 +62,9 @@ class lipi_helper {
 			mod: 11,
 			ne: 12,
 			nep: 12,
-			Odia: 13,
+			Oriya: 13,
 			or: 13,
+			Odiya: 13,
 			pa: 14,
 			pan: 14,
 			pn: 14,
@@ -72,6 +73,7 @@ class lipi_helper {
 			'pu-de': 15,
 			'pu-dev': 15,
 			'pur-dev': 15,
+			Romanised: 16,
 			ro: 16,
 			rom: 16,
 			sa: 17,
@@ -106,17 +108,20 @@ class lipi_helper {
 		if (norm) lang = this.normalize(lang);
 		if (!(lang in this.akSharAH)) {
 			// if not loaded
-			if ('glob' in import.meta) {
-				const langs_data = import.meta.glob('./resources/dattAMsh/*.json');
-				const data = langs_data['./resources/dattAMsh/' + lang + '.json']();
+			if (import.meta.env) {
+				// this part should be used fot vitest and svelte
+				const langs_data = import.meta.glob('/src/tools/converter/resources/dattAMsh/*.json');
+				const data =
+					await langs_data['/src/tools/converter/resources/dattAMsh/' + lang + '.json']();
 				if (callback) callback();
-				this.akSharAH[lang] = data;
+				this.akSharAH[lang] = data.default[0];
 			} else {
+				// if you run file manually from cli
 				const data = JSON.parse(
 					fs.readFileSync('./src/tools/converter/resources/dattAMsh/' + lang + '.json', 'utf-8')
 				);
 				if (callback) callback();
-				this.akSharAH[lang] = data;
+				this.akSharAH[lang] = data[0];
 			}
 		} else if (callback != null) callback();
 	}
@@ -471,7 +476,7 @@ class lipi_parivartak {
 			this.store_last_of_3 = '';
 		}
 	}
-	parivartak(val, from, to, html = false, norm = true) {
+	_parivartak(val, from, to, html = false, norm = true) {
 		if (norm) {
 			from = this.k.normalize(from);
 			to = this.k.normalize(to);
@@ -667,6 +672,14 @@ class lipi_parivartak {
 		if (to == 'Tamil-Extended') return tamil_ex(res, 'to');
 		else if (l.in([from, to], 'Urdu') || l.in([from, to], 'Romanized')) return convert(to, res);
 		return res;
+	}
+	convert(val, from, to) {
+		let out = this._parivartak(val, from, to);
+		if (to === 'Normal' || to === 'Romanized') {
+			// Doing this type of a patch here, for now because its better not touch the main lipi parivartak codebase
+			for (let i = 0; i < 10; i++) out = out.replaceAll(`.${i}`, i);
+		}
+		return out;
 	}
 }
 const lipi_hlp = new lipi_helper();
