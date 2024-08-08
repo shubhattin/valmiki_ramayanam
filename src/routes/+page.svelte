@@ -12,7 +12,7 @@
 	import { FiCircle } from 'svelte-icons-pack/fi';
 	import { TiTick } from 'svelte-icons-pack/ti';
 	import { BiSolidDownload } from 'svelte-icons-pack/bi';
-	import { SiConvertio } from '@components/icons/icons';
+	import { SiConvertio } from '@components/icons';
 	import { getModalStore } from '@skeletonlabs/skeleton';
 	import type { Workbook } from 'exceljs';
 	import { delay } from '@tools/delay';
