@@ -14,6 +14,7 @@
 	import { BiSolidDownload } from 'svelte-icons-pack/bi';
 	import { SiConvertio } from '@components/icons';
 	import { getModalStore } from '@skeletonlabs/skeleton';
+	import ExcelJS from 'exceljs';
 	import type { Workbook } from 'exceljs';
 	import { delay } from '@tools/delay';
 	import { transliterate_xlxs_file } from './xlsx_parivartak';
@@ -62,7 +63,6 @@
 	async function start_transliteration() {
 		const get_workbook_obj_from_file = (file: File) => {
 			return new Promise<Workbook>(async (resolve) => {
-				const ExcelJS = (await import('exceljs')).default;
 				const workbook = new ExcelJS.Workbook();
 				const reader = new FileReader();
 				reader.onload = async (event) => {
