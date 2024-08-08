@@ -62,8 +62,9 @@ class lipi_helper {
 			mod: 11,
 			ne: 12,
 			nep: 12,
-			Odia: 13,
+			Oriya: 13,
 			or: 13,
+			Odiya: 13,
 			pa: 14,
 			pan: 14,
 			pn: 14,
@@ -72,6 +73,7 @@ class lipi_helper {
 			'pu-de': 15,
 			'pu-dev': 15,
 			'pur-dev': 15,
+			Romanised: 16,
 			ro: 16,
 			rom: 16,
 			sa: 17,
@@ -106,11 +108,12 @@ class lipi_helper {
 		if (norm) lang = this.normalize(lang);
 		if (!(lang in this.akSharAH)) {
 			// if not loaded
-			if ('glob' in import.meta) {
-				const langs_data = import.meta.glob('./resources/dattAMsh/*.json');
-				const data = langs_data['./resources/dattAMsh/' + lang + '.json']();
+			if (import.meta.env && import.meta.env.BASE_URL) {
+				const langs_data = import.meta.glob('/src/tools/converter/resources/dattAMsh/*.json');
+				const data =
+					await langs_data['/src/tools/converter/resources/dattAMsh/' + lang + '.json']();
 				if (callback) callback();
-				this.akSharAH[lang] = data;
+				this.akSharAH[lang] = data.default;
 			} else {
 				const data = JSON.parse(
 					fs.readFileSync('./src/tools/converter/resources/dattAMsh/' + lang + '.json', 'utf-8')

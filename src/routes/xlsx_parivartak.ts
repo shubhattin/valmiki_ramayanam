@@ -5,15 +5,17 @@ import LipiLekhikA from '@tools/converter';
  * To transliterate text in a given Excel file
  * @param workbook `exceljs` workbook object
  * @param sheets_to_process index of workspaces to process, `all` to process all workspaces
- * @param lang_row_index the row number in which language codes are present
- * @param text_col_index the column number in which text of `base_lang` is present
- * @param base_lang_code the language code of the base language
+ * @param lang_row_index the row number in which language codes are present, default `1`
+ * @param text_col_index the column number in which text of `base_lang` is present, default `2`
+ * @param text_row_start_index the row number from which text of `base_lang` starts, default `2`
+ * @param base_lang_code the language code of the base language, default `Sanskrit`
  */
 export const transliterate_xlxs_file = async (
 	workbook: ExcelJS.Workbook,
 	sheets_to_process: number[] | 'all' = 'all',
 	lang_row_index: number = 1,
 	text_col_index: number = 2,
+	text_row_start_index: number = 2,
 	base_lang_code: string = 'Sanskrit'
 ) => {
 	const TOTAL_SHEETS = workbook.worksheets.length;
@@ -25,9 +27,10 @@ export const transliterate_xlxs_file = async (
 
 		const lang_row = worksheet.getRow(lang_row_index);
 		const text_col = worksheet.getColumn(text_col_index);
-		const texts: string[] = [];
+		const texts: [number, string][] = [];
 		text_col.eachCell((cell, i) => {
-			if (i > 1 && cell.value) texts.push(cell.value.toString());
+			if (i >= text_row_start_index && cell.value && cell.value.toString() !== '')
+				texts.push([i, cell.value.toString()]);
 		});
 
 		const promises: Promise<void>[] = [];
@@ -37,10 +40,11 @@ export const transliterate_xlxs_file = async (
 				const lang_code = LipiLekhikA.k.normalize(lang_name);
 				if (lang_code && lang_code !== base_lang_code) {
 					await LipiLekhikA.k.load_lang(lang_code);
-					for (let i = 0; i < texts.length; i++) {
-						const text = texts[i];
+					for (let val_pair of texts) {
+						const text = val_pair[1];
+						const i = val_pair[0];
 						const out = LipiLekhikA.parivartak(text, base_lang_code, lang_code);
-						worksheet.getCell(i + 2, col_i).value = out;
+						worksheet.getCell(i, col_i).value = out;
 					}
 				}
 			})();
