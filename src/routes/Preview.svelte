@@ -5,10 +5,10 @@
 	import { scale, slide } from 'svelte/transition';
 	import { TabGroup, Tab } from '@skeletonlabs/skeleton';
 	import type { Writable } from 'svelte/store';
-	import ExcelJS from 'exceljs';
+	import type { Workbook } from 'exceljs';
 
 	export let file_link: string;
-	export let workbook: ExcelJS.Workbook;
+	export let workbook: Workbook;
 	export let file_name: string;
 	export let file_preview_opened: Writable<boolean>;
 

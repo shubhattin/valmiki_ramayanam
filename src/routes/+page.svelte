@@ -14,7 +14,7 @@
 	import { BiSolidDownload } from 'svelte-icons-pack/bi';
 	import { SiConvertio } from '@components/icons/icons';
 	import { getModalStore } from '@skeletonlabs/skeleton';
-	import ExcelJS from 'exceljs';
+	import type { Workbook } from 'exceljs';
 	import { delay } from '@tools/delay';
 	import { transliterate_xlxs_file } from './xlsx_parivartak';
 	import { writable } from 'svelte/store';
@@ -24,7 +24,7 @@
 
 	let file_list: FileList;
 	let file_download_links: string[] = [];
-	let file_workbooks: ExcelJS.Workbook[] = [];
+	let file_workbooks: Workbook[] = [];
 	// let file_list = [{ name: 'vAlamIki.xlsx' }, { name: 'nArada.xlxs' }]; // @warn
 
 	// default options
@@ -37,7 +37,7 @@
 	let now_processing = false;
 
 	let file_preview_opened = writable(false);
-	let current_workbook: ExcelJS.Workbook;
+	let current_workbook: Workbook;
 	let current_file_preview_link: string;
 	let current_file_name: string;
 
@@ -61,7 +61,8 @@
 
 	async function start_transliteration() {
 		const get_workbook_obj_from_file = (file: File) => {
-			return new Promise<ExcelJS.Workbook>((resolve) => {
+			return new Promise<Workbook>(async (resolve) => {
+				const ExcelJS = (await import('exceljs')).default;
 				const workbook = new ExcelJS.Workbook();
 				const reader = new FileReader();
 				reader.onload = async (event) => {
