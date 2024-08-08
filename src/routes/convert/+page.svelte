@@ -28,8 +28,20 @@
 	) {
 		target.set(LipiLekhikA.convert(source_text, source_lang, target_lang));
 	}
+
+	const PAGE_INFO = {
+		title: 'Lipi Parivartak',
+		desciption: 'A Indian Script Transliteration Utility'
+	};
 </script>
 
+<svelte:head>
+	<title>Lipi Parivartak</title>
+	<meta property="og:title" content={PAGE_INFO.title} />
+	<meta name="description" content={PAGE_INFO.desciption} />
+	<meta property="og:description" content={PAGE_INFO.desciption} />
+	<meta property="og:site_name" content={PAGE_INFO.title} />
+</svelte:head>
 <MainAppBar>
 	<span slot="start">
 		<a

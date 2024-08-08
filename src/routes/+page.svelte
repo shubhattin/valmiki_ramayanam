@@ -115,10 +115,19 @@
 		document.body.removeChild(a);
 		// URL.revokeObjectURL(download_link);
 	};
+
+	const PAGE_INFO = {
+		title: 'Lipi Parivartan',
+		desciption: 'A Utility to transliterate text in Excel files for Indian Scripts'
+	};
 </script>
 
 <svelte:head>
 	<title>Lipi Parivartan</title>
+	<meta property="og:title" content={PAGE_INFO.title} />
+	<meta name="description" content={PAGE_INFO.desciption} />
+	<meta property="og:description" content={PAGE_INFO.desciption} />
+	<meta property="og:site_name" content={PAGE_INFO.title} />
 </svelte:head>
 <MainAppBar>
 	<span slot="start" class="font-bold">Lipi Parivartan for Excel Files</span>

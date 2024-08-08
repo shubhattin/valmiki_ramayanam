@@ -10,8 +10,9 @@
 </script>
 
 <svelte:head>
-	<title>Lipi Parivartak</title>
+	<meta property="og:type" content="app" />
 </svelte:head>
+
 <ModeWatcher />
 <Modal />
 <div class="contaiiner mx-auto mb-1 max-w-screen-lg">
