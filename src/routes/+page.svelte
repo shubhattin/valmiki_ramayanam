@@ -19,8 +19,9 @@
 
 	export const modalStore = getModalStore();
 
-	let file_list: FileList; // @warn
-	// let file_list = [{ name: 'vAlamIki.xlsx' }, { name: 'nArada.xlxs' }];
+	let file_list: FileList;
+	let file_download_links: string[] = [];
+	// let file_list = [{ name: 'vAlamIki.xlsx' }, { name: 'nArada.xlxs' }]; // @warn
 
 	// default options
 	let lang_row_index: number = 1;
@@ -62,6 +63,7 @@
 			});
 		};
 		now_processing = true;
+		file_download_links = [];
 		for (let file of file_list) {
 			if (!file) continue;
 			const workbook = await get_workbook_obj_from_file(file);
@@ -73,11 +75,30 @@
 				text_row_start_index,
 				base_lang_code
 			);
+			const buffer = await workbook.xlsx.writeBuffer();
+			const blob = new Blob([buffer], {
+				type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+			});
+			const downloadLink = URL.createObjectURL(blob);
+			file_download_links.push(downloadLink);
 		}
-		await delay(800);
+		await delay(400);
 		now_processing = false;
 		transliterated_atleast_once = true;
 	}
+
+	const download_file = (file_index: number) => {
+		const file = file_list[file_index];
+		const download_link = file_download_links[file_index];
+
+		const a = document.createElement('a');
+		a.href = download_link;
+		a.download = `${file.name.substring(0, file.name.length - 5)}_transliterated.xlsx`;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		// URL.revokeObjectURL(download_link);
+	};
 </script>
 
 <svelte:head>
@@ -149,7 +170,7 @@
 			transition:slide
 			class="list border-2 border-amber-800 dark:border-yellow-600 rounded-lg p-2"
 		>
-			{#each file_list as file (file.name)}
+			{#each file_list as file, file_index (file.name)}
 				<li class="font-bold">
 					<span class="mr-2.5">
 						{#if now_processing}
@@ -161,7 +182,10 @@
 						{/if}
 						{#if transliterated_atleast_once}
 							<span in:fly>
-								<button class="btn p-0 m-0" disabled={now_processing}
+								<button
+									class="btn p-0 m-0"
+									disabled={now_processing}
+									on:click={() => download_file(file_index)}
 									><Icon
 										src={BiSolidDownload}
 										class="text-xl dark:hover:text-gray-400 hover:text-gray-500 active:text-green-600"

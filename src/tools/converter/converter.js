@@ -108,18 +108,20 @@ class lipi_helper {
 		if (norm) lang = this.normalize(lang);
 		if (!(lang in this.akSharAH)) {
 			// if not loaded
-			if (import.meta.env && import.meta.env.BASE_URL) {
+			if (import.meta.env) {
+				// this part should be used fot vitest and svelte
 				const langs_data = import.meta.glob('/src/tools/converter/resources/dattAMsh/*.json');
 				const data =
 					await langs_data['/src/tools/converter/resources/dattAMsh/' + lang + '.json']();
 				if (callback) callback();
-				this.akSharAH[lang] = data.default;
+				this.akSharAH[lang] = data.default[0];
 			} else {
+				// if you run file manually from cli
 				const data = JSON.parse(
 					fs.readFileSync('./src/tools/converter/resources/dattAMsh/' + lang + '.json', 'utf-8')
 				);
 				if (callback) callback();
-				this.akSharAH[lang] = data;
+				this.akSharAH[lang] = data[0];
 			}
 		} else if (callback != null) callback();
 	}

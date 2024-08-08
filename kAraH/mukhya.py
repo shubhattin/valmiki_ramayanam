@@ -380,13 +380,13 @@ def sort_dict(ln):
 for x in akSharAH:
     akSharAH[x] = sort_dict(x)
 for x in akSharAH:
-    d = sh.dump_json(akSharAH[x])
+    d = sh.dump_json([akSharAH[x]])
     chng = {
-        "[\n            ": "[",
-        ",\n            ": ", ",
-        "\n        ],": "],",
-        "\n        ],": "],",
-        "\n        ]": "]",
+        "[\n                ": "[",
+        ",\n                ": ", ",
+        "\n            ],": "],",
+        "\n            ],": "],",
+        "\n            ]": "]",
     }
     for y in chng:
         d = d.replace(y, chng[y])
@@ -394,11 +394,11 @@ for x in akSharAH:
     # only ASCII databases
     d = json.dumps(akSharAH[x], indent=4)
     chng = {
-        "[\n            ": "[",
-        ",\n            ": ", ",
-        "\n        ],": "],",
-        "\n        ],": "],",
-        "\n        ]": "]",
+        "[\n                ": "[",
+        ",\n                ": ", ",
+        "\n            ],": "],",
+        "\n            ],": "],",
+        "\n            ]": "]",
     }
     for y in chng:
         d = d.replace(y, chng[y])
