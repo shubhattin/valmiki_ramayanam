@@ -28,3 +28,6 @@ __pycache__
 a.ts
 .~lock.*
 a.xlsx
+
+data/data
+data/out
