@@ -23,16 +23,18 @@
 
 	export const modalStore = getModalStore();
 
-	let file_list: FileList;
 	let file_download_links: string[] = [];
 	let file_workbooks: Workbook[] = [];
+	let file_list: FileList;
 	// let file_list = [{ name: 'vAlamIki.xlsx' }, { name: 'nArada.xlxs' }]; // @warn
 
 	// default options
-	let lang_row_index: number = 1;
-	let text_col_index: number = 2;
-	let text_row_start_index: number = 2;
-	let base_lang_code: string = 'Sanskrit';
+	let lang_row_index = 1;
+	let text_col_index = 2;
+	let text_row_start_index = 2;
+	let base_lang_code = 'Sanskrit';
+	let file_name_prefix = '';
+	let file_name_postfix = '_transliterated';
 
 	let transliterated_atleast_once = false;
 	let now_processing = false;
@@ -55,6 +57,14 @@
 				current_file_name = null!;
 				current_file_preview_link = null!;
 				transliterated_atleast_once = false;
+
+				// resetting the defaults as well
+				lang_row_index = 1;
+				text_col_index = 2;
+				text_row_start_index = 2;
+				base_lang_code = 'Sanskrit';
+				file_name_prefix = '';
+				file_name_postfix = '_transliterated';
 			}
 		};
 		modalStore.trigger(modal);
@@ -109,11 +119,16 @@
 
 		const a = document.createElement('a');
 		a.href = download_link;
-		a.download = `${file.name.substring(0, file.name.length - 5)}_transliterated.xlsx`;
+		a.download = get_file_name_with_prefix_postfix(file.name);
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
 		// URL.revokeObjectURL(download_link);
+	};
+
+	const get_file_name_with_prefix_postfix = (name: string) => {
+		const base_name = `${name.substring(0, name.length - 5)}`;
+		return `${file_name_prefix}${base_name}${file_name_postfix}.xlsx`;
 	};
 
 	const PAGE_INFO = {
@@ -163,6 +178,7 @@
 	{/if}
 	{#if file_list && file_list.length !== 0}
 		<Accordion>
+			<!-- @warn -->
 			<AccordionItem open={false}>
 				<svelte:fragment slot="lead"><Icon src={IoOptions} class="text-3xl" /></svelte:fragment>
 				<svelte:fragment slot="summary"
@@ -171,27 +187,26 @@
 				<svelte:fragment slot="content">
 					<label class="block space-x-2">
 						<span>Language Row Number</span>
-						<input
-							type="number"
-							bind:value={lang_row_index}
-							class="inline-block rounded-lg dark:bg-surface-700"
-						/>
+						<input type="number" bind:value={lang_row_index} class="input w-16 rounded-lg" />
 					</label>
 					<label class="block space-x-2">
 						<span>Text Column Number</span>
-						<input
-							type="number"
-							bind:value={text_col_index}
-							class="inline-block rounded-lg dark:bg-surface-700"
-						/>
+						<input type="number" bind:value={text_col_index} class="input w-16 rounded-lg" />
 					</label>
 					<label class="block space-x-2">
 						<span>Text Row Start Number</span>
+						<input type="number" bind:value={text_row_start_index} class="input w-16 rounded-lg" />
+					</label>
+					<label class="block">
+						<span class="mr-2">Transliterated file name template</span>
+						<input type="text" bind:value={file_name_prefix} class="input w-28 rounded-lg p-1" />
 						<input
-							type="number"
-							bind:value={text_row_start_index}
-							class="inline-block rounded-lg dark:bg-surface-700"
+							type="text"
+							value="file_name"
+							disabled={true}
+							class="input w-20 rounded-lg p-1"
 						/>
+						<input type="text" bind:value={file_name_postfix} class="input w-36 rounded-lg p-1" />
 					</label>
 					<label class="block space-y-1">
 						<span>Base Language</span>
@@ -239,7 +254,7 @@
 									on:click={() => {
 										current_workbook = file_workbooks[file_index];
 										current_file_preview_link = file_download_links[file_index];
-										current_file_name = `${file.name.substring(0, file.name.length - 5)}_transliterated.xlsx`;
+										current_file_name = get_file_name_with_prefix_postfix(file.name);
 										$file_preview_opened = true;
 									}}
 									><Icon
