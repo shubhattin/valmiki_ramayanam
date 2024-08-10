@@ -26,8 +26,10 @@ kAraH/dattAMsh/ascii
 src/tests/data/nAradavAkyam_out.xlsx
 __pycache__
 a.ts
+a.py
 .~lock.*
 a.xlsx
 
-data/data
-data/out
+data/ramayan/data
+data/ramayan/raw_data
+data/ramayan/out
