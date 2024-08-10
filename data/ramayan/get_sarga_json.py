@@ -25,6 +25,8 @@ NUMBERS = [
     "८",
     "९",
 ]
+SINGLE_VIRAMA = "।"
+DOUBLE_VIRAMA = "॥"
 
 
 def from_dev_numbers(text: str):
@@ -56,41 +58,55 @@ def get_shloka_json(path: str):
 
     def normalize_line(line):
         line = line.strip()  # stripping the leading and trailing spaces
-        line = line.replace("  ", " ").replace(
-            "   ", ""
+        line = line.replace("   ", " ").replace(
+            "  ", ""
         )  # replace double and triple space with single
         return line
 
     prev = None
+    prev_line_not_ended = False
     for line in shlokAni:
         line = normalize_line(line)
         if line != "":
             if prev == None or prev == "":  # new shloka start
                 shloka_list.append(line)
             elif prev != "":
-                shloka_list[-1] = shloka_list[-1] + "\n" + line
-        # also check here #mw-content-text > div.mw-content-ltr.mw-parser-output > p:nth-child(7)
-        prev = line
+                if prev_line_not_ended:
+                    if prev[-1] == "-":
+                        shloka_list[-1] = (
+                            shloka_list[-1][:-1] + line
+                        )  # till -1 else - will also be included
+                    else:
+                        shloka_list[-1] = shloka_list[-1] + " " + line
+                else:
+                    shloka_list[-1] = shloka_list[-1] + "\n" + line
         # Break the shloka line flow also if end if pUrNa virAma ॥
-        if len(line) > 0 and line[-1] == "॥":
+        if len(line) > 0 and line[-1] not in (SINGLE_VIRAMA, DOUBLE_VIRAMA):
+            prev_line_not_ended = True
+        prev = line
+
+        if len(line) > 0 and line[-1] == DOUBLE_VIRAMA:
             prev = ""
 
+    # Normalizing to ॥१-४४-१॥ format
+    # originally this problem found from 1-45 onwards
     normalized_shloka_list = []
     for i in range(len(shloka_list)):
         line = shloka_list[i]
-        # normalizing to ॥१-४४-१॥ format
-        if len(line.split("॥")) == 3:  # ॥<text>॥ found
+        if len(line.split(DOUBLE_VIRAMA)) == 3:  # ॥<text>॥ found
             # stripping the info text in between ॥ before processing
-            line_split = line.split("॥")
-            line = "॥".join([line_split[0], line_split[1].strip(), line_split[2]])
+            line_split = line.split(DOUBLE_VIRAMA)
+            line = DOUBLE_VIRAMA.join(
+                [line_split[0], line_split[1].strip(), line_split[2]]
+            )
             if i == 0 or i == len(shloka_list) - 1:  # ignore for 1st and last
                 normalized_shloka_list.append(line)
                 continue
             match = re.findall(r"॥\d+-\d+-\d+॥", line)
             if not match:
-                line_split = line.split("॥")
+                line_split = line.split(DOUBLE_VIRAMA)
                 shloka_num = line_split[1]
-                line = "॥".join(
+                line = DOUBLE_VIRAMA.join(
                     [
                         line_split[0],
                         to_dev_numbers(f"{kANDa_num}-{sarga_num}-{shloka_num}"),
@@ -101,13 +117,18 @@ def get_shloka_json(path: str):
     shloka_list = normalized_shloka_list
 
     # Adding Space before pUrNa virAma ॥ and ।
+    # originally this problem found from 1-45 onwards
     spaced_shloka_list = []
     for i in range(len(shloka_list)):
         lines = shloka_list[i].splitlines()
         new_lines = []
         for line in lines:
-            if "॥" in line or "।" in line:
-                ind = line.index("॥") if "॥" in line else line.index("।")
+            if DOUBLE_VIRAMA in line or SINGLE_VIRAMA in line:
+                ind = (
+                    line.index(DOUBLE_VIRAMA)
+                    if DOUBLE_VIRAMA in line
+                    else line.index(SINGLE_VIRAMA)
+                )
                 # adding space before virAma
                 if line[ind - 1] != " ":
                     line = line[:ind] + " " + line[ind:]
