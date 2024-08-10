@@ -1,4 +1,5 @@
 import os
+import re
 import time
 
 from pyquery import PyQuery
@@ -12,6 +13,30 @@ console = Console()
 
 OUTPUT_DATA_FOLDER = "data"
 RAW_DATA_FOLDER = "raw_data"
+NUMBERS = [
+    "०",
+    "१",
+    "२",
+    "३",
+    "४",
+    "५",
+    "६",
+    "७",
+    "८",
+    "९",
+]
+
+
+def from_dev_numbers(text: str):
+    for i, num in enumerate(NUMBERS):
+        text = text.replace(num, str(i))
+    return text
+
+
+def to_dev_numbers(text: str):
+    for i, num in enumerate(NUMBERS):
+        text = text.replace(str(i), num)
+    return text
 
 
 def get_shloka_json(path: str):
@@ -24,13 +49,21 @@ def get_shloka_json(path: str):
             "#mw-content-text > div.mw-content-ltr.mw-parser-output > div.poem > p"
         ).text()
     ).splitlines()
-    shloka_list = []
-    prev = None
-    for line in shlokAni:
+    shloka_list: list[str] = []
+    # these nums are in normal formaat
+    kANDa_num = path.split("/")[-2].split(".")[0]
+    sarga_num = path.split("/")[-1].split("_")[-1].split(".")[0]
+
+    def normalize_line(line):
         line = line.strip()  # stripping the leading and trailing spaces
         line = line.replace("  ", " ").replace(
             "   ", ""
         )  # replace double and triple space with single
+        return line
+
+    prev = None
+    for line in shlokAni:
+        line = normalize_line(line)
         if line != "":
             if prev == None or prev == "":  # new shloka start
                 shloka_list.append(line)
@@ -41,7 +74,54 @@ def get_shloka_json(path: str):
         # Break the shloka line flow also if end if pUrNa virAma ॥
         if len(line) > 0 and line[-1] == "॥":
             prev = ""
+
+    normalized_shloka_list = []
+    for i in range(len(shloka_list)):
+        line = shloka_list[i]
+        # normalizing to ॥१-४४-१॥ format
+        if len(line.split("॥")) == 3:  # ॥<text>॥ found
+            # stripping the info text in between ॥ before processing
+            line_split = line.split("॥")
+            line = "॥".join([line_split[0], line_split[1].strip(), line_split[2]])
+            if i == 0 or i == len(shloka_list) - 1:  # ignore for 1st and last
+                normalized_shloka_list.append(line)
+                continue
+            match = re.findall(r"॥\d+-\d+-\d+॥", line)
+            if not match:
+                line_split = line.split("॥")
+                shloka_num = line_split[1]
+                line = "॥".join(
+                    [
+                        line_split[0],
+                        to_dev_numbers(f"{kANDa_num}-{sarga_num}-{shloka_num}"),
+                        line_split[2],
+                    ]
+                )
+        normalized_shloka_list.append(line)
+    shloka_list = normalized_shloka_list
+
+    # Adding Space before pUrNa virAma ॥ and ।
+    spaced_shloka_list = []
+    for i in range(len(shloka_list)):
+        lines = shloka_list[i].splitlines()
+        new_lines = []
+        for line in lines:
+            if "॥" in line or "।" in line:
+                ind = line.index("॥") if "॥" in line else line.index("।")
+                # adding space before virAma
+                if line[ind - 1] != " ":
+                    line = line[:ind] + " " + line[ind:]
+            new_lines.append(line)
+        line = "\n".join(new_lines)
+        spaced_shloka_list.append(line)
+    shloka_list = spaced_shloka_list
+
+    possible_last_line = html(
+        "#mw-content-text > div.mw-content-ltr.mw-parser-output > div.poem + p"
+    )  # the ending line gets missed because of some inconsitency
     out_folder = f"{path.replace(RAW_DATA_FOLDER, OUTPUT_DATA_FOLDER)[:-5]}.json"
+    if possible_last_line:
+        shloka_list.append(normalize_line(possible_last_line.text()))
     sh.write(out_folder, sh.dump_json(shloka_list, 2))
 
 

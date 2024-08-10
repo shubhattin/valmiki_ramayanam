@@ -36,6 +36,10 @@ NUMBERS = [
     "९",
 ]
 
+def from_dev_numbers(text: str):
+    for i, num in enumerate(NUMBERS):
+        text = text.replace(num, str(i))
+    return text
 
 @app.command()
 def main(
@@ -126,8 +130,7 @@ def main(
             f"{RAW_DATA_FOLDER}/{kANDa_index + 1}. {kANDa_list[kANDa_index][0]}"
         )
         sarga_numb = urllib.parse.unquote(sarga_link.split("/")[-1].split("_")[-1])
-        for i, num in enumerate(NUMBERS):
-            sarga_numb = sarga_numb.replace(num, str(i))
+        sarga_numb=from_dev_numbers(sarga_numb)
         sh.write(f"{out_folder}/{sarga_numb}.html", req.text)
         update_func()
 
