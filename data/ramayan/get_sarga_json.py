@@ -46,15 +46,63 @@ def get_shloka_json(path: str):
 
     text = sh.read(path)
     html = PyQuery(text)
-    shlokAni = str(
-        html(
-            "#mw-content-text > div.mw-content-ltr.mw-parser-output > div.poem > p"
-        ).text()
-    ).splitlines()
-    shloka_list: list[str] = []
     # these nums are in normal formaat
     kANDa_num = path.split("/")[-2].split(".")[0]
     sarga_num = path.split("/")[-1].split("_")[-1].split(".")[0]
+
+    shloka_extractor = html(
+        "#mw-content-text > div.mw-content-ltr.mw-parser-output > div.poem > p"
+    )
+    shlokAni: list[str] = []
+    if shloka_extractor:
+        # 1st structure
+        shlokAni = str(shloka_extractor.text()).splitlines()
+        SPECIAL_CASES = [  # special cases detected only after testing
+            ["7", "25"],
+            ["7", "101"],
+            ["7", "16"],
+        ]
+        for spl in SPECIAL_CASES:
+            if kANDa_num == spl[0] and sarga_num == spl[1]:
+                console.print(f"{kANDa_num}-{sarga_num}")
+    else:
+        # 2nd structure
+        # some pages have different strucure, the first noticed was 3-4
+        shloka_extractor = html(
+            "#mw-content-text > div.mw-content-ltr.mw-parser-output > div.verse > pre"
+        )
+        if shloka_extractor:
+            shlokAni = [
+                html(
+                    "#mw-content-text > div.mw-content-ltr.mw-parser-output > div.verse"
+                )
+                .prev("p")
+                .text(),
+                "",  # leaving blank to seperate it
+            ]
+            shlokAni.extend(
+                str(shloka_extractor.html()).splitlines()
+            )  # html as it is contained in a pre tag
+        else:
+            # 3rd structure
+            # some sites have this structure, first found in 2-86
+            prev_elmnt = html(
+                "#mw-content-text > div.mw-content-ltr.mw-parser-output > figure"
+            )
+            atleast_one_p_tag = False
+            while True:
+                next_p = prev_elmnt.next("p")
+                is_p_tag = next_p.is_("p")
+                if not is_p_tag:
+                    # according to structure the series is broken by a div which occurs here
+                    break
+                atleast_one_p_tag = True
+                shlokAni.extend([next_p.text(), ""])
+                prev_elmnt = next_p
+
+    # console.print(f"{kANDa_num}-{sarga_num}")
+
+    shloka_list: list[str] = []
 
     def normalize_line(line):
         line = line.strip()  # stripping the leading and trailing spaces
@@ -78,6 +126,7 @@ def get_shloka_json(path: str):
                         )  # till -1 else - will also be included
                     else:
                         shloka_list[-1] = shloka_list[-1] + " " + line
+                    prev_line_not_ended = False
                 else:
                     shloka_list[-1] = shloka_list[-1] + "\n" + line
         # Break the shloka line flow also if end if pUrNa virAma ॥
@@ -87,6 +136,16 @@ def get_shloka_json(path: str):
 
         if len(line) > 0 and line[-1] == DOUBLE_VIRAMA:
             prev = ""
+
+    possible_last_line = html(
+        "#mw-content-text > div.mw-content-ltr.mw-parser-output > div.poem + p"
+    )  # the ending line gets missed because of some inconsitency
+    if not possible_last_line:
+        possible_last_line = html(
+            "#mw-content-text > div.mw-content-ltr.mw-parser-output > div.verse + p"
+        )  # different structure, first found in 3-4
+    if possible_last_line:
+        shloka_list.append(normalize_line(possible_last_line.text()))
 
     # Normalizing to ॥१-४४-१॥ format
     # originally this problem found from 1-45 onwards
@@ -137,12 +196,7 @@ def get_shloka_json(path: str):
         spaced_shloka_list.append(line)
     shloka_list = spaced_shloka_list
 
-    possible_last_line = html(
-        "#mw-content-text > div.mw-content-ltr.mw-parser-output > div.poem + p"
-    )  # the ending line gets missed because of some inconsitency
     out_folder = f"{path.replace(RAW_DATA_FOLDER, OUTPUT_DATA_FOLDER)[:-5]}.json"
-    if possible_last_line:
-        shloka_list.append(normalize_line(possible_last_line.text()))
     sh.write(out_folder, sh.dump_json(shloka_list, 2))
 
 
