@@ -1,6 +1,9 @@
+#!/usr/bin/env python3
+
 import os
 import re
 import time
+from copy import deepcopy
 
 from pyquery import PyQuery
 import typer
@@ -94,16 +97,29 @@ def get_shloka_json(path: str):
             "#mw-content-text > div.mw-content-ltr.mw-parser-output > div.verse > pre"
         )
         if shloka_extractor:
+
+            def replace_(text):
+                # replacing bold tags as its a pre so html elements not converterted to textual counterparts,
+                replaces = {"<b>": "", "</b>": "", "'''": ""}
+                for k, v in replaces.items():
+                    text = text.replace(k, v)
+                return text
+
             shlokAni = [
-                html(
-                    "#mw-content-text > div.mw-content-ltr.mw-parser-output > div.verse"
-                )
-                .prev("p")
-                .text(),
+                replace_(
+                    html(
+                        "#mw-content-text > div.mw-content-ltr.mw-parser-output > div.verse"
+                    )
+                    .prev("p")
+                    .text()
+                ),
                 "",  # leaving blank to seperate it
             ]
+            # if sarga_num == "38" and kANDa_num == "3":
+            #     console.print([kANDa_num, sarga_num, shlokAni])
+            # sometimes the above atha(starting) line also appears in main paragraph
             shlokAni.extend(
-                str(shloka_extractor.html()).splitlines()
+                replace_(str(shloka_extractor.html())).splitlines()
             )  # html as it is contained in a pre tag
         else:
             # 3rd structure
@@ -118,8 +134,8 @@ def get_shloka_json(path: str):
                 if not is_p_tag:
                     # according to structure the series is broken by a div which occurs here
                     break
-                atleast_one_p_tag = True
                 shlokAni.extend([next_p.text(), ""])
+                atleast_one_p_tag = True
                 prev_elmnt = next_p
 
     # console.print(f"{kANDa_num}-{sarga_num}")
@@ -130,7 +146,7 @@ def get_shloka_json(path: str):
     prev_line_not_ended = False
     for line in shlokAni:
         line = normalize_line(line)
-        if line != "":
+        if line != "" and not line.startswith("<") and not line.startswith("&"):
             if prev == None or prev == "":  # new shloka start
                 shloka_list.append(line)
             elif prev != "":
@@ -151,7 +167,6 @@ def get_shloka_json(path: str):
 
         if len(line) > 0 and line[-1] == DOUBLE_VIRAMA:
             prev = ""
-
     possible_last_line = html(
         "#mw-content-text > div.mw-content-ltr.mw-parser-output > div.poem + p"
     )  # the ending line gets missed because of some inconsitency
@@ -167,12 +182,13 @@ def get_shloka_json(path: str):
     normalized_shloka_list = []
     for i in range(len(shloka_list)):
         line = shloka_list[i]
-        if len(line.split(DOUBLE_VIRAMA)) == 3:  # ॥<text>॥ found
+        line = line.replace(f"{SINGLE_VIRAMA}{SINGLE_VIRAMA}", DOUBLE_VIRAMA)
+        if len(line.split(DOUBLE_VIRAMA)) >= 3:  # ॥<text>॥ found
             # stripping the info text in between ॥ before processing
             line_split = line.split(DOUBLE_VIRAMA)
             line = DOUBLE_VIRAMA.join(
-                [line_split[0], line_split[1].strip(), line_split[2]]
-            )
+                [line_split[0], line_split[1].strip(), ""]
+            )  # add "" as after double virama should be empty
             if i == 0 or i == len(shloka_list) - 1:  # ignore for 1st and last
                 normalized_shloka_list.append(line)
                 continue
@@ -184,17 +200,22 @@ def get_shloka_json(path: str):
                     [
                         line_split[0],
                         to_dev_numbers(f"{kANDa_num}-{sarga_num}-{shloka_num}"),
-                        line_split[2],
+                        "",
                     ]
                 )
         normalized_shloka_list.append(line)
     shloka_list = normalized_shloka_list
 
-    # Adding Space before pUrNa virAma ॥ and ।
+    # Adding Space before pUrNa virAma ॥ and ।, adding ॥ if only one there
     # originally this problem found from 1-45 onwards
     spaced_shloka_list = []
     for i in range(len(shloka_list)):
-        lines = shloka_list[i].splitlines()
+        lines: list[str] = shloka_list[i].splitlines()
+        # if kANDa_num == "6" and sarga_num == "45":
+        # figure out is exactly happening here
+        #     # specific fix for 6-44-1
+        #     # lines = deepcopy(shloka_list[i])
+        #     print(len(shloka_list[i]), type(shloka_list[i]))
         new_lines = []
         for line in lines:
             if DOUBLE_VIRAMA in line or SINGLE_VIRAMA in line:
@@ -206,7 +227,10 @@ def get_shloka_json(path: str):
                 # adding space before virAma
                 if line[ind - 1] != " ":
                     line = line[:ind] + " " + line[ind:]
+            if len(line.split(DOUBLE_VIRAMA)) == 2:
+                line += DOUBLE_VIRAMA
             new_lines.append(line)
+
         line = "\n".join(new_lines)
         spaced_shloka_list.append(line)
     shloka_list = spaced_shloka_list
@@ -217,7 +241,7 @@ def get_shloka_json(path: str):
 
 @app.command()
 def main(
-    no_confirm: bool = typer.Option(True, "--no-confirm", "-y"),
+    no_confirm: bool = typer.Option(True, "--no-confirm", "-y"), run_test: bool = True
 ):
     if not os.path.isdir(RAW_DATA_FOLDER):
         console.print("[bold red]Raw Data folder not found![/]")
@@ -248,7 +272,8 @@ def main(
     console.print(f"[white bold]Time: {round(end_time-start_time)}s[/]")
 
     # running tests after each scraping
-    run_tests()
+    if run_test:
+        run_tests()
 
 
 if __name__ == "__main__":

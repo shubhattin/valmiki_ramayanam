@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os
 from concurrent.futures import ThreadPoolExecutor
 from functools import reduce
@@ -172,7 +174,9 @@ def main(
         os.remove("zipped/raw_data.7z") 
     elif not os.path.isdir("zipped"):
         sh.makedir("zipped")
-    sh.cmd("cd raw_data && 7z a -t7z -mx=9 ../zipped/raw_data.7z *", display=False)
+    return_code:int = sh.cmd("cd raw_data && 7z a -t7z -mx=9 ../zipped/raw_data.7z *", display=False)[0]
+    if return_code == 0:
+        console.print("[yellow]✓ Succesfully compressed raw data[/]")
 
 if __name__ == "__main__":
     app()

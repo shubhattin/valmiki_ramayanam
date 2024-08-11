@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os
 
 from rich.console import Console
@@ -8,14 +10,29 @@ app = Typer()
 console = Console()
 
 DATA_FOLDER = "data"
+SINGLE_VIRAMA = "।"
+DOUBLE_VIRAMA = "॥"
 
 
 def _run_tests(data: list[str], kANDa_num: int, sarga_num: int):
     if len(data) <= 2:
         console.print(f"[red bold]⚠️ [yellow]{kANDa_num}-{sarga_num}[/] is empty !![/]")
         return False
-    no_error_status = True
-    return no_error_status
+    no_error_status = {"status": True}
+
+    def print_error(text: str):
+        console.print(text)
+        no_error_status["status"] = False
+
+    # check if before a line break only single or double is sent
+    for ln_ind, lines in enumerate(data):
+        for line in lines.splitlines():
+            if line[-1] not in (SINGLE_VIRAMA, DOUBLE_VIRAMA):
+                print_error(
+                    f"{kANDa_num}-{sarga_num}-{ln_ind+1} virAma not present before \\n"
+                )
+
+    return no_error_status["status"]
 
 
 @app.command()
@@ -35,6 +52,8 @@ def run_tests():
                 no_error = False
     if no_error:
         console.print("[bold green]✓ All tests passed![/]")
+    else:
+        console.print("\n[bold red]❌ Tests failed![/]")
 
 
 if __name__ == "__main__":
