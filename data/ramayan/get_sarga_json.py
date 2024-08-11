@@ -54,6 +54,14 @@ def get_shloka_json(path: str):
         "#mw-content-text > div.mw-content-ltr.mw-parser-output > div.poem > p"
     )
     shlokAni: list[str] = []
+
+    def normalize_line(line):
+        line = line.strip()  # stripping the leading and trailing spaces
+        line = line.replace("   ", " ").replace(
+            "  ", ""
+        )  # replace double and triple space with single
+        return line
+
     if shloka_extractor:
         # 1st structure
         shlokAni = str(shloka_extractor.text()).splitlines()
@@ -64,7 +72,19 @@ def get_shloka_json(path: str):
         ]
         for spl in SPECIAL_CASES:
             if kANDa_num == spl[0] and sarga_num == spl[1]:
-                console.print(f"{kANDa_num}-{sarga_num}")
+                # 4th case
+                # we have add a blank line after every shloka ending so that they are merged into one line
+                spaced_shlokAni = []
+                for line in shlokAni:
+                    line = normalize_line(line)
+                    line = line.replace(
+                        f"{SINGLE_VIRAMA}{SINGLE_VIRAMA}", DOUBLE_VIRAMA
+                    )
+                    spaced_shlokAni.append(line)
+                    if line[-1] == DOUBLE_VIRAMA:
+                        spaced_shlokAni.append("")
+                shlokAni = spaced_shlokAni
+
     else:
         # 2nd structure
         # some pages have different strucure, the first noticed was 3-4
@@ -103,13 +123,6 @@ def get_shloka_json(path: str):
     # console.print(f"{kANDa_num}-{sarga_num}")
 
     shloka_list: list[str] = []
-
-    def normalize_line(line):
-        line = line.strip()  # stripping the leading and trailing spaces
-        line = line.replace("   ", " ").replace(
-            "  ", ""
-        )  # replace double and triple space with single
-        return line
 
     prev = None
     prev_line_not_ended = False

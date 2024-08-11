@@ -14,6 +14,8 @@ def _run_tests(data: list[str], kANDa_num: int, sarga_num: int):
     if len(data) <= 2:
         console.print(f"[red bold]⚠️ [yellow]{kANDa_num}-{sarga_num}[/] is empty !![/]")
         return False
+    no_error_status = True
+    return no_error_status
 
 
 @app.command()
@@ -32,7 +34,7 @@ def run_tests():
             if no_error and not out:
                 no_error = False
     if no_error:
-        console.print("[bold green]All tests passed![/]")
+        console.print("[bold green]✓ All tests passed![/]")
 
 
 if __name__ == "__main__":
