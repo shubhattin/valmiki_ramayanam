@@ -29,6 +29,8 @@ a.ts
 a.py
 .~lock.*
 a.xlsx
+a.json
+a.yaml
 
 data/ramayan/data
 data/ramayan/raw_data

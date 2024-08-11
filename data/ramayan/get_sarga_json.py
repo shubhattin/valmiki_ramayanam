@@ -176,7 +176,7 @@ def get_shloka_json(path: str):
         )  # different structure, first found in 3-4
     if possible_last_line:
         shloka_list.append(normalize_line(possible_last_line.text()))
-
+    shloka_list = deepcopy(shloka_list)
     # Normalizing to ॥१-४४-१॥ format
     # originally this problem found from 1-45 onwards
     normalized_shloka_list = []
@@ -204,18 +204,16 @@ def get_shloka_json(path: str):
                     ]
                 )
         normalized_shloka_list.append(line)
-    shloka_list = normalized_shloka_list
+    shloka_list = deepcopy(normalized_shloka_list)
 
     # Adding Space before pUrNa virAma ॥ and ।, adding ॥ if only one there
     # originally this problem found from 1-45 onwards
     spaced_shloka_list = []
+    # bugfix specifically for 6-44-1
+    if kANDa_num == "6" and sarga_num == "44":
+        shloka_list = shloka_list[1:]
     for i in range(len(shloka_list)):
         lines: list[str] = shloka_list[i].splitlines()
-        # if kANDa_num == "6" and sarga_num == "45":
-        # figure out is exactly happening here
-        #     # specific fix for 6-44-1
-        #     # lines = deepcopy(shloka_list[i])
-        #     print(len(shloka_list[i]), type(shloka_list[i]))
         new_lines = []
         for line in lines:
             if DOUBLE_VIRAMA in line or SINGLE_VIRAMA in line:
