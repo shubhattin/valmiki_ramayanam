@@ -8,6 +8,8 @@ from rich.console import Console
 from rich.prompt import Confirm
 import shubhlipi as sh
 
+from run_tests import run_tests
+
 app = typer.Typer()
 console = Console()
 
@@ -244,6 +246,9 @@ def main(
             get_shloka_json(path)
     end_time = time.time()
     console.print(f"[white bold]Time: {round(end_time-start_time)}s[/]")
+
+    # running tests after each scraping
+    run_tests()
 
 
 if __name__ == "__main__":

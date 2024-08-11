@@ -167,6 +167,12 @@ def main(
             f"[red]Failed kANDa-sargas : {", ".join(list(map(lambda item:f"{item[0]}-{item[1]}", FAILED_SARGA)))}[/]"
         )
 
+    # Compress the raw data
+    if os.path.isfile("zipped/raw_data.7z"):
+        os.remove("zipped/raw_data.7z") 
+    elif not os.path.isdir("zipped"):
+        sh.makedir("zipped")
+    sh.cmd("cd raw_data && 7z a -t7z -mx=9 ../zipped/raw_data.7z *", display=False)
 
 if __name__ == "__main__":
     app()
