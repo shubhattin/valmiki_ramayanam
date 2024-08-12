@@ -38,10 +38,12 @@ NUMBERS = [
     "९",
 ]
 
+
 def from_dev_numbers(text: str):
     for i, num in enumerate(NUMBERS):
         text = text.replace(num, str(i))
     return text
+
 
 @app.command()
 def main(
@@ -132,7 +134,7 @@ def main(
             f"{RAW_DATA_FOLDER}/{kANDa_index + 1}. {kANDa_list[kANDa_index][0]}"
         )
         sarga_numb = urllib.parse.unquote(sarga_link.split("/")[-1].split("_")[-1])
-        sarga_numb=from_dev_numbers(sarga_numb)
+        sarga_numb = from_dev_numbers(sarga_numb)
         sh.write(f"{out_folder}/{sarga_numb}.html", req.text)
         update_func()
 
@@ -171,12 +173,15 @@ def main(
 
     # Compress the raw data
     if os.path.isfile("zipped/raw_data.7z"):
-        os.remove("zipped/raw_data.7z") 
+        os.remove("zipped/raw_data.7z")
     elif not os.path.isdir("zipped"):
         sh.makedir("zipped")
-    return_code:int = sh.cmd("cd raw_data && 7z a -t7z -mx=9 ../zipped/raw_data.7z *", display=False)[0]
+    return_code: int = sh.cmd(
+        "cd raw_data && 7z a -t7z -mx=9 ../zipped/raw_data.7z *", display=False
+    )[0]
     if return_code == 0:
         console.print("[yellow]✓ Succesfully compressed raw data[/]")
+
 
 if __name__ == "__main__":
     app()

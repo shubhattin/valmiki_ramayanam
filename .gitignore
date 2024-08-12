@@ -30,6 +30,7 @@ a.py
 .~lock.*
 a.xlsx
 a.json
+a.txt
 a.yaml
 
 data/ramayan/data

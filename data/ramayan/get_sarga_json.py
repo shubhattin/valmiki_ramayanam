@@ -8,8 +8,11 @@ from copy import deepcopy
 from pyquery import PyQuery
 import typer
 from rich.console import Console
+from rich import print
 from rich.prompt import Confirm
 import shubhlipi as sh
+from pydantic import BaseModel
+import yaml
 
 from run_tests import run_tests
 
@@ -32,6 +35,14 @@ NUMBERS = [
 ]
 SINGLE_VIRAMA = "।"
 DOUBLE_VIRAMA = "॥"
+SPACE = " "
+DEV_RANGE = [2304, 2431]
+
+
+def in_dev_range(char: str):
+    """Check if the character is in devanagari range"""
+    code = ord(char)
+    return code <= DEV_RANGE[1] and code >= DEV_RANGE[0]
 
 
 def from_dev_numbers(text: str):
@@ -46,6 +57,43 @@ def to_dev_numbers(text: str):
     return text
 
 
+def print_text(text: str):
+    sh.write("a.txt", text)
+
+
+def get_formward_string(
+    text: str, current_index: int, forward: int, include_current_index=False
+):
+    # this is to safely get the forward string, if the forward is more than the length of the text return till last
+    current_index_modifier = int(not include_current_index)
+    return (
+        text[current_index + current_index_modifier : current_index + forward + 1]
+        if current_index + forward < len(text)
+        else text[current_index + current_index_modifier :]
+    )
+
+
+class SargaInfo(BaseModel):
+    name_devanagari: str
+    name_normal: str
+    index: int
+    shloka_count: int
+    shloka_count_extracted: int
+
+
+class KAndaInfo(BaseModel):
+    name_devanagari: str
+    name_normal: str
+    index: int
+    sarga_count: int
+    sarga_count_extracted: int
+    sarga_data: list[SargaInfo]
+
+
+DATA = [KAndaInfo(**data) for data in sh.load_json(sh.read("ramayan_map.json"))]
+SANSKRIT_NUMBER_NAMES: list[list[int, str]] = yaml.safe_load(sh.read("numbers.yaml"))
+
+
 def get_shloka_json(path: str):
     """extract the shlokas from html and save them into json"""
 
@@ -55,41 +103,35 @@ def get_shloka_json(path: str):
     kANDa_num = path.split("/")[-2].split(".")[0]
     sarga_num = path.split("/")[-1].split("_")[-1].split(".")[0]
 
+    def check_kANDa_sarga(kanda: int, sarga: int):
+        """Check if the kANDa and sarga are same"""
+        if kANDa_num == str(kanda) and sarga_num == str(sarga):
+            return True
+        return False
+
+    def check_kANDa(kanda: int):
+        """Check if the kANDa is same"""
+        if kANDa_num == str(kanda):
+            return True
+        return False
+
+    if check_kANDa(7):
+        return
+
+    # if not check_kANDa_sarga(1, 1):
+    #     return
+
+    kANDa_info = DATA[int(kANDa_num) - 1]
+    sarga_info = kANDa_info.sarga_data[int(sarga_num) - 1]
+
     shloka_extractor = html(
         "#mw-content-text > div.mw-content-ltr.mw-parser-output > div.poem > p"
     )
-    shlokAni: list[str] = []
-
-    def normalize_line(line):
-        line = line.strip()  # stripping the leading and trailing spaces
-        line = line.replace("   ", " ").replace(
-            "  ", ""
-        )  # replace double and triple space with single
-        return line
+    shlokAni: str = ""
 
     if shloka_extractor:
         # 1st structure
-        shlokAni = str(shloka_extractor.text()).splitlines()
-        SPECIAL_CASES = [  # special cases detected only after testing
-            ["7", "25"],
-            ["7", "101"],
-            ["7", "16"],
-        ]
-        for spl in SPECIAL_CASES:
-            if kANDa_num == spl[0] and sarga_num == spl[1]:
-                # 4th case
-                # we have add a blank line after every shloka ending so that they are merged into one line
-                spaced_shlokAni = []
-                for line in shlokAni:
-                    line = normalize_line(line)
-                    line = line.replace(
-                        f"{SINGLE_VIRAMA}{SINGLE_VIRAMA}", DOUBLE_VIRAMA
-                    )
-                    spaced_shlokAni.append(line)
-                    if line[-1] == DOUBLE_VIRAMA:
-                        spaced_shlokAni.append("")
-                shlokAni = spaced_shlokAni
-
+        shlokAni = str(shloka_extractor.text())
     else:
         # 2nd structure
         # some pages have different strucure, the first noticed was 3-4
@@ -97,29 +139,8 @@ def get_shloka_json(path: str):
             "#mw-content-text > div.mw-content-ltr.mw-parser-output > div.verse > pre"
         )
         if shloka_extractor:
-
-            def replace_(text):
-                # replacing bold tags as its a pre so html elements not converterted to textual counterparts,
-                replaces = {"<b>": "", "</b>": "", "'''": ""}
-                for k, v in replaces.items():
-                    text = text.replace(k, v)
-                return text
-
-            shlokAni = [
-                replace_(
-                    html(
-                        "#mw-content-text > div.mw-content-ltr.mw-parser-output > div.verse"
-                    )
-                    .prev("p")
-                    .text()
-                ),
-                "",  # leaving blank to seperate it
-            ]
-            # if sarga_num == "38" and kANDa_num == "3":
-            #     console.print([kANDa_num, sarga_num, shlokAni])
-            # sometimes the above atha(starting) line also appears in main paragraph
-            shlokAni.extend(
-                replace_(str(shloka_extractor.html())).splitlines()
+            shlokAni = str(
+                shloka_extractor.html()
             )  # html as it is contained in a pre tag
         else:
             # 3rd structure
@@ -127,113 +148,141 @@ def get_shloka_json(path: str):
             prev_elmnt = html(
                 "#mw-content-text > div.mw-content-ltr.mw-parser-output > figure"
             )
-            atleast_one_p_tag = False
             while True:
                 next_p = prev_elmnt.next("p")
                 is_p_tag = next_p.is_("p")
                 if not is_p_tag:
                     # according to structure the series is broken by a div which occurs here
                     break
-                shlokAni.extend([next_p.text(), ""])
-                atleast_one_p_tag = True
+                shlokAni += next_p.text()
                 prev_elmnt = next_p
-
-    # console.print(f"{kANDa_num}-{sarga_num}")
 
     shloka_list: list[str] = []
 
-    prev = None
-    prev_line_not_ended = False
-    for line in shlokAni:
+    def get_first_line():
+        template = (
+            lambda kANDa_dev_name, sarga_dev_name, sanskrit_number_sarga: f"श्रीमद्वाल्मीकीयरामायणे {kANDa_dev_name} {sarga_dev_name} नाम {sanskrit_number_sarga} सर्गः ॥{to_dev_numbers(kANDa_num)}-{to_dev_numbers(sarga_num)}॥"
+        )
+        e_mAtrA = "े"  # from 1st to 7nd vibhakti
+        kANDa_name = kANDa_info.name_devanagari[:-1] + e_mAtrA
+        line = template(
+            kANDa_name,
+            sarga_info.name_devanagari,
+            SANSKRIT_NUMBER_NAMES[int(sarga_num) - 1][1],
+        )
+        return line
+
+    def get_last_line():
+        template = (
+            lambda kANDa_dev_name, sanskrit_number_sarga: f"इत्यार्षे श्रीमद्रामायणे वाल्मीकीये आदिकाव्ये {kANDa_dev_name} {sanskrit_number_sarga} सर्गः ॥{to_dev_numbers(kANDa_num)}-{to_dev_numbers(sarga_num)}॥"
+        )
+        e_mAtrA = "े"
+        kANda_name = kANDa_info.name_devanagari[:-1] + e_mAtrA
+        line = template(kANda_name, SANSKRIT_NUMBER_NAMES[int(sarga_num) - 1][1])
+        return line
+
+    shloka_list.append(get_first_line())
+
+    def normalize_line(line):
+        line = line.strip()  # stripping the leading and trailing spaces
+        replaces = {
+            "<b>": "",
+            "</b>": "",
+            "'''": "",
+            f"{SINGLE_VIRAMA}{SINGLE_VIRAMA}": DOUBLE_VIRAMA,
+        }
+        for k, v in replaces.items():
+            line = line.replace(k, v)
+        return line
+
+    def is_permitted_dev_char(char: str):
+        return (
+            in_dev_range(char)
+            and char not in NUMBERS
+            and char not in (SINGLE_VIRAMA, DOUBLE_VIRAMA)
+        )
+
+    # Analysing the main shlokas
+    current_shloka: str = ""
+    line_ended: bool = False
+    shloka_numb: int = 1
+    for line in shlokAni.split("\n"):
         line = normalize_line(line)
-        if line != "" and not line.startswith("<") and not line.startswith("&"):
-            if prev == None or prev == "":  # new shloka start
-                shloka_list.append(line)
-            elif prev != "":
-                if prev_line_not_ended:
-                    if prev[-1] == "-":
-                        shloka_list[-1] = (
-                            shloka_list[-1][:-1] + line
-                        )  # till -1 else - will also be included
+        NOT_STARTS_WITH = [
+            "$",
+            "%",
+            "&",
+            "(",
+            "इत्यार्षे श्रीमद्रामायणे वाल्मीकीये",
+            "श्रीमद्वाल्मीकियरामायणे",
+            "श्रीमद्वाल्मीकीयरामायणे",
+        ]
+        continue_status = False
+        for nsw in NOT_STARTS_WITH:
+            if line.startswith(nsw):
+                continue_status = True
+                break
+        if continue_status:
+            continue
+
+        for i, char in enumerate(line):
+            if not line_ended:
+                # to be more careful before we consider the double virama
+                # we have to see that if after that it is terminated another double virama and at least one
+                # devanagari number in between
+                # the more than 1 single virama was there on 1-1-84
+                double_virama_condition = current_shloka != "" and char == DOUBLE_VIRAMA
+                if double_virama_condition:
+                    str_to_search = get_formward_string(line, i, 10)  # 3+1+3+3
+                    another_double_virama_loc = str_to_search.find(DOUBLE_VIRAMA)
+                    if another_double_virama_loc != -1:
+                        str_to_search_for_dev_numbers = str_to_search[
+                            :another_double_virama_loc
+                        ]
+                        atleast_one_dev_number_found = False
+                        for dev_num in NUMBERS:
+                            if dev_num in str_to_search_for_dev_numbers:
+                                atleast_one_dev_number_found = True
+                        if not atleast_one_dev_number_found:
+                            double_virama_condition = False
                     else:
-                        shloka_list[-1] = shloka_list[-1] + " " + line
-                    prev_line_not_ended = False
-                else:
-                    shloka_list[-1] = shloka_list[-1] + "\n" + line
-        # Break the shloka line flow also if end if pUrNa virAma ॥
-        if len(line) > 0 and line[-1] not in (SINGLE_VIRAMA, DOUBLE_VIRAMA):
-            prev_line_not_ended = True
-        prev = line
+                        double_virama_condition = False
+                        if check_kANDa_sarga(1, 1) and shloka_numb == 100:
+                            char = SINGLE_VIRAMA
 
-        if len(line) > 0 and line[-1] == DOUBLE_VIRAMA:
-            prev = ""
-    possible_last_line = html(
-        "#mw-content-text > div.mw-content-ltr.mw-parser-output > div.poem + p"
-    )  # the ending line gets missed because of some inconsitency
-    if not possible_last_line:
-        possible_last_line = html(
-            "#mw-content-text > div.mw-content-ltr.mw-parser-output > div.verse + p"
-        )  # different structure, first found in 3-4
-    if possible_last_line:
-        shloka_list.append(normalize_line(possible_last_line.text()))
-    shloka_list = deepcopy(shloka_list)
-    # Normalizing to ॥१-४४-१॥ format
-    # originally this problem found from 1-45 onwards
-    normalized_shloka_list = []
-    for i in range(len(shloka_list)):
-        line = shloka_list[i]
-        line = line.replace(f"{SINGLE_VIRAMA}{SINGLE_VIRAMA}", DOUBLE_VIRAMA)
-        if len(line.split(DOUBLE_VIRAMA)) >= 3:  # ॥<text>॥ found
-            # stripping the info text in between ॥ before processing
-            line_split = line.split(DOUBLE_VIRAMA)
-            line = DOUBLE_VIRAMA.join(
-                [line_split[0], line_split[1].strip(), ""]
-            )  # add "" as after double virama should be empty
-            if i == 0 or i == len(shloka_list) - 1:  # ignore for 1st and last
-                normalized_shloka_list.append(line)
-                continue
-            match = re.findall(r"॥\d+-\d+-\d+॥", line)
-            if not match:
-                line_split = line.split(DOUBLE_VIRAMA)
-                shloka_num = line_split[1]
-                line = DOUBLE_VIRAMA.join(
-                    [
-                        line_split[0],
-                        to_dev_numbers(f"{kANDa_num}-{sarga_num}-{shloka_num}"),
-                        "",
-                    ]
-                )
-        normalized_shloka_list.append(line)
-    shloka_list = deepcopy(normalized_shloka_list)
+                if double_virama_condition:
+                    if len(current_shloka) > 0 and current_shloka[-1] != SPACE:
+                        current_shloka += SPACE  # add space before danda if not there
+                    current_shloka += (
+                        DOUBLE_VIRAMA
+                        + to_dev_numbers(f"{kANDa_num}-{sarga_num}-{shloka_numb}")
+                        + DOUBLE_VIRAMA
+                    )
+                    shloka_list.append(current_shloka)
+                    current_shloka = ""
+                    shloka_numb += 1
+                    line_ended = False
+                elif current_shloka != "" and char == SINGLE_VIRAMA:
+                    if len(current_shloka) > 0 and current_shloka[-1] != SPACE:
+                        current_shloka += SPACE  # add space before danda if not there
+                    current_shloka += char + "\n"
+                    line_ended = True
+                elif is_permitted_dev_char(char) or (
+                    current_shloka != ""
+                    and char == SPACE
+                    and (len(current_shloka) > 0 and current_shloka[-1] != SPACE)
+                ):  # accept space if in middle of shloka only and one only one max space
+                    current_shloka += char
+            else:
+                if is_permitted_dev_char(char):
+                    current_shloka += char
+                    line_ended = False
 
-    # Adding Space before pUrNa virAma ॥ and ।, adding ॥ if only one there
-    # originally this problem found from 1-45 onwards
-    spaced_shloka_list = []
-    # bugfix specifically for 6-44-1
-    if kANDa_num == "6" and sarga_num == "44":
-        shloka_list = shloka_list[1:]
-    for i in range(len(shloka_list)):
-        lines: list[str] = shloka_list[i].splitlines()
-        new_lines = []
-        for line in lines:
-            if DOUBLE_VIRAMA in line or SINGLE_VIRAMA in line:
-                ind = (
-                    line.index(DOUBLE_VIRAMA)
-                    if DOUBLE_VIRAMA in line
-                    else line.index(SINGLE_VIRAMA)
-                )
-                # adding space before virAma
-                if line[ind - 1] != " ":
-                    line = line[:ind] + " " + line[ind:]
-            if len(line.split(DOUBLE_VIRAMA)) == 2:
-                line += DOUBLE_VIRAMA
-            new_lines.append(line)
+    shloka_list.append(get_last_line())
 
-        line = "\n".join(new_lines)
-        spaced_shloka_list.append(line)
-    shloka_list = spaced_shloka_list
+    print_text(shlokAni)
 
-    out_folder = f"{path.replace(RAW_DATA_FOLDER, OUTPUT_DATA_FOLDER)[:-5]}.json"
+    out_folder = f"{OUTPUT_DATA_FOLDER}/{kANDa_num}/{sarga_num}.json"
     sh.write(out_folder, sh.dump_json(shloka_list, 2))
 
 
@@ -256,10 +305,10 @@ def main(
         sh.makedir(OUTPUT_DATA_FOLDER)
     else:
         sh.makedir(OUTPUT_DATA_FOLDER)
-    [
-        sh.makedir(f"{OUTPUT_DATA_FOLDER}/{kANDa_name}")
-        for kANDa_name in os.listdir(RAW_DATA_FOLDER)
-    ]
+
+    for kANDa_name in os.listdir(RAW_DATA_FOLDER):
+        # Only taking the number to create json folder
+        sh.makedir(f"{OUTPUT_DATA_FOLDER}/{kANDa_name.split(".")[0]}")
 
     start_time = time.time()
     for root, _, files in os.walk(RAW_DATA_FOLDER):
@@ -270,8 +319,8 @@ def main(
     console.print(f"[white bold]Time: {round(end_time-start_time)}s[/]")
 
     # running tests after each scraping
-    if run_test:
-        run_tests()
+    # if run_test:
+    #     run_tests()
 
 
 if __name__ == "__main__":
