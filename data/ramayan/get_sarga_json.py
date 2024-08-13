@@ -5,7 +5,6 @@ import time
 
 import typer
 from rich.console import Console
-from rich import print
 from rich.prompt import Confirm
 import shubhlipi as sh
 
