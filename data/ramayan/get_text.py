@@ -118,9 +118,6 @@ def get_shloka_text(
 
 @app.command()
 def main(use_existing_text: bool = None):
-    if not os.path.isdir(RAW_DATA_FOLDER):
-        console.print("[bold red]Raw Data folder not found![/]")
-        exit(-1)
     CHOICES = ["1", "2"]
     DEFAULT_CHOICE = "1"
     choice: str = ""
@@ -136,6 +133,9 @@ def main(use_existing_text: bool = None):
         # if use existing text is true, use default choice
         choice = DEFAULT_CHOICE
     if choice == "2":
+        if not os.path.isdir(RAW_DATA_FOLDER):
+            console.print("[bold red]Raw Data folder not found![/]")
+            exit(-1)
         if os.path.isdir(OUTPUT_TEXT_FOLDER):
             choice_text_recreate = Confirm.ask(
                 "[yellow]Text Data already exists, do you want to recreate it, [red bold](Not Recommended)[/] ?[/]"
