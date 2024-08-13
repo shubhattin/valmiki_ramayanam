@@ -32,6 +32,7 @@ So before we start on how to correct manually, we need to understand that how it
   - `॥` is used to end the shloka. If it is missing the shloka will end.
 - You also do not need to worry about the numbering of the shlokas, as it is done programmatically. Just make sure that `॥` is present at the end of the shloka.
 - The starting and ending text does not needs taken care of as they will be ignored and rather added promgrammatically to the final output.(`श्रीमद्वाल्मीकीयरामायणे बालकाण्डे` and `इत्यार्षे श्रीमद्रामायणे वाल्मीकीये आदिकाव्ये` lines)
+- Do not make any changes to spacing before ॥ and ।, as they are ignored and added programmatically.
 
 ### Recording Manuall Corrections
 

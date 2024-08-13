@@ -19,7 +19,7 @@ RAW_DATA_FOLDER = "raw_data"
 
 
 def get_shloka_text(
-    kANDa_num: str, sarga_num: str, to_recreate_text_folder=False, path: str = ""
+    kANDa_num: str, sarga_num: str, to_recreate_text_folder=False, path=""
 ):
     """extract the shlokas from html and save them into text"""
 
@@ -78,6 +78,9 @@ def get_shloka_text(
         return line
 
     # Some filtering and preprocessing for text files
+    shlokAni = shlokAni.replace(
+        "-\n", ""
+    )  # removing hyphen at line end, a remnant of the line split and indentation
     new_lines = []
     for line in shlokAni.split("\n"):
         line = normalize_line(line)
@@ -114,18 +117,24 @@ def get_shloka_text(
 
 
 @app.command()
-def main():
+def main(use_existing_text: bool = None):
     if not os.path.isdir(RAW_DATA_FOLDER):
         console.print("[bold red]Raw Data folder not found![/]")
         exit(-1)
-    choices = ["1", "2"]
-    console.print(
-        "[blue]1. Use the existing text data to make programatic adjustments[/]"
-    )
-    console.print(
-        "[blue]2. Get the text data from raw data [red bold](Not Recommended)[/][/]"
-    )
-    choice = Prompt.ask("Choose an option", choices=choices, default="1")
+    CHOICES = ["1", "2"]
+    DEFAULT_CHOICE = "1"
+    choice: str = ""
+    if not use_existing_text:
+        console.print(
+            "[blue]1. Use the existing text data to make programatic adjustments[/]"
+        )
+        console.print(
+            "[blue]2. Get the text data from raw data [red bold](Not Recommended)[/][/]"
+        )
+        choice = Prompt.ask("Choose an option", choices=CHOICES, default=DEFAULT_CHOICE)
+    else:
+        # if use existing text is true, use default choice
+        choice = DEFAULT_CHOICE
     if choice == "2":
         if os.path.isdir(OUTPUT_TEXT_FOLDER):
             choice_text_recreate = Confirm.ask(
