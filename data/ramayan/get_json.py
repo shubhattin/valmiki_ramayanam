@@ -19,6 +19,7 @@ from common import (
     in_dev_range,
     get_formward_string,
     SPACE,
+    NEW_LINE,
 )
 import get_text
 
@@ -91,7 +92,7 @@ def get_shloka_json(path: str):
     current_shloka: str = ""
     line_ended: bool = False
     shloka_numb: int = 1
-    for line in shlokAni.split("\n"):
+    for line in shlokAni.split(NEW_LINE):
 
         def check_kANDa_sarga_shloka(kANDa: int, sarga: int, shloka: int):
             if check_kANDa_sarga(kANDa, sarga) and shloka_numb == shloka:
@@ -120,9 +121,8 @@ def get_shloka_json(path: str):
                             double_virama_condition = False
                     else:
                         double_virama_condition = False
-
                 if double_virama_condition:
-                    if len(current_shloka) > 0 and current_shloka[-1] != SPACE:
+                    if current_shloka[-1] != SPACE:
                         current_shloka += SPACE  # add space before danda if not there
                     current_shloka += (
                         DOUBLE_VIRAMA
@@ -134,15 +134,22 @@ def get_shloka_json(path: str):
                     shloka_numb += 1
                     line_ended = False
                 elif current_shloka != "" and char == SINGLE_VIRAMA:
-                    if len(current_shloka) > 0 and current_shloka[-1] != SPACE:
+                    if current_shloka[-1] != SPACE:
                         current_shloka += SPACE  # add space before danda if not there
-                    current_shloka += char + "\n"
+                    current_shloka += char + NEW_LINE
                     line_ended = True
                 elif is_permitted_dev_char(char) or (
                     current_shloka != ""
                     and char == SPACE
-                    and (len(current_shloka) > 0 and current_shloka[-1] != SPACE)
+                    and current_shloka[-1] != SPACE
                 ):  # accept space if in middle of shloka only and one only one max space
+                    if (
+                        current_shloka != ""
+                        and current_shloka[-1] not in (NEW_LINE, SPACE)
+                        and i == 0
+                    ):  # adding space when a single line spans across multiple lines in .txt file
+                        # using i=0 as it marks the start of the line
+                        current_shloka += " "
                     current_shloka += char
             else:
                 if is_permitted_dev_char(char):

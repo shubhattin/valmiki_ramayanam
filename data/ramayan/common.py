@@ -17,6 +17,7 @@ NUMBERS = [
 SINGLE_VIRAMA = "।"
 DOUBLE_VIRAMA = "॥"
 SPACE = " "
+NEW_LINE = "\n"
 DEV_RANGE = [2304, 2431]
 
 
