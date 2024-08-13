@@ -9,11 +9,12 @@ from typing import Callable
 
 import typer
 from rich.console import Console
-from rich.prompt import Confirm
+from rich.prompt import Confirm, Prompt
 from pyquery import PyQuery
 import requests
 import shubhlipi as sh
 from rich.progress import Progress, SpinnerColumn, BarColumn
+from common import from_dev_numbers, NUMBERS
 
 app = typer.Typer()
 console = Console()
@@ -64,6 +65,21 @@ def main(
         sh.makedir(RAW_DATA_FOLDER)
     else:
         sh.makedir(RAW_DATA_FOLDER)
+
+    console.print("[bold blue]1. Get Data from cached zip[/]")
+    console.print("[bold blue]2. Redownload (Not Recommended)[/]")
+
+    option = Prompt.ask("Select option", choices=["1", "2"], default="1")
+    if option == "1":
+        ZIP_FILE_LINK = "https://github.com/shubhattin/sanskrit_text_transliteration/releases/download/raw_data/raw_data.7z"
+        if not os.path.isdir("zipped"):
+            sh.makedir("zipped")
+        req = requests.get(ZIP_FILE_LINK, allow_redirects=True)
+        sh.write_bin("zipped/raw_data.7z", req.content)
+
+        sh.extract("zipped/raw_data.7z", RAW_DATA_FOLDER)  # only on linux
+        return
+
     scraping_url = URL if not url else url
     req = requests.get(scraping_url, headers=USER_AGENT_HEADER, timeout=5)
     if not req.ok:
