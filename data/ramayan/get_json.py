@@ -20,6 +20,7 @@ from common import (
     get_formward_string,
     SPACE,
 )
+import get_text
 
 
 app = typer.Typer()
@@ -177,6 +178,9 @@ def main(
     for kANDa_num in os.listdir(TEXT_DATA_FOLDER):
         # Only taking the number to create json folder
         sh.makedir(f"{OUTPUT_DATA_FOLDER}/{kANDa_num}")
+
+    # Running get text
+    get_text.main(use_existing_text=True)
 
     start_time = time.time()
     for root, _, files in os.walk(TEXT_DATA_FOLDER):
