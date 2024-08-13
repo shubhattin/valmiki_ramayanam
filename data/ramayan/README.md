@@ -43,4 +43,5 @@ Example change text
 
 ```text
 `1-1-100` line 3 change ॥ to ।
+`1-3-(24-39)` added । at the end of the line.
 ```

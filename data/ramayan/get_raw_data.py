@@ -26,18 +26,6 @@ USER_AGENT_HEADER = {
 }
 RAW_DATA_FOLDER = "raw_data"
 DATA_OUTPUT_FOLDER = "data"
-NUMBERS = [
-    "०",
-    "१",
-    "२",
-    "३",
-    "४",
-    "५",
-    "६",
-    "७",
-    "८",
-    "९",
-]
 
 
 def from_dev_numbers(text: str):
@@ -114,14 +102,19 @@ def main(
             sarga_link = sarga("a").attr("href")
             if sarga_link[0] == "/":
                 sarga_link = HOST_URL + sarga_link
+            sarga_name = urllib.parse.unquote(sarga_link.split("/")[-1])
+            if kANDa_index == 0 and sarga_name == "सम्पूर्णम्":
+                # ignore the last sarga of first kANDa
+                continue
+            else:
+                sarga_num = int(from_dev_numbers(sarga_name.split("_")[1]))
+                if sarga_num != len(sarga_info_per_kanda[kANDa_index]) + 1:
+                    # mismatch in sarga number from the order they appear and the actaul text/link says
+                    # altough this has not happended yet, so the current zip for raw should not have this issue
+                    console.print(
+                        f"[red]kANDa {kANDa_index+1} : {sarga_num} -> {len(sarga_info_per_kanda[kANDa_index])+1}[/]"
+                    )
             sarga_info_per_kanda[kANDa_index].append(sarga_link)
-        # in bAlakANDa remove the last saMpUrNam
-        if kANDa_index == 0:
-            name = urllib.parse.unquote(
-                sarga_info_per_kanda[0][-1].split("/")[-1].split("&")[0]
-            )
-            if name == "सम्पूर्णम्":
-                sarga_info_per_kanda[0].pop()
 
     sarga_info_per_kanda: list[list[str]] = []
     with ThreadPoolExecutor(max_workers=10) as executor:
