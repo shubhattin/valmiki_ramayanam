@@ -150,6 +150,9 @@ def get_shloka_json(path: str):
 
     shloka_list.append(get_last_line())
 
+    # Updating the shloka count of the sarga
+    sarga_info.shloka_count_extracted = len(shloka_list) - 2
+
     out_folder = f"{OUTPUT_DATA_FOLDER}/{kANDa_num}/{sarga_num}.json"
     sh.write(out_folder, sh.dump_json(shloka_list, 2))
 
@@ -187,6 +190,12 @@ def main(
             path = os.path.join(root, file)
             get_shloka_json(path)
     end_time = time.time()
+
+    # saving the DATA back into ramayan_map.json
+    sh.write(
+        "ramayan_map.json", sh.dump_json([kANDa.model_dump() for kANDa in DATA], 2)
+    )
+
     console.print(f"[white bold]Time: {round(end_time-start_time)}s[/]")
 
     # running tests after each scraping
