@@ -16,10 +16,10 @@ from common import (
     NUMBERS,
     SANSKRIT_NUMBER_NAMES,
     to_dev_numbers,
-    in_dev_range,
     get_formward_string,
     SPACE,
     NEW_LINE,
+    is_permitted_dev_char,
 )
 import get_text
 
@@ -80,13 +80,6 @@ def get_shloka_json(path: str):
         return line
 
     shloka_list.append(get_first_line())
-
-    def is_permitted_dev_char(char: str):
-        return (
-            in_dev_range(char)
-            and char not in NUMBERS
-            and char not in (SINGLE_VIRAMA, DOUBLE_VIRAMA)
-        )
 
     # Analysing the main shlokas
     current_shloka: str = ""

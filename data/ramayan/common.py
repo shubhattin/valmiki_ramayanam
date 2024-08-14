@@ -51,6 +51,15 @@ def get_formward_string(
     )
 
 
+def is_permitted_dev_char(char: str):
+    """only allow devanagari chacters exclude devanagart numbers, । and ॥"""
+    return (
+        in_dev_range(char)
+        and char not in NUMBERS
+        and char not in (SINGLE_VIRAMA, DOUBLE_VIRAMA)
+    )
+
+
 class SargaInfo(BaseModel):
     name_devanagari: str
     name_normal: str

@@ -8,7 +8,7 @@ import typer
 from rich.console import Console
 from rich.prompt import Confirm, Prompt
 import shubhlipi as sh
-from common import DOUBLE_VIRAMA, SINGLE_VIRAMA
+from common import DOUBLE_VIRAMA, SINGLE_VIRAMA, is_permitted_dev_char
 
 
 app = typer.Typer()
@@ -18,9 +18,7 @@ OUTPUT_TEXT_FOLDER = "text_data"
 RAW_DATA_FOLDER = "raw_data"
 
 
-def get_shloka_text(
-    kANDa_num: str, sarga_num: str, to_recreate_text_folder=False, path=""
-):
+def get_shloka_text(kANDa_num: str, sarga_num: str, to_recreate_text_folder=False):
     """extract the shlokas from html and save them into text"""
 
     shlokAni: str = ""
@@ -28,7 +26,7 @@ def get_shloka_text(
         # not recreating the text data, rather reiterating over it
         shlokAni = sh.read(f"{OUTPUT_TEXT_FOLDER}/{kANDa_num}/{sarga_num}.txt")
     else:
-        text = sh.read(path)
+        text = sh.read(f"{RAW_DATA_FOLDER}/{kANDa_num}/{sarga_num}.html")
         html = PyQuery(text)
 
         shloka_extractor = html(
@@ -65,7 +63,7 @@ def get_shloka_text(
 
     def normalize_line(line):
         line = line.strip()  # stripping the leading and trailing spaces
-        replaces = {
+        REPLACES = {
             "<b>": "",
             "</b>": "",
             "'''": "",
@@ -73,27 +71,32 @@ def get_shloka_text(
             f"{SINGLE_VIRAMA}{SINGLE_VIRAMA}": DOUBLE_VIRAMA,
             f"{SINGLE_VIRAMA}{DOUBLE_VIRAMA}": DOUBLE_VIRAMA,  # first found in 1-2-27
         }
-        for k, v in replaces.items():
+        for k, v in REPLACES.items():
             line = line.replace(k, v)
         return line
 
     # Some filtering and preprocessing for text files
-    shlokAni = shlokAni.replace(
-        "-\n", ""
-    )  # removing hyphen at line end, a remnant of the line split and indentation
+    DIRECT_REPLACES = {
+        "-\n": "",  # removing hyphen at line end, a remnant of the line split and indentation
+        "\n\n\n\n": "\n",
+        "\n\n\n": "\n",
+    }
+    for k, v in DIRECT_REPLACES.items():
+        shlokAni = shlokAni.replace(k, v)
     new_lines = []
     for line in shlokAni.split("\n"):
         line = normalize_line(line)
-        END_TEXTS = ("इत्यार्षे श्रीमद्रामायणे वाल्मीकीये", "इति वाल्मीकि रामायणे आदि काव्ये")
+        if line != "" and not is_permitted_dev_char(line[0]):
+            continue  # only devanagari characters excluding devanagari numbers and virAma
+        END_TEXTS = (
+            "इत्यार्षे श्रीमद्रामायणे वाल्मीकीये",
+            "इति वाल्मीकि रामायणे आदि काव्ये",
+            "इत्यार्षे श्रीमद्रामायणे श्रीमद्वाल्मीकीये",
+        )
         NOT_STARTS_WITH = [
-            "$",
-            "%",
-            "&",
-            "(",
-            "<",
-            ">",
             "श्रीमद्वाल्मीकियरामायणे",
             "श्रीमद्वाल्मीकीयरामायणे",
+            "पाठकौ घनपाठी",  # we have to safely remove this as its not aa ramayan line
         ]
         NOT_STARTS_WITH.extend(END_TEXTS)
         continue_status = False
@@ -146,23 +149,26 @@ def main(use_existing_text: bool = None):
             sh.makedir(OUTPUT_TEXT_FOLDER)
         else:
             sh.makedir(OUTPUT_TEXT_FOLDER)
-        for kANDa_name in os.listdir(RAW_DATA_FOLDER):
+        for kANDa_num in os.listdir(RAW_DATA_FOLDER):
             # Only taking the number to create json folder
-            sh.makedir(f"{OUTPUT_TEXT_FOLDER}/{kANDa_name.split(".")[0]}")
+            sh.makedir(f"{OUTPUT_TEXT_FOLDER}/{kANDa_num}")
 
     if choice == "1" and not os.path.isdir(OUTPUT_TEXT_FOLDER):
         console.print("[bold red]Text Data folder not found![/]")
         exit(-1)
 
     start_time = time.time()
-    for root, _, files in os.walk(RAW_DATA_FOLDER):
+    for root, _, files in os.walk(
+        RAW_DATA_FOLDER if choice == "2" else OUTPUT_TEXT_FOLDER
+    ):
         for file in files:
             path = os.path.join(root, file)
-            kANDa_num = path.split("/")[-2].split(".")[0]
-            sarga_num = path.split("/")[-1].split("_")[-1].split(".")[0]
-            get_shloka_text(kANDa_num, sarga_num, choice == "2", path)
+            kANDa_num = path.split("/")[-2]
+            sarga_num = path.split("/")[-1].split(".")[0]
+            get_shloka_text(kANDa_num, sarga_num, choice == "2")
     end_time = time.time()
-    console.print(f"[white bold]Time: {round(end_time-start_time)}s[/]")
+    if not use_existing_text:
+        console.print(f"[white bold]Time: {round(end_time-start_time)}s[/]")
 
 
 if __name__ == "__main__":

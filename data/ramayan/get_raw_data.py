@@ -76,17 +76,17 @@ def main(
     # Getting kANDa list -> name and link
     html = PyQuery(req.text)
     kANDa_ref = html("#mw-content-text > div.mw-content-ltr.mw-parser-output > ol li")
-    kANDa_list: list[list[str]] = []  # name, link
+    kANDa_link_list: list[str] = []  # name, link
     i = 1
-    for kANDa in kANDa_ref.items():
-        kANDa_name = kANDa.text()
-        sh.makedir(f"{RAW_DATA_FOLDER}/{i}. {kANDa_name}")
-        kANDa_link = str(kANDa("a").attr("href"))
+    for kANDa_link in kANDa_ref.items():
+        # kANDa_name = kANDa_link.text()
+        sh.makedir(f"{RAW_DATA_FOLDER}/{i}")
+        kANDa_link = str(kANDa_link("a").attr("href"))
         if kANDa_link[0] == "/":
             kANDa_link = HOST_URL + kANDa_link
-        kANDa_list.append([kANDa_name, kANDa_link])
+        kANDa_link_list.append(kANDa_link)
         i += 1
-    console.print(f"Number of kANDa found : {len(kANDa_list)}")
+    console.print(f"[yellow]Number of kANDa found : {len(kANDa_link_list)}[/]")
 
     # Getting sarga info(link) of each kANDa
     def get_sarga_links_list(sarga_link: str, kANDa_index):
@@ -118,10 +118,10 @@ def main(
 
     sarga_info_per_kanda: list[list[str]] = []
     with ThreadPoolExecutor(max_workers=10) as executor:
-        for i, kANDa in enumerate(kANDa_list):
+        for i, kANDa_link in enumerate(kANDa_link_list):
             sarga_info_per_kanda.append([])
             executor.submit(
-                get_sarga_links_list, kANDa[1], i
+                get_sarga_links_list, kANDa_link, i
             )  # passing link to get_sarga_links_list
     TOTAL_SARGA = reduce(lambda prev, lst: prev + len(lst), sarga_info_per_kanda, 0)
     console.print(f"[bold]Total sarga found : {TOTAL_SARGA}[/]")
@@ -140,7 +140,7 @@ def main(
             update_func()
             return
         out_folder = (
-            f"{RAW_DATA_FOLDER}/{kANDa_index + 1}. {kANDa_list[kANDa_index][0]}"
+            f"{RAW_DATA_FOLDER}/{kANDa_index + 1}"
         )
         sarga_numb = urllib.parse.unquote(sarga_link.split("/")[-1].split("_")[-1])
         sarga_numb = from_dev_numbers(sarga_numb)
@@ -163,7 +163,7 @@ def main(
             progress.update(task_progress, advance=1)
 
         with ThreadPoolExecutor(max_workers=300) as executor:
-            for kANDa_index in range(len(kANDa_list)):
+            for kANDa_index in range(len(kANDa_link_list)):
                 for sarga_link in sarga_info_per_kanda[kANDa_index]:
                     executor.submit(
                         get_sarga_info,
