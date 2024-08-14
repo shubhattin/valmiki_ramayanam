@@ -16,7 +16,6 @@ from common import (
     NUMBERS,
     SANSKRIT_NUMBER_NAMES,
     to_dev_numbers,
-    get_formward_string,
     SPACE,
     NEW_LINE,
     is_permitted_dev_char,
@@ -98,9 +97,9 @@ def get_shloka_json(path: str):
                 # we have to see that if after that it is terminated another double virama and at least one
                 # devanagari number in between
                 # the more than 1 single virama was there on 1-1-84
-                double_virama_condition = current_shloka != "" and char == DOUBLE_VIRAMA
-                if double_virama_condition:
-                    str_to_search = get_formward_string(line, i, 10)  # 3+1+3+3
+                DOUBLE_VIRAMA_CONDITION = current_shloka != "" and char == DOUBLE_VIRAMA
+                if DOUBLE_VIRAMA_CONDITION:
+                    str_to_search = line[i + 1 :]
                     another_double_virama_loc = str_to_search.find(DOUBLE_VIRAMA)
                     if another_double_virama_loc != -1:
                         str_to_search_for_dev_numbers = str_to_search[
@@ -111,10 +110,10 @@ def get_shloka_json(path: str):
                             if dev_num in str_to_search_for_dev_numbers:
                                 atleast_one_dev_number_found = True
                         if not atleast_one_dev_number_found:
-                            double_virama_condition = False
+                            DOUBLE_VIRAMA_CONDITION = False
                     else:
-                        double_virama_condition = False
-                if double_virama_condition:
+                        DOUBLE_VIRAMA_CONDITION = False
+                if DOUBLE_VIRAMA_CONDITION:
                     if current_shloka[-1] != SPACE:
                         current_shloka += SPACE  # add space before danda if not there
                     current_shloka += (

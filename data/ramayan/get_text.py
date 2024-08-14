@@ -63,7 +63,7 @@ def get_shloka_text(kANDa_num: str, sarga_num: str, to_recreate_text_folder=Fals
 
     def normalize_line(line):
         line = line.strip()  # stripping the leading and trailing spaces
-        REPLACES = {
+        PER_LINE_REPLACES = {
             "<b>": "",
             "</b>": "",
             "'''": "",
@@ -71,23 +71,23 @@ def get_shloka_text(kANDa_num: str, sarga_num: str, to_recreate_text_folder=Fals
             f"{SINGLE_VIRAMA}{SINGLE_VIRAMA}": DOUBLE_VIRAMA,
             f"{SINGLE_VIRAMA}{DOUBLE_VIRAMA}": DOUBLE_VIRAMA,  # first found in 1-2-27
         }
-        for k, v in REPLACES.items():
+        for k, v in PER_LINE_REPLACES.items():
             line = line.replace(k, v)
         return line
 
     # Some filtering and preprocessing for text files
     DIRECT_REPLACES = {
-        "-\n": "",  # removing hyphen at line end, a remnant of the line split and indentation
-        "\n\n\n\n": "\n",
-        "\n\n\n": "\n",
+        "-\n": "",  # removing hyphen at line end, a remnant of the word split
+        # "\n\n\n\n": "\n",
+        # "\n\n\n": "\n",
     }
     for k, v in DIRECT_REPLACES.items():
         shlokAni = shlokAni.replace(k, v)
     new_lines = []
     for line in shlokAni.split("\n"):
         line = normalize_line(line)
-        if line != "" and not is_permitted_dev_char(line[0]):
-            continue  # only devanagari characters excluding devanagari numbers and virAma
+        # if line != "" and not is_permitted_dev_char(line[0]):
+        #     continue  # only devanagari characters excluding devanagari numbers and virAma
         END_TEXTS = (
             "इत्यार्षे श्रीमद्रामायणे वाल्मीकीये",
             "इति वाल्मीकि रामायणे आदि काव्ये",
