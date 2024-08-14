@@ -4,6 +4,7 @@
   1. `1-1-100` line 3 change ॥ to ।
   1. `1-3-(24-39)` added ।
   1. `1-10` added । to every 1st line
+  1. `1-14-59` added ।
   1. `1-17-37` added ।
   1. `1-34-(9-13)` added ।
   1. `1-36-28` added ।
