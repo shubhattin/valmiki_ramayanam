@@ -62,9 +62,13 @@ def get_shloka_json(path: str):
         )
         e_mAtrA = "े"  # from 1st to 7nd vibhakti
         kANDa_name = kANDa_info.name_devanagari[:-1] + e_mAtrA
+        sarga_name = sarga_info.name_devanagari
+        if kANDa_num == "7" and sarga_name.count(NEW_LINE) > 0:
+            # if more than one name for sarga, then use the first (uttarakANDa)
+            sarga_name = sarga_name.splitlines()[0]
         line = template(
             kANDa_name,
-            sarga_info.name_devanagari,
+            sarga_name,
             SANSKRIT_NUMBER_NAMES[int(sarga_num) - 1][1],
         )
         return line

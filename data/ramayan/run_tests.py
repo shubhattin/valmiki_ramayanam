@@ -44,8 +44,8 @@ def run_tests():
     for root, _, files in os.walk(DATA_FOLDER):
         for file in files:
             path = os.path.join(root, file)
-            kANDa_num = path.split("/")[-2].split(".")[0]
-            sarga_num = path.split("/")[-1].split("_")[-1].split(".")[0]
+            kANDa_num = path.split("/")[-2]
+            sarga_num = path.split("/")[-1].split(".")[0]
             data = sh.load_json(sh.read(path))
             out = _run_tests(data, kANDa_num, sarga_num)
             if no_error and not out:

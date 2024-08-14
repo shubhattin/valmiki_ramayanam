@@ -139,9 +139,7 @@ def main(
             FAILED_SARGA.append([kANDa_index + 1, sarga_numb + 1])
             update_func()
             return
-        out_folder = (
-            f"{RAW_DATA_FOLDER}/{kANDa_index + 1}"
-        )
+        out_folder = f"{RAW_DATA_FOLDER}/{kANDa_index + 1}"
         sarga_numb = urllib.parse.unquote(sarga_link.split("/")[-1].split("_")[-1])
         sarga_numb = from_dev_numbers(sarga_numb)
         sh.write(f"{out_folder}/{sarga_numb}.html", req.text)
