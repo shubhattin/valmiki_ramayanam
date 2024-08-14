@@ -57,7 +57,7 @@ def run_tests():
     sh.write("test_output.md", RENDERRED_OUTPUT)
     if no_error:
         console.print("[bold green]✓ All tests passed![/]")
-        exit(0)
+        exit(-1)
     else:
         console.print("\n[bold red]❌ Tests failed![/]")
         exit(-1)
