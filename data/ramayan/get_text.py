@@ -78,16 +78,16 @@ def get_shloka_text(kANDa_num: str, sarga_num: str, to_recreate_text_folder=Fals
     # Some filtering and preprocessing for text files
     DIRECT_REPLACES = {
         "-\n": "",  # removing hyphen at line end, a remnant of the word split
-        # "\n\n\n\n": "\n",
-        # "\n\n\n": "\n",
+        "\n\n\n\n": "\n",
+        "\n\n\n": "\n",
     }
     for k, v in DIRECT_REPLACES.items():
         shlokAni = shlokAni.replace(k, v)
     new_lines = []
     for line in shlokAni.split("\n"):
         line = normalize_line(line)
-        # if line != "" and not is_permitted_dev_char(line[0]):
-        #     continue  # only devanagari characters excluding devanagari numbers and virAma
+        if line != "" and not is_permitted_dev_char(line[0]):
+            continue  # only devanagari characters excluding devanagari numbers and virAma
         END_TEXTS = (
             "इत्यार्षे श्रीमद्रामायणे वाल्मीकीये",
             "इति वाल्मीकि रामायणे आदि काव्ये",
