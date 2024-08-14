@@ -4,7 +4,7 @@ This is a extarct to scape data from [विकिस्रोत](https://sa.wi
 
 ## Data Scraping
 
-We scape data from the main vikisrot page of the Ramayana and then from each of the kandas. We then extract the text from each of the shlokas, and store it in text_data folder.
+We scape data from the main vikisrot page of the Ramayana and then from each of the kandas. We then extract the text from each of the shlokas, and store it in [text_data](./text_data/) folder. Also we process it further to generate the json data which is stored in the [data](./data/) folder, which is the main final output.
 
 ## Standardization
 
@@ -34,14 +34,20 @@ So before we start on how to correct manually, we need to understand that how it
 - The starting and ending text does not needs taken care of as they will be ignored and rather added promgrammatically to the final output.(`श्रीमद्वाल्मीकीयरामायणे बालकाण्डे` and `इत्यार्षे श्रीमद्रामायणे वाल्मीकीये आदिकाव्ये` lines)
 - Do not make any changes to spacing before ॥ and ।, as they are ignored and added programmatically.
 
+### **_Files to change_**
+
+- **Text Data** : It is stored in the [text_data](./text_data/) folder. The manual changes to be made shall be done in this folder. The folder format for files is `kANDa_number/sarga_number.txt`.
+- **JSON Data** : No change should be direct made to **_[data](./data/)_** folder as it contains json data which is build output generated from the text_data folder. So if the text_data is correctly changed output should also be correct.
+- **Normally** if you are submitiing any changes to the text_data folder, you need not worry about generating the json output as it will be done by me when i merge the changes.
+
 ### Recording Manuall Corrections
 
 We also recommend that you add the corrections you make to [Manual_Changes.md](./Manual_Changes.md) file, so that we can keep track of the changes made.
-Example change text
+Example change text.
 
 > :warning: You shoould know `markdown` in order to make changes to the file.
 
-```text
+```markdown
 `1-1-100` line 3 change ॥ to ।
 `1-3-(24-39)` added । at the end of the line.
 ```
