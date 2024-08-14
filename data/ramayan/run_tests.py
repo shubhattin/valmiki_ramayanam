@@ -5,6 +5,7 @@ import os
 from rich.console import Console
 from typer import Typer
 import shubhlipi as sh
+from common import render_template
 
 app = Typer()
 console = Console()
@@ -50,10 +51,16 @@ def run_tests():
             out = _run_tests(data, kANDa_num, sarga_num)
             if no_error and not out:
                 no_error = False
+    RENDER_DATA = {"no_error": no_error}
+    RENDERRED_OUTPUT = render_template("test_out_template.md", **RENDER_DATA)
+    os.environ["GITHUB_STEP_SUMMARY"] = RENDERRED_OUTPUT
+    sh.write("test_output.md", RENDERRED_OUTPUT)
     if no_error:
         console.print("[bold green]✓ All tests passed![/]")
+        exit(0)
     else:
         console.print("\n[bold red]❌ Tests failed![/]")
+        exit(-1)
 
 
 if __name__ == "__main__":

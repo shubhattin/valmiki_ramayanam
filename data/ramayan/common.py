@@ -1,6 +1,7 @@
 import shubhlipi as sh
 from pydantic import BaseModel
 import yaml
+import jinja2
 
 NUMBERS = [
     "०",
@@ -79,3 +80,13 @@ class KAndaInfo(BaseModel):
 
 DATA = [KAndaInfo(**data) for data in sh.load_json(sh.read("ramayan_map.json"))]
 SANSKRIT_NUMBER_NAMES: list[list[int, str]] = yaml.safe_load(sh.read("numbers.yaml"))
+
+TEMPLATE_FOLDER = "template"
+
+
+def render_template(fl_name: str, **o) -> str:
+    return (
+        jinja2.Environment(loader=jinja2.FileSystemLoader("template"))
+        .get_template(fl_name)
+        .render(**o)
+    )

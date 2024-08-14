@@ -7,6 +7,7 @@ rich
 pydantic
 requests
 pyyaml
+jinja2
 
 # Other
 shubhlipi

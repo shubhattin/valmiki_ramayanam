@@ -1,0 +1,26 @@
+name: Ramayan CI
+
+on:
+  - push
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Setup Python version 3.10
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10
+      # set working directory to data/ramayan
+      # Install dependencies
+      - name: Install dependencies
+        working-directory: data/ramayan
+        run: |
+          pip insatll --upgrade pip
+          pip install -r requirements.txt
+      - name: Run tests
+        working-directory: data/ramayan
+        run: |
+          python3 run_tests.py
