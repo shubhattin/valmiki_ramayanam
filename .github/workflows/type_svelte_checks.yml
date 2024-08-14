@@ -1,4 +1,4 @@
-name: TS & Svelte Check
+name: Vitest Checks
 
 on:
   - push
