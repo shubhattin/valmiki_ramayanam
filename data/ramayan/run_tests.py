@@ -46,6 +46,10 @@ TEST_INFO: list[TestInfo] = [
         test_info="Sargas with Shloka count variance (`L → extracted|R → book|difference from book`)",
         report_test_fail_if_found=False,
     ),  # 4
+    TestInfo(
+        test_title=f"Check for {DOUBLE_VIRAMA} at the end of shloka",
+        test_info="Double virAma not present at the end in these shlokas",
+    ),  # 5
 ]
 
 
@@ -61,25 +65,30 @@ def _run_tests(data: list[str], kANDa_num: str, sarga_num: str):
     EMPTY_TEST = TEST_INFO[0]
     if len(data) <= 2:
         EMPTY_TEST.failed_cases.append(f"{kANDa_num}-{sarga_num}")
+        return
     # if check_kANDa_sarga(2, 1):
     #     EMPTY_TEST.failed_cases.append("1-16")
     #     EMPTY_TEST.failed_cases.append("2-37")
+    #     return
 
     # check if before a line break only single or double is sent
     # this test case actually is not needed after we have updared our json extraction algorithm
     VIRAMA_TEST = TEST_INFO[1]
     SINGLE_LINE_TEST = TEST_INFO[2]
     MORE_THAN_3_TEST = TEST_INFO[3]
+    DOUBLE_VIRAMA_TEST = TEST_INFO[5]
     for ln_ind, lines in enumerate(data):
         # ln_ind will act as shloka number as first line in start
+        if lines.count(DOUBLE_VIRAMA) != 2:
+            DOUBLE_VIRAMA_TEST.failed_cases.append(f"{kANDa_num}-{sarga_num}-{ln_ind}")
         for line in lines.splitlines():
             if line[-1] not in (
                 SINGLE_VIRAMA,
                 DOUBLE_VIRAMA,
             ):
                 VIRAMA_TEST.failed_cases.append(f"{kANDa_num}-{sarga_num}-{ln_ind}")
-            if check_kANDa_sarga(1, 1):
-                VIRAMA_TEST.failed_cases.append(f"{kANDa_num}-{sarga_num}-{ln_ind+1}")
+        # if check_kANDa_sarga(1, 1):
+        #     VIRAMA_TEST.failed_cases.append(f"{kANDa_num}-{sarga_num}-{ln_ind+1}")
         if ln_ind not in (0, len(data) - 1):
             if lines.count(NEW_LINE) == 0:
                 # if not starting or ending line but still a single line
