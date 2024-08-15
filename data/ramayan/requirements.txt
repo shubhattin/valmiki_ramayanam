@@ -8,6 +8,7 @@ pydantic
 requests
 pyyaml
 jinja2
+pyquery
 
 # Other
 shubhlipi
