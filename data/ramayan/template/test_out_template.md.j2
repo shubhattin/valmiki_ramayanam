@@ -10,7 +10,17 @@
 ## {% if test_case.failed_cases|length == 0 %}✔{% else %}✗{% endif %} {{ test_case.test_title|safe }}
 
 {% if test_case.failed_cases|length > 0 -%}
-{{test_case.test_info|safe}}, Total={{test_case.failed_cases|length}} : `{{"`, `".join(test_case.failed_cases)|safe}}`
+{{test_case.test_info|safe}}
+
+Total: {{test_case.failed_cases|length}}
+
+{# We have to segment results into sarga 1 to 7 #}
+{%- for sarga_num in range(1,8) %}
+{%- set starting_with_sarga = filter_function(test_case.failed_cases, sarga_num) -%}
+{%- if starting_with_sarga|length > 0 %}
+- **_Sarga {{sarga_num}}_**, Σ={{starting_with_sarga|length}} : `{{"`, `".join(starting_with_sarga)|safe}}`
+{%- endif -%}
+{% endfor %}
 {%- endif %}
 
 {%- endif %}
@@ -31,7 +41,7 @@ Total: {{test_case.failed_cases|length}}
 {%- for sarga_num in range(1,8) %}
 {%- set starting_with_sarga = filter_function(test_case.failed_cases, sarga_num) -%}
 {%- if starting_with_sarga|length > 0 %}
-- _Sarga {{sarga_num}}_ : `{{"`, `".join(starting_with_sarga)|safe}}`
+- **_Sarga {{sarga_num}}_**, Σ={{starting_with_sarga|length}} : `{{"`, `".join(starting_with_sarga)|safe}}`
 {%- endif -%}
 {% endfor %}
 {%- endif %}

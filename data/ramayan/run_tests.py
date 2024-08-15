@@ -78,8 +78,8 @@ def _run_tests(data: list[str], kANDa_num: str, sarga_num: str):
                 DOUBLE_VIRAMA,
             ):
                 VIRAMA_TEST.failed_cases.append(f"{kANDa_num}-{sarga_num}-{ln_ind}")
-            # if check_kANDa_sarga(1, 1):
-            #     VIRAMA_TEST.failed_cases.append(f"{kANDa_num}-{sarga_num}-{ln_ind+1}")
+            if check_kANDa_sarga(1, 1):
+                VIRAMA_TEST.failed_cases.append(f"{kANDa_num}-{sarga_num}-{ln_ind+1}")
         if ln_ind not in (0, len(data) - 1):
             if lines.count(NEW_LINE) == 0:
                 # if not starting or ending line but still a single line
