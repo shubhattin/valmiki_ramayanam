@@ -58,7 +58,8 @@ async function main() {
 	}
 	const end_time = Date.now();
 	console.log('Time :', ((end_time - start_time) / 1000).toPrecision(2), 'seconds');
-	// $ cd out && 7z a -t7z -mx=9 ../zipped/rAmAyaNam.7z *
-	// run the above shell command
+
+	// compressing
+	exec(`cd ${OUT_FOLDER} && 7z a -t7z -mx=9 ../zipped/rAmAyaNam.7z *`);
 }
 main();
