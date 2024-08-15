@@ -9,6 +9,7 @@ requests
 pyyaml
 jinja2
 pyquery
+black
 
 # Other
 shubhlipi
