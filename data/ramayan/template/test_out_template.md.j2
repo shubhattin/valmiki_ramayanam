@@ -10,20 +10,30 @@
 ## {% if test_case.failed_cases|length == 0 %}✔{% else %}✗{% endif %} {{ test_case.test_title|safe }}
 
 {% if test_case.failed_cases|length > 0 -%}
-_{{test_case.test_info}}_ : `{{"`, `".join(test_case.failed_cases)|safe}}`
+{{test_case.test_info|safe}}, Total={{test_case.failed_cases|length}} : `{{"`, `".join(test_case.failed_cases)|safe}}`
 {%- endif %}
 
 {%- endif %}
 {%- endfor %}
 
-## Checks that need manual verification and attention
+## :warning: Checks that need manual verification and attention
 
 {%- for test_case in test_info %}
 {%- if not test_case.report_test_fail_if_found %}
 ### {% if test_case.failed_cases|length == 0 %}✔{% endif %} {{ test_case.test_title|safe }}
 
 {% if test_case.failed_cases|length > 0 -%}
-_{{test_case.test_info}}_ : `{{"`, `".join(test_case.failed_cases)|safe}}`
+{{test_case.test_info|safe}}
+
+Total: {{test_case.failed_cases|length}}
+
+{# We have to segment results into sarga 1 to 7 #}
+{%- for sarga_num in range(1,8) %}
+{%- set starting_with_sarga = filter_function(test_case.failed_cases, sarga_num) -%}
+{%- if starting_with_sarga|length > 0 %}
+- _Sarga {{sarga_num}}_ : `{{"`, `".join(starting_with_sarga)|safe}}`
+{%- endif -%}
+{% endfor %}
 {%- endif %}
 
 {%- endif %}

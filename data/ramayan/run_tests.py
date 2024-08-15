@@ -43,7 +43,7 @@ TEST_INFO: list[TestInfo] = [
     ),  # 3
     TestInfo(
         test_title="Variance in Shloka Count from Book Source",
-        test_info="Sargas with Shloka count variance (L → extracted, R → book)",
+        test_info="Sargas with Shloka count variance (`L → extracted|R → book|difference from book`)",
         report_test_fail_if_found=False,
     ),  # 4
 ]
@@ -77,25 +77,31 @@ def _run_tests(data: list[str], kANDa_num: str, sarga_num: str):
                 SINGLE_VIRAMA,
                 DOUBLE_VIRAMA,
             ):
-                VIRAMA_TEST.failed_cases.append(f"{kANDa_num}-{sarga_num}-{ln_ind+1}")
+                VIRAMA_TEST.failed_cases.append(f"{kANDa_num}-{sarga_num}-{ln_ind}")
             # if check_kANDa_sarga(1, 1):
             #     VIRAMA_TEST.failed_cases.append(f"{kANDa_num}-{sarga_num}-{ln_ind+1}")
         if ln_ind not in (0, len(data) - 1):
             if lines.count(NEW_LINE) == 0:
                 # if not starting or ending line but still a single line
                 SINGLE_LINE_TEST.failed_cases.append(
-                    f"{kANDa_num}-{sarga_num}-{ln_ind+1}"
+                    f"{kANDa_num}-{sarga_num}-{ln_ind}"
                 )
             elif lines.count(NEW_LINE) >= 3:  # checking for 4 lined and more
                 MORE_THAN_3_TEST.failed_cases.append(
-                    f"{kANDa_num}-{sarga_num}-{ln_ind+1} → {lines.count(NEW_LINE) + 1}"
+                    f"{kANDa_num}-{sarga_num}-{ln_ind} → {lines.count(NEW_LINE) + 1}"
                 )
 
     SARGA_SHLOKA_COUNT_TEST = TEST_INFO[4]
     sarga_info = DATA[int(kANDa_num) - 1].sarga_data[int(sarga_num) - 1]
     if sarga_info.shloka_count != sarga_info.shloka_count_extracted:
         SARGA_SHLOKA_COUNT_TEST.failed_cases.append(
-            f"{kANDa_num}-{sarga_num} → {sarga_info.shloka_count_extracted}|{sarga_info.shloka_count}"
+            f"{kANDa_num}-{sarga_num} → {sarga_info.shloka_count_extracted}|{sarga_info.shloka_count}| "
+            + (
+                "+"
+                if sarga_info.shloka_count_extracted > sarga_info.shloka_count
+                else "-"
+            )
+            + f"{abs(sarga_info.shloka_count_extracted - sarga_info.shloka_count)}"
         )
 
 
@@ -115,14 +121,20 @@ def run_tests():
     all_tests_passed = (
         reduce(
             lambda prev, val: (
-                prev + len(val.failed_cases) if val.report_test_fail_if_found else 0
+                prev + (len(val.failed_cases) if val.report_test_fail_if_found else 0)
             ),
             TEST_INFO,
             0,
         )
         == 0
     )  # if no failed cases
-    RENDER_DATA = {"all_tests_passed": all_tests_passed, "test_info": TEST_INFO}
+    RENDER_DATA = {
+        "all_tests_passed": all_tests_passed,
+        "test_info": TEST_INFO,
+        "filter_function": lambda lst, start_text: list(
+            filter(lambda x: x.startswith(f"{start_text}-"), lst)
+        ),
+    }
     RENDERRED_OUTPUT_MD = render_template("test_out_template.md.j2", **RENDER_DATA)
     sh.write("test_output.md", RENDERRED_OUTPUT_MD)
 
