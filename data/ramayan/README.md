@@ -39,6 +39,17 @@ So before we start on how to correct manually, we need to understand that how it
 
 #### Other
 
+- Steps to start contributing
+  - Make sure you have a [github](https://github.com/signup) account.
+  - Fork the [repository](https://github.com/shubhattin/sanskrit_text_transliteration) to your account.
+  - Goto the forked repository and press `.(dot)` key on keyboard. This will open the github.dev environment.
+  - You can start editing the files in the text_data folder.
+  - In the left side you should see the git icon, click on it and you should see the changes you have made.
+  - Add a commit message and press the tick mark to commit the changes.
+  - Go Back to the forked repository and press `Contribute > Open Pull Request` button to create a pull request.
+  - Notify me somehow if you can, after opening PR so I am notified.
+  - After the PR has been merged, the changes will be reflected in the main repository.
+  - If you again need to make some changes, then before make sure to sync the changes from main repo by clicking on Sync Button.
 - After you have commited and pushed the changes in Github Codespace or on github.dev, you should be able to see the test results for your latest commit py pressing on the `Actions` tab and then on the `Ramayan CI` workflow. You can also see the results of the test by clicking on the `Ramayan CI` badge above also.
 
 ### **_Files to change_**
