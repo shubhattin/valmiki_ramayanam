@@ -9,6 +9,7 @@ import LipiLekhikA from '@tools/converter';
  * @param text_col_index the column number in which text of `base_lang` is present, default `2`
  * @param text_row_start_index the row number from which text of `base_lang` starts, default `2`
  * @param base_lang_code the language code of the base language, default `Sanskrit`
+ * @param base_folder_path_lipi_parivartak the path of the folder where `lipi-parivaryaka` is present, default `./src` only needed when executng directly
  */
 export const transliterate_xlxs_file = async (
 	workbook: ExcelJS.Workbook,
@@ -16,14 +17,21 @@ export const transliterate_xlxs_file = async (
 	lang_row_index: number = 1,
 	text_col_index: number = 2,
 	text_row_start_index: number = 2,
-	base_lang_code: string = 'Sanskrit'
+	base_lang_code: string = 'Sanskrit',
+	base_folder_path_lipi_parivartak: string = './src'
 ) => {
 	const TOTAL_SHEETS = workbook.worksheets.length;
 	for (let i_worksheet = 0; i_worksheet < TOTAL_SHEETS; i_worksheet++) {
 		if (sheets_to_process !== 'all' && !sheets_to_process.includes(i_worksheet + 1)) continue;
 		const worksheet = workbook.worksheets[i_worksheet];
 
-		await LipiLekhikA.k.load_lang(base_lang_code);
+		await LipiLekhikA.k.load_lang(
+			base_lang_code,
+			null,
+			false,
+			true,
+			base_folder_path_lipi_parivartak
+		);
 
 		const lang_row = worksheet.getRow(lang_row_index);
 		const text_col = worksheet.getColumn(text_col_index);
@@ -39,7 +47,13 @@ export const transliterate_xlxs_file = async (
 				const lang_name = cell.value?.toLocaleString().trim().replaceAll(' ', ''); // trimming white spaces and
 				const lang_code = LipiLekhikA.k.normalize(lang_name);
 				if (lang_code && lang_code !== base_lang_code) {
-					await LipiLekhikA.k.load_lang(lang_code);
+					await LipiLekhikA.k.load_lang(
+						lang_code,
+						null,
+						false,
+						true,
+						base_folder_path_lipi_parivartak
+					);
 					for (let val_pair of texts) {
 						const text = val_pair[1];
 						const i = val_pair[0];
