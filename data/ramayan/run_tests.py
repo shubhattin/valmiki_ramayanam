@@ -53,13 +53,12 @@ def run_tests():
                 no_error = False
     RENDER_DATA = {"no_error": no_error}
     RENDERRED_OUTPUT = render_template("test_out_template.md", **RENDER_DATA)
-    os.environ["GITHUB_STEP_SUMMARY"] = RENDERRED_OUTPUT
     sh.write("test_output.md", RENDERRED_OUTPUT)
     if no_error:
-        console.print("[bold green]✓ All tests passed![/]")
-        exit(-1)
+        console.print("[bold green]✓ All Tests passed![/]")
+        exit(0)
     else:
-        console.print("\n[bold red]❌ Tests failed![/]")
+        console.print("\n[bold red]❌ Some Tests failed![/]")
         exit(-1)
 
 

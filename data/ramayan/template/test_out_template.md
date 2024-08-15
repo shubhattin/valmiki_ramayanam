@@ -1,9 +1,9 @@
 {% if no_error -%}
 
-## ✓ All tests passed!
+# ✓ All Tests passed!
 
 {%- else -%}
 
-## ❌ Tests failed
+# ❌ Some Tests failed
 
 {% endif %}
