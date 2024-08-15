@@ -4,7 +4,7 @@ on:
   - push
 
 jobs:
-  tests:
+  run_checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,7 +20,7 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Run tests
+      - name: Run Checks
         working-directory: data/ramayan
         run: |
           python3 get_json.py
