@@ -60,6 +60,9 @@ async function main() {
 	console.log('Time :', ((end_time - start_time) / 1000).toPrecision(2), 'seconds');
 
 	// compressing
-	exec(`cd ${OUT_FOLDER} && 7z a -t7z -mx=9 ../zipped/rAmAyaNam.7z *`);
+	if (!fs.existsSync('zipped')) {
+		fs.mkdirSync('zipped');
+	}
+	exec(`cd ${OUT_FOLDER} && zip -r ../zipped/rAmAyaNam.zip *`);
 }
 main();
