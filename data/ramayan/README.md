@@ -1,10 +1,11 @@
 # श्रीमद्रामायणस्य Data Extraction and Transliteration
 
-This is a extarct to scape data from [विकिस्रोत](https://sa.wikisource.org/wiki/%E0%A4%B5%E0%A4%BE%E0%A4%B2%E0%A5%8D%E0%A4%AE%E0%A5%80%E0%A4%95%E0%A4%BF%E0%A4%B0%E0%A4%BE%E0%A4%AE%E0%A4%BE%E0%A4%AF%E0%A4%A3%E0%A4%AE%E0%A5%8D) and extract from and standardize it both using mannual and automated processes.
+This is a extarct to scape data from [विकिस्रोत](https://sa.wikisource.org/wiki/रामायणम्) and extract from and standardize it both using mannual and automated processes.
 
 ## Data Scraping
 
-We scape data from the main vikisrot page of the Ramayana and then from each of the kandas. We then extract the text from each of the shlokas, and store it in [text_data](./text_data/) folder. Also we process it further to generate the json data which is stored in the [data](./data/) folder, which is the main final output.
+We [scape data](./get_raw_data.py) from the main vikisrot page of the Ramayana and then from each of the kandas. We then [extract text](./get_text.py) from each of the shlokas, and store it in [text_data](./text_data/) folder. Also we [process](./get_json.py) it further to generate the json data which is stored in the [data](./data/) folder, which is the main final output.
+Altough the raw data extraction steps is done only once while initializing the project(so need for step anymore), the text extraction and json generation can be done multiple times(necessarily after manual changes).
 
 ## Standardization
 

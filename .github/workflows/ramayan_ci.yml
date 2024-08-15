@@ -23,5 +23,6 @@ jobs:
       - name: Run tests
         working-directory: data/ramayan
         run: |
+          python3 get_json.py
           python3 run_tests.py
           cat test_output.md > $GITHUB_STEP_SUMMARY

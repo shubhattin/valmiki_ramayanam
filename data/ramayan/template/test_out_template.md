@@ -1,6 +1,6 @@
 {% if no_error -%}
 
-# ✓ All Tests passed!
+# ✅ All Tests passed!
 
 {%- else -%}
 
