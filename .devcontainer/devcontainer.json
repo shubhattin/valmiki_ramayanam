@@ -1,6 +1,5 @@
 {
 	"name": "Sanskrit Transliteration",
-	"image": "mcr.microsoft.com/devcontainers/javascript-node:0-18",
 	"initializeCommand": "echo 'Skipping default npm install'",
 	"postCreateCommand": "npm i -g pnpm && pnpm install && cd data/ramayan && pip install -r requirements.txt && cd ../.."
 }
