@@ -1,0 +1,17 @@
+{%- if all_tests_passed -%}
+
+# ✅ All Tests passed
+{%- else -%}
+# ❌ Some Tests failed
+{% endif %}
+
+{%- for test_case in test_info %}
+
+## {% if test_case.failed_cases|length == 0 %}✔{% else %}✗{% endif %} {{ test_case.test_title|safe }}
+
+{% if test_case.failed_cases|length > 0 -%}
+{% for failed_case in test_case.failed_cases -%}
+1. {{ test_case.test_info_template.format(failed_case)|safe }}
+{% endfor -%}
+{% endif -%}
+{% endfor -%}
