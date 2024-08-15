@@ -8,3 +8,10 @@ node_modules
 build
 
 src/tools/converter/resources/dattAMsh/
+
+data/ramayan/data
+data/ramayan/raw_data
+data/ramayan/out
+data/ramayan/text_data
+data/ramayan/zipped
+data/ramayan/ramayan_map.json

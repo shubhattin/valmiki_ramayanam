@@ -1,0 +1,28 @@
+name: Ramayan CI
+
+on:
+  - push
+
+jobs:
+  run_checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Setup Python version 3.10
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      # set working directory to data/ramayan
+      # Install dependencies
+      - name: Install dependencies
+        working-directory: data/ramayan
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run Checks
+        working-directory: data/ramayan
+        run: |
+          python3 get_json.py
+          python3 run_tests.py
+          cat test_output.md > $GITHUB_STEP_SUMMARY

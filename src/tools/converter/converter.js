@@ -104,7 +104,7 @@ class lipi_helper {
 		else if (ln in this.alts) return this.langs[this.alts[ln]];
 		else return false;
 	}
-	async load_lang(lang, callback = null, block = false, norm = true) {
+	async load_lang(lang, callback = null, block = false, norm = true, base_folder_path = './src') {
 		if (norm) lang = this.normalize(lang);
 		if (!(lang in this.akSharAH)) {
 			// if not loaded
@@ -118,7 +118,10 @@ class lipi_helper {
 			} else {
 				// if you run file manually from cli
 				const data = JSON.parse(
-					fs.readFileSync('./src/tools/converter/resources/dattAMsh/' + lang + '.json', 'utf-8')
+					fs.readFileSync(
+						base_folder_path + '/tools/converter/resources/dattAMsh/' + lang + '.json',
+						'utf-8'
+					)
 				);
 				if (callback) callback();
 				this.akSharAH[lang] = data[0];
@@ -678,6 +681,14 @@ class lipi_parivartak {
 		if (to === 'Normal' || to === 'Romanized') {
 			// Doing this type of a patch here, for now because its better not touch the main lipi parivartak codebase
 			for (let i = 0; i < 10; i++) out = out.replaceAll(`.${i}`, i);
+		}
+		if (to === 'Normal') {
+			const replaces = {
+				Y: 'J'
+			};
+			for (let key in replaces) {
+				out = out.replaceAll(key, replaces[key]);
+			}
 		}
 		return out;
 	}
