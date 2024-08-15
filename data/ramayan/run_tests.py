@@ -32,15 +32,20 @@ TEST_INFO: list[TestInfo] = [
         test_info="virAma not present before new line in",
     ),  # 1
     TestInfo(
-        test_title=f"Check for Single Line Shlokas",
+        test_title=f"Single Line Shlokas",
         test_info="Single line shlokas found",
         report_test_fail_if_found=False,
     ),  # 2
     TestInfo(
-        test_title=f"Check for Line Count more than 3",
+        test_title=f"Line Count more than 3",
         test_info="Shlokas with more than 3 lines",
         report_test_fail_if_found=False,
     ),  # 3
+    TestInfo(
+        test_title="Variance in Shloka Count from Book Source",
+        test_info="Sargas with Shloka count variance (L → extracted, R → book)",
+        report_test_fail_if_found=False,
+    ),  # 4
 ]
 
 
@@ -81,10 +86,17 @@ def _run_tests(data: list[str], kANDa_num: str, sarga_num: str):
                 SINGLE_LINE_TEST.failed_cases.append(
                     f"{kANDa_num}-{sarga_num}-{ln_ind+1}"
                 )
-            elif lines.count(NEW_LINE) > 3:
+            elif lines.count(NEW_LINE) >= 3:  # checking for 4 lined and more
                 MORE_THAN_3_TEST.failed_cases.append(
-                    f"{kANDa_num}-{sarga_num}-{ln_ind+1} -> {lines.count(NEW_LINE)}"
+                    f"{kANDa_num}-{sarga_num}-{ln_ind+1} → {lines.count(NEW_LINE) + 1}"
                 )
+
+    SARGA_SHLOKA_COUNT_TEST = TEST_INFO[4]
+    sarga_info = DATA[int(kANDa_num) - 1].sarga_data[int(sarga_num) - 1]
+    if sarga_info.shloka_count != sarga_info.shloka_count_extracted:
+        SARGA_SHLOKA_COUNT_TEST.failed_cases.append(
+            f"{kANDa_num}-{sarga_num} → {sarga_info.shloka_count_extracted}|{sarga_info.shloka_count}"
+        )
 
 
 @app.command()
