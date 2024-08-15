@@ -37,6 +37,10 @@ So before we start on how to correct manually, we need to understand that how it
 - The starting and ending text does not needs taken care of as they will be ignored and rather added promgrammatically to the final output.(`श्रीमद्वाल्मीकीयरामायणे बालकाण्डे` and `इत्यार्षे श्रीमद्रामायणे वाल्मीकीये आदिकाव्ये` lines)
 - Do not make any changes to spacing before ॥ and ।, as they are ignored and added programmatically.
 
+#### Other
+
+- After you have commited and pushed the changes in Github Codespace or on github.dev, you should be able to see the test results for your latest commit py pressing on the `Actions` tab and then on the `Ramayan CI` workflow. You can also see the results of the test by clicking on the `Ramayan CI` badge above also.
+
 ### **_Files to change_**
 
 - **Text Data** : It is stored in the [text_data](./text_data/) folder. The manual changes to be made shall be done in this folder. The folder format for files is `kANDa_number/sarga_number.txt`.
