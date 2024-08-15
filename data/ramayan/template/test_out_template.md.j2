@@ -30,7 +30,7 @@ Total: {{test_case.failed_cases|length}}
 
 {%- for test_case in test_info %}
 {%- if not test_case.report_test_fail_if_found %}
-### {% if test_case.failed_cases|length == 0 %}✔{% endif %} {{ test_case.test_title|safe }}
+## {% if test_case.failed_cases|length == 0 %}✔{% endif %} {{ test_case.test_title|safe }}
 
 {% if test_case.failed_cases|length > 0 -%}
 {{test_case.test_info|safe}}
