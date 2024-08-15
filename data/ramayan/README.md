@@ -2,6 +2,8 @@
 
 This is a extarct to scape data from [विकिस्रोत](https://sa.wikisource.org/wiki/रामायणम्) and extract from and standardize it both using mannual and automated processes.
 
+[![Ramayan CI](https://github.com/shubhattin/sanskrit_text_transliteration/actions/workflows/ramayan_ci.yml/badge.svg)](https://github.com/shubhattin/sanskrit_text_transliteration/actions/workflows/ramayan_ci.yml)
+
 ## Data Scraping
 
 We [scape data](./get_raw_data.py) from the main vikisrot page of the Ramayana and then from each of the kandas. We then [extract text](./get_text.py) from each of the shlokas, and store it in [text_data](./text_data/) folder. Also we [process](./get_json.py) it further to generate the json data which is stored in the [data](./data/) folder, which is the main final output.
