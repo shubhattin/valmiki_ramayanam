@@ -36,10 +36,11 @@
 	};
 
 	const download_excel_file = async () => {
-		const file_list = import.meta.glob('/data/ramayan/template/excel_file_template.xlsx', {
-			query: 'raw'
-		});
-		const url = Object.keys(file_list)[0];
+		const url = new URL('/data/ramayan/template/excel_file_template.xlsx', import.meta.url).href;
+		// const file_list = import.meta.glob('/data/ramayan/template/excel_file_template.xlsx', {
+		// 	query: 'raw'
+		// });
+		// const url = Object.keys(file_list)[0];
 		const req = await fetch(url);
 		const blob = await req.blob();
 		const workbook = new ExcelJS.Workbook();
