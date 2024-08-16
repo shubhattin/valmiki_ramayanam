@@ -4,6 +4,8 @@ import { transliterate_xlxs_file } from '../../src/routes/xlsx_parivartak';
 import * as fs from 'fs';
 import { z } from 'zod';
 import { exec } from 'child_process';
+import cliProgress from 'cli-progress';
+import chalk from 'chalk';
 
 const TEMPLATE_FILE = './template/excel_file_template.xlsx';
 const COLUMN_FOR_DEV = 2;
@@ -49,13 +51,23 @@ async function main() {
 		const out_path = `${OUT_FOLDER}/${kANDa_info.index}. ${kANDa_info.name_normal}/${sarga_info.index}. ${sarga_name}.xlsx`;
 		await workbook.xlsx.writeFile(out_path);
 	}
-
+	const TOTAL_SARGAS = ramAyaNa_map.reduce((acc, kANDa) => acc + kANDa.sarga_data.length, 0);
+	const progressBar = new cliProgress.SingleBar({
+		format: 'Progress |{bar}| {percentage}% | ETA: {eta}s | {value}/{total} Sargas',
+		barCompleteChar: '\u2588',
+		barIncompleteChar: '\u2591',
+		hideCursor: true
+	});
+	progressBar.start(TOTAL_SARGAS, 0);
 	for (let kANDa_info of ramAyaNa_map) {
 		fs.mkdirSync(`${OUT_FOLDER}/${kANDa_info.index}. ${kANDa_info.name_normal}`);
 		for (let sarga_info of kANDa_info.sarga_data) {
 			await processSarga(kANDa_info, sarga_info);
+			progressBar.increment();
 		}
 	}
+
+	progressBar.stop();
 	const end_time = Date.now();
 	console.log('Time :', ((end_time - start_time) / 1000).toPrecision(2), 'seconds');
 
@@ -63,6 +75,12 @@ async function main() {
 	if (!fs.existsSync('zipped')) {
 		fs.mkdirSync('zipped');
 	}
-	exec(`cd ${OUT_FOLDER} && zip -r ../zipped/rAmAyaNam.zip *`);
+	exec(`cd ${OUT_FOLDER} && zip -r ../zipped/rAmAyaNam.zip *`, (error) => {
+		if (error) {
+			console.log(chalk.red.bold('Failed to make zip:', error.message));
+		} else {
+			console.log(chalk.green.bold('Zip file created successfully!'));
+		}
+	});
 }
 main();
