@@ -7,28 +7,45 @@
 	import { fly, scale, slide } from 'svelte/transition';
 	import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
 	import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
+	import { transliterate_xlxs_file } from '@tools/excel/transliterate_xlsx_file';
+	import { download_file_in_browser } from '@tools/download_file_browser';
+	import { onDestroy, onMount } from 'svelte';
+	import { delay } from '@tools/delay';
+	import { writable } from 'svelte/store';
 	import ExcelJS from 'exceljs';
 
-	// let kANDa_selected = 0;
-	// let sarga_selected = 0;
-	let kANDa_selected = 1; // @warn
-	let sarga_selected = 1; // @warn
+	let kANDa_selected = writable(0);
+	let sarga_selected = 0;
 	let sarga_data: string[] = [];
 	let sarga_loading = false;
 
+	onMount(() => {
+		if (import.meta.env.DEV) {
+			$kANDa_selected = 1;
+			sarga_selected = 1;
+		}
+	});
+
 	$: {
 		(async () => {
-			if (kANDa_selected === 0 || sarga_selected === 0) return;
+			if ($kANDa_selected === 0 || sarga_selected === 0) return;
 			const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
 			sarga_loading = true;
 			const data = (
-				(await all_sargas[`/data/ramayan/data/${kANDa_selected}/${sarga_selected}.json`]()) as any
+				(await all_sargas[`/data/ramayan/data/${$kANDa_selected}/${sarga_selected}.json`]()) as any
 			).default as string[];
 			sarga_data = data;
+			await delay(400);
 			sarga_loading = false;
 		})();
 	}
-	// $: kANDa_selected && (sarga_selected = 0);
+	const kANDa_selected_unsub = kANDa_selected.subscribe(() => {
+		sarga_selected = 0;
+	});
+
+	onDestroy(() => {
+		kANDa_selected_unsub();
+	});
 
 	const PAGE_INFO = {
 		title: 'श्रीमद्रामायणम्',
@@ -36,17 +53,30 @@
 	};
 
 	const download_excel_file = async () => {
+		// the method used below creates a url for both dev and prod
 		const url = new URL('/data/ramayan/template/excel_file_template.xlsx', import.meta.url).href;
-		// const file_list = import.meta.glob('/data/ramayan/template/excel_file_template.xlsx', {
-		// 	query: 'raw'
-		// });
-		// const url = Object.keys(file_list)[0];
 		const req = await fetch(url);
-		const blob = await req.blob();
+		const file_blob = await req.blob();
 		const workbook = new ExcelJS.Workbook();
-		await workbook.xlsx.load(await blob.arrayBuffer());
+		await workbook.xlsx.load(await file_blob.arrayBuffer());
 		const worksheet = workbook.getWorksheet(1)!;
-		console.log(worksheet.getCell(1, 2).value);
+		const COLUMN_FOR_DEV = 2;
+		const TEXT_START_ROW = 2;
+		for (let i = 0; i < sarga_data.length; i++) {
+			worksheet.getCell(i + COLUMN_FOR_DEV, TEXT_START_ROW).value = sarga_data[i];
+		}
+		await transliterate_xlxs_file(workbook, 'all', 1, COLUMN_FOR_DEV, TEXT_START_ROW, 'Sanskrit');
+
+		// saving file to output path
+		let sarga_name =
+			rAmAyaNa_map[$kANDa_selected - 1].sarga_data[sarga_selected - 1].name_normal.split('\n')[0];
+		console.log(sarga_name);
+		const buffer = await workbook.xlsx.writeBuffer();
+		const blob = new Blob([buffer], {
+			type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+		});
+		const downloadLink = URL.createObjectURL(blob);
+		download_file_in_browser(downloadLink, `${sarga_selected}. ${sarga_name}.xlsx`);
 	};
 </script>
 
@@ -85,15 +115,15 @@
 <div class="mt-4 space-y-4">
 	<label class="space-x-4">
 		<span class="font-bold">Select kANDa</span>
-		<select bind:value={kANDa_selected} class="select w-52">
+		<select bind:value={$kANDa_selected} class="select w-52">
 			<option value={0}>Select</option>
 			{#each rAmAyaNa_map as kANDa}
 				<option value={kANDa.index}>{kANDa.index}. {kANDa.name_devanagari}</option>
 			{/each}
 		</select>
 	</label>
-	{#if kANDa_selected !== 0}
-		{@const kANDa = rAmAyaNa_map[kANDa_selected - 1]}
+	{#if $kANDa_selected !== 0}
+		{@const kANDa = rAmAyaNa_map[$kANDa_selected - 1]}
 		<label class="space-x-4">
 			<span class="font-bold">Select Sarga</span>
 			<select bind:value={sarga_selected} class="select w-52">
@@ -104,8 +134,8 @@
 			</select>
 		</label>
 	{/if}
-	{#if kANDa_selected !== 0 && sarga_selected !== 0}
-		{@const kANDa = rAmAyaNa_map[kANDa_selected - 1]}
+	{#if $kANDa_selected !== 0 && sarga_selected !== 0}
+		{@const kANDa = rAmAyaNa_map[$kANDa_selected - 1]}
 		<div class="space-x-3">
 			{#if sarga_selected !== 1}
 				<button
