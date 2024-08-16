@@ -11,7 +11,7 @@
 	import { OiGear16 } from 'svelte-icons-pack/oi';
 	import { FiCircle } from 'svelte-icons-pack/fi';
 	import { TiTick } from 'svelte-icons-pack/ti';
-	import { BiSolidDownload } from 'svelte-icons-pack/bi';
+	import { BiSolidDownload, BiBookOpen } from 'svelte-icons-pack/bi';
 	import { SiConvertio } from '@components/icons';
 	import { getModalStore } from '@skeletonlabs/skeleton';
 	import ExcelJS from 'exceljs';
@@ -146,7 +146,22 @@
 </svelte:head>
 <MainAppBar>
 	<span slot="start" class="font-bold">Lipi Parivartan for Excel Files</span>
-	<span slot="end">
+	<span slot="end" class="space-x-2">
+		<a
+			class="text-xl"
+			href="/books/ramayan"
+			use:popup={{
+				event: 'hover',
+				target: 'ramayan_popup',
+				placement: 'bottom'
+			}}
+		>
+			<Icon src={BiBookOpen} class="text-2xl hover:fill-red-700 dark:hover:fill-sky-500" />
+			<div data-popup="ramayan_popup" class="variant-ghost-tertiary px-1 text-base">
+				श्रीमद्रामायणम्
+				<div class="bg-surface-100-800-token arrow" />
+			</div>
+		</a>
 		<a
 			class="text-xl"
 			href="/convert"

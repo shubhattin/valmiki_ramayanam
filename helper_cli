@@ -6,14 +6,14 @@ import os
 
 OPTIONS = [
     [
-        "1. Generate JSON Files",
+        "Generate JSON Files",
         [
             "cd data/ramayan/",
             "python3 get_json.py",
         ],
     ],
     [
-        "2. Generate JSON Files + Excel zip",
+        "Generate JSON Files + Excel zip",
         [
             "rm -f rAmAyaNam.zip",
             "cd data/ramayan/",
@@ -24,21 +24,21 @@ OPTIONS = [
         "[bold]The zip file has been generated as 'rAmAyaNam.zip'[/]",
     ],
     [
-        "3. Run Checks on JSON Files",
+        "Run Checks on JSON Files",
         [
             "cd data/ramayan/",
             "python3 run_tests.py",
         ],
         "[bold]The test report has been generated as 'data/ramayan/test_output.md'. Open that file and press `[yellow]Ctrl+Shift+V[/]` to view the report[/]",
     ],
-    ["4. Launch the web app", ["pnpm dev"]],
+    ["Launch the web app", ["pnpm dev"]],
 ]
 
 
 def main():
     print("[bold yellow]Select an option to run:[/]")
-    for option in OPTIONS:
-        print(f"[blue]{option[0]}[/]")
+    for i, option in enumerate(OPTIONS):
+        print(f"[blue]{i+1}. {option[0]}[/]")
 
     choice = Prompt.ask(
         "Choose an option", choices=[str(i + 1) for i in range(len(OPTIONS))]

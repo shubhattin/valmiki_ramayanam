@@ -10,7 +10,8 @@ const config = {
 		alias: {
 			'@tools': './src/tools',
 			'@tests': './src/tests',
-			'@components': './src/components'
+			'@components': './src/components',
+			'@data': './data'
 		}
 	}
 };
