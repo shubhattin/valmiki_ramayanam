@@ -6,11 +6,13 @@
 	import rAmAyaNa_map from '@data/ramayan/ramayan_map.json';
 	import { fly, scale, slide } from 'svelte/transition';
 	import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
+	import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
+	import ExcelJS from 'exceljs';
 
-	let kANDa_selected = 0;
-	let sarga_selected = 0;
-	// let kANDa_selected = 1; // @warn
-	// let sarga_selected = 1; // @warn
+	// let kANDa_selected = 0;
+	// let sarga_selected = 0;
+	let kANDa_selected = 1; // @warn
+	let sarga_selected = 1; // @warn
 	let sarga_data: string[] = [];
 	let sarga_loading = false;
 
@@ -26,21 +28,25 @@
 			sarga_loading = false;
 		})();
 	}
-	$: kANDa_selected && (sarga_selected = 0);
+	// $: kANDa_selected && (sarga_selected = 0);
 
 	const PAGE_INFO = {
 		title: 'श्रीमद्रामायणम्',
 		desciption: 'श्रीमद्रामायणस्य पठनम्'
 	};
 
-	// const download_excel_file = async () => {
-	// 	const file_list = import.meta.glob('/data/ramayan/template/excel_file_template.xlsx', {
-	// 		query: 'raw'
-	// 	});
-	// 	const file_binary_str = (
-	// 		(await file_list['/data/ramayan/template/excel_file_template.xlsx']()) as any
-	// 	).default;
-	// };
+	const download_excel_file = async () => {
+		const file_list = import.meta.glob('/data/ramayan/template/excel_file_template.xlsx', {
+			query: 'raw'
+		});
+		const url = Object.keys(file_list)[0];
+		const req = await fetch(url);
+		const blob = await req.blob();
+		const workbook = new ExcelJS.Workbook();
+		await workbook.xlsx.load(await blob.arrayBuffer());
+		const worksheet = workbook.getWorksheet(1)!;
+		console.log(worksheet.getCell(1, 2).value);
+	};
 </script>
 
 <svelte:head>
@@ -122,7 +128,7 @@
 					<Icon class="-mt-1 ml-1 text-xl" src={TiArrowForwardOutline} />
 				</button>
 			{/if}
-			<!-- <button
+			<button
 				on:click={download_excel_file}
 				class="variant-outline-success btn rounded-lg border-2 border-emerald-600 px-2 py-2 font-bold dark:border-emerald-400"
 			>
@@ -131,7 +137,7 @@
 					src={RiDocumentFileExcel2Line}
 				/>
 				Download Excel File
-			</button> -->
+			</button>
 		</div>
 		{#if !sarga_loading}
 			<div

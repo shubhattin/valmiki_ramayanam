@@ -39,6 +39,7 @@ So before we start on how to correct manually, we need to understand that how it
 
 #### Other
 
+- If you are using Github Codespace then you should use the command `./helper_cli` to do all your terminal related tasks
 - Steps to start contributing
   - Make sure you have a [github](https://github.com/signup) account.
   - Fork the [repository](https://github.com/shubhattin/sanskrit_text_transliteration) to your account.
