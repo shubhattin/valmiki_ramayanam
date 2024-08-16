@@ -1,6 +1,6 @@
 import ExcelJS from 'exceljs';
 import ramAyaNa_map from './ramayan_map.json';
-import { transliterate_xlxs_file } from '../../src/routes/xlsx_parivartak';
+import { transliterate_xlxs_file } from '../../src/tools/excel/transliterate_xlsx_file';
 import * as fs from 'fs';
 import { z } from 'zod';
 import { exec } from 'child_process';

@@ -17,7 +17,8 @@
 	import ExcelJS from 'exceljs';
 	import type { Workbook } from 'exceljs';
 	import { delay } from '@tools/delay';
-	import { transliterate_xlxs_file } from './xlsx_parivartak';
+	import { transliterate_xlxs_file } from '@tools/excel/transliterate_xlsx_file';
+	import { download_file_in_browser } from '@tools/download_file_browser';
 	import { writable } from 'svelte/store';
 	import Preview from './Preview.svelte';
 
@@ -117,13 +118,7 @@
 		const file = file_list[file_index];
 		const download_link = file_download_links[file_index];
 
-		const a = document.createElement('a');
-		a.href = download_link;
-		a.download = get_file_name_with_prefix_postfix(file.name);
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
-		// URL.revokeObjectURL(download_link);
+		download_file_in_browser(download_link, get_file_name_with_prefix_postfix(file.name));
 	};
 
 	const get_file_name_with_prefix_postfix = (name: string) => {
