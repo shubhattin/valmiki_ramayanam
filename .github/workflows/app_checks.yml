@@ -20,8 +20,7 @@ jobs:
           run_install: true
 
       - run: |
-          echo "## Running Vitest checks" >> $GITHUB_STEP_SUMMARY
-          pnpm test >> $GITHUB_STEP_SUMMARY
+          pnpm test
   svelte_and_type_check:
     runs-on: ubuntu-latest
     steps:
@@ -36,7 +35,5 @@ jobs:
         with:
           version: 8
           run_install: true
-
       - run: |
-          echo "## Running tests for Svelte and TS" >> $GITHUB_STEP_SUMMARY
-          pnpm check >> $GITHUB_STEP_SUMMARY
+          pnpm check
