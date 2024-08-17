@@ -19,7 +19,8 @@ jobs:
           version: 8
           run_install: true
 
-      - run: pnpm check
+      - run: |
+          pnpm check >> $GITHUB_STEP_SUMMARY
   svelte_and_type_check:
     runs-on: ubuntu-latest
     steps:
@@ -35,4 +36,5 @@ jobs:
           version: 8
           run_install: true
 
-      - run: pnpm check
+      - run: |
+          pnpm check >> $GITHUB_STEP_SUMMARY
