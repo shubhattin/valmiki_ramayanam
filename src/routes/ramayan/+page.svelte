@@ -1,7 +1,5 @@
 <script lang="ts">
 	import MainAppBar from '@components/MainAppBar.svelte';
-	import { popup } from '@skeletonlabs/skeleton';
-	import { BiArrowBack } from 'svelte-icons-pack/bi';
 	import Icon from '@tools/Icon.svelte';
 	import rAmAyaNa_map from '@data/ramayan/ramayan_map.json';
 	import { fly, scale, slide } from 'svelte/transition';
@@ -80,27 +78,9 @@
 	<meta property="og:site_name" content={PAGE_INFO.title} />
 </svelte:head>
 
-<MainAppBar>
-	<span slot="start">
-		<a
-			class="text-xl"
-			href="/"
-			use:popup={{
-				event: 'hover',
-				target: 'home_popup',
-				placement: 'bottom'
-			}}
-		>
-			<Icon
-				src={BiArrowBack}
-				class="-mt-1 mr-1 text-2xl hover:fill-red-700 dark:hover:fill-sky-500"
-			/>
-			<div data-popup="home_popup" class="variant-ghost-tertiary px-1 text-base">
-				Home Page
-				<div class="bg-surface-100-800-token arrow" />
-			</div>
-		</a>
-		<span class="ml-2 text-xl font-bold">{PAGE_INFO.title}</span>
+<MainAppBar page="ramayan">
+	<span slot="headline">
+		<span class="ml-2 text-2xl font-bold">{PAGE_INFO.title}</span>
 	</span>
 </MainAppBar>
 

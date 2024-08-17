@@ -1,7 +1,5 @@
 <script lang="ts">
 	import MainAppBar from '@components/MainAppBar.svelte';
-	import { popup } from '@skeletonlabs/skeleton';
-	import { BiArrowBack } from 'svelte-icons-pack/bi';
 	import Icon from '@tools/Icon.svelte';
 	import { LANG_LIST } from '@tools/lang_list';
 	import LipiLekhikA from '@tools/converter';
@@ -42,27 +40,9 @@
 	<meta property="og:description" content={PAGE_INFO.desciption} />
 	<meta property="og:site_name" content={PAGE_INFO.title} />
 </svelte:head>
-<MainAppBar>
-	<span slot="start">
-		<a
-			class="text-xl"
-			href="/"
-			use:popup={{
-				event: 'hover',
-				target: 'home_popup',
-				placement: 'bottom'
-			}}
-		>
-			<Icon
-				src={BiArrowBack}
-				class="-mt-1 mr-1 text-2xl hover:fill-red-700 dark:hover:fill-sky-500"
-			/>
-			<div data-popup="home_popup" class="variant-ghost-tertiary px-1 text-base">
-				Home Page
-				<div class="bg-surface-100-800-token arrow" />
-			</div>
-		</a>
-		<span class="ml-2 text-xl font-bold">Lipi Parivartak</span>
+<MainAppBar page="convert">
+	<span slot="headline">
+		<span class="ml-2 text-2xl font-bold">Lipi Parivartak</span>
 	</span>
 </MainAppBar>
 

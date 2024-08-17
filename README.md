@@ -9,4 +9,4 @@ The Tool Used to Transliteration is `Lipi Lekhika`.
 
 **_[श्रीमद्रामायणम्](./data/ramayan/)_**
 
-**[श्रीमद्रामायणस्य पठनम्](https://lipi-parivartan.vercel.app/books/ramayan)**
+**[श्रीमद्रामायणस्य पठनम्](https://lipi-parivartan.vercel.app/ramayan)**
