@@ -19,7 +19,8 @@ jobs:
           version: 8
           run_install: true
 
-      - run: pnpm check
+      - run: |
+          pnpm test
   svelte_and_type_check:
     runs-on: ubuntu-latest
     steps:
@@ -34,5 +35,5 @@ jobs:
         with:
           version: 8
           run_install: true
-
-      - run: pnpm check
+      - run: |
+          pnpm check

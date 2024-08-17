@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import exceljs from 'exceljs';
-import * as fs from 'fs/promises';
-import LipiLekhikA from '../../src/tools/converter';
+import * as fs from 'fs';
 
 const sarga_info_schema = z.object({
 	name_devanagari: z.string(),
@@ -22,7 +21,7 @@ export const kANDa_list_schema = z.array(kANDa_info_schema);
 
 async function main() {
 	const workbook = new exceljs.Workbook();
-	await workbook.xlsx.readFile('./data/ramayan/a.xlsx');
+	await workbook.xlsx.readFile('./data/ramayan/template/overview.xlsx');
 	const worksheet = workbook.getWorksheet(1)!;
 	const DATA: [number, string, string][] = [
 		[1, 'बालकाण्डम्', 'bAlakANDaH'],
@@ -33,36 +32,27 @@ async function main() {
 		[6, 'युद्धकाण्डम्', 'yuddhakANDaH'],
 		[7, 'उत्तरकाण्डम्', 'uttaralANDaH']
 	];
-	await LipiLekhikA.k.load_lang('Sanskrit');
 	const res: z.infer<typeof kANDa_info_schema>[] = [];
 	for (let kANDa_info of DATA) {
-		const sarga_file_names = await list_dir(
-			`./data/ramayan/data/${kANDa_info[0]}. ${kANDa_info[1]}`
-		);
+		const sarga_file_names = list_dir(`./data/ramayan/data/${kANDa_info[0]}`);
 		const INFO_INDEX = 3 * kANDa_info[0] - 1;
 		const sagra_list: z.infer<typeof sarga_info_schema>[] = [];
 		for (let i_ = 0; i_ < sarga_file_names.length; i_++) {
 			const sarga_file_name = sarga_file_names[i_];
 			const i = parseInt(sarga_file_name.split('.')[0]);
 			const sarga_data: string[] = JSON.parse(
-				await fs.readFile(
-					`./data/ramayan/data/${kANDa_info[0]}. ${kANDa_info[1]}/${sarga_file_name}`,
-					'utf-8'
-				)
+				fs.readFileSync(`./data/ramayan/data/${kANDa_info[0]}/${sarga_file_name}`, 'utf-8')
 			);
 			// console.log([kANDa_info[0], i, sarga_file_name, sarga_data.length]);
 			const sarga_norm_name = worksheet.getCell(2 + i, INFO_INDEX).value;
 			let sarga_dev_name = worksheet.getCell(2 + i, INFO_INDEX + 1).value ?? '';
 			const shloka_count = worksheet.getCell(2 + i, INFO_INDEX + 2).value;
-			if (kANDa_info[0] == 4 && sarga_dev_name == '') {
-				sarga_dev_name = LipiLekhikA.convert(sarga_norm_name, 'Normal', 'Sanskrit');
-			}
 			const sarga_info = sarga_info_schema.parse({
 				name_devanagari: sarga_dev_name,
 				name_normal: sarga_norm_name,
 				index: i,
 				shloka_count,
-				shloka_count_extracted: sarga_data.length
+				shloka_count_extracted: sarga_data.length - 2
 			});
 			sagra_list.push(sarga_info);
 		}
@@ -80,11 +70,11 @@ async function main() {
 		res.push(kANDa_infor);
 	}
 
-	await fs.writeFile('./data/ramayan/ramayan_map.json', JSON.stringify(res, null, 2));
+	fs.writeFileSync('./data/ramayan/ramayan_map.json', JSON.stringify(res, null, 2));
 }
 main();
 
-async function list_dir(dir: string) {
-	const files: string[] = await fs.readdir(dir);
+function list_dir(dir: string) {
+	const files: string[] = fs.readdirSync(dir);
 	return files;
 }

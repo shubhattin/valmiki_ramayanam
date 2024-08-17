@@ -677,17 +677,42 @@ class lipi_parivartak {
 		return res;
 	}
 	convert(val, from, to) {
+		const pacham_patches = [
+			// patching कवर्ग
+			['Gk', 'nk'],
+			['Gkh', 'nkh'],
+			['Gg', 'ng'],
+			['Ggh', 'ngh'],
+			// patching चवर्ग
+			['Jch', 'nch'],
+			['JCh', 'nCh'],
+			['Jj', 'nj'],
+			['Jjh', 'njh'],
+			['jJ', 'jn']
+		]; // this info will also be use to convert to Normal as well from Normal
+		if (from == 'Normal') {
+			for (let text of pacham_patches) {
+				val = val.replaceAll(text[1], text[0]);
+			}
+		}
 		let out = this._parivartak(val, from, to);
 		if (to === 'Normal' || to === 'Romanized') {
 			// Doing this type of a patch here, for now because its better not touch the main lipi parivartak codebase
 			for (let i = 0; i < 10; i++) out = out.replaceAll(`.${i}`, i);
-		}
-		if (to === 'Normal') {
-			const replaces = {
-				Y: 'J'
-			};
-			for (let key in replaces) {
-				out = out.replaceAll(key, replaces[key]);
+			// removing . and .. for । and ॥ respectively
+			// the change below is a lossfull change and cannot be recovered while converting back to the original script
+			out = out.replaceAll('..', '');
+			out = out.replaceAll('.', '');
+			if (to === 'Normal') {
+				let replaces = [
+					// patching छ and ञ from Y -> J
+					['chh', 'Ch'],
+					['Y', 'J']
+				];
+				replaces.push(...pacham_patches);
+				for (let text of replaces) {
+					out = out.replaceAll(text[0], text[1]);
+				}
 			}
 		}
 		return out;
