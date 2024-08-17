@@ -687,7 +687,8 @@ class lipi_parivartak {
 			['Jch', 'nch'],
 			['JCh', 'nCh'],
 			['Jj', 'nj'],
-			['Jjh', 'njh']
+			['Jjh', 'njh'],
+			['jJ', 'jn']
 		]; // this info will also be use to convert to Normal as well from Normal
 		if (from == 'Normal') {
 			for (let text of pacham_patches) {

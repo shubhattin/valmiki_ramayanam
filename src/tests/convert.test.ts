@@ -6,7 +6,7 @@ import LipiLekhikA from '../tools/converter';
 const LANG_LIST = ['de', 'te', 'kn', 'ta', 'bn', 'or', 'gu', 'ml'];
 
 describe('Basic Conversions', () => {
-	it('convert from devanagari to other scripts', async () => {
+	it('Convert from Devanagari to Other scripts', async () => {
 		const list = yaml.load(fs.readFileSync('./src/tests/data/tests.yml', 'utf-8')) as Record<
 			string,
 			string
@@ -39,7 +39,8 @@ describe('Test Custom Patches', () => {
 		['चञ्चल', 'chanchala'],
 		['कञ्छी', 'kanChI'],
 		['भञ्जनकरं', 'bhanjanakaraM'],
-		['प्रबलञ्झ', 'prabalanjha']
+		['प्रबलञ्झ', 'prabalanjha'],
+		['प्रतिज्ञा', 'pratijnA']
 	];
 	it('From Devanagari to Normal', async () => {
 		const SOURCE_LANG = 'Sanskrit';
