@@ -703,6 +703,7 @@ class lipi_parivartak {
 			// the change below is a lossfull change and cannot be recovered while converting back to the original script
 			out = out.replaceAll('..', '');
 			out = out.replaceAll('.', '');
+			out = out.replaceAll("''", 'a');
 			if (to === 'Normal') {
 				let replaces = [
 					// patching छ and ञ from Y -> J
