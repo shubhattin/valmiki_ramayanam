@@ -102,6 +102,7 @@ def get_shloka_text(kANDa_num: str, sarga_num: str, to_recreate_text_folder=Fals
         NOT_STARTS_WITH.extend(END_TEXTS)
         continue_status = False
         break_loop_as_last_found = False
+        line = line.replace(" ऽ", 'ऽ')
         for nsw in NOT_STARTS_WITH:
             if line.startswith(nsw):
                 for end_text in END_TEXTS:
