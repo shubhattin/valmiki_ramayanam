@@ -698,20 +698,20 @@ class lipi_parivartak {
 		if (to === 'Normal' || to === 'Romanized') {
 			// Doing this type of a patch here, for now because its better not touch the main lipi parivartak codebase
 			for (let i = 0; i < 10; i++) out = out.replaceAll(`.${i}`, i);
-		}
-		if (to === 'Normal') {
-			let replaces = [
-				// removing . and .. for । and ॥ respectively
-				// the change below is a lossfull change and cannot be recovered while converting back to the original script
-				['.', ''],
-				['..', ''],
-				// patching छ and ञ from Y -> J
-				['chh', 'Ch'],
-				['Y', 'J']
-			];
-			replaces.push(...pacham_patches);
-			for (let text of replaces) {
-				out = out.replaceAll(text[0], text[1]);
+			// removing . and .. for । and ॥ respectively
+			// the change below is a lossfull change and cannot be recovered while converting back to the original script
+			out = out.replaceAll('..', '');
+			out = out.replaceAll('.', '');
+			if (to === 'Normal') {
+				let replaces = [
+					// patching छ and ञ from Y -> J
+					['chh', 'Ch'],
+					['Y', 'J']
+				];
+				replaces.push(...pacham_patches);
+				for (let text of replaces) {
+					out = out.replaceAll(text[0], text[1]);
+				}
 			}
 		}
 		return out;
