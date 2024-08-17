@@ -21,7 +21,7 @@ export const kANDa_list_schema = z.array(kANDa_info_schema);
 
 async function main() {
 	const workbook = new exceljs.Workbook();
-	await workbook.xlsx.readFile('../../data/ramayan/template/overview.xlsx');
+	await workbook.xlsx.readFile('./data/ramayan/template/overview.xlsx');
 	const worksheet = workbook.getWorksheet(1)!;
 	const DATA: [number, string, string][] = [
 		[1, 'बालकाण्डम्', 'bAlakANDaH'],
@@ -34,17 +34,14 @@ async function main() {
 	];
 	const res: z.infer<typeof kANDa_info_schema>[] = [];
 	for (let kANDa_info of DATA) {
-		const sarga_file_names = list_dir(`../../data/ramayan/data/${kANDa_info[0]}. ${kANDa_info[1]}`);
+		const sarga_file_names = list_dir(`./data/ramayan/data/${kANDa_info[0]}`);
 		const INFO_INDEX = 3 * kANDa_info[0] - 1;
 		const sagra_list: z.infer<typeof sarga_info_schema>[] = [];
 		for (let i_ = 0; i_ < sarga_file_names.length; i_++) {
 			const sarga_file_name = sarga_file_names[i_];
 			const i = parseInt(sarga_file_name.split('.')[0]);
 			const sarga_data: string[] = JSON.parse(
-				fs.readFileSync(
-					`../../data/ramayan/data/${kANDa_info[0]}. ${kANDa_info[1]}/${sarga_file_name}`,
-					'utf-8'
-				)
+				fs.readFileSync(`./data/ramayan/data/${kANDa_info[0]}/${sarga_file_name}`, 'utf-8')
 			);
 			// console.log([kANDa_info[0], i, sarga_file_name, sarga_data.length]);
 			const sarga_norm_name = worksheet.getCell(2 + i, INFO_INDEX).value;
@@ -55,7 +52,7 @@ async function main() {
 				name_normal: sarga_norm_name,
 				index: i,
 				shloka_count,
-				shloka_count_extracted: sarga_data.length
+				shloka_count_extracted: sarga_data.length - 2
 			});
 			sagra_list.push(sarga_info);
 		}

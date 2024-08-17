@@ -1966,7 +1966,7 @@
         "shloka_count_extracted": 31
       },
       {
-        "name_devanagari": "भूषणप्रत्यभिज्नानम्",
+        "name_devanagari": "भूषणप्रत्यभिज्ञानम्",
         "name_normal": "bhUShaNapratyabhijnAnam",
         "index": 6,
         "shloka_count": 26,
@@ -1980,7 +1980,7 @@
         "shloka_count_extracted": 25
       },
       {
-        "name_devanagari": "वालिवधप्रतिज्ना",
+        "name_devanagari": "वालिवधप्रतिज्ञा",
         "name_normal": "vAlivadhapratijnA",
         "index": 8,
         "shloka_count": 46,
@@ -1994,8 +1994,8 @@
         "shloka_count_extracted": 26
       },
       {
-        "name_devanagari": "राजनिर्वासकथनम्",
-        "name_normal": "rAjanirvAsakathanam",
+        "name_devanagari": "राज्यनिर्वासकथनम्",
+        "name_normal": "rAjyanirvAsakathanam",
         "index": 10,
         "shloka_count": 35,
         "shloka_count_extracted": 35
@@ -2036,7 +2036,7 @@
         "shloka_count_extracted": 31
       },
       {
-        "name_devanagari": "वालिसम्हारः",
+        "name_devanagari": "वालिसंहारः",
         "name_normal": "vAlisamhAraH",
         "index": 16,
         "shloka_count": 39,
@@ -2085,7 +2085,7 @@
         "shloka_count_extracted": 32
       },
       {
-        "name_devanagari": "अन्गदाभिवादनम्",
+        "name_devanagari": "अङ्गदाभिवादनम्",
         "name_normal": "angadAbhivAdanam",
         "index": 23,
         "shloka_count": 30,
@@ -2120,8 +2120,8 @@
         "shloka_count_extracted": 48
       },
       {
-        "name_devanagari": "प्रावृदुज्जृभणम्",
-        "name_normal": "prAvRdujjRbhaNam",
+        "name_devanagari": "प्रावृडुज्जृम्भणम्",
+        "name_normal": "prAvRDujjRmbhaNam",
         "index": 28,
         "shloka_count": 66,
         "shloka_count_extracted": 66
@@ -2232,7 +2232,7 @@
         "shloka_count_extracted": 62
       },
       {
-        "name_devanagari": "हनुमत्सन्देशः",
+        "name_devanagari": "हनुमत्संदेशः",
         "name_normal": "hanumatsandEshaH",
         "index": 44,
         "shloka_count": 17,
@@ -2295,15 +2295,15 @@
         "shloka_count_extracted": 32
       },
       {
-        "name_devanagari": "अन्गदादिनिर्वेदः",
+        "name_devanagari": "अङ्गदादिनिर्वेदः",
         "name_normal": "angadAdinirvEdaH",
         "index": 53,
         "shloka_count": 40,
         "shloka_count_extracted": 27
       },
       {
-        "name_devanagari": "हनूमत्भेदनम्",
-        "name_normal": "hanUmatbhEdanam",
+        "name_devanagari": "हनूमद्भेदनम्",
+        "name_normal": "hanUmadbhEdanam",
         "index": 54,
         "shloka_count": 22,
         "shloka_count_extracted": 22
@@ -2316,22 +2316,22 @@
         "shloka_count_extracted": 23
       },
       {
-        "name_devanagari": "सम्पातिप्रश्नः",
+        "name_devanagari": "संपातिप्रश्नः",
         "name_normal": "sampAtiprashnaH",
         "index": 56,
         "shloka_count": 16,
         "shloka_count_extracted": 24
       },
       {
-        "name_devanagari": "जटायुर्दिष्ठकथनम्",
-        "name_normal": "jaTAyurdiShThakathanam",
+        "name_devanagari": "जटायुर्दिष्टकथनम्",
+        "name_normal": "jaTAyurdiShTakathanam",
         "index": 57,
         "shloka_count": 27,
         "shloka_count_extracted": 19
       },
       {
-        "name_devanagari": "सीताप्रवृच्युपलम्बः",
-        "name_normal": "sItApravRchyupalambaH",
+        "name_devanagari": "सीताप्रवृच्युपलम्भः",
+        "name_normal": "sItApravRchyupalambhaH",
         "index": 58,
         "shloka_count": 36,
         "shloka_count_extracted": 37
@@ -2344,7 +2344,7 @@
         "shloka_count_extracted": 28
       },
       {
-        "name_devanagari": "सम्पातिपुरावृत्तवर्णनम्",
+        "name_devanagari": "संपातिपुरावृत्तवर्णनम्",
         "name_normal": "sampAtipurAvRttavarNanam",
         "index": 60,
         "shloka_count": 29,
@@ -2365,14 +2365,14 @@
         "shloka_count_extracted": 15
       },
       {
-        "name_devanagari": "सम्पातिपक्षप्ररोहः",
+        "name_devanagari": "संपातिपक्षप्ररोहः",
         "name_normal": "sampAtipakShaprarOhaH",
         "index": 63,
         "shloka_count": 14,
         "shloka_count_extracted": 15
       },
       {
-        "name_devanagari": "समुद्रलन्घनमन्त्रणम्",
+        "name_devanagari": "समुद्रलङ्घनमन्त्रणम्",
         "name_normal": "samudralanghanamantraNam",
         "index": 64,
         "shloka_count": 25,
@@ -2386,14 +2386,14 @@
         "shloka_count_extracted": 35
       },
       {
-        "name_devanagari": "हनुमद्बलसन्धुक्षणम्",
+        "name_devanagari": "हनुमद्बलसंधुक्षणम्",
         "name_normal": "hanumadbalasandhukShaNam",
         "index": 66,
         "shloka_count": 39,
         "shloka_count_extracted": 38
       },
       {
-        "name_devanagari": "लन्घनावष्टम्भः",
+        "name_devanagari": "लङ्घनावष्टम्भः",
         "name_normal": "langhanAvaShTambhaH",
         "index": 67,
         "shloka_count": 49,
