@@ -139,40 +139,8 @@
 	<meta property="og:description" content={PAGE_INFO.desciption} />
 	<meta property="og:site_name" content={PAGE_INFO.title} />
 </svelte:head>
-<MainAppBar>
-	<span slot="start" class="font-bold">Lipi Parivartan for Excel Files</span>
-	<span slot="end" class="space-x-2">
-		<a
-			class="text-xl"
-			href="/books/ramayan"
-			use:popup={{
-				event: 'hover',
-				target: 'ramayan_popup',
-				placement: 'bottom'
-			}}
-		>
-			<Icon src={BiBookOpen} class="text-2xl hover:fill-red-700 dark:hover:fill-sky-500" />
-			<div data-popup="ramayan_popup" class="variant-ghost-tertiary px-1 text-base">
-				श्रीमद्रामायणम्
-				<div class="bg-surface-100-800-token arrow" />
-			</div>
-		</a>
-		<a
-			class="text-xl"
-			href="/convert"
-			use:popup={{
-				event: 'hover',
-				target: 'convert_popup',
-				placement: 'bottom'
-			}}
-		>
-			<Icon src={SiConvertio} class="text-2xl hover:fill-red-700 dark:hover:fill-sky-500" />
-			<div data-popup="convert_popup" class="variant-ghost-tertiary px-1 text-base">
-				Lipi Parivartak
-				<div class="bg-surface-100-800-token arrow" />
-			</div>
-		</a>
-	</span>
+<MainAppBar page="home">
+	<span slot="headline" class="text-xl font-bold">Lipi Parivartan for Excel Files</span>
 </MainAppBar>
 <div class="mt-3 space-y-4">
 	{#if !file_list}
