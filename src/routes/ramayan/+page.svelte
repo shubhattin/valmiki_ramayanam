@@ -2,7 +2,7 @@
 	import MainAppBar from '@components/MainAppBar.svelte';
 	import Icon from '@tools/Icon.svelte';
 	import rAmAyaNa_map from '@data/ramayan/ramayan_map.json';
-	import { fly, scale, slide } from 'svelte/transition';
+	import { fade, scale, slide } from 'svelte/transition';
 	import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
 	import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
 	import { transliterate_xlxs_file } from '@tools/excel/transliterate_xlsx_file';
@@ -142,15 +142,16 @@
 				Download Excel File
 			</button>
 		</div>
-		{#if !sarga_loading}
-			<div
-				transition:fly
-				class="h-[65vh] space-y-3 overflow-scroll rounded-xl border-2 border-red-600 px-4 py-3 dark:border-yellow-300"
-			>
-				{#each sarga_data as line}
-					<div><pre>{line}</pre></div>
-				{/each}
-			</div>
-		{/if}
+		<div
+			class="h-[65vh] overflow-scroll rounded-xl border-2 border-red-600 px-4 py-3 dark:border-yellow-300"
+		>
+			{#if !sarga_loading}
+				<div transition:fade={{ duration: 250 }} class="space-y-3">
+					{#each sarga_data as line}
+						<div><pre>{line}</pre></div>
+					{/each}
+				</div>
+			{/if}
+		</div>
 	{/if}
 </div>
