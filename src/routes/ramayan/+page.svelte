@@ -127,13 +127,12 @@
 		<select bind:value={$kANDa_selected} class="select w-52">
 			<option value={0}>Select</option>
 			{#each rAmAyaNa_map as kANDa}
-				<option value={kANDa.index}
-					>{kANDa.index}. {LipiLekhikA.convert(
-						kANDa.name_devanagari,
-						BASE_SCRIPT,
-						loaded_viewing_script
-					)}</option
-				>
+				{@const kANDa_name = LipiLekhikA.convert(
+					kANDa.name_devanagari,
+					BASE_SCRIPT,
+					loaded_viewing_script
+				)}
+				<option value={kANDa.index}>{kANDa.index}. {kANDa_name}</option>
 			{/each}
 		</select>
 	</label>
@@ -144,13 +143,12 @@
 			<select bind:value={$sarga_selected} class="select w-52">
 				<option value={0}>Select</option>
 				{#each kANDa.sarga_data as sarga}
-					<option value={sarga.index}
-						>{sarga.index}. {LipiLekhikA.convert(
-							sarga.name_devanagari,
-							BASE_SCRIPT,
-							loaded_viewing_script
-						)}</option
-					>
+					{@const sarga_name = LipiLekhikA.convert(
+						sarga.name_devanagari.split('\n')[0],
+						BASE_SCRIPT,
+						loaded_viewing_script
+					)}
+					<option value={sarga.index}>{sarga.index}. {sarga_name}</option>
 				{/each}
 			</select>
 		</label>
