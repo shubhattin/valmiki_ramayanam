@@ -15,6 +15,7 @@
 	import { SlideToggle } from '@skeletonlabs/skeleton';
 	import { LANG_LIST } from '@tools/lang_list';
 	import LipiLekhikA from '@tools/converter';
+	import { LanguageIcon } from '@components/icons';
 
 	const BASE_SCRIPT = 'Sanskrit';
 
@@ -114,7 +115,7 @@
 
 <div class="mt-4 space-y-4">
 	<label class="space-x-4">
-		<span class="font-bold">Select Viewing Script</span>
+		<Icon src={LanguageIcon} class="text-4xl" />
 		<select class="select inline-block w-40" bind:value={viewing_script}>
 			{#each LANG_LIST as lang (lang)}
 				<option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
