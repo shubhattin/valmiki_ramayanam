@@ -50,7 +50,7 @@
 	<div class="space-y-2">
 		<select class="select" bind:value={from_lang}>
 			{#each LANG_LIST as lang (lang)}
-				<option value={lang}>{lang}</option>
+				<option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
 			{/each}
 		</select>
 		<textarea
@@ -80,7 +80,7 @@
 	<div class="space-y-2">
 		<select class="select" bind:value={to_lang}>
 			{#each LANG_LIST as lang (lang)}
-				<option value={lang}>{lang}</option>
+				<option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
 			{/each}
 		</select>
 		<textarea class="textarea h-56" placeholder={`Enter text in ${to_lang}`} bind:value={$to_text}

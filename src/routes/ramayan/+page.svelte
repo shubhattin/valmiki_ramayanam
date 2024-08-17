@@ -5,17 +5,41 @@
 	import { fade, scale, slide } from 'svelte/transition';
 	import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
 	import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
+	import { BsClipboard2Check } from 'svelte-icons-pack/bs';
 	import { transliterate_xlxs_file } from '@tools/excel/transliterate_xlsx_file';
 	import { download_file_in_browser } from '@tools/download_file_browser';
-	import { onDestroy } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { delay } from '@tools/delay';
 	import { writable } from 'svelte/store';
 	import ExcelJS from 'exceljs';
+	import { SlideToggle } from '@skeletonlabs/skeleton';
+	import { LANG_LIST } from '@tools/lang_list';
+	import LipiLekhikA from '@tools/converter';
+
+	const BASE_SCRIPT = 'Sanskrit';
 
 	let kANDa_selected = writable(0);
 	let sarga_selected = writable(0);
 	let sarga_data: string[] = [];
 	let sarga_loading = false;
+	let enable_copy_to_clipbaord = true;
+	let copied_shloka_number: number | null = null;
+	let viewing_script = BASE_SCRIPT;
+	let loaded_viewing_script: string = viewing_script;
+
+	$: (async () => {
+		await LipiLekhikA.k.load_lang(viewing_script);
+		loaded_viewing_script = viewing_script;
+	})();
+	$: copied_shloka_number !== null && setTimeout(() => (copied_shloka_number = null), 1400);
+
+	onMount(async () => {
+		if (import.meta.env.DEV) {
+			$kANDa_selected = 1;
+			$sarga_selected = 1;
+		}
+		await LipiLekhikA.k.load_lang(BASE_SCRIPT);
+	});
 
 	const sarga_unsub = sarga_selected.subscribe(async () => {
 		if ($kANDa_selected === 0 || $sarga_selected === 0) return;
@@ -68,6 +92,10 @@
 		const downloadLink = URL.createObjectURL(blob);
 		download_file_in_browser(downloadLink, `${$sarga_selected}. ${sarga_name}.xlsx`);
 	};
+
+	const copy_text_to_clipboard = (text: string) => {
+		navigator.clipboard.writeText(text);
+	};
 </script>
 
 <svelte:head>
@@ -86,11 +114,25 @@
 
 <div class="mt-4 space-y-4">
 	<label class="space-x-4">
+		<span class="font-bold">Select Viewing Script</span>
+		<select class="select inline-block w-40" bind:value={viewing_script}>
+			{#each LANG_LIST as lang (lang)}
+				<option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
+			{/each}
+		</select>
+	</label>
+	<label class="space-x-4">
 		<span class="font-bold">Select kANDa</span>
 		<select bind:value={$kANDa_selected} class="select w-52">
 			<option value={0}>Select</option>
 			{#each rAmAyaNa_map as kANDa}
-				<option value={kANDa.index}>{kANDa.index}. {kANDa.name_devanagari}</option>
+				<option value={kANDa.index}
+					>{kANDa.index}. {LipiLekhikA.convert(
+						kANDa.name_devanagari,
+						BASE_SCRIPT,
+						loaded_viewing_script
+					)}</option
+				>
 			{/each}
 		</select>
 	</label>
@@ -101,7 +143,13 @@
 			<select bind:value={$sarga_selected} class="select w-52">
 				<option value={0}>Select</option>
 				{#each kANDa.sarga_data as sarga}
-					<option value={sarga.index}>{sarga.index}. {sarga.name_devanagari}</option>
+					<option value={sarga.index}
+						>{sarga.index}. {LipiLekhikA.convert(
+							sarga.name_devanagari,
+							BASE_SCRIPT,
+							loaded_viewing_script
+						)}</option
+					>
 				{/each}
 			</select>
 		</label>
@@ -142,13 +190,45 @@
 				Download Excel File
 			</button>
 		</div>
+		<div class="flex space-x-4">
+			<SlideToggle
+				name="Copy to Clipboard"
+				bind:checked={enable_copy_to_clipbaord}
+				active="bg-primary-500"
+			>
+				Doudle Click on Shloka to Copy
+			</SlideToggle>
+			{#if copied_shloka_number !== null}
+				<span class="mt-1 cursor-default select-none font-bold dark:text-green-300">
+					<Icon src={BsClipboard2Check} />
+					Copied Shloka {copied_shloka_number} to Clipboard
+				</span>
+			{/if}
+		</div>
 		<div
-			class="h-[65vh] overflow-scroll rounded-xl border-2 border-red-600 px-4 py-3 dark:border-yellow-300"
+			class="h-[65vh] overflow-scroll rounded-xl border-2 border-red-600 px-2 py-3 dark:border-yellow-300"
 		>
 			{#if !sarga_loading}
-				<div transition:fade={{ duration: 250 }} class="space-y-3">
-					{#each sarga_data as line}
-						<div><pre>{line}</pre></div>
+				<div transition:fade={{ duration: 250 }} class="">
+					{#each sarga_data as line, i}
+						{@const line_transliterated = LipiLekhikA.convert(
+							line,
+							BASE_SCRIPT,
+							loaded_viewing_script
+						)}
+						<!-- svelte-ignore a11y-click-events-have-key-events -->
+						<!-- svelte-ignore a11y-no-static-element-interactions -->
+						<div
+							class="rounded-lg px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-800"
+							on:dblclick={() => {
+								if (enable_copy_to_clipbaord) {
+									copied_shloka_number = i;
+									copy_text_to_clipboard(line_transliterated);
+								}
+							}}
+						>
+							<pre>{line_transliterated}</pre>
+						</div>
 					{/each}
 				</div>
 			{/if}
