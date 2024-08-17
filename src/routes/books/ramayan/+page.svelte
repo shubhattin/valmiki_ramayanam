@@ -9,42 +9,35 @@
 	import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
 	import { transliterate_xlxs_file } from '@tools/excel/transliterate_xlsx_file';
 	import { download_file_in_browser } from '@tools/download_file_browser';
-	import { onDestroy, onMount } from 'svelte';
+	import { onDestroy } from 'svelte';
 	import { delay } from '@tools/delay';
 	import { writable } from 'svelte/store';
 	import ExcelJS from 'exceljs';
 
 	let kANDa_selected = writable(0);
-	let sarga_selected = 0;
+	let sarga_selected = writable(0);
 	let sarga_data: string[] = [];
 	let sarga_loading = false;
 
-	onMount(() => {
-		if (import.meta.env.DEV) {
-			$kANDa_selected = 1;
-			sarga_selected = 1;
-		}
+	const sarga_unsub = sarga_selected.subscribe(async () => {
+		if ($kANDa_selected === 0 || $sarga_selected === 0) return;
+		sarga_loading = true;
+		sarga_data = [];
+		const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
+		const data = (
+			(await all_sargas[`/data/ramayan/data/${$kANDa_selected}/${$sarga_selected}.json`]()) as any
+		).default as string[];
+		await delay(400);
+		sarga_loading = false;
+		sarga_data = data;
 	});
-
-	$: {
-		(async () => {
-			if ($kANDa_selected === 0 || sarga_selected === 0) return;
-			const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
-			sarga_loading = true;
-			const data = (
-				(await all_sargas[`/data/ramayan/data/${$kANDa_selected}/${sarga_selected}.json`]()) as any
-			).default as string[];
-			sarga_data = data;
-			await delay(400);
-			sarga_loading = false;
-		})();
-	}
 	const kANDa_selected_unsub = kANDa_selected.subscribe(() => {
-		sarga_selected = 0;
+		$sarga_selected = 0;
 	});
 
 	onDestroy(() => {
 		kANDa_selected_unsub();
+		sarga_unsub();
 	});
 
 	const PAGE_INFO = {
@@ -69,14 +62,13 @@
 
 		// saving file to output path
 		let sarga_name =
-			rAmAyaNa_map[$kANDa_selected - 1].sarga_data[sarga_selected - 1].name_normal.split('\n')[0];
-		console.log(sarga_name);
+			rAmAyaNa_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].name_normal.split('\n')[0];
 		const buffer = await workbook.xlsx.writeBuffer();
 		const blob = new Blob([buffer], {
 			type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 		});
 		const downloadLink = URL.createObjectURL(blob);
-		download_file_in_browser(downloadLink, `${sarga_selected}. ${sarga_name}.xlsx`);
+		download_file_in_browser(downloadLink, `${$sarga_selected}. ${sarga_name}.xlsx`);
 	};
 </script>
 
@@ -126,7 +118,7 @@
 		{@const kANDa = rAmAyaNa_map[$kANDa_selected - 1]}
 		<label class="space-x-4">
 			<span class="font-bold">Select Sarga</span>
-			<select bind:value={sarga_selected} class="select w-52">
+			<select bind:value={$sarga_selected} class="select w-52">
 				<option value={0}>Select</option>
 				{#each kANDa.sarga_data as sarga}
 					<option value={sarga.index}>{sarga.index}. {sarga.name_devanagari}</option>
@@ -134,12 +126,12 @@
 			</select>
 		</label>
 	{/if}
-	{#if $kANDa_selected !== 0 && sarga_selected !== 0}
+	{#if $kANDa_selected !== 0 && $sarga_selected !== 0}
 		{@const kANDa = rAmAyaNa_map[$kANDa_selected - 1]}
 		<div class="space-x-3">
-			{#if sarga_selected !== 1}
+			{#if $sarga_selected !== 1}
 				<button
-					on:click={() => (sarga_selected -= 1)}
+					on:click={() => ($sarga_selected -= 1)}
 					in:scale
 					out:slide
 					class="btn rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white"
@@ -148,9 +140,9 @@
 					Previous
 				</button>
 			{/if}
-			{#if sarga_selected !== kANDa.sarga_data.length}
+			{#if $sarga_selected !== kANDa.sarga_data.length}
 				<button
-					on:click={() => (sarga_selected += 1)}
+					on:click={() => ($sarga_selected += 1)}
 					in:scale
 					out:slide
 					class="btn rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white"
