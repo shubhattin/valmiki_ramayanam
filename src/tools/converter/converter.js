@@ -94,6 +94,8 @@ class lipi_helper {
 			tel: 23,
 			ur: 24
 		};
+
+		this.pUrNasarve = this.alph[0] + this.alph[1] + "01234567890'$.#?";
 	}
 	normalize(ln) {
 		// function to normalize the names of scripts
@@ -213,6 +215,51 @@ class lipi_parivartak {
 			['', -1]
 		];
 		this.second_cap_time = 0;
+
+		// patch
+		this.callback_func_for_state_update = null;
+	}
+
+	/**
+	 * The mukhya function performs a specific task.
+	 *
+	 * @param {any} elmt - The textarea element parameter.
+	 * @param {string} [text=''] - The text parameter. Default value is an empty string.
+	 * @param {string} [lang=''] - The lang parameter. Default value is an empty string.
+	 * @param {boolean} [on_status=true] - The on_status parameter. Default value is true.
+	 * @param {any} [callback=null] - The callback parameter. Default value is null.
+	 * @returns {void}
+	 */
+
+	mukhya(elmt, text = '', lang = '', on_status = true, callback = null) {
+		// if (!this.karya) return;
+		if (!on_status) return;
+		if (text == null || text == undefined) {
+			this.clear_all_val(true);
+			return;
+		}
+		text = text.substring(text.length - 1);
+		let elf = this.elphased_time() < 15.0;
+		if (this.k.in(this.k.pUrNasarve, text)) {
+			if (!elf) this.clear_all_val(true);
+			let lng = lang;
+			lng = this.k.normalize(lng);
+			this.callback_func_for_state_update = callback;
+			this.prakriyA({
+				text: text,
+				typing: 1, // sanskrit mode
+				lang: lng,
+				mode: 1, // element mode, 0 for text mode
+				element: elmt
+			});
+		} else this.clear_all_val(true);
+	}
+	elphased_time() {
+		let t = this.time,
+			c = this.k.time();
+		let t1 = c - t;
+		this.time = c;
+		return t1;
 	}
 	prakriyA(args) {
 		let code = '',
@@ -423,6 +470,56 @@ class lipi_parivartak {
 		if (mode == 0) {
 			for (let p = 0; p < val[1]; p++) this.dev_text.pop();
 			for (let x of val[0]) this.dev_text.push(x);
+		} else if (mode == 1) {
+			let is_input = false;
+			// if (l.in(['input', 'textarea'], elm[0].tagName.toLowerCase())) is_input = true;
+			// in this we assume it to be true
+			is_input = true;
+			if (is_input) {
+				let dyn = elm.value;
+				let current_cursor_pos = elm.selectionStart + 1;
+				let ex = 0;
+				if (this.from_click) {
+					current_cursor_pos++;
+					ex = 1;
+				}
+				let pre_part = dyn.substring(0, current_cursor_pos - val[1] - 2);
+				let changing_part = val[0];
+				let post_part = '';
+				if (dyn.length + 1 + (this.from_click ? 1 : 0) == current_cursor_pos)
+					post_part = dyn.substring(current_cursor_pos + 1);
+				else if (dyn.length + 1 != current_cursor_pos)
+					post_part = dyn.substring(current_cursor_pos - 1 - ex);
+				let length = pre_part.length + changing_part.length;
+				const new_value = pre_part + changing_part + post_part;
+				if (this.callback_func_for_state_update) {
+					this.callback_func_for_state_update(new_value);
+					this.callback_func_for_state_update = null;
+				}
+				// ele.value = new_value;
+				// the above is not needed atleast for svelte because the rerender is imediatee and precise
+				// this might be in react owing to the VDOM and how it rerenders
+				elm.focus();
+				elm.selectionStart = length;
+				elm.selectionEnd = length;
+				if (this.from_click) this.from_click = false;
+			}
+		}
+		if (this.capital[0] == 3) this.capital = [0, '', -1, -1, 0, 0, false];
+		if (
+			key.length == 1 &&
+			l.is_lower(key) &&
+			l.to_upper(key) in this.akSharANi &&
+			this.capital[0] == 0 &&
+			mode == 1
+		) {
+			let a = [0, '', -1, -1, 0, 0, false];
+			let b = [1, key, varna_sthiti, temp, l.time(), this.varna[1].length, false];
+			if (key + key in data) {
+				if (this.akSharANi[l.to_upper(key)][l.to_upper(key)][0] != data[key + key][0])
+					this.capital = b;
+				else this.capital = a;
+			} else this.capital = b;
 		}
 		this.next_chars = current[current.length - 2];
 		if (varna_sthiti == 3) this.store_last_of_3 = l.last(this.varna[1]);
@@ -703,6 +800,7 @@ class lipi_parivartak {
 			// the change below is a lossfull change and cannot be recovered while converting back to the original script
 			out = out.replaceAll('..', '');
 			out = out.replaceAll('.', '');
+			// replacing avagraha with a
 			out = out.replaceAll("''", 'a');
 			if (to === 'Normal') {
 				let replaces = [

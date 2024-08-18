@@ -1,17 +1,22 @@
 <script lang="ts">
 	import MainAppBar from '@components/MainAppBar.svelte';
 	import Icon from '@tools/Icon.svelte';
+	import { SlideToggle } from '@skeletonlabs/skeleton';
 	import { LANG_LIST } from '@tools/lang_list';
 	import LipiLekhikA from '@tools/converter';
 	import { FaCircleUp, FaCircleDown } from 'svelte-icons-pack/fa';
 	import { writable } from 'svelte/store';
 	import type { Writable } from 'svelte/store';
+	import { BsKeyboard } from 'svelte-icons-pack/bs';
 
 	let from_lang = 'Sanskrit';
 	let to_lang = 'Telugu';
 
 	let from_text = writable('');
 	let to_text = writable('');
+
+	let from_text_type_enabled = true;
+	let to_text_type_enabled = true;
 
 	$: {
 		LipiLekhikA.k.load_lang(from_lang);
@@ -31,6 +36,9 @@
 		title: 'Lipi Parivartak',
 		desciption: 'A Indian Script Transliteration Utility'
 	};
+
+	$: console.log([1, $from_text]);
+	$: console.log([2, $to_text]);
 </script>
 
 <svelte:head>
@@ -48,15 +56,32 @@
 
 <div class="mt-4">
 	<div class="space-y-2">
-		<select class="select" bind:value={from_lang}>
-			{#each LANG_LIST as lang (lang)}
-				<option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
-			{/each}
-		</select>
+		<div class="flex space-x-4">
+			<select class="select w-40" bind:value={from_lang}>
+				{#each LANG_LIST as lang (lang)}
+					<option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
+				{/each}
+			</select>
+			<SlideToggle
+				name="from_text_type"
+				active="bg-primary-500"
+				class="mt-1 hover:text-gray-500 dark:hover:text-gray-400"
+				bind:checked={from_text_type_enabled}
+				size="sm"
+			>
+				<Icon src={BsKeyboard} class="text-4xl" />
+			</SlideToggle>
+		</div>
 		<textarea
 			class="textarea h-56"
 			placeholder={`Enter text in ${from_lang}`}
 			bind:value={$from_text}
+			on:input={(e) => {
+				// @ts-ignore
+				LipiLekhikA.mukhya(e.target, $from_text, from_lang, from_text_type_enabled, (val) => {
+					$from_text = val;
+				});
+			}}
 		></textarea>
 	</div>
 	<div class="my-3 flex justify-center space-x-3">
@@ -78,12 +103,32 @@
 		>
 	</div>
 	<div class="space-y-2">
-		<select class="select" bind:value={to_lang}>
-			{#each LANG_LIST as lang (lang)}
-				<option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
-			{/each}
-		</select>
-		<textarea class="textarea h-56" placeholder={`Enter text in ${to_lang}`} bind:value={$to_text}
+		<div class="flex space-x-4">
+			<select class="select w-40" bind:value={to_lang}>
+				{#each LANG_LIST as lang (lang)}
+					<option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
+				{/each}
+			</select>
+			<SlideToggle
+				name="to_text_type"
+				active="bg-primary-500"
+				class="mt-1 hover:text-gray-500 dark:hover:text-gray-400"
+				bind:checked={to_text_type_enabled}
+				size="sm"
+			>
+				<Icon src={BsKeyboard} class="text-4xl" />
+			</SlideToggle>
+		</div>
+		<textarea
+			class="textarea h-56"
+			placeholder={`Enter text in ${to_lang}`}
+			bind:value={$to_text}
+			on:input={(e) => {
+				// @ts-ignore
+				LipiLekhikA.mukhya(e.target, $to_text, to_lang, to_text_type_enabled, (val) => {
+					$to_text = val;
+				});
+			}}
 		></textarea>
 	</div>
 </div>

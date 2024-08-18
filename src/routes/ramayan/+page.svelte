@@ -194,6 +194,7 @@
 				name="Copy to Clipboard"
 				bind:checked={enable_copy_to_clipbaord}
 				active="bg-primary-500"
+				size="sm"
 			>
 				Doudle Click on Shloka to Copy
 			</SlideToggle>
