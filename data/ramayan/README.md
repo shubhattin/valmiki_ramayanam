@@ -2,7 +2,7 @@
 
 This is a extarct to scape data from [विकिस्रोत](https://sa.wikisource.org/wiki/रामायणम्) and extract from and standardize it both using mannual and automated processes.
 
-[![Ramayan CI](https://github.com/shubhattin/sanskrit_text_transliteration/actions/workflows/ramayan_ci.yml/badge.svg)](https://github.com/shubhattin/sanskrit_text_transliteration/actions/workflows/ramayan_ci.yml)
+[![Ramayan CI](https://github.com/shubhattin/valmiki_ramayanam/actions/workflows/ramayan_ci.yml/badge.svg)](https://github.com/shubhattin/valmiki_ramayanam/actions/workflows/ramayan_ci.yml)
 
 ## Data Scraping
 
@@ -42,7 +42,7 @@ So before we start on how to correct manually, we need to understand that how it
 - If you are using Github Codespace then you should use the command `./helper_cli` to do all your terminal related tasks
 - Steps to start contributing
   - Make sure you have a [github](https://github.com/signup) account.
-  - Fork the [repository](https://github.com/shubhattin/sanskrit_text_transliteration) to your account.
+  - Fork the [repository](https://github.com/shubhattin/valmiki_ramayanam) to your account.
   - Goto the forked repository and press `.(dot)` key on keyboard. This will open the github.dev environment.
   - You can start editing the files in the text_data folder.
   - In the left side you should see the git icon, click on it and you should see the changes you have made.

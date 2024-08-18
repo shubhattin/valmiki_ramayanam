@@ -194,11 +194,12 @@
 				name="Copy to Clipboard"
 				bind:checked={enable_copy_to_clipbaord}
 				active="bg-primary-500"
+				size="sm"
 			>
 				Doudle Click on Shloka to Copy
 			</SlideToggle>
 			{#if copied_shloka_number !== null}
-				<span class="mt-1 cursor-default select-none font-bold dark:text-green-300">
+				<span class="cursor-default select-none font-bold text-green-700 dark:text-green-300">
 					<Icon src={BsClipboard2Check} />
 					Copied Shloka {copied_shloka_number} to Clipboard
 				</span>
