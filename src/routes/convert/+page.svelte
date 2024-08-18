@@ -36,9 +36,6 @@
 		title: 'Lipi Parivartak',
 		desciption: 'A Indian Script Transliteration Utility'
 	};
-
-	$: console.log([1, $from_text]);
-	$: console.log([2, $to_text]);
 </script>
 
 <svelte:head>
@@ -78,7 +75,7 @@
 			bind:value={$from_text}
 			on:input={(e) => {
 				// @ts-ignore
-				LipiLekhikA.mukhya(e.target, $from_text, from_lang, from_text_type_enabled, (val) => {
+				LipiLekhikA.mukhya(e.target, e.data, from_lang, from_text_type_enabled, (val) => {
 					$from_text = val;
 				});
 			}}
@@ -125,7 +122,7 @@
 			bind:value={$to_text}
 			on:input={(e) => {
 				// @ts-ignore
-				LipiLekhikA.mukhya(e.target, $to_text, to_lang, to_text_type_enabled, (val) => {
+				LipiLekhikA.mukhya(e.target, e.data, to_lang, to_text_type_enabled, (val) => {
 					$to_text = val;
 				});
 			}}

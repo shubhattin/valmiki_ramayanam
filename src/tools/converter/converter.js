@@ -224,29 +224,29 @@ class lipi_parivartak {
 	 * The mukhya function performs a specific task.
 	 *
 	 * @param {any} elmt - The textarea element parameter.
-	 * @param {string} [text=''] - The text parameter. Default value is an empty string.
+	 * @param {string} [event_data=''] - The text parameter. Default value is an empty string.
 	 * @param {string} [lang=''] - The lang parameter. Default value is an empty string.
 	 * @param {boolean} [on_status=true] - The on_status parameter. Default value is true.
 	 * @param {any} [callback=null] - The callback parameter. Default value is null.
 	 * @returns {void}
 	 */
 
-	mukhya(elmt, text = '', lang = '', on_status = true, callback = null) {
+	mukhya(elmt, event_data = '', lang = '', on_status = true, callback = null) {
 		// if (!this.karya) return;
 		if (!on_status) return;
-		if (text == null || text == undefined) {
+		if (event_data == null || event_data == undefined) {
 			this.clear_all_val(true);
 			return;
 		}
-		text = text.substring(text.length - 1);
+		event_data = event_data.substring(event_data.length - 1);
 		let elf = this.elphased_time() < 15.0;
-		if (this.k.in(this.k.pUrNasarve, text)) {
+		if (this.k.in(this.k.pUrNasarve, event_data)) {
 			if (!elf) this.clear_all_val(true);
 			let lng = lang;
 			lng = this.k.normalize(lng);
 			this.callback_func_for_state_update = callback;
 			this.prakriyA({
-				text: text,
+				text: event_data,
 				typing: 1, // sanskrit mode
 				lang: lng,
 				mode: 1, // element mode, 0 for text mode
@@ -492,16 +492,14 @@ class lipi_parivartak {
 					post_part = dyn.substring(current_cursor_pos - 1 - ex);
 				let length = pre_part.length + changing_part.length;
 				const new_value = pre_part + changing_part + post_part;
+				elm.value = new_value;
+				elm.focus();
+				elm.selectionStart = length;
+				elm.selectionEnd = length;
 				if (this.callback_func_for_state_update) {
 					this.callback_func_for_state_update(new_value);
 					this.callback_func_for_state_update = null;
 				}
-				// ele.value = new_value;
-				// the above is not needed atleast for svelte because the rerender is imediatee and precise
-				// this might be in react owing to the VDOM and how it rerenders
-				elm.focus();
-				elm.selectionStart = length;
-				elm.selectionEnd = length;
 				if (this.from_click) this.from_click = false;
 			}
 		}
