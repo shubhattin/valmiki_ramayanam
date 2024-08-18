@@ -8,7 +8,13 @@ import typer
 from rich.console import Console
 from rich.prompt import Confirm, Prompt
 import shubhlipi as sh
-from common import DOUBLE_VIRAMA, SINGLE_VIRAMA, is_permitted_dev_char
+from common import (
+    DOUBLE_VIRAMA,
+    SINGLE_VIRAMA,
+    is_permitted_dev_char,
+    VISARGA,
+    AVAGRAHA,
+)
 
 
 app = typer.Typer()
@@ -100,9 +106,14 @@ def get_shloka_text(kANDa_num: str, sarga_num: str, to_recreate_text_folder=Fals
             "पाठकौ घनपाठी",  # we have to safely remove this as its not aa ramayan line
         ]
         NOT_STARTS_WITH.extend(END_TEXTS)
+        line = line.replace(f" {AVAGRAHA}", AVAGRAHA)
+        # this should be usually not a problem because any line starting with visarga is already ignord
+        # so whenever you have to make the change mentioned below, for recreating the text data
+        # first run the program and then uncomment the line below and run again
+        # if you are sure and satisfied with the changes, then you can make the change in the code
+        line = line.replace(":", VISARGA)
         continue_status = False
         break_loop_as_last_found = False
-        line = line.replace(" ऽ", 'ऽ')
         for nsw in NOT_STARTS_WITH:
             if line.startswith(nsw):
                 for end_text in END_TEXTS:
