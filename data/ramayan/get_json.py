@@ -58,14 +58,11 @@ def get_shloka_json(path: str):
 
     def get_first_line():
         template = (
-            lambda kANDa_dev_name, sarga_dev_name, sanskrit_number_sarga: f"श्रीमद्वाल्मीकीयरामायणे {kANDa_dev_name} {sarga_dev_name} नाम {sanskrit_number_sarga} सर्गः ॥{to_dev_numbers(kANDa_num)}-{to_dev_numbers(sarga_num)}॥"
+            lambda kANDa_dev_name, sarga_dev_name, sanskrit_number_sarga: f"अथ श्रीमद्वाल्मीकीयरामायणे {kANDa_dev_name} {sarga_dev_name} नाम {sanskrit_number_sarga} सर्गः ॥{to_dev_numbers(kANDa_num)}-{to_dev_numbers(sarga_num)}॥"
         )
         e_mAtrA = "े"  # from 1st to 7nd vibhakti
         kANDa_name = kANDa_info.name_devanagari[:-1] + e_mAtrA
-        sarga_name = sarga_info.name_devanagari
-        if kANDa_num == "7" and sarga_name.count(NEW_LINE) > 0:
-            # if more than one name for sarga, then use the first (uttarakANDa)
-            sarga_name = sarga_name.splitlines()[0]
+        sarga_name = sarga_info.name_devanagari.splitlines()[0]
         line = template(
             kANDa_name,
             sarga_name,
@@ -75,11 +72,14 @@ def get_shloka_json(path: str):
 
     def get_last_line():
         template = (
-            lambda kANDa_dev_name, sanskrit_number_sarga: f"इत्यार्षे श्रीमद्रामायणे वाल्मीकीये आदिकाव्ये {kANDa_dev_name} {sanskrit_number_sarga} सर्गः ॥{to_dev_numbers(kANDa_num)}-{to_dev_numbers(sarga_num)}॥"
+            lambda kANDa_dev_name, sanskrit_number_sarga, sarga_dev_name: f"इत्यार्षे श्रीमद्रामायणे वाल्मीकीये आदिकाव्ये {kANDa_dev_name} {sarga_dev_name} नाम {sanskrit_number_sarga} सर्गः ॥{to_dev_numbers(kANDa_num)}-{to_dev_numbers(sarga_num)}॥"
         )
         e_mAtrA = "े"
+        sarga_name = sarga_info.name_devanagari.splitlines()[0]
         kANda_name = kANDa_info.name_devanagari[:-1] + e_mAtrA
-        line = template(kANda_name, SANSKRIT_NUMBER_NAMES[int(sarga_num) - 1][1])
+        line = template(
+            kANda_name, SANSKRIT_NUMBER_NAMES[int(sarga_num) - 1][1], sarga_name
+        )
         return line
 
     shloka_list.append(get_first_line())
