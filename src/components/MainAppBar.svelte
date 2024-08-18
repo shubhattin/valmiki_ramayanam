@@ -41,7 +41,7 @@
 		<div class="space-x-2">
 			<a
 				class="text-xl"
-				href="https://github.com/shubhattin/sanskrit_text_transliteration"
+				href="https://github.com/shubhattin/valmiki_ramayanam"
 				target="_blank"
 				rel="noopener noreferrer"
 				use:popup={{
