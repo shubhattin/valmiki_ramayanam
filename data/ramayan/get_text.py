@@ -111,6 +111,7 @@ def get_shloka_text(kANDa_num: str, sarga_num: str, to_recreate_text_folder=Fals
         # so whenever you have to make the change mentioned below, for recreating the text data
         # first run the program and then uncomment the line below and run again
         # if you are sure and satisfied with the changes, then you can make the change in the code
+        # this problem was found in 2-(89-119)
         line = line.replace(":", VISARGA)
         continue_status = False
         break_loop_as_last_found = False
