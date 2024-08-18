@@ -18,6 +18,8 @@ NUMBERS = [
 SINGLE_VIRAMA = "।"
 DOUBLE_VIRAMA = "॥"
 SPACE = " "
+VISARGA = "ः"
+AVAGRAHA = "ऽ"
 NEW_LINE = "\n"
 DEV_RANGE = [2304, 2431]
 
