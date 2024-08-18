@@ -2891,7 +2891,7 @@
     "name_normal": "yuddhakANDaH",
     "index": 6,
     "sarga_count": 131,
-    "sarga_count_extracted": 128,
+    "sarga_count_extracted": 131,
     "sarga_data": [
       {
         "name_devanagari": "हनूमत्प्रशंसनम्",
@@ -3507,119 +3507,119 @@
         "name_normal": "saumitrirAvaNiyuddham",
         "index": 88,
         "shloka_count": 40,
-        "shloka_count_extracted": 77
+        "shloka_count_extracted": 36
       },
       {
         "name_devanagari": "सौमित्रिसंधुक्षणम्",
         "name_normal": "saumitrisandhukShaNam",
         "index": 89,
         "shloka_count": 42,
-        "shloka_count_extracted": 53
+        "shloka_count_extracted": 41
       },
       {
         "name_devanagari": "सौमित्रिरावणियुद्धम्",
         "name_normal": "saumitrirAvaNiyuddham",
         "index": 90,
         "shloka_count": 54,
-        "shloka_count_extracted": 94
+        "shloka_count_extracted": 53
       },
       {
         "name_devanagari": "रावणिवधः",
         "name_normal": "rAvaNivadhaH",
         "index": 91,
         "shloka_count": 98,
-        "shloka_count_extracted": 29
+        "shloka_count_extracted": 94
       },
       {
         "name_devanagari": "रावणिशस्त्रहतचिकित्सा",
         "name_normal": "rAvaNishastrahatachikitsA",
         "index": 92,
         "shloka_count": 28,
-        "shloka_count_extracted": 68
+        "shloka_count_extracted": 29
       },
       {
         "name_devanagari": "सीताहननोद्यमनिवृत्तिः",
         "name_normal": "sItAhananOdyamanivRttiH",
         "index": 93,
         "shloka_count": 67,
-        "shloka_count_extracted": 39
+        "shloka_count_extracted": 68
       },
       {
         "name_devanagari": "गन्धर्वास्त्रमोहनम्",
         "name_normal": "gandharvAstramOhanam",
         "index": 94,
         "shloka_count": 39,
-        "shloka_count_extracted": 41
+        "shloka_count_extracted": 39
       },
       {
         "name_devanagari": "राक्षसीविलापः",
         "name_normal": "rAkShasIvilApaH",
         "index": 95,
         "shloka_count": 43,
-        "shloka_count_extracted": 54
+        "shloka_count_extracted": 41
       },
       {
         "name_devanagari": "रावणाभिषेणनम्",
         "name_normal": "rAvaNAbhiShENanam",
         "index": 96,
         "shloka_count": 51,
-        "shloka_count_extracted": 36
+        "shloka_count_extracted": 54
       },
       {
         "name_devanagari": "विरूपाक्षवधः",
         "name_normal": "virUpAkShavadhaH",
         "index": 97,
         "shloka_count": 36,
-        "shloka_count_extracted": 38
+        "shloka_count_extracted": 36
       },
       {
         "name_devanagari": "महोदरवधः",
         "name_normal": "mahOdaravadhaH",
         "index": 98,
         "shloka_count": 38,
-        "shloka_count_extracted": 26
+        "shloka_count_extracted": 38
       },
       {
         "name_devanagari": "महापार्श्ववधः",
         "name_normal": "mahApArshvavadhaH",
         "index": 99,
         "shloka_count": 26,
-        "shloka_count_extracted": 51
+        "shloka_count_extracted": 26
       },
       {
         "name_devanagari": "रामरावणास्त्रपरम्परा",
         "name_normal": "rAmarAvaNAstraparamparA",
         "index": 100,
         "shloka_count": 51,
-        "shloka_count_extracted": 62
+        "shloka_count_extracted": 51
       },
       {
         "name_devanagari": "लक्ष्मणशक्तिक्षेपः",
         "name_normal": "lakShmaNashaktikShEpaH",
         "index": 101,
         "shloka_count": 63,
-        "shloka_count_extracted": 56
+        "shloka_count_extracted": 62
       },
       {
         "name_devanagari": "लक्ष्मणसंजीवनम्",
         "name_normal": "lakShmaNasanjIvanam",
         "index": 102,
         "shloka_count": 55,
-        "shloka_count_extracted": 70
+        "shloka_count_extracted": 56
       },
       {
         "name_devanagari": "ऐन्द्ररथकेतुपातनम्",
         "name_normal": "aindrarathakEtupAtanam",
         "index": 103,
         "shloka_count": 40,
-        "shloka_count_extracted": 31
+        "shloka_count_extracted": 38
       },
       {
         "name_devanagari": "रावणशूलभङ्गः",
         "name_normal": "rAvaNashUlabhangaH",
         "index": 104,
         "shloka_count": 32,
-        "shloka_count_extracted": 27
+        "shloka_count_extracted": 32
       },
       {
         "name_devanagari": "दशग्रीवविघूर्णनम्",
@@ -3633,160 +3633,181 @@
         "name_normal": "sArathivijnEyam",
         "index": 106,
         "shloka_count": 27,
-        "shloka_count_extracted": 36
+        "shloka_count_extracted": 27
       },
       {
         "name_devanagari": "आदित्यहृदयम्",
         "name_normal": "AdityahRdayam",
         "index": 107,
         "shloka_count": 31,
-        "shloka_count_extracted": 67
+        "shloka_count_extracted": 31
       },
       {
         "name_devanagari": "शुभाशुभनिमित्तदर्शनम्",
         "name_normal": "shubhAshubhanimittadarshanam",
         "index": 108,
         "shloka_count": 36,
-        "shloka_count_extracted": 34
+        "shloka_count_extracted": 36
       },
       {
         "name_devanagari": "रावणध्वजोन्मथनम्",
         "name_normal": "rAvaNadhvajOnmathanam",
         "index": 109,
         "shloka_count": 29,
-        "shloka_count_extracted": 25
+        "shloka_count_extracted": 28
       },
       {
         "name_devanagari": "रावणैकशतशिरश्छेदनम्",
         "name_normal": "rAvaNaikashatashirashChEdanam",
         "index": 110,
         "shloka_count": 39,
-        "shloka_count_extracted": 26
+        "shloka_count_extracted": 39
       },
       {
         "name_devanagari": "पौलस्त्यवधः",
         "name_normal": "paulastyavadhaH",
         "index": 111,
         "shloka_count": 34,
-        "shloka_count_extracted": 124
+        "shloka_count_extracted": 34
       },
       {
         "name_devanagari": "विभीषणविलापः",
         "name_normal": "vibhIShaNavilApaH",
         "index": 112,
         "shloka_count": 26,
-        "shloka_count_extracted": 26
+        "shloka_count_extracted": 25
       },
       {
         "name_devanagari": "रावाणान्तःपुरपरिदेवनम्",
         "name_normal": "rAvANAntaHpuraparidEvanam",
         "index": 113,
         "shloka_count": 26,
-        "shloka_count_extracted": 53
+        "shloka_count_extracted": 26
       },
       {
         "name_devanagari": "मन्दोदरीविलापः",
         "name_normal": "mandOdarIvilApaH",
         "index": 114,
         "shloka_count": 116,
-        "shloka_count_extracted": 36
+        "shloka_count_extracted": 124
       },
       {
         "name_devanagari": "विभीषणाभिषेकः",
         "name_normal": "vibhIShaNAbhiShEkaH",
         "index": 115,
         "shloka_count": 25,
-        "shloka_count_extracted": 25
+        "shloka_count_extracted": 26
       },
       {
         "name_devanagari": "मैथिलीप्रियनिवेदनम्",
         "name_normal": "maithilIpriyanivEdanam",
         "index": 116,
         "shloka_count": 51,
-        "shloka_count_extracted": 36
+        "shloka_count_extracted": 53
       },
       {
         "name_devanagari": "सीताभर्तृमुखोदीक्षणम्",
         "name_normal": "sItAbhartRmukhOdIkShaNam",
         "index": 117,
         "shloka_count": 36,
-        "shloka_count_extracted": 32
+        "shloka_count_extracted": 36
       },
       {
         "name_devanagari": "सीताप्रत्यादेशः",
         "name_normal": "sItApratyAdEshaH",
         "index": 118,
         "shloka_count": 25,
-        "shloka_count_extracted": 22
+        "shloka_count_extracted": 25
       },
       {
         "name_devanagari": "हुताशनप्रवेशः",
         "name_normal": "hutAshanapravEshaH",
         "index": 119,
         "shloka_count": 34,
-        "shloka_count_extracted": 39
+        "shloka_count_extracted": 36
       },
       {
         "name_devanagari": "ब्रह्मकृतरामस्तवः",
         "name_normal": "brahmakRtarAmastavaH",
         "index": 120,
         "shloka_count": 32,
-        "shloka_count_extracted": 24
+        "shloka_count_extracted": 32
       },
       {
         "name_devanagari": "सीताप्रतिग्रहः",
         "name_normal": "sItApratigrahaH",
         "index": 121,
         "shloka_count": 22,
-        "shloka_count_extracted": 30
+        "shloka_count_extracted": 22
       },
       {
         "name_devanagari": "दशरथप्रतिसमादेशः",
         "name_normal": "dasharathapratisamAdEshaH",
         "index": 122,
         "shloka_count": 36,
-        "shloka_count_extracted": 27
+        "shloka_count_extracted": 39
       },
       {
         "name_devanagari": "इन्द्रवरदानम्",
         "name_normal": "indravaradAnam",
         "index": 123,
         "shloka_count": 23,
-        "shloka_count_extracted": 57
+        "shloka_count_extracted": 24
       },
       {
         "name_devanagari": "पुष्पकोपस्थापनम्",
         "name_normal": "puShpakOpasthApanam",
         "index": 124,
         "shloka_count": 30,
-        "shloka_count_extracted": 23
+        "shloka_count_extracted": 30
       },
       {
         "name_devanagari": "पुष्पकोत्पतनम्",
         "name_normal": "puShpakOtpatanam",
         "index": 125,
         "shloka_count": 27,
-        "shloka_count_extracted": 46
+        "shloka_count_extracted": 27
       },
       {
         "name_devanagari": "प्रत्यवृत्तिपथवर्णनम्",
         "name_normal": "pratyavRttipathavarNanam",
         "index": 126,
         "shloka_count": 52,
-        "shloka_count_extracted": 55
+        "shloka_count_extracted": 57
       },
       {
         "name_devanagari": "भरद्वाजामन्त्रणम्",
         "name_normal": "bharadvAjAmantraNam",
         "index": 127,
         "shloka_count": 21,
-        "shloka_count_extracted": 64
+        "shloka_count_extracted": 23
       },
       {
         "name_devanagari": "भरतप्रियाख्यानम्",
         "name_normal": "bharatapriyAkhyAnam",
         "index": 128,
         "shloka_count": 45,
+        "shloka_count_extracted": 46
+      },
+      {
+        "name_devanagari": "हनूमद्भरतसंभाषणम्",
+        "name_normal": "hanUmadbharatasambhAShaNam",
+        "index": 129,
+        "shloka_count": 54,
+        "shloka_count_extracted": 55
+      },
+      {
+        "name_devanagari": "भरतसमागमः",
+        "name_normal": "bharatasamAgamaH",
+        "index": 130,
+        "shloka_count": 61,
+        "shloka_count_extracted": 64
+      },
+      {
+        "name_devanagari": "श्रीरामपट्टाभिषेकः",
+        "name_normal": "shrIrAmapaTTAbhiShEkaH",
+        "index": 131,
+        "shloka_count": 124,
         "shloka_count_extracted": 125
       }
     ]
