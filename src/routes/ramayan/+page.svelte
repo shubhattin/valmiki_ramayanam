@@ -13,7 +13,7 @@
 	import { writable } from 'svelte/store';
 	import ExcelJS from 'exceljs';
 	import { SlideToggle } from '@skeletonlabs/skeleton';
-	import { LANG_LIST } from '@tools/lang_list';
+	import { SCRIPT_LIST } from '@tools/lang_list';
 	import LipiLekhikA from '@tools/converter';
 	import { LanguageIcon } from '@components/icons';
 
@@ -117,7 +117,7 @@
 	<label class="space-x-4">
 		<Icon src={LanguageIcon} class="text-4xl" />
 		<select class="select inline-block w-40" bind:value={viewing_script}>
-			{#each LANG_LIST as lang (lang)}
+			{#each SCRIPT_LIST as lang (lang)}
 				<option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
 			{/each}
 		</select>

@@ -2,7 +2,7 @@
 	import MainAppBar from '@components/MainAppBar.svelte';
 	import Icon from '@tools/Icon.svelte';
 	import { SlideToggle } from '@skeletonlabs/skeleton';
-	import { LANG_LIST } from '@tools/lang_list';
+	import { SCRIPT_LIST } from '@tools/lang_list';
 	import LipiLekhikA from '@tools/converter';
 	import { FaCircleUp, FaCircleDown } from 'svelte-icons-pack/fa';
 	import { writable } from 'svelte/store';
@@ -55,7 +55,7 @@
 	<div class="space-y-2">
 		<div class="flex space-x-4">
 			<select class="select w-40" bind:value={from_lang}>
-				{#each LANG_LIST as lang (lang)}
+				{#each SCRIPT_LIST as lang (lang)}
 					<option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
 				{/each}
 			</select>
@@ -102,7 +102,7 @@
 	<div class="space-y-2">
 		<div class="flex space-x-4">
 			<select class="select w-40" bind:value={to_lang}>
-				{#each LANG_LIST as lang (lang)}
+				{#each SCRIPT_LIST as lang (lang)}
 					<option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
 				{/each}
 			</select>

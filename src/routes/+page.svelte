@@ -3,7 +3,7 @@
 	import { FileButton, Accordion, AccordionItem, popup } from '@skeletonlabs/skeleton';
 	import type { ModalSettings } from '@skeletonlabs/skeleton';
 	import { slide, scale, fly } from 'svelte/transition';
-	import { LANG_LIST } from '@tools/lang_list';
+	import { SCRIPT_LIST } from '@tools/lang_list';
 	import Icon from '@tools/Icon.svelte';
 	import { IoOptions } from 'svelte-icons-pack/io';
 	import { AiOutlineDelete } from 'svelte-icons-pack/ai';
@@ -189,7 +189,7 @@
 					<label class="block space-y-1">
 						<span>Base Language</span>
 						<select class="select" bind:value={base_lang_code}>
-							{#each LANG_LIST as lang (lang)}
+							{#each SCRIPT_LIST as lang (lang)}
 								<option value={lang}>{lang}</option>
 							{/each}
 						</select>

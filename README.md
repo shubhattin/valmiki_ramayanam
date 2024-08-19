@@ -1,12 +1,13 @@
-## Tool to transliterate Excel files
+# श्रीमद्वाल्मीकीयरामायणम् (Ṣrīmadvālmīkīya*rāmāyaṇam*)
 
-[![Ramayan CI](https://github.com/shubhattin/valmiki_ramayanam/actions/workflows/ramayan_ci.yml/badge.svg)](https://github.com/shubhattin/valmiki_ramayanam/actions/workflows/ramayan_ci.yml)
-[![App Checks](https://github.com/shubhattin/valmiki_ramayanam/actions/workflows/app_checks.yml/badge.svg)](https://github.com/shubhattin/valmiki_ramayanam/actions/workflows/app_checks.yml)
+**[श्रीमद्रामायणस्य पठनम्](https://lipi-parivartan.vercel.app)**
 
-This tool can be used to process excel files to transliterate them. It takes text from one Indian Script and uses it to transliterate it to another Indian Script, thus automating the Process.
+This Project is an effort to provide the text of the Valmiki Ramayanam in a structured format. The text is fetched from the [Valmiki Ramayanam - Wikisource](https://sa.wikisource.org/wiki/रामायणम्) and processed to provide the text in various formats.
 
-The Tool Used to Transliteration is `Lipi Lekhika`.
+We also aim to provide Translations and _Transliterations_ of the text in various languages.
 
-_[श्रीमद्रामायणम् data](./data/ramayan/)_
+<!-- load an image stored in assets/tsc.png in proper size so that does not take much psace -->
 
-**[श्रीमद्रामायणस्य पठनम्](https://lipi-parivartan.vercel.app/ramayan)**
+This Project is done with collaboration and Support from [![The Sanskrit Channel](./assets/tsc.png)](https://www.youtube.com/c/thesanskritchannel).
+
+**[Techinal Details](./Technical_Details.md)**
