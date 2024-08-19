@@ -6,7 +6,7 @@
 	import { SiGithub } from 'svelte-icons-pack/si';
 	import { SiConvertio } from './icons';
 
-	export let page: 'home' | 'convert' | 'ramayan';
+	export let page: 'home' | 'convert' | 'excel_tool';
 </script>
 
 <AppBar>
@@ -27,7 +27,7 @@
 					class="-mt-1 mr-1 text-2xl hover:fill-red-700 dark:hover:fill-sky-500"
 				/>
 				<div data-popup="home_popup" class="variant-ghost-tertiary px-1 text-base">
-					Home Page
+					श्रीमद्रामायणम्
 					<div class="bg-surface-100-800-token arrow" />
 				</div>
 			</a>
@@ -59,27 +59,6 @@
 					<div class="bg-surface-100-800-token arrow" />
 				</div>
 			</a>
-			{#if page !== 'ramayan'}
-				<a
-					href="/ramayan"
-					use:popup={{
-						event: 'hover',
-						target: 'ramayan_popup',
-						placement: 'bottom'
-					}}
-					class="hover:text-yellow-800 dark:hover:text-slate-300"
-				>
-					<span class="text-sm">रामायणम्</span>
-					<Icon src={BiBookOpen} class="text-2xl" />
-					<div
-						data-popup="ramayan_popup"
-						class="variant-ghost-tertiary px-1 text-base text-black dark:text-white"
-					>
-						श्रीमद्रामायणम्
-						<div class="bg-surface-100-800-token arrow" />
-					</div>
-				</a>
-			{/if}
 			{#if page !== 'convert'}
 				<a
 					class="text-xl"
