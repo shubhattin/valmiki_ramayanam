@@ -1,12 +1,22 @@
 <script lang="ts">
 	import { AppBar, popup } from '@skeletonlabs/skeleton';
+	import type { PopupSettings } from '@skeletonlabs/skeleton';
 	import ThemeChanger from './ThemeChanger.svelte';
-	import { BiArrowBack, BiBookOpen, BiLogoGithub } from 'svelte-icons-pack/bi';
+	import { BiArrowBack } from 'svelte-icons-pack/bi';
 	import Icon from '@tools/Icon.svelte';
 	import { SiGithub } from 'svelte-icons-pack/si';
 	import { SiConvertio } from './icons';
+	import { AiOutlineMenu } from 'svelte-icons-pack/ai';
+	import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
 
 	export let page: 'home' | 'convert' | 'excel_tool';
+
+	const popupFeatured: PopupSettings = {
+		event: 'click',
+		target: 'app_bar_menu',
+		placement: 'left-end',
+		closeQuery: '.will-close'
+	};
 </script>
 
 <AppBar>
@@ -39,26 +49,6 @@
 	<svelte:fragment slot="trail">
 		<slot name="end"></slot>
 		<div class="space-x-2">
-			<a
-				class="text-xl"
-				href="https://github.com/shubhattin/valmiki_ramayanam"
-				target="_blank"
-				rel="noopener noreferrer"
-				use:popup={{
-					event: 'hover',
-					target: 'github_popup',
-					placement: 'bottom'
-				}}
-			>
-				<Icon
-					src={SiGithub}
-					class="-mt-1 mr-1 text-2xl hover:fill-indigo-700 dark:hover:fill-zinc-400"
-				/>
-				<div data-popup="github_popup" class="variant-ghost-tertiary px-1 text-base">
-					Project's Github Page
-					<div class="bg-surface-100-800-token arrow" />
-				</div>
-			</a>
 			{#if page !== 'convert'}
 				<a
 					class="text-xl"
@@ -80,6 +70,38 @@
 				</a>
 			{/if}
 		</div>
-		<ThemeChanger />
+		<button class="btn m-0 p-0" use:popup={popupFeatured}>
+			<Icon src={AiOutlineMenu} class="text-3xl" />
+		</button>
+		<div class="card rounded-lg px-3 py-2 shadow-xl" data-popup="app_bar_menu">
+			<div class="space-y-2">
+				<a
+					href="/excel_tool"
+					class="will-close text-md flex space-x-1 rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
+				>
+					<Icon
+						src={RiDocumentFileExcel2Line}
+						class="-mt-1 text-xl text-green-600 dark:text-green-400"
+					/>
+					<span>Excel File Transliterator</span>
+				</a>
+				<a
+					href="https://github.com/shubhattin/valmiki_ramayanam"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="will-close text-md flex space-x-1 rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
+				>
+					<Icon
+						src={SiGithub}
+						class="-mt-1 mr-1 text-2xl hover:fill-indigo-700 dark:hover:fill-zinc-400"
+					/>
+					<span>Project's Github Page</span>
+				</a>
+				<div class="wont-close text-md flex space-x-3 rounded-md px-2 py-1">
+					<span class="mt-1">Set Theme</span>
+					<ThemeChanger />
+				</div>
+			</div>
+		</div>
 	</svelte:fragment>
 </AppBar>
