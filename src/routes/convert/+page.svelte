@@ -9,6 +9,7 @@
 	import type { Writable } from 'svelte/store';
 	import { BsKeyboard } from 'svelte-icons-pack/bs';
 	import MetaTags from '@components/MetaTags.svelte';
+	import { OiCopy16 } from 'svelte-icons-pack/oi';
 
 	let from_lang = 'Sanskrit';
 	let to_lang = 'Telugu';
@@ -32,6 +33,9 @@
 	) {
 		target.set(await lipi_parivartak_async(source_text, source_lang, target_lang));
 	}
+	const copy_text_to_clipboard = (text: string) => {
+		navigator.clipboard.writeText(text);
+	};
 
 	const PAGE_INFO = {
 		title: 'Lipi Parivartak',
@@ -55,6 +59,13 @@
 					<option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
 				{/each}
 			</select>
+			<button
+				title="Copy Text"
+				class="btn m-0 select-none p-0 outline-none dark:hover:text-gray-400"
+				on:click={() => copy_text_to_clipboard($from_text)}
+			>
+				<Icon src={OiCopy16} class="text-xl" />
+			</button>
 			<SlideToggle
 				name="from_text_type"
 				active="bg-primary-500"
@@ -102,6 +113,13 @@
 					<option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
 				{/each}
 			</select>
+			<button
+				title="Copy Text"
+				class="btn m-0 select-none p-0 outline-none dark:hover:text-gray-400"
+				on:click={() => copy_text_to_clipboard($to_text)}
+			>
+				<Icon src={OiCopy16} class="text-xl" />
+			</button>
 			<SlideToggle
 				name="to_text_type"
 				active="bg-primary-500"
