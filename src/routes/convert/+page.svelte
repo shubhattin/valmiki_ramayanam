@@ -3,12 +3,13 @@
 	import Icon from '@tools/Icon.svelte';
 	import { SlideToggle } from '@skeletonlabs/skeleton';
 	import { SCRIPT_LIST } from '@tools/lang_list';
-	import LipiLekhikA from '@tools/converter';
+	import LipiLekhikA, { load_parivartak_lang_data, lipi_parivartak_async } from '@tools/converter';
 	import { FaCircleUp, FaCircleDown } from 'svelte-icons-pack/fa';
 	import { writable } from 'svelte/store';
 	import type { Writable } from 'svelte/store';
 	import { BsKeyboard } from 'svelte-icons-pack/bs';
 	import MetaTags from '@components/MetaTags.svelte';
+	import { OiCopy16 } from 'svelte-icons-pack/oi';
 
 	let from_lang = 'Sanskrit';
 	let to_lang = 'Telugu';
@@ -20,18 +21,21 @@
 	let to_text_type_enabled = true;
 
 	$: {
-		LipiLekhikA.k.load_lang(from_lang);
-		LipiLekhikA.k.load_lang(to_lang);
+		load_parivartak_lang_data(from_lang);
+		load_parivartak_lang_data(to_lang);
 	}
 
-	function convert_text(
+	async function convert_text(
 		source_text: string,
 		target: Writable<string>,
 		source_lang: string,
 		target_lang: string
 	) {
-		target.set(LipiLekhikA.convert(source_text, source_lang, target_lang));
+		target.set(await lipi_parivartak_async(source_text, source_lang, target_lang));
 	}
+	const copy_text_to_clipboard = (text: string) => {
+		navigator.clipboard.writeText(text);
+	};
 
 	const PAGE_INFO = {
 		title: 'Lipi Parivartak',
@@ -55,6 +59,13 @@
 					<option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
 				{/each}
 			</select>
+			<button
+				title="Copy Text"
+				class="btn m-0 select-none p-0 outline-none dark:hover:text-gray-400"
+				on:click={() => copy_text_to_clipboard($from_text)}
+			>
+				<Icon src={OiCopy16} class="text-xl" />
+			</button>
 			<SlideToggle
 				name="from_text_type"
 				active="bg-primary-500"
@@ -102,6 +113,13 @@
 					<option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
 				{/each}
 			</select>
+			<button
+				title="Copy Text"
+				class="btn m-0 select-none p-0 outline-none dark:hover:text-gray-400"
+				on:click={() => copy_text_to_clipboard($to_text)}
+			>
+				<Icon src={OiCopy16} class="text-xl" />
+			</button>
 			<SlideToggle
 				name="to_text_type"
 				active="bg-primary-500"
