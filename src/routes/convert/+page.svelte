@@ -8,6 +8,7 @@
 	import { writable } from 'svelte/store';
 	import type { Writable } from 'svelte/store';
 	import { BsKeyboard } from 'svelte-icons-pack/bs';
+	import MetaTags from '@components/MetaTags.svelte';
 
 	let from_lang = 'Sanskrit';
 	let to_lang = 'Telugu';
@@ -34,20 +35,15 @@
 
 	const PAGE_INFO = {
 		title: 'Lipi Parivartak',
-		desciption: 'A Indian Script Transliteration Utility'
+		description: 'A Indian Script Transliteration Utility'
 	};
 </script>
 
-<svelte:head>
-	<title>Lipi Parivartak</title>
-	<meta property="og:title" content={PAGE_INFO.title} />
-	<meta name="description" content={PAGE_INFO.desciption} />
-	<meta property="og:description" content={PAGE_INFO.desciption} />
-	<meta property="og:site_name" content={PAGE_INFO.title} />
-</svelte:head>
+<MetaTags title={PAGE_INFO.title} description={PAGE_INFO.description} />
+
 <MainAppBar page="convert">
 	<span slot="headline">
-		<span class="ml-2 text-2xl font-bold">Lipi Parivartak</span>
+		<span class="text-2xl font-bold">Lipi Parivartak</span>
 	</span>
 </MainAppBar>
 

@@ -20,6 +20,7 @@
 	import { download_file_in_browser } from '@tools/download_file_browser';
 	import { writable } from 'svelte/store';
 	import Preview from './Preview.svelte';
+	import MetaTags from '@components/MetaTags.svelte';
 
 	export const modalStore = getModalStore();
 
@@ -126,18 +127,13 @@
 	};
 
 	const PAGE_INFO = {
-		title: 'Lipi Parivartan',
-		desciption: 'A Utility to transliterate text in Excel files for Indian Scripts'
+		title: 'Lipi Parivartan for Excel Files',
+		description: 'A Utility to transliterate text in Excel files for Indian Scripts'
 	};
 </script>
 
-<svelte:head>
-	<title>Lipi Parivartan</title>
-	<meta property="og:title" content={PAGE_INFO.title} />
-	<meta name="description" content={PAGE_INFO.desciption} />
-	<meta property="og:description" content={PAGE_INFO.desciption} />
-	<meta property="og:site_name" content={PAGE_INFO.title} />
-</svelte:head>
+<MetaTags title={PAGE_INFO.title} description={PAGE_INFO.description} />
+
 <MainAppBar page="excel_tool">
 	<span slot="headline" class="text-xl font-bold">Lipi Parivartan for Excel Files</span>
 </MainAppBar>

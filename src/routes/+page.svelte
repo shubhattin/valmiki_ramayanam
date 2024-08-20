@@ -16,6 +16,7 @@
 	import { SCRIPT_LIST } from '@tools/lang_list';
 	import LipiLekhikA from '@tools/converter';
 	import { LanguageIcon } from '@components/icons';
+	import MetaTags from '@components/MetaTags.svelte';
 
 	const BASE_SCRIPT = 'Sanskrit';
 
@@ -63,11 +64,6 @@
 		sarga_unsub();
 	});
 
-	const PAGE_INFO = {
-		title: 'श्रीमद्रामायणम्',
-		desciption: 'श्रीमद्रामायणस्य पठनम्'
-	};
-
 	const download_excel_file = async () => {
 		// the method used below creates a url for both dev and prod
 		const url = new URL('/data/ramayan/template/excel_file_template.xlsx', import.meta.url).href;
@@ -97,19 +93,18 @@
 	const copy_text_to_clipboard = (text: string) => {
 		navigator.clipboard.writeText(text);
 	};
+
+	const PAGE_INFO = {
+		title: 'श्रीमद्रामायणम्',
+		description: 'श्रीमद्रामायणस्य पठनम्'
+	};
 </script>
 
-<svelte:head>
-	<title>{PAGE_INFO.title}</title>
-	<meta property="og:title" content={PAGE_INFO.title} />
-	<meta name="description" content={PAGE_INFO.desciption} />
-	<meta property="og:description" content={PAGE_INFO.desciption} />
-	<meta property="og:site_name" content={PAGE_INFO.title} />
-</svelte:head>
+<MetaTags title={PAGE_INFO.title} description={PAGE_INFO.description} />
 
 <MainAppBar page="home">
 	<span slot="headline">
-		<span class="ml-2 text-2xl font-bold">{PAGE_INFO.title}</span>
+		<span class="text-2xl font-bold">{PAGE_INFO.title}</span>
 	</span>
 </MainAppBar>
 
