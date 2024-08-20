@@ -14,7 +14,7 @@
 	import ExcelJS from 'exceljs';
 	import { SlideToggle } from '@skeletonlabs/skeleton';
 	import { SCRIPT_LIST } from '@tools/lang_list';
-	import LipiLekhikA from '@tools/converter';
+	import { load_parivartak_lang_data, lipi_parivartak } from '@tools/converter';
 	import { LanguageIcon } from '@components/icons';
 	import MetaTags from '@components/MetaTags.svelte';
 
@@ -30,7 +30,7 @@
 	let loaded_viewing_script: string = viewing_script;
 
 	$: (async () => {
-		await LipiLekhikA.k.load_lang(viewing_script);
+		await load_parivartak_lang_data(viewing_script);
 		loaded_viewing_script = viewing_script;
 	})();
 	$: copied_shloka_number !== null && setTimeout(() => (copied_shloka_number = null), 1400);
@@ -40,7 +40,7 @@
 			$kANDa_selected = 1;
 			$sarga_selected = 1;
 		}
-		await LipiLekhikA.k.load_lang(BASE_SCRIPT);
+		await load_parivartak_lang_data(BASE_SCRIPT);
 	});
 
 	const sarga_unsub = sarga_selected.subscribe(async () => {
@@ -122,7 +122,7 @@
 		<select bind:value={$kANDa_selected} class="select w-52">
 			<option value={0}>Select</option>
 			{#each rAmAyaNa_map as kANDa}
-				{@const kANDa_name = LipiLekhikA.convert(
+				{@const kANDa_name = lipi_parivartak(
 					kANDa.name_devanagari,
 					BASE_SCRIPT,
 					loaded_viewing_script
@@ -138,7 +138,7 @@
 			<select bind:value={$sarga_selected} class="select w-52">
 				<option value={0}>Select</option>
 				{#each kANDa.sarga_data as sarga}
-					{@const sarga_name = LipiLekhikA.convert(
+					{@const sarga_name = lipi_parivartak(
 						sarga.name_devanagari.split('\n')[0],
 						BASE_SCRIPT,
 						loaded_viewing_script
@@ -206,11 +206,7 @@
 			{#if !sarga_loading}
 				<div transition:fade={{ duration: 250 }} class="">
 					{#each sarga_data as line, i}
-						{@const line_transliterated = LipiLekhikA.convert(
-							line,
-							BASE_SCRIPT,
-							loaded_viewing_script
-						)}
+						{@const line_transliterated = lipi_parivartak(line, BASE_SCRIPT, loaded_viewing_script)}
 						<!-- svelte-ignore a11y-click-events-have-key-events -->
 						<!-- svelte-ignore a11y-no-static-element-interactions -->
 						<div

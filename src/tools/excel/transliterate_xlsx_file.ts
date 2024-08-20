@@ -1,5 +1,5 @@
 import type ExcelJS from 'exceljs';
-import LipiLekhikA from '@tools/converter';
+import LipiLekhikA, { normalize_lang_code, lipi_parivartak_async } from '@tools/converter';
 
 /**
  * To transliterate text in a given Excel file
@@ -44,8 +44,8 @@ export const transliterate_xlxs_file = async (
 		const promises: Promise<void>[] = [];
 		lang_row.eachCell((cell, col_i) => {
 			const promise = (async () => {
-				const lang_name = cell.value?.toLocaleString().trim().replaceAll(' ', ''); // trimming white spaces and
-				const lang_code = LipiLekhikA.k.normalize(lang_name);
+				const lang_name = cell.value!.toLocaleString().trim().replaceAll(' ', ''); // trimming white spaces and
+				const lang_code = normalize_lang_code(lang_name);
 				if (lang_code && lang_code !== base_lang_code) {
 					await LipiLekhikA.k.load_lang(
 						lang_code,
@@ -57,7 +57,7 @@ export const transliterate_xlxs_file = async (
 					for (let val_pair of texts) {
 						const text = val_pair[1];
 						const i = val_pair[0];
-						const out = LipiLekhikA.convert(text, base_lang_code, lang_code);
+						const out = await lipi_parivartak_async(text, base_lang_code, lang_code);
 						worksheet.getCell(i, col_i).value = out;
 					}
 				}
