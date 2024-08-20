@@ -185,7 +185,7 @@ class lipi_helper {
 		return val;
 	}
 }
-class lipi_parivartak {
+class LipiParivartak {
 	constructor() {
 		this.k = lipi_hlp;
 		this.karya = true;
@@ -771,52 +771,111 @@ class lipi_parivartak {
 		else if (l.in([from, to], 'Urdu') || l.in([from, to], 'Romanized')) return convert(to, res);
 		return res;
 	}
-	convert(val, from, to) {
-		const pacham_patches = [
-			// patching कवर्ग
-			['Gk', 'nk'],
-			['Gkh', 'nkh'],
-			['Gg', 'ng'],
-			['Ggh', 'ngh'],
-			// patching चवर्ग
-			['Jch', 'nch'],
-			['JCh', 'nCh'],
-			['Jj', 'nj'],
-			['Jjh', 'njh'],
-			['jJ', 'jn']
-		]; // this info will also be use to convert to Normal as well from Normal
-		if (from == 'Normal') {
-			for (let text of pacham_patches) {
-				val = val.replaceAll(text[1], text[0]);
-			}
-		}
-		let out = this._parivartak(val, from, to);
-		if (to === 'Normal' || to === 'Romanized') {
-			// Doing this type of a patch here, for now because its better not touch the main lipi parivartak codebase
-			for (let i = 0; i < 10; i++) out = out.replaceAll(`.${i}`, i);
-			// removing . and .. for । and ॥ respectively
-			// the change below is a lossfull change and cannot be recovered while converting back to the original script
-			out = out.replaceAll('..', '');
-			out = out.replaceAll('.', '');
-			// replacing avagraha with a
-			out = out.replaceAll("''", 'a');
-			if (to === 'Normal') {
-				let replaces = [
-					// patching छ and ञ from Y -> J
-					['chh', 'Ch'],
-					['Y', 'J']
-				];
-				replaces.push(...pacham_patches);
-				for (let text of replaces) {
-					out = out.replaceAll(text[0], text[1]);
-				}
-			}
-		}
-		return out;
-	}
 }
 const lipi_hlp = new lipi_helper();
-const LipiLekhikA = new lipi_parivartak();
+const LipiLekhikA = new LipiParivartak();
 lipi_hlp.k = LipiLekhikA;
 
 export default LipiLekhikA;
+
+/**
+ * @param {string} lang
+ * @returns {string}
+ */
+export const normalize_lang_code = (lang) => {
+	return lipi_hlp.normalize(lang);
+};
+
+export const load_parivartak_lang_data = async (lang) => {
+	await LipiLekhikA.k.load_lang(lang);
+};
+
+const pacham_patches = [
+	// patching कवर्ग
+	['Gk', 'nk'],
+	['Gkh', 'nkh'],
+	['Gg', 'ng'],
+	['Ggh', 'ngh'],
+	// patching चवर्ग
+	['Jch', 'nch'],
+	['JCh', 'nCh'],
+	['Jj', 'nj'],
+	['Jjh', 'njh'],
+	['jJ', 'jn']
+]; // this info will also be use to convert to Normal as well from Normal
+
+/**
+ * @type {Array<Array<string>>}
+ */
+const VARGANI = [
+	['क', 'ख', 'ग', 'घ', 'ङ'],
+	['च', 'छ', 'ज', 'झ', 'ञ'],
+	['ट', 'ठ', 'ड', 'ढ', 'ण'],
+	['त', 'थ', 'द', 'ध', 'न'],
+	['प', 'फ', 'ब', 'भ', 'म']
+];
+const HALANT = '्';
+const ANUNASIK = 'ं';
+
+/**
+ * This function is used to convert the text from one script to another
+ * @param {string} val - The text to be converted
+ * @param {string} from - The script of the text to be converted
+ * @param {string} to - The script to which the text is to be converted
+ * @returns {string} - The text converted to the desired script
+ *
+ */
+export const lipi_parivartak = (val, from, to) => {
+	from = normalize_lang_code(from);
+	to = normalize_lang_code(to);
+	if (from == 'Normal') {
+		for (let text of pacham_patches) {
+			val = val.replaceAll(text[1], text[0]);
+		}
+	}
+	const SCRIPTS_TO_REPLACE_WITH_ANUNASIK = ['Telugu', 'Kannada'];
+	if (from === 'Sanskrit' && SCRIPTS_TO_REPLACE_WITH_ANUNASIK.indexOf(to) !== -1) {
+		for (let varga of VARGANI) {
+			for (let i = 0; i <= 3; i++)
+				val = val.replaceAll(varga[4] + HALANT + varga[i], ANUNASIK + varga[i]);
+		}
+	}
+	let out = LipiLekhikA._parivartak(val, from, to);
+	if (to === 'Normal' || to === 'Romanized') {
+		// Doing this type of a patch here, for now because its better not touch the main lipi parivartak codebase
+		for (let i = 0; i < 10; i++) out = out.replaceAll(`.${i}`, i);
+		// removing . and .. for । and ॥ respectively
+		// the change below is a lossfull change and cannot be recovered while converting back to the original script
+		out = out.replaceAll('..', '');
+		out = out.replaceAll('.', '');
+		// replacing avagraha with a
+		out = out.replaceAll("''", 'a');
+		if (to === 'Normal') {
+			let replaces = [
+				// patching छ and ञ from Y -> J
+				['chh', 'Ch'],
+				['Y', 'J']
+			];
+			replaces.push(...pacham_patches);
+			for (let text of replaces) {
+				out = out.replaceAll(text[0], text[1]);
+			}
+		}
+	}
+	return out;
+};
+
+/**
+ * This function is an async version of the lipi_parivartak function
+ * It does not require the user to manually load the languages before converting the text
+ * It is used to convert the text from one script to another
+ * @param {string} val - The text to be converted
+ * @param {string} from - The script of the text to be converted
+ * @param {string} to - The script to which the text is to be converted
+ * @returns {Promise<string>} - The text converted to the desired script
+ **/
+export const lipi_parivartak_async = async (val, from, to) => {
+	await load_parivartak_lang_data(from);
+	await load_parivartak_lang_data(to);
+	return lipi_parivartak(val, from, to);
+};

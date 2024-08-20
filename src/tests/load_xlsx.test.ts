@@ -1,7 +1,7 @@
 // this file should be called root of project
 import { describe, it } from 'vitest';
 import ExcelJS from 'exceljs';
-import LipiLekhikA from '@tools/converter';
+import { normalize_lang_code, lipi_parivartak_async } from '@tools/converter';
 
 // Define file paths
 const inputFilePath = './src/tests/data/nAradavAkyam.xlsx';
@@ -19,18 +19,15 @@ async function processExcelFile() {
 	text_col.eachCell((cell, i) => {
 		if (i > 1 && cell.value) texts.push(cell.value.toString());
 	});
-	await LipiLekhikA.k.load_lang('de');
-	await LipiLekhikA.k.load_lang('hi');
 	const promises: Promise<void>[] = [];
 	lang_row.eachCell((cell, col_i) => {
 		const promise = (async () => {
-			const lang_name = cell.value?.toLocaleString().trim().replaceAll(' ', ''); // trimming white spaces and
-			const lang_code = LipiLekhikA.k.normalize(lang_name);
+			const lang_name = cell.value!.toLocaleString().trim().replaceAll(' ', ''); // trimming white spaces and
+			const lang_code = normalize_lang_code(lang_name);
 			if (lang_code && lang_code !== 'Sanskrit') {
-				await LipiLekhikA.k.load_lang(lang_code);
 				for (let i = 0; i < texts.length; i++) {
 					const text = texts[i];
-					const out = LipiLekhikA.convert(text, 'de', lang_code);
+					const out = await lipi_parivartak_async(text, 'de', lang_code);
 					worksheet.getCell(i + 2, col_i).value = out;
 				}
 			}
