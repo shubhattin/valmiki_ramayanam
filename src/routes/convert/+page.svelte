@@ -3,7 +3,7 @@
 	import Icon from '@tools/Icon.svelte';
 	import { SlideToggle } from '@skeletonlabs/skeleton';
 	import { SCRIPT_LIST } from '@tools/lang_list';
-	import LipiLekhikA from '@tools/converter';
+	import LipiLekhikA, { load_parivartak_lang_data, lipi_parivartak_async } from '@tools/converter';
 	import { FaCircleUp, FaCircleDown } from 'svelte-icons-pack/fa';
 	import { writable } from 'svelte/store';
 	import type { Writable } from 'svelte/store';
@@ -20,17 +20,17 @@
 	let to_text_type_enabled = true;
 
 	$: {
-		LipiLekhikA.k.load_lang(from_lang);
-		LipiLekhikA.k.load_lang(to_lang);
+		load_parivartak_lang_data(from_lang);
+		load_parivartak_lang_data(to_lang);
 	}
 
-	function convert_text(
+	async function convert_text(
 		source_text: string,
 		target: Writable<string>,
 		source_lang: string,
 		target_lang: string
 	) {
-		target.set(LipiLekhikA.convert(source_text, source_lang, target_lang));
+		target.set(await lipi_parivartak_async(source_text, source_lang, target_lang));
 	}
 
 	const PAGE_INFO = {

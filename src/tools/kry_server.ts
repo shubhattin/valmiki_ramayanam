@@ -1,6 +1,6 @@
 import readline from 'readline';
 import { existsSync } from 'fs';
-import { mkdir } from 'fs/promises';
+import { mkdirSync } from 'fs';
 
 export async function take_input(prompt: string) {
 	return new Promise<string>((resolve) => {
@@ -15,8 +15,8 @@ export async function take_input(prompt: string) {
 	});
 }
 
-export async function make_dir(folderPath: string) {
-	if (!existsSync(folderPath)) await mkdir(folderPath, { recursive: true });
+export function make_dir(folderPath: string) {
+	if (!existsSync(folderPath)) mkdirSync(folderPath, { recursive: true });
 }
 
 export const dbMode = (() => {
