@@ -2,12 +2,13 @@
 	import MainAppBar from '@components/MainAppBar.svelte';
 	import Icon from '@tools/Icon.svelte';
 	import { SlideToggle } from '@skeletonlabs/skeleton';
-	import { LANG_LIST } from '@tools/lang_list';
+	import { SCRIPT_LIST } from '@tools/lang_list';
 	import LipiLekhikA from '@tools/converter';
 	import { FaCircleUp, FaCircleDown } from 'svelte-icons-pack/fa';
 	import { writable } from 'svelte/store';
 	import type { Writable } from 'svelte/store';
 	import { BsKeyboard } from 'svelte-icons-pack/bs';
+	import MetaTags from '@components/MetaTags.svelte';
 
 	let from_lang = 'Sanskrit';
 	let to_lang = 'Telugu';
@@ -34,20 +35,15 @@
 
 	const PAGE_INFO = {
 		title: 'Lipi Parivartak',
-		desciption: 'A Indian Script Transliteration Utility'
+		description: 'A Indian Script Transliteration Utility'
 	};
 </script>
 
-<svelte:head>
-	<title>Lipi Parivartak</title>
-	<meta property="og:title" content={PAGE_INFO.title} />
-	<meta name="description" content={PAGE_INFO.desciption} />
-	<meta property="og:description" content={PAGE_INFO.desciption} />
-	<meta property="og:site_name" content={PAGE_INFO.title} />
-</svelte:head>
+<MetaTags title={PAGE_INFO.title} description={PAGE_INFO.description} />
+
 <MainAppBar page="convert">
 	<span slot="headline">
-		<span class="ml-2 text-2xl font-bold">Lipi Parivartak</span>
+		<span class="text-2xl font-bold">Lipi Parivartak</span>
 	</span>
 </MainAppBar>
 
@@ -55,7 +51,7 @@
 	<div class="space-y-2">
 		<div class="flex space-x-4">
 			<select class="select w-40" bind:value={from_lang}>
-				{#each LANG_LIST as lang (lang)}
+				{#each SCRIPT_LIST as lang (lang)}
 					<option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
 				{/each}
 			</select>
@@ -102,7 +98,7 @@
 	<div class="space-y-2">
 		<div class="flex space-x-4">
 			<select class="select w-40" bind:value={to_lang}>
-				{#each LANG_LIST as lang (lang)}
+				{#each SCRIPT_LIST as lang (lang)}
 					<option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
 				{/each}
 			</select>

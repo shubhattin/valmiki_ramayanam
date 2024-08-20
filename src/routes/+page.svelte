@@ -1,268 +1,232 @@
 <script lang="ts">
 	import MainAppBar from '@components/MainAppBar.svelte';
-	import { FileButton, Accordion, AccordionItem, popup } from '@skeletonlabs/skeleton';
-	import type { ModalSettings } from '@skeletonlabs/skeleton';
-	import { slide, scale, fly } from 'svelte/transition';
-	import { LANG_LIST } from '@tools/lang_list';
 	import Icon from '@tools/Icon.svelte';
-	import { IoOptions } from 'svelte-icons-pack/io';
-	import { AiOutlineDelete } from 'svelte-icons-pack/ai';
-	import { VscDebugStart, VscPreview } from 'svelte-icons-pack/vsc';
-	import { OiGear16 } from 'svelte-icons-pack/oi';
-	import { FiCircle } from 'svelte-icons-pack/fi';
-	import { TiTick } from 'svelte-icons-pack/ti';
-	import { BiSolidDownload, BiBookOpen } from 'svelte-icons-pack/bi';
-	import { SiConvertio } from '@components/icons';
-	import { getModalStore } from '@skeletonlabs/skeleton';
-	import ExcelJS from 'exceljs';
-	import type { Workbook } from 'exceljs';
-	import { delay } from '@tools/delay';
+	import rAmAyaNa_map from '@data/ramayan/ramayan_map.json';
+	import { fade, scale, slide } from 'svelte/transition';
+	import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
+	import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
+	import { BsClipboard2Check } from 'svelte-icons-pack/bs';
 	import { transliterate_xlxs_file } from '@tools/excel/transliterate_xlsx_file';
 	import { download_file_in_browser } from '@tools/download_file_browser';
+	import { onDestroy, onMount } from 'svelte';
+	import { delay } from '@tools/delay';
 	import { writable } from 'svelte/store';
-	import Preview from './Preview.svelte';
+	import ExcelJS from 'exceljs';
+	import { SlideToggle } from '@skeletonlabs/skeleton';
+	import { SCRIPT_LIST } from '@tools/lang_list';
+	import LipiLekhikA from '@tools/converter';
+	import { LanguageIcon } from '@components/icons';
+	import MetaTags from '@components/MetaTags.svelte';
 
-	export const modalStore = getModalStore();
+	const BASE_SCRIPT = 'Sanskrit';
 
-	let file_download_links: string[] = [];
-	let file_workbooks: Workbook[] = [];
-	let file_list: FileList;
-	// let file_list = [{ name: 'vAlamIki.xlsx' }, { name: 'nArada.xlxs' }]; // @warn
+	let kANDa_selected = writable(0);
+	let sarga_selected = writable(0);
+	let sarga_data: string[] = [];
+	let sarga_loading = false;
+	let enable_copy_to_clipbaord = true;
+	let copied_shloka_number: number | null = null;
+	let viewing_script = BASE_SCRIPT;
+	let loaded_viewing_script: string = viewing_script;
 
-	// default options
-	let lang_row_index = 1;
-	let text_col_index = 2;
-	let text_row_start_index = 2;
-	let base_lang_code = 'Sanskrit';
-	let file_name_prefix = '';
-	let file_name_postfix = '_transliterated';
+	$: (async () => {
+		await LipiLekhikA.k.load_lang(viewing_script);
+		loaded_viewing_script = viewing_script;
+	})();
+	$: copied_shloka_number !== null && setTimeout(() => (copied_shloka_number = null), 1400);
 
-	let transliterated_atleast_once = false;
-	let now_processing = false;
-
-	let file_preview_opened = writable(false);
-	let current_workbook: Workbook;
-	let current_file_preview_link: string;
-	let current_file_name: string;
-
-	function clear_file_list() {
-		const modal: ModalSettings = {
-			type: 'confirm',
-			title: 'Please Confirm',
-			body: 'Are you sure to clear all loaded files ?',
-			response: (resp: boolean) => {
-				if (!resp) return;
-				file_list = null!;
-				$file_preview_opened = false;
-				current_workbook = null!;
-				current_file_name = null!;
-				current_file_preview_link = null!;
-				transliterated_atleast_once = false;
-
-				// resetting the defaults as well
-				lang_row_index = 1;
-				text_col_index = 2;
-				text_row_start_index = 2;
-				base_lang_code = 'Sanskrit';
-				file_name_prefix = '';
-				file_name_postfix = '_transliterated';
-			}
-		};
-		modalStore.trigger(modal);
-	}
-
-	async function start_transliteration() {
-		const get_workbook_obj_from_file = (file: File) => {
-			return new Promise<Workbook>(async (resolve) => {
-				const workbook = new ExcelJS.Workbook();
-				const reader = new FileReader();
-				reader.onload = async (event) => {
-					const data = event.target?.result;
-					if (data instanceof ArrayBuffer) {
-						await workbook.xlsx.load(data);
-						resolve(workbook);
-						return;
-					}
-				};
-				reader.readAsArrayBuffer(file);
-			});
-		};
-		now_processing = true;
-		file_download_links = [];
-		file_workbooks = [];
-		for (let file of file_list) {
-			if (!file) continue;
-			const workbook = await get_workbook_obj_from_file(file);
-			await transliterate_xlxs_file(
-				workbook,
-				'all',
-				lang_row_index,
-				text_col_index,
-				text_row_start_index,
-				base_lang_code
-			);
-			file_workbooks.push(workbook);
-			const buffer = await workbook.xlsx.writeBuffer();
-			const blob = new Blob([buffer], {
-				type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-			});
-			const downloadLink = URL.createObjectURL(blob);
-			file_download_links.push(downloadLink);
+	onMount(async () => {
+		if (import.meta.env.DEV) {
+			$kANDa_selected = 1;
+			$sarga_selected = 1;
 		}
+		await LipiLekhikA.k.load_lang(BASE_SCRIPT);
+	});
+
+	const sarga_unsub = sarga_selected.subscribe(async () => {
+		if ($kANDa_selected === 0 || $sarga_selected === 0) return;
+		sarga_loading = true;
+		sarga_data = [];
+		const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
+		const data = (
+			(await all_sargas[`/data/ramayan/data/${$kANDa_selected}/${$sarga_selected}.json`]()) as any
+		).default as string[];
 		await delay(400);
-		now_processing = false;
-		transliterated_atleast_once = true;
-	}
+		sarga_loading = false;
+		sarga_data = data;
+	});
+	const kANDa_selected_unsub = kANDa_selected.subscribe(() => {
+		$sarga_selected = 0;
+	});
 
-	const download_file = (file_index: number) => {
-		const file = file_list[file_index];
-		const download_link = file_download_links[file_index];
+	onDestroy(() => {
+		kANDa_selected_unsub();
+		sarga_unsub();
+	});
 
-		download_file_in_browser(download_link, get_file_name_with_prefix_postfix(file.name));
+	const download_excel_file = async () => {
+		// the method used below creates a url for both dev and prod
+		const url = new URL('/data/ramayan/template/excel_file_template.xlsx', import.meta.url).href;
+		const req = await fetch(url);
+		const file_blob = await req.blob();
+		const workbook = new ExcelJS.Workbook();
+		await workbook.xlsx.load(await file_blob.arrayBuffer());
+		const worksheet = workbook.getWorksheet(1)!;
+		const COLUMN_FOR_DEV = 2;
+		const TEXT_START_ROW = 2;
+		for (let i = 0; i < sarga_data.length; i++) {
+			worksheet.getCell(i + COLUMN_FOR_DEV, TEXT_START_ROW).value = sarga_data[i];
+		}
+		await transliterate_xlxs_file(workbook, 'all', 1, COLUMN_FOR_DEV, TEXT_START_ROW, 'Sanskrit');
+
+		// saving file to output path
+		let sarga_name =
+			rAmAyaNa_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].name_normal.split('\n')[0];
+		const buffer = await workbook.xlsx.writeBuffer();
+		const blob = new Blob([buffer], {
+			type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+		});
+		const downloadLink = URL.createObjectURL(blob);
+		download_file_in_browser(downloadLink, `${$sarga_selected}. ${sarga_name}.xlsx`);
 	};
 
-	const get_file_name_with_prefix_postfix = (name: string) => {
-		const base_name = `${name.substring(0, name.length - 5)}`;
-		return `${file_name_prefix}${base_name}${file_name_postfix}.xlsx`;
+	const copy_text_to_clipboard = (text: string) => {
+		navigator.clipboard.writeText(text);
 	};
 
 	const PAGE_INFO = {
-		title: 'Lipi Parivartan',
-		desciption: 'A Utility to transliterate text in Excel files for Indian Scripts'
+		title: 'श्रीमद्रामायणम्',
+		description: 'श्रीमद्रामायणस्य पठनम्'
 	};
 </script>
 
-<svelte:head>
-	<title>Lipi Parivartan</title>
-	<meta property="og:title" content={PAGE_INFO.title} />
-	<meta name="description" content={PAGE_INFO.desciption} />
-	<meta property="og:description" content={PAGE_INFO.desciption} />
-	<meta property="og:site_name" content={PAGE_INFO.title} />
-</svelte:head>
-<MainAppBar page="home">
-	<span slot="headline" class="text-xl font-bold">Lipi Parivartan for Excel Files</span>
-</MainAppBar>
-<div class="mt-3 space-y-4">
-	{#if !file_list}
-		<div in:scale out:slide>
-			<FileButton
-				bind:files={file_list}
-				multiple={true}
-				name="files"
-				accept=".xlsx"
-				button="btn variant-filled-tertiary">Select Excel files</FileButton
-			>
-		</div>
-	{/if}
-	{#if file_list && file_list.length !== 0}
-		<Accordion>
-			<!-- @warn -->
-			<AccordionItem open={false}>
-				<svelte:fragment slot="lead"><Icon src={IoOptions} class="text-3xl" /></svelte:fragment>
-				<svelte:fragment slot="summary"
-					><span class="font-bold">Change Default Options</span></svelte:fragment
-				>
-				<svelte:fragment slot="content">
-					<label class="block space-x-2">
-						<span>Language Row Number</span>
-						<input type="number" bind:value={lang_row_index} class="input w-16 rounded-lg" />
-					</label>
-					<label class="block space-x-2">
-						<span>Text Column Number</span>
-						<input type="number" bind:value={text_col_index} class="input w-16 rounded-lg" />
-					</label>
-					<label class="block space-x-2">
-						<span>Text Row Start Number</span>
-						<input type="number" bind:value={text_row_start_index} class="input w-16 rounded-lg" />
-					</label>
-					<label class="block">
-						<span class="mr-2">Transliterated file name template</span>
-						<input type="text" bind:value={file_name_prefix} class="input w-28 rounded-lg p-1" />
-						<input
-							type="text"
-							value="file_name"
-							disabled={true}
-							class="input w-20 rounded-lg p-1"
-						/>
-						<input type="text" bind:value={file_name_postfix} class="input w-36 rounded-lg p-1" />
-					</label>
-					<label class="block space-y-1">
-						<span>Base Language</span>
-						<select class="select" bind:value={base_lang_code}>
-							{#each LANG_LIST as lang (lang)}
-								<option value={lang}>{lang}</option>
-							{/each}
-						</select>
-					</label>
-				</svelte:fragment>
-			</AccordionItem>
-		</Accordion>
-		<button class="variant-filled-error btn flex" on:click={clear_file_list}>
-			<Icon src={AiOutlineDelete} class="mr-1 text-2xl" />
-			Clear File List
-		</button>
-		<ul
-			transition:slide
-			class="list rounded-lg border-2 border-amber-800 p-2 dark:border-yellow-600"
-		>
-			{#each file_list as file, file_index (file.name)}
-				<li class="font-bold">
-					<span class="mr-2.5">
-						{#if now_processing}
-							<Icon src={OiGear16} class="animate-spin text-xl" />
-						{:else if !transliterated_atleast_once}
-							<Icon src={FiCircle} class="text-xl text-zinc-500" />
-						{:else}
-							<Icon src={TiTick} class="text-xl text-green-600 dark:text-green-500" />
-						{/if}
-						{#if transliterated_atleast_once}
-							<span in:fly>
-								<button
-									class="btn m-0 p-0"
-									disabled={now_processing}
-									on:click={() => download_file(file_index)}
-									><Icon
-										src={BiSolidDownload}
-										class="text-xl hover:text-gray-500 active:text-green-600 dark:hover:text-gray-400"
-									/></button
-								>
-								<button
-									class="btn m-0 p-0"
-									disabled={now_processing}
-									on:click={() => {
-										current_workbook = file_workbooks[file_index];
-										current_file_preview_link = file_download_links[file_index];
-										current_file_name = get_file_name_with_prefix_postfix(file.name);
-										$file_preview_opened = true;
-									}}
-									><Icon
-										src={VscPreview}
-										class="text-xl hover:text-slate-500 active:text-blue-600 dark:hover:text-slate-400"
-									/></button
-								>
-							</span>
-						{/if}
-					</span>
-					{file.name}
-				</li>
-			{/each}
-		</ul>
+<MetaTags title={PAGE_INFO.title} description={PAGE_INFO.description} />
 
-		<button
-			on:click={start_transliteration}
-			disabled={now_processing}
-			class="variant-outline-success btn flex font-bold text-green-700 dark:text-white"
+<MainAppBar page="home">
+	<span slot="headline">
+		<span class="text-2xl font-bold">{PAGE_INFO.title}</span>
+	</span>
+</MainAppBar>
+
+<div class="mt-4 space-y-4">
+	<label class="space-x-4">
+		<Icon src={LanguageIcon} class="text-4xl" />
+		<select class="select inline-block w-40" bind:value={viewing_script}>
+			{#each SCRIPT_LIST as lang (lang)}
+				<option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
+			{/each}
+		</select>
+	</label>
+	<label class="space-x-4">
+		<span class="font-bold">Select kANDa</span>
+		<select bind:value={$kANDa_selected} class="select w-52">
+			<option value={0}>Select</option>
+			{#each rAmAyaNa_map as kANDa}
+				{@const kANDa_name = LipiLekhikA.convert(
+					kANDa.name_devanagari,
+					BASE_SCRIPT,
+					loaded_viewing_script
+				)}
+				<option value={kANDa.index}>{kANDa.index}. {kANDa_name}</option>
+			{/each}
+		</select>
+	</label>
+	{#if $kANDa_selected !== 0}
+		{@const kANDa = rAmAyaNa_map[$kANDa_selected - 1]}
+		<label class="space-x-4">
+			<span class="font-bold">Select Sarga</span>
+			<select bind:value={$sarga_selected} class="select w-52">
+				<option value={0}>Select</option>
+				{#each kANDa.sarga_data as sarga}
+					{@const sarga_name = LipiLekhikA.convert(
+						sarga.name_devanagari.split('\n')[0],
+						BASE_SCRIPT,
+						loaded_viewing_script
+					)}
+					<option value={sarga.index}>{sarga.index}. {sarga_name}</option>
+				{/each}
+			</select>
+		</label>
+	{/if}
+	{#if $kANDa_selected !== 0 && $sarga_selected !== 0}
+		{@const kANDa = rAmAyaNa_map[$kANDa_selected - 1]}
+		<div class="space-x-3">
+			{#if $sarga_selected !== 1}
+				<button
+					on:click={() => ($sarga_selected -= 1)}
+					in:scale
+					out:slide
+					class="btn rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white"
+				>
+					<Icon class="-mt-1 mr-1 text-xl" src={TiArrowBackOutline} />
+					Previous
+				</button>
+			{/if}
+			{#if $sarga_selected !== kANDa.sarga_data.length}
+				<button
+					on:click={() => ($sarga_selected += 1)}
+					in:scale
+					out:slide
+					class="btn rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white"
+				>
+					Next
+					<Icon class="-mt-1 ml-1 text-xl" src={TiArrowForwardOutline} />
+				</button>
+			{/if}
+			<button
+				on:click={download_excel_file}
+				class="variant-outline-success btn rounded-lg border-2 border-emerald-600 px-2 py-2 font-bold dark:border-emerald-400"
+			>
+				<Icon
+					class="-mt-1 mr-2 text-2xl text-green-600 dark:text-green-400"
+					src={RiDocumentFileExcel2Line}
+				/>
+				Download Excel File
+			</button>
+		</div>
+		<div class="flex space-x-4">
+			<SlideToggle
+				name="Copy to Clipboard"
+				bind:checked={enable_copy_to_clipbaord}
+				active="bg-primary-500"
+				size="sm"
+			>
+				Doudle Click on Shloka to Copy
+			</SlideToggle>
+			{#if copied_shloka_number !== null}
+				<span class="cursor-default select-none font-bold text-green-700 dark:text-green-300">
+					<Icon src={BsClipboard2Check} />
+					Copied Shloka {copied_shloka_number} to Clipboard
+				</span>
+			{/if}
+		</div>
+		<div
+			class="h-[65vh] overflow-scroll rounded-xl border-2 border-red-600 px-2 py-3 dark:border-yellow-300"
 		>
-			<Icon src={VscDebugStart} class="mr-1 text-2xl" />
-			Start Transliteration
-		</button>
-		{#if $file_preview_opened}
-			<Preview
-				workbook={current_workbook}
-				{file_preview_opened}
-				file_name={current_file_name}
-				file_link={current_file_preview_link}
-			/>
-		{/if}
+			{#if !sarga_loading}
+				<div transition:fade={{ duration: 250 }} class="">
+					{#each sarga_data as line, i}
+						{@const line_transliterated = LipiLekhikA.convert(
+							line,
+							BASE_SCRIPT,
+							loaded_viewing_script
+						)}
+						<!-- svelte-ignore a11y-click-events-have-key-events -->
+						<!-- svelte-ignore a11y-no-static-element-interactions -->
+						<div
+							class="rounded-lg px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-800"
+							on:dblclick={() => {
+								if (enable_copy_to_clipbaord) {
+									copied_shloka_number = i;
+									copy_text_to_clipboard(line_transliterated);
+								}
+							}}
+						>
+							<pre>{line_transliterated}</pre>
+						</div>
+					{/each}
+				</div>
+			{/if}
+		</div>
 	{/if}
 </div>

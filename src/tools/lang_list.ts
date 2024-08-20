@@ -1,4 +1,4 @@
-export const LANG_LIST = [
+export const SCRIPT_LIST = [
 	'Sanskrit',
 	'Telugu',
 	'Tamil',

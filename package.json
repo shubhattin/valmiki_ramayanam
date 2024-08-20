@@ -44,7 +44,6 @@
 		"autoprefixer": "^10.4.20",
 		"clsx": "^2.1.1",
 		"exceljs": "^4.4.0",
-		"lucide-svelte": "^0.424.0",
 		"mode-watcher": "^0.4.1",
 		"postcss": "^8.4.41",
 		"postcss-load-config": "^5.0.2",
