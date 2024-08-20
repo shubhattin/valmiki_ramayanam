@@ -790,6 +790,33 @@ export const load_parivartak_lang_data = async (lang) => {
 	await LipiLekhikA.k.load_lang(lang);
 };
 
+const pacham_patches = [
+	// patching कवर्ग
+	['Gk', 'nk'],
+	['Gkh', 'nkh'],
+	['Gg', 'ng'],
+	['Ggh', 'ngh'],
+	// patching चवर्ग
+	['Jch', 'nch'],
+	['JCh', 'nCh'],
+	['Jj', 'nj'],
+	['Jjh', 'njh'],
+	['jJ', 'jn']
+]; // this info will also be use to convert to Normal as well from Normal
+
+/**
+ * @type {Array<Array<string>>}
+ */
+const VARGANI = [
+	['क', 'ख', 'ग', 'घ', 'ङ'],
+	['च', 'छ', 'ज', 'झ', 'ञ'],
+	['ट', 'ठ', 'ड', 'ढ', 'ण'],
+	['त', 'थ', 'द', 'ध', 'न'],
+	['प', 'फ', 'ब', 'भ', 'म']
+];
+const HALANT = '्';
+const ANUNASIK = 'ं';
+
 /**
  * This function is used to convert the text from one script to another
  * @param {string} val - The text to be converted
@@ -799,22 +826,18 @@ export const load_parivartak_lang_data = async (lang) => {
  *
  */
 export const lipi_parivartak = (val, from, to) => {
-	const pacham_patches = [
-		// patching कवर्ग
-		['Gk', 'nk'],
-		['Gkh', 'nkh'],
-		['Gg', 'ng'],
-		['Ggh', 'ngh'],
-		// patching चवर्ग
-		['Jch', 'nch'],
-		['JCh', 'nCh'],
-		['Jj', 'nj'],
-		['Jjh', 'njh'],
-		['jJ', 'jn']
-	]; // this info will also be use to convert to Normal as well from Normal
+	from = normalize_lang_code(from);
+	to = normalize_lang_code(to);
 	if (from == 'Normal') {
 		for (let text of pacham_patches) {
 			val = val.replaceAll(text[1], text[0]);
+		}
+	}
+	const SCRIPTS_TO_REPLACE_WITH_ANUNASIK = ['Telugu', 'Kannada'];
+	if (from === 'Sanskrit' && SCRIPTS_TO_REPLACE_WITH_ANUNASIK.indexOf(to) !== -1) {
+		for (let varga of VARGANI) {
+			for (let i = 0; i <= 3; i++)
+				val = val.replaceAll(varga[4] + HALANT + varga[i], ANUNASIK + varga[i]);
 		}
 	}
 	let out = LipiLekhikA._parivartak(val, from, to);
