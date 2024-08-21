@@ -14,6 +14,7 @@
   import Modal from '@components/Modal.svelte';
   import Authenticate from '@components/Authenticate.svelte';
   import { writable } from 'svelte/store';
+  import { AiOutlineUser } from 'svelte-icons-pack/ai';
 
   const modalStore = getModalStore();
 
@@ -71,7 +72,9 @@
     <div class="select-none space-y-2 p-1">
       <div class="text-base font-bold">
         {#if user_info.user_type === 'admin'}
-          <Icon class="text-2xl" src={RiUserFacesAdminLine} />
+          <Icon class="-mt-1 text-2xl" src={RiUserFacesAdminLine} />
+        {:else}
+          <Icon class="-mt-1 text-2xl" src={AiOutlineUser} />
         {/if}{user_info.user_name}
         <span class="text-sm text-gray-500 dark:text-gray-400">({user_info.user_id})</span>
       </div>
