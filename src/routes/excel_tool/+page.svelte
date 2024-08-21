@@ -1,6 +1,6 @@
 <script lang="ts">
   import MainAppBar from '@components/MainAppBar.svelte';
-  import { FileButton, Accordion, AccordionItem, popup } from '@skeletonlabs/skeleton';
+  import { FileButton, Accordion, AccordionItem } from '@skeletonlabs/skeleton';
   import type { ModalSettings } from '@skeletonlabs/skeleton';
   import { slide, scale, fly } from 'svelte/transition';
   import { SCRIPT_LIST } from '@tools/lang_list';

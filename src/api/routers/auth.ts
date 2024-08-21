@@ -9,7 +9,8 @@ import { db } from '@db/db';
 const user_info_schema = UsersSchemaZod.pick({
   user_id: true,
   user_name: true,
-  user_type: true
+  user_type: true,
+  id: true
 });
 type user_info_type = z.infer<typeof user_info_schema>;
 
@@ -26,7 +27,13 @@ const get_id_and_aceess_token = async (user_info: user_info_type) => {
     .sign(JWT_SECRET);
 
   // Access Token will be used for authorization, i.e. to access the user's resources.
-  const access_token = await new SignJWT({ user: user_info, type: 'api' })
+  const access_token = await new SignJWT({
+    user: {
+      id: user_info.id,
+      user_type: user_info.user_type
+    },
+    type: 'api'
+  })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime(ACCESS_TOKEN_EXPIRE)
@@ -72,7 +79,8 @@ const verify_pass_router = publicProcedure
     const { id_token, access_token } = await get_id_and_aceess_token({
       user_id: user_info.user_id,
       user_name: user_info.user_name,
-      user_type: user_info.user_type
+      user_type: user_info.user_type,
+      id: user_info.id
     });
     return {
       verified,

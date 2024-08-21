@@ -5,7 +5,7 @@ import transformer from './transformer';
 
 let jwt_token: string;
 
-export const setJwtToken = (token: string) => {
+export const setAccessToken = (token: string) => {
   // to set the jwt_token while we make trpc request
   jwt_token = token;
 };

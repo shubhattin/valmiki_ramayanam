@@ -1,6 +1,8 @@
 <script lang="ts">
-  import { client, setJwtToken } from '@api/client';
-  import { writable, type Writable } from 'svelte/store';
+  import { client } from '@api/client';
+  import { storeAuthInfo } from '@tools/auth_tools';
+  import { writable } from 'svelte/store';
+  import type { Writable } from 'svelte/store';
   import { delay } from '@tools/delay';
   import { cl_join } from '@tools/cl_join';
   import { RiSystemLoginCircleLine } from 'svelte-icons-pack/ri';
@@ -9,9 +11,9 @@
   export let on_verify: (verified: boolean, id_token: string, access_token: string) => void = null!;
   export let is_verified: Writable<boolean>;
   export let show_always = false;
-  export let pass_input_element: Writable<HTMLInputElement> = writable(null!);
+  let pass_input_element: Writable<HTMLInputElement> = writable(null!);
 
-  let user_input_element: Writable<HTMLInputElement> = writable(null!);
+  export let user_input_element: Writable<HTMLInputElement> = writable(null!);
 
   let username_or_email: string;
   let password: string;
@@ -42,15 +44,14 @@
       }
     } else {
       $is_verified = true;
-      console.log(res);
-      //   setJwtToken(res.access_token);
+      storeAuthInfo(res);
       if (on_verify) on_verify($is_verified, res.id_token, res.access_token);
     }
   };
 </script>
 
 {#if show_always || !$is_verified}
-  <div class="font-bold text-orange-600 dark:text-yellow-500">Authentication</div>
+  <div class="text-2xl font-bold text-orange-600 dark:text-yellow-500">Authentication</div>
   <form on:submit|preventDefault={check_pass} class="mt-2 space-y-2.5">
     <label class="space-y-1">
       <div class="space-x-3 font-bold">
