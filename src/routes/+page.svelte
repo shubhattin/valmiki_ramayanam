@@ -11,12 +11,12 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { delay } from '@tools/delay';
 	import { writable } from 'svelte/store';
-	import ExcelJS from 'exceljs';
 	import { SlideToggle } from '@skeletonlabs/skeleton';
 	import { SCRIPT_LIST } from '@tools/lang_list';
 	import { load_parivartak_lang_data, lipi_parivartak } from '@tools/converter';
 	import { LanguageIcon } from '@components/icons';
 	import MetaTags from '@components/MetaTags.svelte';
+	import User from './User.svelte';
 
 	const BASE_SCRIPT = 'Sanskrit';
 
@@ -66,6 +66,7 @@
 
 	const download_excel_file = async () => {
 		// the method used below creates a url for both dev and prod
+		const ExcelJS = (await import('exceljs')).default;
 		const url = new URL('/data/ramayan/template/excel_file_template.xlsx', import.meta.url).href;
 		const req = await fetch(url);
 		const file_blob = await req.blob();
@@ -109,14 +110,17 @@
 </MainAppBar>
 
 <div class="mt-4 space-y-4">
-	<label class="space-x-4">
-		<Icon src={LanguageIcon} class="text-4xl" />
-		<select class="select inline-block w-40" bind:value={viewing_script}>
-			{#each SCRIPT_LIST as lang (lang)}
-				<option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
-			{/each}
-		</select>
-	</label>
+	<div class="flex justify-between">
+		<label class="space-x-4">
+			<Icon src={LanguageIcon} class="text-4xl" />
+			<select class="select inline-block w-40" bind:value={viewing_script}>
+				{#each SCRIPT_LIST as lang (lang)}
+					<option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
+				{/each}
+			</select>
+		</label>
+		<User />
+	</div>
 	<label class="space-x-4">
 		<span class="font-bold">Select kANDa</span>
 		<select bind:value={$kANDa_selected} class="select w-52">
@@ -173,7 +177,7 @@
 					<Icon class="-mt-1 ml-1 text-xl" src={TiArrowForwardOutline} />
 				</button>
 			{/if}
-			<button
+			<!-- <button
 				on:click={download_excel_file}
 				class="variant-outline-success btn rounded-lg border-2 border-emerald-600 px-2 py-2 font-bold dark:border-emerald-400"
 			>
@@ -182,7 +186,7 @@
 					src={RiDocumentFileExcel2Line}
 				/>
 				Download Excel File
-			</button>
+			</button> -->
 		</div>
 		<div class="flex space-x-4">
 			<SlideToggle
