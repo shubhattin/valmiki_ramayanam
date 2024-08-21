@@ -13,6 +13,8 @@ const config = {
 			'@tools': './src/tools',
 			'@tests': './src/tests',
 			'@components': './src/components',
+			'@db': './src/db',
+			'@api': './src/api',
 			'@data': './data'
 		}
 	}
