@@ -17,6 +17,7 @@
   import { LanguageIcon } from '@components/icons';
   import MetaTags from '@components/MetaTags.svelte';
   import User from './User.svelte';
+  import Authenticate from '@components/Authenticate.svelte';
 
   const BASE_SCRIPT = 'Sanskrit';
 
@@ -108,7 +109,7 @@
     <span class="text-2xl font-bold">{PAGE_INFO.title}</span>
   </span>
 </MainAppBar>
-
+<Authenticate is_verified={writable(false)} />
 <div class="mt-4 space-y-4">
   <div class="flex justify-between">
     <label class="space-x-4">

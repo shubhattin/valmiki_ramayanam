@@ -1,6 +1,5 @@
 <script lang="ts">
   import Icon from '@tools/Icon.svelte';
-  import { FaCircleUser } from 'svelte-icons-pack/fa';
   import { client } from '@api/client';
   import { popup } from '@skeletonlabs/skeleton';
   import { TrOutlineLogin2 } from 'svelte-icons-pack/tr';
