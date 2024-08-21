@@ -5,10 +5,10 @@ import dotenv from 'dotenv';
 dotenv.config({ path: './.env.local' });
 
 export default {
-	dialect: 'postgresql',
-	schema: './src/db/schema.ts',
-	out: './src/db/migrations',
-	dbCredentials: {
-		url: get_db_url(process.env)
-	}
+  dialect: 'postgresql',
+  schema: './src/db/schema.ts',
+  out: './src/db/migrations',
+  dbCredentials: {
+    url: get_db_url(process.env)
+  }
 } satisfies Config;

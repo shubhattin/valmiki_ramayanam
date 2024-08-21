@@ -10,24 +10,24 @@ import type { inferAsyncReturnType } from '@trpc/server';
 // });
 
 export async function createContext(event: RequestEvent) {
-	const { request } = event;
+  const { request } = event;
 
-	async function getUserFromHeader() {
-		try {
-			const jwt_token = request.headers.get('Authorization')?.split(' ')[1]!;
-			const jwt_data = await jwtVerify(jwt_token, JWT_SECRET, {
-				algorithms: ['HS256']
-			});
-			// const payload = jwt_payload_schema.parse(jwt_data.payload);
-			// return payload;
-		} catch {}
-		return null;
-	}
+  async function getUserFromHeader() {
+    try {
+      const jwt_token = request.headers.get('Authorization')?.split(' ')[1]!;
+      const jwt_data = await jwtVerify(jwt_token, JWT_SECRET, {
+        algorithms: ['HS256']
+      });
+      // const payload = jwt_payload_schema.parse(jwt_data.payload);
+      // return payload;
+    } catch {}
+    return null;
+  }
 
-	const user = await getUserFromHeader();
-	return {
-		user
-	};
+  const user = await getUserFromHeader();
+  return {
+    user
+  };
 }
 
 export type Context = inferAsyncReturnType<typeof createContext>;
