@@ -35,7 +35,7 @@ const JWT_HEADER_SCHEMA = z.object({
 });
 
 export const get_id_token_info = () => {
-  const cookie = getCookie(AUTH_ID);
+  const cookie = getCookie(AUTH_ID)!;
 
   // header parsing :- not returning it as it typically not required, but verifying it to be more sure of the integrity of the token
   JWT_HEADER_SCHEMA.parse(JSON.parse(from_base64(cookie.split('.')[0])));

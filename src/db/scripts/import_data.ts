@@ -13,7 +13,7 @@ const main = async () => {
     PREVIEW: 'db_data_preview.json',
     LOCAL: 'db_data.json'
   }[dbMode];
-  await writeFile(`./out/${out_file_name}`, JSON.stringify(json_data, null, 2));
+  // await writeFile(`./out/${out_file_name}`, JSON.stringify(json_data, null, 2));
 };
 main().then(() => {
   queryClient.end();
