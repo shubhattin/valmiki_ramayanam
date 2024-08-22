@@ -17,19 +17,19 @@
 
   let username_or_email: string;
   let password: string;
-  let pass_input_spinner_show = false;
+  let is_logging_in_status = false;
   let wrong_pass_status = false;
   let user_not_found_status = false;
 
   const check_pass = async () => {
     if (password === '') return;
-    pass_input_spinner_show = true;
+    is_logging_in_status = true;
     const res = await client.auth.verify_pass.query({
       username_or_email: username_or_email,
       password: password
     });
     await delay(500);
-    pass_input_spinner_show = false;
+    is_logging_in_status = false;
     user_not_found_status = false;
     wrong_pass_status = false;
     if (!res.verified) {
@@ -85,7 +85,7 @@
     <button
       type="submit"
       class="btn rounded-lg bg-primary-700 p-0 py-1 pr-2 font-bold text-white"
-      disabled={pass_input_spinner_show}
+      disabled={is_logging_in_status}
     >
       <Icon src={BiLogIn} class="text-3xl" />
       <span>Login</span>

@@ -15,6 +15,7 @@
   import Authenticate from '@components/Authenticate.svelte';
   import { writable } from 'svelte/store';
   import { AiOutlineUser } from 'svelte-icons-pack/ai';
+  import NewUser from './NewUser.svelte';
 
   const modalStore = getModalStore();
 
@@ -26,7 +27,10 @@
   });
 
   let pass_enterer_status = writable(false);
-  let user_input_elmnt = writable<HTMLInputElement>(null!);
+  let user_input_elmnt_login = writable<HTMLInputElement>(null!);
+
+  let user_create_modal_status = writable(false);
+  let name_input_elmnt_new_user = writable<HTMLInputElement>(null!);
 
   const log_out = () => {
     const modal: ModalSettings = {
@@ -76,6 +80,9 @@
       <button
         on:click={() => {
           $pass_enterer_status = true;
+          setTimeout(() => {
+            $user_input_elmnt_login.focus();
+          }, 500);
         }}
         class="group flex w-full space-x-2 rounded-md px-2 py-1 font-bold hover:bg-gray-200 dark:hover:bg-gray-700"
       >
@@ -86,6 +93,12 @@
         <span>Login</span>
       </button>
       <button
+        on:click={() => {
+          $user_create_modal_status = true;
+          setTimeout(() => {
+            $user_input_elmnt_login.focus();
+          }, 500);
+        }}
         class="group flex w-full space-x-2 rounded-md px-2 py-1 font-bold hover:bg-gray-200 dark:hover:bg-gray-700"
       >
         <Icon
@@ -102,12 +115,22 @@
     <Authenticate
       is_verified={writable(false)}
       show_always={true}
-      user_input_element={user_input_elmnt}
+      user_input_element={user_input_elmnt_login}
       on_verify={(verified) => {
         if (verified) {
           $pass_enterer_status = false;
           user_info = get_id_token_info().user;
         }
+      }}
+    />
+  </div>
+</Modal>
+<Modal modal_open={user_create_modal_status}>
+  <div class="p-2">
+    <NewUser
+      name_input_element={name_input_elmnt_new_user}
+      on_verify={() => {
+        $user_create_modal_status = false;
       }}
     />
   </div>

@@ -2,9 +2,10 @@ import { publicProcedure, t } from '@api/trpc_init';
 import { z } from 'zod';
 import { JWT_SECRET } from '@tools/jwt.server';
 import { jwtVerify, SignJWT } from 'jose';
-import { puShTi } from '@tools/hash';
+import { puShTi, gen_salt, hash_256 } from '@tools/hash';
 import { UsersSchemaZod } from '@db/schema_zod';
 import { db } from '@db/db';
+import { users } from '@db/schema';
 
 const user_info_schema = UsersSchemaZod.pick({
   user_id: true,
@@ -129,54 +130,50 @@ const renew_access_token = publicProcedure
     return { verified: true, ...(await get_id_and_aceess_token(user.user)) };
   });
 
-// async function check_user_already_exist(username: string) {
-//   const data_parse = user_info_schema.safeParse(await base_get(USERS_INFO_DRIVE_LOC, username));
-//   if (data_parse.success) return true;
-//   return false;
-// }
+const add_new_user_route = publicProcedure
+  .input(
+    z.object({
+      username: z.string(),
+      name: z.string(),
+      password: z.string(),
+      email: z.string().email(),
+      contact_number: z.string().optional()
+    })
+  )
+  .output(
+    z.object({
+      success: z.boolean(),
+      status_code: z.enum(['user_already_exist', 'email_already_exist', 'success'])
+    })
+  )
+  .mutation(async ({ input: { username, password, email, name, contact_number } }) => {
+    let success = false;
+    if (await db.query.users.findFirst({ where: ({ user_id }, { eq }) => eq(user_id, username) }))
+      return { success, status_code: 'user_already_exist' };
+    if (
+      await db.query.users.findFirst({ where: ({ user_email }, { eq }) => eq(user_email, email) })
+    )
+      return { success, status_code: 'email_already_exist' };
 
-// const add_new_user_route = publicProcedure
-//   .input(
-//     z.object({
-//       username: z.string(),
-//       password: z.string(),
-//       email: z.string().email()
-//     })
-//   )
-//   .output(
-//     z.object({
-//       success: z.boolean(),
-//       status_code: get_zod_key_enum(dattStruct.drive.login.new_user.msg_codes)
-//     })
-//   )
-//   .mutation(async ({ input: { username, password, email } }) => {
-//     let success = false;
-//     if (await check_user_already_exist(username))
-//       return { success, status_code: 'user_already_exist' };
+    // hashing password
+    const slt = gen_salt();
+    const hashed_password = (await hash_256(password + slt)) + slt;
 
-//     // storing hashed_email
-//     const slt = gen_salt();
-//     const hashed_email = (await hash_256(email + slt)) + slt;
+    await db.insert(users).values({
+      user_id: username,
+      user_name: name,
+      user_email: email,
+      password_hash: hashed_password,
+      contact_number: contact_number
+    });
+    // user_type -> default non-admin
+    // we can be sure that if the insert is success then only it will
+    // proceed else throw a error into trpc and quit
 
-//     // storing hashed_password
-//     const hashed_password = await bcrypt.hash(password, await bcrypt.genSalt());
+    success = true;
 
-//     // encryption key :- a 32 byte random value
-//     const encrypt_key = crypto.randomBytes(32).toString('base64');
-
-//     await base_put(USERS_INFO_DRIVE_LOC, [
-//       {
-//         key: username,
-//         email_hash: hashed_email,
-//         password: hashed_password,
-//         encrypt_key
-//       }
-//     ]);
-
-//     success = true;
-
-//     return { success, status_code: 'success_detail' };
-//   });
+    return { success, status_code: 'success' };
+  });
 
 // const reset_pass_route = publicProcedure
 //   .input(
@@ -213,7 +210,7 @@ const renew_access_token = publicProcedure
 
 export const auth_router = t.router({
   verify_pass: verify_pass_router,
-  renew_access_token: renew_access_token
-  // add_new_user: add_new_user_route,
+  renew_access_token: renew_access_token,
+  add_new_user: add_new_user_route
   // reset_pass: reset_pass_route
 });
