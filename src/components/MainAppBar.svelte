@@ -8,7 +8,7 @@
   import { SiConvertio } from './icons';
   import { AiOutlineMenu } from 'svelte-icons-pack/ai';
   import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
-  import { BsYoutube } from 'svelte-icons-pack/bs';
+  import { YoutubeIcon } from '@components/icons';
 
   export let page: 'home' | 'convert' | 'excel_tool';
 
@@ -82,7 +82,7 @@
           rel="noopener noreferrer"
           class="will-close flex space-x-1 rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
         >
-          <Icon src={BsYoutube} class="mt-0 text-2xl text-[red]" />
+          <Icon src={YoutubeIcon} class="mt-0 text-2xl text-[red]" />
           <span>The Sanskrit Channel</span>
         </a>
         <a

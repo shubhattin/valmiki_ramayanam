@@ -42,21 +42,6 @@
   };
 </script>
 
-<Modal modal_open={pass_enterer_status}>
-  <div class="p-2">
-    <Authenticate
-      is_verified={writable(false)}
-      show_always={true}
-      user_input_element={user_input_elmnt}
-      on_verify={(verified) => {
-        if (verified) {
-          $pass_enterer_status = false;
-          user_info = get_id_token_info().user;
-        }
-      }}
-    />
-  </div>
-</Modal>
 <button
   class="btn m-2 p-0"
   use:popup={{
@@ -92,17 +77,38 @@
         on:click={() => {
           $pass_enterer_status = true;
         }}
-        class="text-md flex w-full space-x-2 rounded-md px-2 py-1 font-bold hover:bg-gray-200 dark:hover:bg-gray-700"
+        class="group flex w-full space-x-2 rounded-md px-2 py-1 font-bold hover:bg-gray-200 dark:hover:bg-gray-700"
       >
-        <Icon src={TrOutlineLogin2} class="-ml-1 -mt-1 text-3xl" />
+        <Icon
+          src={TrOutlineLogin2}
+          class="-ml-1 -mt-1 text-3xl group-hover:text-gray-600 dark:group-hover:text-stone-400"
+        />
         <span>Login</span>
       </button>
       <button
-        class="text-md flex w-full space-x-2 rounded-md px-2 py-1 font-bold hover:bg-gray-200 dark:hover:bg-gray-700"
+        class="group flex w-full space-x-2 rounded-md px-2 py-1 font-bold hover:bg-gray-200 dark:hover:bg-gray-700"
       >
-        <Icon src={LuUserPlus} class="text-2xl" />
+        <Icon
+          src={LuUserPlus}
+          class="text-2xl group-hover:text-gray-600 dark:group-hover:text-stone-400"
+        />
         <span>Signup</span>
       </button>
     </div>
   {/if}
 </div>
+<Modal modal_open={pass_enterer_status}>
+  <div class="p-2">
+    <Authenticate
+      is_verified={writable(false)}
+      show_always={true}
+      user_input_element={user_input_elmnt}
+      on_verify={(verified) => {
+        if (verified) {
+          $pass_enterer_status = false;
+          user_info = get_id_token_info().user;
+        }
+      }}
+    />
+  </div>
+</Modal>
