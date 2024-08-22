@@ -1,5 +1,4 @@
 <script lang="ts">
-  import MainAppBar from '@components/MainAppBar.svelte';
   import Icon from '@tools/Icon.svelte';
   import { SlideToggle } from '@skeletonlabs/skeleton';
   import { SCRIPT_LIST } from '@tools/lang_list';
@@ -10,6 +9,7 @@
   import { BsKeyboard } from 'svelte-icons-pack/bs';
   import MetaTags from '@components/MetaTags.svelte';
   import { OiCopy16 } from 'svelte-icons-pack/oi';
+  import { main_app_bar_info } from '@state/state';
 
   let from_lang = 'Sanskrit';
   let to_lang = 'Telugu';
@@ -41,15 +41,14 @@
     title: 'Lipi Parivartak',
     description: 'A Indian Script Transliteration Utility'
   };
+
+  main_app_bar_info.set({
+    className: 'text-2xl font-bold',
+    title: PAGE_INFO.title
+  });
 </script>
 
 <MetaTags title={PAGE_INFO.title} description={PAGE_INFO.description} />
-
-<MainAppBar page="convert">
-  <span slot="headline">
-    <span class="text-2xl font-bold">Lipi Parivartak</span>
-  </span>
-</MainAppBar>
 
 <div class="mt-4">
   <div class="space-y-2">

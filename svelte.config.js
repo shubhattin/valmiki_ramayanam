@@ -15,7 +15,8 @@ const config = {
       '@components': './src/components',
       '@db': './src/db',
       '@api': './src/api',
-      '@data': './data'
+      '@data': './data',
+      '@state': './src/state'
     }
   }
 };

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import MainAppBar from '@components/MainAppBar.svelte';
   import Icon from '@tools/Icon.svelte';
   import rAmAyaNa_map from '@data/ramayan/ramayan_map.json';
   import { fade, scale, slide } from 'svelte/transition';
@@ -19,6 +18,7 @@
   import User from './User.svelte';
   import { ensure_auth_access_status } from '@tools/auth_tools';
   import { browser } from '$app/environment';
+  import { main_app_bar_info } from '@state/state';
 
   const BASE_SCRIPT = 'Sanskrit';
 
@@ -102,15 +102,14 @@
     title: 'श्रीमद्रामायणम्',
     description: 'श्रीमद्रामायणस्य पठनम्'
   };
+
+  main_app_bar_info.set({
+    className: 'text-2xl font-bold',
+    title: PAGE_INFO.title
+  });
 </script>
 
 <MetaTags title={PAGE_INFO.title} description={PAGE_INFO.description} />
-
-<MainAppBar page="home">
-  <span slot="headline">
-    <span class="text-2xl font-bold">{PAGE_INFO.title}</span>
-  </span>
-</MainAppBar>
 
 <div class="mt-4 space-y-4">
   <div class="flex justify-between">

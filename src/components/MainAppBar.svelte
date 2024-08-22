@@ -9,8 +9,11 @@
   import { AiOutlineMenu } from 'svelte-icons-pack/ai';
   import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
   import { YoutubeIcon } from '@components/icons';
+  import { page } from '$app/stores';
+  import { z } from 'zod';
+  import { main_app_bar_info } from '@state/state';
 
-  export let page: 'home' | 'convert' | 'excel_tool';
+  $: page_url = z.enum(['/', '/convert', '/excel_tool']).parse($page.url.pathname);
 
   const app_menu_popup: PopupSettings = {
     event: 'click',
@@ -23,7 +26,7 @@
 <AppBar>
   <svelte:fragment slot="lead">
     <slot name="start" />
-    {#if page !== 'home'}
+    {#if page_url !== '/'}
       <a class="mr-2 text-xl" href="/" title="श्रीरामायणम्">
         <Icon
           src={BiArrowBack}
@@ -31,7 +34,9 @@
         />
       </a>
     {/if}
-    <slot name="headline"><span></span></slot>
+    <slot name="headline">
+      <span class={$main_app_bar_info.className}>{$main_app_bar_info.title}</span>
+    </slot>
   </svelte:fragment>
   <!-- <svelte:fragment slot="headline">
 		<slot name="headline"><span></span></slot>
@@ -39,7 +44,7 @@
   <svelte:fragment slot="trail">
     <slot name="end"></slot>
     <div class="space-x-2">
-      {#if page !== 'convert'}
+      {#if page_url !== '/convert'}
         <a class="text-xl" href="/convert" title="Lipi Parivartak">
           <Icon
             src={SiConvertio}

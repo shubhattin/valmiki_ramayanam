@@ -1,5 +1,4 @@
 <script lang="ts">
-  import MainAppBar from '@components/MainAppBar.svelte';
   import { FileButton, Accordion, AccordionItem } from '@skeletonlabs/skeleton';
   import type { ModalSettings } from '@skeletonlabs/skeleton';
   import { slide, scale, fly } from 'svelte/transition';
@@ -21,6 +20,7 @@
   import { writable } from 'svelte/store';
   import Preview from './Preview.svelte';
   import MetaTags from '@components/MetaTags.svelte';
+  import { main_app_bar_info } from '@state/state';
 
   export const modalStore = getModalStore();
 
@@ -130,13 +130,15 @@
     title: 'Lipi Parivartan for Excel Files',
     description: 'A Utility to transliterate text in Excel files for Indian Scripts'
   };
+
+  main_app_bar_info.set({
+    className: 'text-xl font-bold',
+    title: PAGE_INFO.title
+  });
 </script>
 
 <MetaTags title={PAGE_INFO.title} description={PAGE_INFO.description} />
 
-<MainAppBar page="excel_tool">
-  <span slot="headline" class="text-xl font-bold">Lipi Parivartan for Excel Files</span>
-</MainAppBar>
 <div class="mt-3 space-y-4">
   {#if !file_list}
     <div in:scale out:slide>
