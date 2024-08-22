@@ -5,8 +5,8 @@
   import type { Writable } from 'svelte/store';
   import { delay } from '@tools/delay';
   import { cl_join } from '@tools/cl_join';
-  import { RiSystemLoginCircleLine } from 'svelte-icons-pack/ri';
   import Icon from '@tools/Icon.svelte';
+  import { BiLogIn } from 'svelte-icons-pack/bi';
 
   export let on_verify: (verified: boolean, id_token: string, access_token: string) => void = null!;
   export let is_verified: Writable<boolean>;
@@ -61,6 +61,7 @@
         {/if}
       </div>
       <input
+        name="username"
         type="text"
         bind:this={$user_input_element}
         bind:value={username_or_email}
@@ -72,6 +73,7 @@
     <label class="space-y-1">
       <span class="font-bold">Password</span>
       <input
+        name="password"
         class={cl_join('input variant-form-material', wrong_pass_status && 'input-error')}
         type="password"
         placeholder="Password"
@@ -82,10 +84,10 @@
     </label>
     <button
       type="submit"
-      class="btn rounded-lg bg-primary-700 py-1 pl-1 pr-2 font-bold text-white"
+      class="btn rounded-lg bg-primary-700 p-0 py-1 pr-2 font-bold text-white"
       disabled={pass_input_spinner_show}
     >
-      <Icon src={RiSystemLoginCircleLine} class="text-2xl" />
+      <Icon src={BiLogIn} class="text-3xl" />
       <span>Login</span>
     </button>
   </form>

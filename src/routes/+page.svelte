@@ -17,6 +17,8 @@
   import { LanguageIcon } from '@components/icons';
   import MetaTags from '@components/MetaTags.svelte';
   import User from './User.svelte';
+  import { ensure_auth_access_status } from '@tools/auth_tools';
+  import { browser } from '$app/environment';
 
   const BASE_SCRIPT = 'Sanskrit';
 
@@ -41,6 +43,7 @@
       $sarga_selected = 1;
     }
     await load_parivartak_lang_data(BASE_SCRIPT);
+    if (browser) await ensure_auth_access_status();
   });
 
   const sarga_unsub = sarga_selected.subscribe(async () => {

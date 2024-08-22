@@ -8,6 +8,7 @@
   import { SiConvertio } from './icons';
   import { AiOutlineMenu } from 'svelte-icons-pack/ai';
   import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
+  import { BsYoutube } from 'svelte-icons-pack/bs';
 
   export let page: 'home' | 'convert' | 'excel_tool';
 
@@ -57,17 +58,17 @@
       <div class="space-y-2">
         <a
           href="/convert"
-          class="will-close text-md flex space-x-2 rounded-md px-2 py-1 font-bold hover:bg-gray-200 dark:hover:bg-gray-700"
+          class="will-close group flex space-x-2 rounded-md px-2 py-1 font-bold hover:bg-gray-200 dark:hover:bg-gray-700"
         >
           <Icon
             src={SiConvertio}
-            class="text-2xl hover:fill-emerald-600 dark:hover:fill-zinc-400"
+            class="text-2xl group-hover:fill-emerald-600 dark:group-hover:fill-zinc-400"
           />
           <span>Lipi Parivartak</span>
         </a>
         <a
           href="/excel_tool"
-          class="will-close text-md flex space-x-1 rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
+          class="will-close flex space-x-1 rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
         >
           <Icon
             src={RiDocumentFileExcel2Line}
@@ -76,18 +77,27 @@
           <span>Excel File Transliterator</span>
         </a>
         <a
+          href="https://www.youtube.com/c/thesanskritchannel"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="will-close flex space-x-1 rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
+        >
+          <Icon src={BsYoutube} class="mt-0 text-2xl text-[red]" />
+          <span>The Sanskrit Channel</span>
+        </a>
+        <a
           href="https://github.com/shubhattin/valmiki_ramayanam"
           target="_blank"
           rel="noopener noreferrer"
-          class="will-close text-md flex space-x-1 rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
+          class="will-close group flex space-x-1 rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
         >
           <Icon
             src={SiGithub}
-            class="-mt-1 mr-1 text-2xl hover:fill-indigo-700 dark:hover:fill-zinc-400"
+            class="-mt-1 mr-1 text-2xl group-hover:fill-indigo-700 dark:group-hover:fill-zinc-400"
           />
           <span>Project's Github Page</span>
         </a>
-        <div class="wont-close text-md flex space-x-3 rounded-md px-2 py-1">
+        <div class="wont-close flex space-x-3 rounded-md px-2 py-1">
           <span class="mt-1">Set Theme</span>
           <ThemeChanger />
         </div>
