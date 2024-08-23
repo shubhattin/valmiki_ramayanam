@@ -21,25 +21,35 @@
 
   let kANDa_selected = writable(0);
   let sarga_selected = writable(0);
-  let sarga_data: string[] = [];
   let sarga_loading = false;
   let enable_copy_to_clipbaord = true;
   let copied_shloka_number: number | null = null;
   let viewing_script = BASE_SCRIPT;
   let loaded_viewing_script: string = viewing_script;
 
+  let sarga_data: string[] = [];
+  let trans_en_data: Map<number, string> = new Map();
+  let loaded_en_trans_data = false;
   let view_translation_status = false;
 
   $: (async () => {
     await load_parivartak_lang_data(viewing_script);
     loaded_viewing_script = viewing_script;
   })();
+  $: view_translation_status &&
+    (async () => {
+      loaded_en_trans_data = false;
+      const en_trans_data = await load_english_translation($kANDa_selected, $sarga_selected);
+      trans_en_data = en_trans_data;
+      loaded_en_trans_data = true;
+    })();
   $: copied_shloka_number !== null && setTimeout(() => (copied_shloka_number = null), 1400);
 
   onMount(async () => {
     if (import.meta.env.DEV) {
       $kANDa_selected = 1;
       $sarga_selected = 1;
+      view_translation_status = true;
     }
     await load_parivartak_lang_data(BASE_SCRIPT);
     if (browser) await ensure_auth_access_status();
@@ -59,22 +69,24 @@
   });
   const kANDa_selected_unsub = kANDa_selected.subscribe(() => {
     $sarga_selected = 0;
+    loaded_en_trans_data = false;
   });
 
   const load_english_translation = async (kANDa_num: number, sarga_number: number) => {
     let data: Record<number, string> = {};
+    const data_map = new Map<number, string>();
     if (import.meta.env.DEV) {
       const yaml = (await import('js-yaml')).default;
       const glob_yaml = import.meta.glob('/data/ramayan/trans_en/*/*.yaml', {
         query: '?raw'
       });
-      if (!(`/data/ramayan/trans_en/${kANDa_num}/${sarga_number}.yaml` in glob_yaml)) return null;
+      if (!(`/data/ramayan/trans_en/${kANDa_num}/${sarga_number}.yaml` in glob_yaml))
+        return data_map;
       const text = (
         (await glob_yaml[`/data/ramayan/trans_en/${kANDa_num}/${sarga_number}.yaml`]()) as any
       ).default as string;
       data = yaml.load(text) as Record<number, string>;
     }
-    const data_map = new Map<number, string>();
 
     for (const [key, value] of Object.entries(data)) {
       data_map.set(Number(key), value.replaceAll(/\n$/g, '')); // replace the ending newline
@@ -149,6 +161,16 @@
   {/if}
   {#if $kANDa_selected !== 0 && $sarga_selected !== 0}
     {@const kANDa = rAmAyaNa_map[$kANDa_selected - 1]}
+    {#if !view_translation_status}
+      <button
+        out:slide
+        on:click={() => {
+          view_translation_status = true;
+        }}
+        class="btn bg-primary-800 px-2 py-1 font-bold text-white dark:bg-primary-700"
+        >View Translations</button
+      >
+    {/if}
     <div class="space-x-3">
       {#if $sarga_selected !== 1}
         <button
@@ -190,7 +212,7 @@
       {/if}
     </div>
     <div
-      class="h-[65vh] overflow-scroll rounded-xl border-2 border-red-600 p-0 dark:border-gray-600"
+      class="h-[65vh] overflow-scroll rounded-xl border-2 border-gray-400 p-0 dark:border-gray-600"
     >
       {#if !sarga_loading}
         <div transition:fade={{ duration: 250 }}>
@@ -201,6 +223,7 @@
               loaded_viewing_script
             )}
             {@const line_split = line_transliterated.split('\n')}
+
             <div class="rounded-lg px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-800">
               {#if i !== 0 && i !== sarga_data.length - 1}
                 <span class="inline-block rounded-full text-center align-top text-xs text-gray-300"
@@ -208,9 +231,23 @@
                 >
               {/if}
               <div class="ml-1 inline-block">
-                {#each line_split as line_shlk}
-                  <div>{line_shlk}</div>
-                {/each}
+                <div>
+                  {#each line_split as line_shlk}
+                    <div>{line_shlk}</div>
+                  {/each}
+                </div>
+                {#if loaded_en_trans_data}
+                  <div class="text-stone-500 dark:text-slate-300">
+                    {#if trans_en_data.has(i)}
+                      <!-- Usually translations are single but still... -->
+                      {#each trans_en_data.get(i).split('\n') as line_trans}
+                        <div>{line_trans}</div>
+                      {/each}
+                    {:else if i === sarga_data.length - 1 && trans_en_data.has(-1)}
+                      <div>{trans_en_data.get(-1)}</div>
+                    {/if}
+                  </div>
+                {/if}
               </div>
             </div>
           {/each}
