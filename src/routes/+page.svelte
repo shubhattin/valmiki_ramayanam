@@ -3,10 +3,7 @@
   import rAmAyaNa_map from '@data/ramayan/ramayan_map.json';
   import { fade, scale, slide } from 'svelte/transition';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
-  import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
   import { BsClipboard2Check } from 'svelte-icons-pack/bs';
-  import { transliterate_xlxs_file } from '@tools/excel/transliterate_xlsx_file';
-  import { download_file_in_browser } from '@tools/download_file_browser';
   import { onDestroy, onMount } from 'svelte';
   import { delay } from '@tools/delay';
   import { writable } from 'svelte/store';
@@ -66,33 +63,6 @@
     kANDa_selected_unsub();
     sarga_unsub();
   });
-
-  const download_excel_file = async () => {
-    // the method used below creates a url for both dev and prod
-    const ExcelJS = (await import('exceljs')).default;
-    const url = new URL('/data/ramayan/template/excel_file_template.xlsx', import.meta.url).href;
-    const req = await fetch(url);
-    const file_blob = await req.blob();
-    const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.load(await file_blob.arrayBuffer());
-    const worksheet = workbook.getWorksheet(1)!;
-    const COLUMN_FOR_DEV = 2;
-    const TEXT_START_ROW = 2;
-    for (let i = 0; i < sarga_data.length; i++) {
-      worksheet.getCell(i + COLUMN_FOR_DEV, TEXT_START_ROW).value = sarga_data[i];
-    }
-    await transliterate_xlxs_file(workbook, 'all', 1, COLUMN_FOR_DEV, TEXT_START_ROW, 'Sanskrit');
-
-    // saving file to output path
-    let sarga_name =
-      rAmAyaNa_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].name_normal.split('\n')[0];
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    });
-    const downloadLink = URL.createObjectURL(blob);
-    download_file_in_browser(downloadLink, `${$sarga_selected}. ${sarga_name}.xlsx`);
-  };
 
   const copy_text_to_clipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -179,16 +149,6 @@
           <Icon class="-mt-1 ml-1 text-xl" src={TiArrowForwardOutline} />
         </button>
       {/if}
-      <!-- <button
-				on:click={download_excel_file}
-				class="variant-outline-success btn rounded-lg border-2 border-emerald-600 px-2 py-2 font-bold dark:border-emerald-400"
-			>
-				<Icon
-					class="-mt-1 mr-2 text-2xl text-green-600 dark:text-green-400"
-					src={RiDocumentFileExcel2Line}
-				/>
-				Download Excel File
-			</button> -->
     </div>
     <div class="flex space-x-4">
       <SlideToggle
@@ -207,24 +167,28 @@
       {/if}
     </div>
     <div
-      class="h-[65vh] overflow-scroll rounded-xl border-2 border-red-600 px-2 py-3 dark:border-yellow-300"
+      class="h-[65vh] overflow-scroll rounded-xl border-2 border-red-600 p-0 dark:border-gray-600"
     >
       {#if !sarga_loading}
-        <div transition:fade={{ duration: 250 }} class="">
-          {#each sarga_data as line, i}
-            {@const line_transliterated = lipi_parivartak(line, BASE_SCRIPT, loaded_viewing_script)}
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
-            <div
-              class="rounded-lg px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-800"
-              on:dblclick={() => {
-                if (enable_copy_to_clipbaord) {
-                  copied_shloka_number = i;
-                  copy_text_to_clipboard(line_transliterated);
-                }
-              }}
-            >
-              <pre>{line_transliterated}</pre>
+        <div transition:fade={{ duration: 250 }}>
+          {#each sarga_data as shloka_lines, i}
+            {@const line_transliterated = lipi_parivartak(
+              shloka_lines,
+              BASE_SCRIPT,
+              loaded_viewing_script
+            )}
+            {@const line_split = line_transliterated.split('\n')}
+            <div class="rounded-lg px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-800">
+              {#if i !== 0 && i !== sarga_data.length - 1}
+                <span class="inline-block rounded-full text-center align-top text-xs text-gray-300"
+                  >{i}</span
+                >
+              {/if}
+              <div class="ml-1 inline-block">
+                {#each line_split as line_shlk}
+                  <div>{line_shlk}</div>
+                {/each}
+              </div>
             </div>
           {/each}
         </div>
