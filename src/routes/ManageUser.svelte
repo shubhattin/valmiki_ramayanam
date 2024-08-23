@@ -1,16 +1,13 @@
 <script lang="ts">
-  import type { Writable } from 'svelte/store';
-  import { cl_join } from '@tools/cl_join';
-  import { LuUserPlus } from 'svelte-icons-pack/lu';
   import Icon from '@tools/Icon.svelte';
   import { client } from '@api/client';
-  import { delay } from '@tools/delay';
-  import { number, z } from 'zod';
+  import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
   import { get_id_token_info } from '@tools/auth_tools';
-  import { AiOutlineUser } from 'svelte-icons-pack/ai';
-  import { RiUserFacesAdminLine } from 'svelte-icons-pack/ri';
+  import { RiSystemAddLargeFill, RiSystemCloseLargeLine } from 'svelte-icons-pack/ri';
   import { onMount } from 'svelte';
   import { browser } from '$app/environment';
+
+  const modal_store = getModalStore();
 
   const currrent_user_info = get_id_token_info().user;
   let users_info: Awaited<ReturnType<typeof client.user_info.get_all_users_info.query>> | null;
@@ -37,6 +34,24 @@
       }
     }
   };
+
+  const add_unverified_user = async (id: number, user_id: string) => {
+    modal_store.trigger({
+      type: 'confirm',
+      title: `Are you sure to verify '${user_id}' user?`,
+      response(r: boolean) {
+        if (!r) return;
+        (async () => {
+          await client.auth.verify_user.mutate({ id: id });
+          users_info = null;
+          admin_users_index = [];
+          normal_users_index = [];
+          unverified_normal_users_index = [];
+          await fetch_user_info();
+        })();
+      }
+    });
+  };
 </script>
 
 <div class="text-2xl font-bold text-orange-600 dark:text-yellow-500">Manage User Settings</div>
@@ -55,7 +70,7 @@
         <div>
           <div class="text-lg font-bold underline">Admin Users</div>
           <div class="space-y-1">
-            {#each admin_users_index as index}
+            {#each admin_users_index as index (users_info[index].user_id)}
               {@const user = users_info[index]}
               <div>
                 <span class="font-bold">{user.user_name}</span>
@@ -67,17 +82,31 @@
       {/if}
       {#if unverified_normal_users_index.length !== 0}
         <div>
+          <div class="text-lg font-bold underline">Unverified Normal Users</div>
           <table class="table table-hover table-compact table-cell-fit">
             <thead>
               <th class="text-center">User ID</th>
               <th class="text-center">Name</th>
+              <th class="text-center">Action</th>
             </thead>
             <tbody>
-              {#each unverified_normal_users_index as index}
+              {#each unverified_normal_users_index as index (users_info[index].user_id)}
                 {@const user = users_info[index]}
                 <tr>
                   <td class="text-center">{user.user_id}</td>
                   <td class="text-center">{user.user_name}</td>
+                  <td>
+                    <button
+                      title="Verify User"
+                      on:click={() => add_unverified_user(user.id, user.user_id)}
+                      class="btn mx-1 inline-block p-0"
+                    >
+                      <Icon src={RiSystemAddLargeFill} class="text-xl" />
+                    </button>
+                    <button title="Remove User" class="btn mx-1 inline-block p-0">
+                      <Icon src={RiSystemCloseLargeLine} class="text-xl" />
+                    </button>
+                  </td>
                 </tr>
               {/each}
             </tbody>

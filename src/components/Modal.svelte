@@ -59,9 +59,9 @@
   };
   onMount(() => {
     document.addEventListener('click', (e) => {
-      if (visibleModal && !visibleModal.querySelector('article')?.contains(e.target as Node)) {
-        closeModal();
-      }
+      // if (visibleModal && !visibleModal.querySelector('article')?.contains(e.target as Node)) {
+      //   closeModal();
+      // }
     });
 
     document.addEventListener('keydown', (e) => {

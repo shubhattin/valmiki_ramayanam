@@ -1,4 +1,4 @@
-import { publicProcedure, t } from '@api/trpc_init';
+import { protectedAdminProcedure, publicProcedure, t } from '@api/trpc_init';
 import { z } from 'zod';
 import { JWT_SECRET } from '@tools/jwt.server';
 import { jwtVerify, SignJWT } from 'jose';
@@ -6,6 +6,7 @@ import { puShTi, gen_salt, hash_256 } from '@tools/hash';
 import { UsersSchemaZod } from '@db/schema_zod';
 import { db } from '@db/db';
 import { user_verification_requests, users } from '@db/schema';
+import { eq } from 'drizzle-orm';
 
 const user_info_schema = UsersSchemaZod.pick({
   user_id: true,
@@ -182,8 +183,15 @@ const add_new_user_route = publicProcedure
     return { success, status_code: 'success' };
   });
 
+const verify_user_router = protectedAdminProcedure
+  .input(z.object({ id: z.number().int() }))
+  .mutation(async ({ input: { id } }) => {
+    await db.delete(user_verification_requests).where(eq(user_verification_requests.id, id));
+  });
+
 export const auth_router = t.router({
   verify_pass: verify_pass_router,
   renew_access_token: renew_access_token,
-  add_new_user: add_new_user_route
+  add_new_user: add_new_user_route,
+  verify_user: verify_user_router
 });
