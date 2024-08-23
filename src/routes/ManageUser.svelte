@@ -1,11 +1,12 @@
 <script lang="ts">
   import Icon from '@tools/Icon.svelte';
   import { client } from '@api/client';
-  import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
+  import { getModalStore } from '@skeletonlabs/skeleton';
   import { get_id_token_info } from '@tools/auth_tools';
   import { RiSystemAddLargeFill, RiSystemCloseLargeLine } from 'svelte-icons-pack/ri';
   import { onMount } from 'svelte';
   import { browser } from '$app/environment';
+  import { delay } from '@tools/delay';
 
   const modal_store = getModalStore();
 
@@ -21,6 +22,7 @@
   const fetch_user_info = async () => {
     if (!browser) return;
     users_info = null;
+    await delay(600);
     const info = await client.user_info.get_all_users_info.query();
     users_info = info;
 
@@ -42,7 +44,24 @@
       response(r: boolean) {
         if (!r) return;
         (async () => {
-          await client.auth.verify_user.mutate({ id: id });
+          await client.auth.verify_unverified_user.mutate({ id: id });
+          users_info = null;
+          admin_users_index = [];
+          normal_users_index = [];
+          unverified_normal_users_index = [];
+          await fetch_user_info();
+        })();
+      }
+    });
+  };
+  const remove_unverified_user = async (id: number, user_id: string) => {
+    modal_store.trigger({
+      type: 'confirm',
+      title: `Are you sure to remove '${user_id}' user?`,
+      response(r: boolean) {
+        if (!r) return;
+        (async () => {
+          await client.auth.delete_unverified_user.mutate({ id: id });
           users_info = null;
           admin_users_index = [];
           normal_users_index = [];
@@ -80,6 +99,20 @@
           </div>
         </div>
       {/if}
+      {#if normal_users_index.length !== 0}
+        <div>
+          <div class="text-lg font-bold underline">Users</div>
+          <div class="space-y-1">
+            {#each normal_users_index as index (users_info[index].user_id)}
+              {@const user = users_info[index]}
+              <div>
+                <span class="font-bold">{user.user_name}</span>
+                <span class="text text-sm text-gray-500 dark:text-gray-400">({user.user_id})</span>
+              </div>
+            {/each}
+          </div>
+        </div>
+      {/if}
       {#if unverified_normal_users_index.length !== 0}
         <div>
           <div class="text-lg font-bold underline">Unverified Normal Users</div>
@@ -103,7 +136,11 @@
                     >
                       <Icon src={RiSystemAddLargeFill} class="text-xl" />
                     </button>
-                    <button title="Remove User" class="btn mx-1 inline-block p-0">
+                    <button
+                      title="Remove User"
+                      on:click={() => remove_unverified_user(user.id, user.user_id)}
+                      class="btn mx-1 inline-block p-0"
+                    >
                       <Icon src={RiSystemCloseLargeLine} class="text-xl" />
                     </button>
                   </td>
@@ -113,6 +150,25 @@
           </table>
         </div>
       {/if}
+    {:else}
+      <section class="card w-full space-y-3">
+        {#each Array.from({ length: 3 }) as _, i}
+          <div class="space-y-2">
+            <div class="placeholder animate-pulse" />
+            <div class="grid grid-cols-3 gap-8">
+              <div class="placeholder animate-pulse" />
+              <div class="placeholder animate-pulse" />
+              <div class="placeholder animate-pulse" />
+            </div>
+            <div class="grid grid-cols-4 gap-4">
+              <div class="placeholder animate-pulse" />
+              <div class="placeholder animate-pulse" />
+              <div class="placeholder animate-pulse" />
+              <div class="placeholder animate-pulse" />
+            </div>
+          </div>
+        {/each}
+      </section>
     {/if}
   {/if}
 </div>

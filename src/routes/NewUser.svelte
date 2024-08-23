@@ -84,6 +84,8 @@
         type="text"
         bind:value={name}
         bind:this={$name_input_element}
+        minlength={4}
+        maxlength={50}
         required
         class="input variant-form-material"
         placeholder="Name"
@@ -102,6 +104,8 @@
         bind:value={username}
         bind:this={username_input_element}
         required
+        minlength={3}
+        maxlength={25}
         class="input variant-form-material"
         placeholder="Username"
       />
@@ -139,6 +143,8 @@
       <input
         name="contact_number"
         type="tel"
+        minlength={10}
+        maxlength={17}
         bind:value={contact_number}
         class="input variant-form-material"
         placeholder="Contact Number (Optional)"

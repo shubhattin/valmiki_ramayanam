@@ -189,9 +189,16 @@ const verify_user_router = protectedAdminProcedure
     await db.delete(user_verification_requests).where(eq(user_verification_requests.id, id));
   });
 
+const delete_unverified_user_router = protectedAdminProcedure
+  .input(z.object({ id: z.number().int() }))
+  .mutation(async ({ input: { id } }) => {
+    await db.delete(users).where(eq(users.id, id));
+  });
+
 export const auth_router = t.router({
   verify_pass: verify_pass_router,
   renew_access_token: renew_access_token,
   add_new_user: add_new_user_route,
-  verify_user: verify_user_router
+  verify_unverified_user: verify_user_router,
+  delete_unverified_user: delete_unverified_user_router
 });
