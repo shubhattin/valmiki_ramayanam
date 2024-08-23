@@ -21,6 +21,8 @@
   let user_already_exists = false;
   let email_already_exists = false;
 
+  let user_created_status = false;
+
   const create_new_user = async () => {
     if (
       [username, name, password, email].some((v) => !v || v === '') ||
@@ -50,88 +52,105 @@
         email_already_exists = true;
       }
     } else {
-      if (on_verify) on_verify();
+      user_created_status = true;
     }
   };
 </script>
 
 <div class="text-2xl font-bold text-orange-600 dark:text-yellow-500">Create New User</div>
-<form on:submit|preventDefault={create_new_user} class="mt-2 space-y-2.5 text-base">
-  <label class="space-y-1">
-    <div class="space-x-3 font-bold">
-      <span>Name</span>
+{#if user_created_status}
+  <div class="mt-2 space-y-2">
+    <div class="font-bold text-green-600 dark:text-green-500">User created successfully</div>
+    <div>
+      But You Account is not yet acticted to make changes to Translations. Also you been assigned
+      any language to work on. Please contact the Admin to activate your account and assign you a
+      language to work on.
     </div>
-    <input
-      name="name"
-      type="text"
-      bind:value={name}
-      bind:this={$name_input_element}
-      required
-      class="input variant-form-material"
-      placeholder="Name"
-    />
-  </label>
-  <label class="space-y-1">
-    <div class="space-x-3 font-bold">
-      <span>Username</span>
-      {#if user_already_exists}
-        <span class="text-red-600 dark:text-red-500">Username already exists</span>
-      {/if}
-    </div>
-    <input
-      name="username"
-      type="text"
-      bind:value={username}
-      bind:this={username_input_element}
-      required
-      class="input variant-form-material"
-      placeholder="Username"
-    />
-  </label>
-  <label class="space-y-1">
-    <div class="space-x-3 font-bold">
-      <span>Email</span>
-      {#if email_already_exists}
-        <span class="text-red-600 dark:text-red-500">Email already exists</span>
-      {/if}
-    </div>
-    <input
-      name="email"
-      type="email"
-      bind:value={email}
-      bind:this={email_input_element}
-      required
-      class="input variant-form-material"
-      placeholder="Email"
-    />
-  </label>
-  <label class="space-y-1">
-    <span class="font-bold">Password</span>
-    <input
-      name="password"
-      class={cl_join('input variant-form-material')}
-      type="password"
-      placeholder="Password"
-      bind:value={password}
-      required
-    />
-  </label>
-  <label class="space-y-1">
-    <span>Contact Number</span>
-    <input
-      name="contact_number"
-      type="tel"
-      bind:value={contact_number}
-      class="input variant-form-material"
-      placeholder="Contact Number (Optional)"
-    />
-  </label>
-  <button
-    type="submit"
-    class="btn rounded-lg bg-primary-700 px-2 py-1 font-bold text-white"
-    disabled={creating_new_user_status}
-  >
-    <Icon src={LuUserPlus} class="text-2xl" />
-    <span>Signup</span>
-  </button>
-</form>
+    <button
+      class="variant-outline-primary btn"
+      on:click={() => {
+        if (on_verify) on_verify();
+      }}>Continue</button
+    >
+  </div>
+{:else}
+  <form on:submit|preventDefault={create_new_user} class="mt-2 space-y-2.5 text-base">
+    <label class="space-y-1">
+      <div class="space-x-3 font-bold">
+        <span>Name</span>
+      </div>
+      <input
+        name="name"
+        type="text"
+        bind:value={name}
+        bind:this={$name_input_element}
+        required
+        class="input variant-form-material"
+        placeholder="Name"
+      />
+    </label>
+    <label class="space-y-1">
+      <div class="space-x-3 font-bold">
+        <span>Username</span>
+        {#if user_already_exists}
+          <span class="text-red-600 dark:text-red-500">Username already exists</span>
+        {/if}
+      </div>
+      <input
+        name="username"
+        type="text"
+        bind:value={username}
+        bind:this={username_input_element}
+        required
+        class="input variant-form-material"
+        placeholder="Username"
+      />
+    </label>
+    <label class="space-y-1">
+      <div class="space-x-3 font-bold">
+        <span>Email</span>
+        {#if email_already_exists}
+          <span class="text-red-600 dark:text-red-500">Email already exists</span>
+        {/if}
+      </div>
+      <input
+        name="email"
+        type="email"
+        bind:value={email}
+        bind:this={email_input_element}
+        required
+        class="input variant-form-material"
+        placeholder="Email"
+      />
+    </label>
+    <label class="space-y-1">
+      <span class="font-bold">Password</span>
+      <input
+        name="password"
+        class={cl_join('input variant-form-material')}
+        type="password"
+        placeholder="Password"
+        bind:value={password}
+        required
+      />
+    </label>
+    <label class="space-y-1">
+      <span>Contact Number</span>
+      <input
+        name="contact_number"
+        type="tel"
+        bind:value={contact_number}
+        class="input variant-form-material"
+        placeholder="Contact Number (Optional)"
+      />
+    </label>
+    <button
+      type="submit"
+      class="btn rounded-lg bg-primary-700 px-2 py-1 font-bold text-white"
+      disabled={creating_new_user_status}
+    >
+      <Icon src={LuUserPlus} class="text-2xl" />
+      <span>Signup</span>
+    </button>
+  </form>
+{/if}

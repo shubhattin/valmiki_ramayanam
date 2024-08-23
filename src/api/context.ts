@@ -3,10 +3,14 @@ import { jwtVerify } from 'jose';
 import { JWT_SECRET } from '@tools/jwt.server';
 import type { RequestEvent } from '@sveltejs/kit';
 import type { inferAsyncReturnType } from '@trpc/server';
+import { z } from 'zod';
 
-const access_token_payload_schema = UsersSchemaZod.pick({
-  id: true,
-  user_type: true
+const access_token_payload_schema = z.object({
+  user: UsersSchemaZod.pick({
+    id: true,
+    user_type: true
+  }),
+  type: z.literal('api')
 });
 
 export async function createContext(event: RequestEvent) {
@@ -19,7 +23,7 @@ export async function createContext(event: RequestEvent) {
         algorithms: ['HS256']
       });
       const payload = access_token_payload_schema.parse(jwt_data.payload);
-      return payload;
+      return payload.user;
     } catch {}
     return null;
   }

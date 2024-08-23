@@ -5,7 +5,7 @@ import { jwtVerify, SignJWT } from 'jose';
 import { puShTi, gen_salt, hash_256 } from '@tools/hash';
 import { UsersSchemaZod } from '@db/schema_zod';
 import { db } from '@db/db';
-import { users } from '@db/schema';
+import { user_verification_requests, users } from '@db/schema';
 
 const user_info_schema = UsersSchemaZod.pick({
   user_id: true,
@@ -159,58 +159,31 @@ const add_new_user_route = publicProcedure
     const slt = gen_salt();
     const hashed_password = (await hash_256(password + slt)) + slt;
 
-    await db.insert(users).values({
-      user_id: username,
-      user_name: name,
-      user_email: email,
-      password_hash: hashed_password,
-      contact_number: contact_number
+    await db.transaction(async (tx) => {
+      const returning_data = await tx
+        .insert(users)
+        .values({
+          user_id: username,
+          user_name: name,
+          user_email: email,
+          password_hash: hashed_password,
+          contact_number: contact_number
+        })
+        .returning();
+      // user_type -> default non-admin
+      // we can be sure that if the insert is success then only it will
+      // proceed else throw a error into trpc and quit
+      const id = returning_data[0].id;
+      await tx.insert(user_verification_requests).values({
+        id: id
+      });
     });
-    // user_type -> default non-admin
-    // we can be sure that if the insert is success then only it will
-    // proceed else throw a error into trpc and quit
-
     success = true;
-
     return { success, status_code: 'success' };
   });
-
-// const reset_pass_route = publicProcedure
-//   .input(
-//     z.object({
-//       id: z.string(),
-//       email: z.string(),
-//       newPass: z.string()
-//     })
-//   )
-//   .output(
-//     z.object({
-//       success: z.boolean(),
-//       status_code: get_zod_key_enum(dattStruct.drive.login.reset.msg_codes)
-//     })
-//   )
-//   .mutation(async ({ input: { id, email, newPass } }) => {
-//     let success = false;
-//     const user_info_parse = user_info_schema.safeParse(await base_get(USERS_INFO_DRIVE_LOC, id));
-//     if (!user_info_parse.success) return { success, status_code: 'user_not_found' };
-//     const user_info = user_info_parse.data;
-
-//     // verifying email
-//     const verified_email = await puShTi(email, user_info.email_hash);
-//     (await base_get<{ key: string; value: string }>(`${USERS_INFO_DRIVE_LOC}_email`, id))?.value!;
-//     if (!verified_email) return { success, status_code: 'wrong_email' };
-
-//     // storing new password
-//     const hashed_password = await bcrypt.hash(newPass, await bcrypt.genSalt());
-//     base_put<user_info_type>(USERS_INFO_DRIVE_LOC, [{ ...user_info, password: hashed_password }]);
-//     success = true;
-
-//     return { success, status_code: 'success_detail' };
-//   });
 
 export const auth_router = t.router({
   verify_pass: verify_pass_router,
   renew_access_token: renew_access_token,
   add_new_user: add_new_user_route
-  // reset_pass: reset_pass_route
 });

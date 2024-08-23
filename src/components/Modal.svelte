@@ -85,7 +85,7 @@
     <div
       in:scale={{ duration: animationDuration }}
       out:slide={{ duration: animationDuration }}
-      class="mx-3 max-w-screen-lg"
+      class="mx-3 max-h-[90%] max-w-screen-lg overflow-scroll"
     >
       <article class="rounded-lg bg-white p-3 pt-0 shadow-lg dark:bg-gray-800">
         <div class="flex justify-end">

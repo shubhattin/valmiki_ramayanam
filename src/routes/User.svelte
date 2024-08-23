@@ -4,7 +4,7 @@
   import type { ModalSettings } from '@skeletonlabs/skeleton';
   import { TrOutlineLogin2 } from 'svelte-icons-pack/tr';
   import { VscAccount } from 'svelte-icons-pack/vsc';
-  import { LuUserPlus } from 'svelte-icons-pack/lu';
+  import { LuSettings, LuUserPlus } from 'svelte-icons-pack/lu';
   import { onMount } from 'svelte';
   import { get_id_token_info, ID_TOKEN_INFO_SCHEMA } from '@tools/auth_tools';
   import { z } from 'zod';
@@ -16,6 +16,8 @@
   import { writable } from 'svelte/store';
   import { AiOutlineUser } from 'svelte-icons-pack/ai';
   import NewUser from './NewUser.svelte';
+  import { IoSettingsOutline } from 'svelte-icons-pack/io';
+  import ManageUser from './ManageUser.svelte';
 
   const modalStore = getModalStore();
 
@@ -31,6 +33,8 @@
 
   let user_create_modal_status = writable(false);
   let name_input_elmnt_new_user = writable<HTMLInputElement>(null!);
+
+  let manage_user_modal_status = writable(false);
 
   const log_out = () => {
     const modal: ModalSettings = {
@@ -59,7 +63,7 @@
 <div class="card z-40 px-1 py-2 shadow-2xl" data-popup="user_info">
   {#if user_info}
     <div class="select-none space-y-2 p-1">
-      <div class="text-base font-bold">
+      <div class="text-center text-base font-bold">
         {#if user_info.user_type === 'admin'}
           <Icon class="-mt-1 text-2xl" src={RiUserFacesAdminLine} />
         {:else}
@@ -67,13 +71,22 @@
         {/if}{user_info.user_name}
         <span class="text-sm text-gray-500 dark:text-gray-400">({user_info.user_id})</span>
       </div>
-      <button
-        on:click={log_out}
-        class="variant-filled-error btn m-0 rounded-md pb-1 pl-1 pr-2 pt-0 font-bold"
-      >
-        <Icon class="text-2xl" src={BiLogOut} />
-        <span>Logout</span>
-      </button>
+      <div class="space-x-4">
+        <button
+          on:click={() => ($manage_user_modal_status = true)}
+          class="btn space-x-2 rounded-md bg-primary-800 pb-1 pl-1 pr-2 pt-1 font-bold text-white"
+        >
+          <Icon class="text-2xl" src={LuSettings} />
+          <span>User Settings</span>
+        </button>
+        <button
+          on:click={log_out}
+          class="variant-filled-error btn m-0 rounded-md pb-1 pl-1 pr-2 pt-0 font-bold"
+        >
+          <Icon class="text-2xl" src={BiLogOut} />
+          <span>Logout</span>
+        </button>
+      </div>
     </div>
   {:else}
     <div class="space-y-2">
@@ -133,5 +146,10 @@
         $user_create_modal_status = false;
       }}
     />
+  </div>
+</Modal>
+<Modal modal_open={manage_user_modal_status}>
+  <div class="p-2">
+    <ManageUser />
   </div>
 </Modal>
