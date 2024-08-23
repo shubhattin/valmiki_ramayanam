@@ -28,6 +28,8 @@
   let viewing_script = BASE_SCRIPT;
   let loaded_viewing_script: string = viewing_script;
 
+  let view_translation_status = false;
+
   $: (async () => {
     await load_parivartak_lang_data(viewing_script);
     loaded_viewing_script = viewing_script;
@@ -58,6 +60,27 @@
   const kANDa_selected_unsub = kANDa_selected.subscribe(() => {
     $sarga_selected = 0;
   });
+
+  const load_english_translation = async (kANDa_num: number, sarga_number: number) => {
+    let data: Record<number, string> = {};
+    if (import.meta.env.DEV) {
+      const yaml = (await import('js-yaml')).default;
+      const glob_yaml = import.meta.glob('/data/ramayan/trans_en/*/*.yaml', {
+        query: '?raw'
+      });
+      if (!(`/data/ramayan/trans_en/${kANDa_num}/${sarga_number}.yaml` in glob_yaml)) return null;
+      const text = (
+        (await glob_yaml[`/data/ramayan/trans_en/${kANDa_num}/${sarga_number}.yaml`]()) as any
+      ).default as string;
+      data = yaml.load(text) as Record<number, string>;
+    }
+    const data_map = new Map<number, string>();
+
+    for (const [key, value] of Object.entries(data)) {
+      data_map.set(Number(key), value.replaceAll(/\n$/g, '')); // replace the ending newline
+    }
+    return data_map;
+  };
 
   onDestroy(() => {
     kANDa_selected_unsub();
