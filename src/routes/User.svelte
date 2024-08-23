@@ -72,13 +72,15 @@
         <span class="text-sm text-gray-500 dark:text-gray-400">({user_info.user_id})</span>
       </div>
       <div class="space-x-4">
-        <button
-          on:click={() => ($manage_user_modal_status = true)}
-          class="btn space-x-2 rounded-md bg-primary-800 pb-1 pl-1 pr-2 pt-1 font-bold text-white"
-        >
-          <Icon class="text-2xl" src={LuSettings} />
-          <span>User Settings</span>
-        </button>
+        {#if user_info.user_type === 'admin'}
+          <button
+            on:click={() => ($manage_user_modal_status = true)}
+            class="btn space-x-2 rounded-md bg-primary-800 pb-1 pl-1 pr-2 pt-1 font-bold text-white"
+          >
+            <Icon class="text-2xl" src={LuSettings} />
+            <span>Settings</span>
+          </button>
+        {/if}
         <button
           on:click={log_out}
           class="variant-filled-error btn m-0 rounded-md pb-1 pl-1 pr-2 pt-0 font-bold"

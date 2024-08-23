@@ -12,6 +12,7 @@ const get_all_user_info_router = protectedAdminProcedure.query(async ({ ctx: { u
       user_type: true,
       allowed_langs: true
     },
+    orderBy: ({ user_name }, { asc }) => asc(user_name),
     where: ({ id }, { eq, not }) => not(eq(id, user.id)),
     with: {
       user_verification_requests: true

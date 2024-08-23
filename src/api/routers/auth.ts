@@ -7,6 +7,7 @@ import { UsersSchemaZod } from '@db/schema_zod';
 import { db } from '@db/db';
 import { user_verification_requests, users } from '@db/schema';
 import { eq } from 'drizzle-orm';
+import type { lang_list_type } from '@tools/lang_list';
 
 const user_info_schema = UsersSchemaZod.pick({
   user_id: true,
@@ -16,8 +17,8 @@ const user_info_schema = UsersSchemaZod.pick({
 });
 type user_info_type = z.infer<typeof user_info_schema>;
 
-const ID_TOKREN_EXPIRE = '15d';
-const ACCESS_TOKEN_EXPIRE = '5h';
+const ID_TOKREN_EXPIRE = '20d';
+const ACCESS_TOKEN_EXPIRE = '16h';
 
 const get_id_and_aceess_token = async (user_info: user_info_type) => {
   // ID Token will be used for authentication, i.e. to verify the user's identity.
@@ -195,10 +196,18 @@ const delete_unverified_user_router = protectedAdminProcedure
     await db.delete(users).where(eq(users.id, id));
   });
 
+const update_user_allowed_langs_router = protectedAdminProcedure
+  .input(z.object({ id: z.number().int(), langs: z.string().array() }))
+  .mutation(async ({ input: { id, langs } }) => {
+    const langs_type = langs as lang_list_type[];
+    await db.update(users).set({ allowed_langs: langs_type }).where(eq(users.id, id));
+  });
+
 export const auth_router = t.router({
   verify_pass: verify_pass_router,
   renew_access_token: renew_access_token,
   add_new_user: add_new_user_route,
   verify_unverified_user: verify_user_router,
-  delete_unverified_user: delete_unverified_user_router
+  delete_unverified_user: delete_unverified_user_router,
+  add_user_allowed_langs: update_user_allowed_langs_router
 });
