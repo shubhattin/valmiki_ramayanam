@@ -76,6 +76,7 @@
         name="password"
         class={cl_join('input variant-form-material', wrong_pass_status && 'input-error')}
         type="password"
+        minlength={6}
         placeholder="Password"
         bind:value={password}
         required

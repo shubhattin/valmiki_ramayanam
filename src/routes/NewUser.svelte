@@ -133,6 +133,7 @@
         name="password"
         class={cl_join('input variant-form-material')}
         type="password"
+        minlength={6}
         placeholder="Password"
         bind:value={password}
         required

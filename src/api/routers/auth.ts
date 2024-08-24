@@ -1,4 +1,4 @@
-import { protectedAdminProcedure, publicProcedure, t } from '@api/trpc_init';
+import { protectedAdminProcedure, protectedProcedure, publicProcedure, t } from '@api/trpc_init';
 import { z } from 'zod';
 import { JWT_SECRET } from '@tools/jwt.server';
 import { jwtVerify, SignJWT } from 'jose';
@@ -184,6 +184,28 @@ const add_new_user_route = publicProcedure
     return { success, status_code: 'success' };
   });
 
+const update_password_router = protectedProcedure
+  .input(
+    z.object({
+      current_password: z.string(),
+      new_password: z.string()
+    })
+  )
+  .mutation(async ({ input: { current_password, new_password }, ctx: { user } }) => {
+    const user_info = (await db.query.users.findFirst({
+      columns: {
+        password_hash: true
+      },
+      where: ({ id }, { eq }) => eq(id, user.id)
+    }))!;
+    const verified = await puShTi(current_password, user_info.password_hash);
+    if (!verified) return { success: false };
+    const slt = gen_salt();
+    const hashed_password = (await hash_256(new_password + slt)) + slt;
+    await db.update(users).set({ password_hash: hashed_password }).where(eq(users.id, user.id));
+    return { success: true };
+  });
+
 const verify_user_router = protectedAdminProcedure
   .input(z.object({ id: z.number().int() }))
   .mutation(async ({ input: { id } }) => {
@@ -207,6 +229,7 @@ export const auth_router = t.router({
   verify_pass: verify_pass_router,
   renew_access_token: renew_access_token,
   add_new_user: add_new_user_route,
+  update_password: update_password_router,
   verify_unverified_user: verify_user_router,
   delete_unverified_user: delete_unverified_user_router,
   add_user_allowed_langs: update_user_allowed_langs_router

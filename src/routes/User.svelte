@@ -9,7 +9,7 @@
   import { get_id_token_info, ID_TOKEN_INFO_SCHEMA } from '@tools/auth_tools';
   import { z } from 'zod';
   import { RiUserFacesAdminLine } from 'svelte-icons-pack/ri';
-  import { BiLogOut } from 'svelte-icons-pack/bi';
+  import { BiLock, BiLogOut } from 'svelte-icons-pack/bi';
   import { deleteAuthCookies } from '@tools/auth_tools';
   import Modal from '@components/Modal.svelte';
   import Authenticate from '@components/Authenticate.svelte';
@@ -17,6 +17,7 @@
   import { AiOutlineUser } from 'svelte-icons-pack/ai';
   import NewUser from './NewUser.svelte';
   import ManageUser from './ManageUser.svelte';
+  import UpdatePassword from './UpdatePassword.svelte';
 
   const modalStore = getModalStore();
 
@@ -35,6 +36,8 @@
 
   let user_create_modal_status = writable(false);
   let name_input_elmnt_new_user = writable<HTMLInputElement>(null!);
+
+  let update_password_modal_status = writable(false);
 
   let manage_user_modal_status = writable(false);
 
@@ -92,6 +95,14 @@
           <span>Logout</span>
         </button>
       </div>
+      <button
+        disabled={editing_status}
+        on:click={() => ($update_password_modal_status = true)}
+        class="btn m-0 rounded-md bg-secondary-800 pb-1 pl-1 pr-2 pt-0 font-bold text-white dark:bg-secondary-700"
+      >
+        <Icon class="text-2xl" src={BiLock} />
+        <span>Update Password</span>
+      </button>
       {#if user_info.user_type !== 'admin'}
         <div>
           <span class="text-sm text-gray-500 dark:text-gray-300">Languages:</span>
@@ -165,4 +176,7 @@
   <div class="p-2">
     <ManageUser />
   </div>
+</Modal>
+<Modal modal_open={update_password_modal_status}>
+  <UpdatePassword on_done={() => ($update_password_modal_status = false)} />
 </Modal>
