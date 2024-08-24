@@ -3,16 +3,17 @@
   import Icon from '@tools/Icon.svelte';
   import { get_possibily_not_undefined, copy_text_to_clipboard } from '@tools/kry';
   import { RiSystemAddLargeLine } from 'svelte-icons-pack/ri';
-  import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import type { Writable } from 'svelte/store';
   import { fade, scale, slide } from 'svelte/transition';
-  import ramayan_map_type from '@data/ramayan/ramayan_map.json';
-  import { SlideToggle } from '@skeletonlabs/skeleton';
+  import { SlideToggle, getModalStore } from '@skeletonlabs/skeleton';
+  import type { ModalSettings } from '@skeletonlabs/skeleton';
   import { FiSave } from 'svelte-icons-pack/fi';
   import { BsClipboard2Check } from 'svelte-icons-pack/bs';
   import { cl_join } from '@tools/cl_join';
   import LipiLekhikA from '@tools/converter';
   import { client } from '@api/client';
+
+  const modal_store = getModalStore();
 
   export let sarga_data: string[];
   export let loaded_viewing_script: string;
@@ -25,7 +26,6 @@
   export let sarga_loading: boolean;
   export let sarga_selected: Writable<number>;
   export let kANDa_selected: Writable<number>;
-  export let kANDa: (typeof ramayan_map_type)[0];
   export let edit_language_typer_status: boolean;
   export let trans_lang: Writable<string>;
 
@@ -37,58 +37,44 @@
 
   $: copied_text_status && setTimeout(() => (copied_text_status = false), 1400);
 
-  const save_data = async () => {
+  const save_data = () => {
+    if (edited_translations_indexes.size + added_translations_indexes.length === 0) return;
     const added_indexes = added_translations_indexes.map((index) => index);
     const edited_indexes = Array.from(edited_translations_indexes).map((index) => index);
+    const modal_options: ModalSettings = {
+      title: 'Sure to save Changes ?',
+      type: 'confirm',
+      body: `Edits ➔ ${edited_indexes.length} ${edited_indexes.length > 0 ? '[ ' + edited_indexes.join(', ') + ' ]' : ''}
+      <br/>Additions ➔ ${added_indexes.length} ${added_indexes.length > 0 ? '[ ' + added_indexes.join(', ') + ' ]' : ''}`,
+      response(r: boolean) {
+        if (!r) return;
+        (async () => {
+          const added_texts = added_indexes.map((index) => $trans_lang_data.get(index)!);
+          const edited_texts = edited_indexes.map((index) => $trans_lang_data.get(index)!);
 
-    const added_texts = added_indexes.map((index) => $trans_lang_data.get(index)!);
-    const edited_texts = edited_indexes.map((index) => $trans_lang_data.get(index)!);
-
-    const res = await client.translations.edit_translation.mutate({
-      data: {
-        add_data: added_texts,
-        edit_data: edited_texts,
-        to_add_indexed: added_indexes,
-        to_edit_indexed: edited_indexes
-      },
-      sarga_num: $sarga_selected,
-      kANDa_num: $kANDa_selected,
-      lang: $trans_lang
-    });
-    if (res.success) {
-      added_translations_indexes = [];
-      edited_translations_indexes = new Set();
-      $editing_status_on = false;
-    }
+          const res = await client.translations.edit_translation.mutate({
+            data: {
+              add_data: added_texts,
+              edit_data: edited_texts,
+              to_add_indexed: added_indexes,
+              to_edit_indexed: edited_indexes
+            },
+            sarga_num: $sarga_selected,
+            kANDa_num: $kANDa_selected,
+            lang: $trans_lang
+          });
+          if (res.success) {
+            added_translations_indexes = [];
+            edited_translations_indexes = new Set();
+            $editing_status_on = false;
+          }
+        })();
+      }
+    };
+    modal_store.trigger(modal_options);
   };
 </script>
 
-<div class="space-x-3">
-  {#if $sarga_selected !== 1}
-    <button
-      on:click={() => ($sarga_selected -= 1)}
-      in:scale
-      out:slide
-      disabled={$editing_status_on}
-      class="btn rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white"
-    >
-      <Icon class="-mt-1 mr-1 text-xl" src={TiArrowBackOutline} />
-      Previous
-    </button>
-  {/if}
-  {#if $sarga_selected !== kANDa.sarga_data.length}
-    <button
-      on:click={() => ($sarga_selected += 1)}
-      in:scale
-      out:slide
-      disabled={$editing_status_on}
-      class="btn rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white"
-    >
-      Next
-      <Icon class="-mt-1 ml-1 text-xl" src={TiArrowForwardOutline} />
-    </button>
-  {/if}
-</div>
 <div class="flex space-x-4">
   <SlideToggle
     name="Copy to Clipboard"
@@ -137,12 +123,9 @@
         {@const trans_index = sarga_data.length - 1 === i ? -1 : i}
         <div class="rounded-lg px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-800">
           {#if i !== 0 && i !== sarga_data.length - 1}
-            <span
-              class="inline-block rounded-full text-center align-top text-xs text-gray-500 dark:text-gray-300"
-              >{i}</span
-            >
+            <span class="inline-block align-top text-xs text-gray-500 dark:text-gray-300">{i}</span>
           {/if}
-          <div class="ml-1 space-y-1">
+          <div class="mt-0 space-y-1">
             <!-- svelte-ignore a11y-no-static-element-interactions -->
             <div
               on:dblclick={() => {
@@ -165,7 +148,7 @@
                   );
                   copied_text_status = true;
                 }}
-                class="text-stone-500 dark:text-slate-300"
+                class="text-stone-500 dark:text-slate-400"
               >
                 {#if trans_en_data.has(trans_index)}
                   <!-- Usually translations are single but still... -->

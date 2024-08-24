@@ -21,6 +21,7 @@
   const modalStore = getModalStore();
 
   export let editing_status: boolean;
+  export let user_allowed_langs: string[] = [];
 
   let user_info: z.infer<typeof ID_TOKEN_INFO_SCHEMA> | null = null;
   onMount(() => {
@@ -91,6 +92,14 @@
           <span>Logout</span>
         </button>
       </div>
+      {#if user_info.user_type !== 'admin'}
+        <div>
+          <span class="text-sm text-gray-500 dark:text-gray-300">Languages:</span>
+          <span class="text-sm text-gray-500 dark:text-gray-300">
+            {user_allowed_langs.join(', ')}
+          </span>
+        </div>
+      {/if}
     </div>
   {:else}
     <div class="space-y-2">
