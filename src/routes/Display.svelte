@@ -10,6 +10,8 @@
   import { SlideToggle } from '@skeletonlabs/skeleton';
   import { FiSave } from 'svelte-icons-pack/fi';
   import { BsClipboard2Check } from 'svelte-icons-pack/bs';
+  import { cl_join } from '@tools/cl_join';
+  import LipiLekhikA from '@tools/converter';
 
   export let sarga_data: string[];
   export let loaded_viewing_script: string;
@@ -22,9 +24,14 @@
   export let sarga_loading: boolean;
   export let sarga_selected: Writable<number>;
   export let kANDa: (typeof ramayan_map_type)[0];
+  export let edit_language_typer_status: boolean;
+  export let trans_lang: Writable<string>;
 
   let enable_copy_to_clipbaord = true;
   let copied_text_status = false;
+
+  let added_translations_indexes: number[] = [];
+  let edited_translations_indexes = new Set<number>();
 
   $: copied_text_status && setTimeout(() => (copied_text_status = false), 1400);
 </script>
@@ -81,16 +88,25 @@
     <span>Save</span>
   </button>
 {/if}
-<div class="h-[65vh] overflow-scroll rounded-xl border-2 border-gray-400 p-0 dark:border-gray-600">
+<div
+  class={cl_join(
+    'h-[85vh] overflow-scroll rounded-xl border-2 border-gray-400 p-0 dark:border-gray-600',
+    loaded_en_trans_data && 'h-[90vh]',
+    loaded_lang_trans_data && 'h-[95vh]',
+    editing_status_on && 'h-[100vh]'
+  )}
+>
   {#if !sarga_loading}
-    <div transition:fade={{ duration: 250 }}>
-      {#each sarga_data as shloka_lines, i}
+    <div transition:fade={{ duration: 250 }} class="space-y-2">
+      {#each sarga_data as shloka_lines, i (i)}
         {@const line_transliterated = lipi_parivartak(
           shloka_lines,
           BASE_SCRIPT,
           loaded_viewing_script
         )}
         {@const line_split = line_transliterated.split('\n')}
+        <!-- with 0 and -1 index -->
+        {@const trans_index = sarga_data.length - 1 === i ? -1 : i}
         <div class="rounded-lg px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-800">
           {#if i !== 0 && i !== sarga_data.length - 1}
             <span
@@ -98,10 +114,11 @@
               >{i}</span
             >
           {/if}
-          <div class="ml-1 inline-block">
+          <div class="ml-1 space-y-1">
             <!-- svelte-ignore a11y-no-static-element-interactions -->
             <div
               on:dblclick={() => {
+                if (!enable_copy_to_clipbaord) return;
                 copy_text_to_clipboard(line_transliterated);
                 copied_text_status = true;
               }}
@@ -114,40 +131,78 @@
               <!-- svelte-ignore a11y-no-static-element-interactions -->
               <div
                 on:dblclick={() => {
-                  if (i === sarga_data.length - 1)
-                    copy_text_to_clipboard(get_possibily_not_undefined(trans_en_data.get(-1)));
-                  else copy_text_to_clipboard(get_possibily_not_undefined(trans_en_data.get(i)));
+                  if (!enable_copy_to_clipbaord) return;
+                  copy_text_to_clipboard(
+                    get_possibily_not_undefined(trans_en_data.get(trans_index))
+                  );
                   copied_text_status = true;
                 }}
                 class="text-stone-500 dark:text-slate-300"
               >
-                {#if trans_en_data.has(i)}
+                {#if trans_en_data.has(trans_index)}
                   <!-- Usually translations are single but still... -->
-                  {#each get_possibily_not_undefined(trans_en_data.get(i)).split('\n') as line_trans}
+                  {#each get_possibily_not_undefined(trans_en_data.get(trans_index)).split('\n') as line_trans}
                     <div>{line_trans}</div>
                   {/each}
-                {:else if i === sarga_data.length - 1 && trans_en_data.has(-1)}
-                  <div>{trans_en_data.get(-1)}</div>
                 {/if}
               </div>
             {/if}
             {#if editing_status_on}
               <div transition:slide>
-                <button
-                  class="btn m-0 rounded-md bg-surface-500 p-0 px-1 font-bold text-white dark:bg-surface-500"
-                >
-                  <Icon src={RiSystemAddLargeLine} />
-                </button>
+                {#if !trans_lang_data.has(trans_index)}
+                  <button
+                    on:click={() => {
+                      trans_lang_data.set(trans_index, '');
+                      added_translations_indexes.push(trans_index);
+                      trans_lang_data = trans_lang_data;
+                    }}
+                    class="btn m-0 rounded-md bg-surface-500 p-0 px-1 font-bold text-white dark:bg-surface-500"
+                  >
+                    <Icon src={RiSystemAddLargeLine} />
+                  </button>
+                {:else}
+                  <textarea
+                    on:input={(e) => {
+                      edited_translations_indexes.add(trans_index);
+                      if (edit_language_typer_status)
+                        LipiLekhikA.mukhya(
+                          e.target,
+                          // @ts-ignore
+                          e.data,
+                          $trans_lang === 'Hindi' ? 'Sanskrit' : $trans_lang,
+                          true,
+                          // @ts-ignore
+                          (val) => {
+                            trans_lang_data.set(trans_index, val);
+                          }
+                        );
+                      else {
+                        trans_lang_data.set(trans_index, e.currentTarget.value);
+                      }
+                      trans_lang_data = trans_lang_data;
+                    }}
+                    class="textarea h-16 w-full"
+                    value={trans_lang_data.get(trans_index)}
+                  ></textarea>
+                {/if}
               </div>
             {:else if loaded_lang_trans_data}
-              <div class="text-yellow-700 dark:text-yellow-500">
-                {#if trans_lang_data.has(i)}
+              <!-- svelte-ignore a11y-no-static-element-interactions -->
+              <div
+                on:dblclick={() => {
+                  if (!enable_copy_to_clipbaord) return;
+                  copy_text_to_clipboard(
+                    get_possibily_not_undefined(trans_lang_data.get(trans_index))
+                  );
+                  copied_text_status = true;
+                }}
+                class="text-yellow-700 dark:text-yellow-500"
+              >
+                {#if trans_lang_data.has(trans_index)}
                   <!-- Usually translations are single but still... -->
-                  {#each get_possibily_not_undefined(trans_lang_data.get(i)).split('\n') as line_trans}
+                  {#each get_possibily_not_undefined(trans_lang_data.get(trans_index)).split('\n') as line_trans}
                     <div>{line_trans}</div>
                   {/each}
-                {:else if i === sarga_data.length - 1 && trans_lang_data.has(-1)}
-                  <div>{trans_lang_data.get(-1)}</div>
                 {/if}
               </div>
             {/if}

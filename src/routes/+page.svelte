@@ -21,6 +21,9 @@
   import { z } from 'zod';
   import { client } from '@api/client';
   import { get_possibily_not_undefined } from '@tools/kry';
+  import { BiEdit } from 'svelte-icons-pack/bi';
+  import { BsKeyboard } from 'svelte-icons-pack/bs';
+  import { SlideToggle } from '@skeletonlabs/skeleton';
 
   const BASE_SCRIPT = 'Sanskrit';
 
@@ -42,6 +45,7 @@
 
   let editing_status_on = false;
   let loaded_user_info = false; // info related to assigned editable langs
+  let edit_language_typer_status = true;
 
   let user_info: z.infer<typeof ID_TOKEN_INFO_SCHEMA> | null = null;
   onMount(() => {
@@ -55,6 +59,7 @@
       $sarga_selected = 1;
       view_translation_status = true;
       $trans_lang = 'Hindi';
+      editing_status_on = true;
     }
     load_parivartak_lang_data(BASE_SCRIPT);
     if (browser) ensure_auth_access_status();
@@ -72,6 +77,12 @@
     await load_parivartak_lang_data(viewing_script);
     loaded_viewing_script = viewing_script;
   })();
+  $: browser &&
+    $trans_lang !== '--' &&
+    (async () => {
+      // loading trnaslation lang data for typing support
+      await load_parivartak_lang_data($trans_lang);
+    })();
   $: view_translation_status &&
     browser &&
     (async () => {
@@ -95,22 +106,24 @@
       else user_allowed_langs = data;
       loaded_user_info = true;
     })();
-  const trans_lang_unsub = trans_lang.subscribe(async () => {
-    if (!browser || $trans_lang === '--') return;
-    loaded_lang_trans_data = false;
-    const data = await client.translations.get_translations_per_sarga.query({
-      lang: $trans_lang,
-      kANDa_num: $kANDa_selected,
-      sarga_num: $sarga_selected
-    });
-    const data_map = new Map<number, string>();
-    for (let val of data) {
-      // we dont need to manually care abouy 0 or -1, it will be handled while making changes
-      data_map.set(val.shloka_num, val.text);
-    }
-    trans_lang_data = data_map;
-    loaded_lang_trans_data = true;
-  });
+  $: browser &&
+    $trans_lang !== '--' &&
+    (async () => {
+      if (!($kANDa_selected !== 0 && $sarga_selected !== 0)) return;
+      loaded_lang_trans_data = false;
+      const data = await client.translations.get_translations_per_sarga.query({
+        lang: $trans_lang,
+        kANDa_num: $kANDa_selected,
+        sarga_num: $sarga_selected
+      });
+      const data_map = new Map<number, string>();
+      for (let val of data) {
+        // we dont need to manually care abouy 0 or -1, it will be handled while making changes
+        data_map.set(val.shloka_num, val.text);
+      }
+      trans_lang_data = data_map;
+      loaded_lang_trans_data = true;
+    })();
 
   const sarga_unsub = sarga_selected.subscribe(async () => {
     if ($kANDa_selected === 0 || $sarga_selected === 0) return;
@@ -154,7 +167,6 @@
   onDestroy(() => {
     kANDa_selected_unsub();
     sarga_unsub();
-    trans_lang_unsub();
   });
 
   const PAGE_INFO = {
@@ -174,11 +186,7 @@
   <div class="flex justify-between">
     <label class="space-x-4">
       <Icon src={LanguageIcon} class="text-4xl" />
-      <select
-        class="select inline-block w-40"
-        disabled={editing_status_on}
-        bind:value={viewing_script}
-      >
+      <select class="select inline-block w-40" bind:value={viewing_script}>
         {#each SCRIPT_LIST as lang (lang)}
           <option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
         {/each}
@@ -247,8 +255,21 @@
         <button
           on:click={() => (editing_status_on = true)}
           class="btn my-1 rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white dark:bg-tertiary-600"
-          >Edit</button
         >
+          <Icon src={BiEdit} class="mr-1 text-2xl" />
+          Edit
+        </button>
+      {/if}
+      {#if editing_status_on}
+        <SlideToggle
+          name="edit_lang"
+          active="bg-primary-500"
+          class="mt-1 hover:text-gray-500 dark:hover:text-gray-400"
+          bind:checked={edit_language_typer_status}
+          size="sm"
+        >
+          <Icon src={BsKeyboard} class="text-4xl" />
+        </SlideToggle>
       {/if}
     {/if}
     <Display
@@ -263,7 +284,9 @@
         loaded_lang_trans_data,
         kANDa,
         sarga_loading,
-        sarga_selected
+        sarga_selected,
+        edit_language_typer_status,
+        trans_lang
       }}
     />
   {/if}
