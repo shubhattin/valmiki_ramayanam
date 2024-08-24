@@ -62,9 +62,9 @@
   <div class="mt-2 space-y-2">
     <div class="font-bold text-green-600 dark:text-green-500">User created successfully</div>
     <div>
-      But You Account is not yet acticted to make changes to Translations. Also you been assigned
-      any language to work on. Please contact the Admin to activate your account and assign you a
-      language to work on.
+      But your account is not yet activated to make changes to Translations. Also you have not been
+      assigned any language to work upon. Please contact the admin to activate your account and
+      assign you language(s).
     </div>
     <button
       class="variant-outline-primary btn"
