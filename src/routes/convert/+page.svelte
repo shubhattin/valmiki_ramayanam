@@ -78,12 +78,13 @@
     <textarea
       class="textarea h-56"
       placeholder={`Enter text in ${from_lang}`}
-      bind:value={$from_text}
       on:input={(e) => {
-        // @ts-ignore
-        LipiLekhikA.mukhya(e.target, e.data, from_lang, from_text_type_enabled, (val) => {
-          $from_text = val;
-        });
+        if (from_text_type_enabled)
+          // @ts-ignore
+          LipiLekhikA.mukhya(e.target, e.data, from_lang, true, (val) => {
+            $from_text = val;
+          });
+        else $from_text = e.currentTarget.value;
       }}
     ></textarea>
   </div>
@@ -132,12 +133,13 @@
     <textarea
       class="textarea h-56"
       placeholder={`Enter text in ${to_lang}`}
-      bind:value={$to_text}
       on:input={(e) => {
-        // @ts-ignore
-        LipiLekhikA.mukhya(e.target, e.data, to_lang, to_text_type_enabled, (val) => {
-          $to_text = val;
-        });
+        if (to_text_type_enabled)
+          // @ts-ignore
+          LipiLekhikA.mukhya(e.target, e.data, to_lang, true, (val) => {
+            $to_text = val;
+          });
+        else $to_text = e.currentTarget.value;
       }}
     ></textarea>
   </div>

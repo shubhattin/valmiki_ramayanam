@@ -1,14 +1,11 @@
 <script lang="ts">
   import Icon from '@tools/Icon.svelte';
   import rAmAyaNa_map from '@data/ramayan/ramayan_map.json';
-  import { fade, scale, slide } from 'svelte/transition';
-  import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
-  import { BsClipboard2Check } from 'svelte-icons-pack/bs';
+  import { slide } from 'svelte/transition';
   import { onDestroy, onMount } from 'svelte';
   import { delay } from '@tools/delay';
   import { writable } from 'svelte/store';
-  import { SlideToggle } from '@skeletonlabs/skeleton';
-  import { LANG_LIST, SCRIPT_LIST, type lang_list_type } from '@tools/lang_list';
+  import { LANG_LIST, SCRIPT_LIST } from '@tools/lang_list';
   import { load_parivartak_lang_data, lipi_parivartak } from '@tools/converter';
   import { LanguageIcon } from '@components/icons';
   import MetaTags from '@components/MetaTags.svelte';
@@ -30,8 +27,6 @@
   let kANDa_selected = writable(0);
   let sarga_selected = writable(0);
   let sarga_loading = false;
-  let enable_copy_to_clipbaord = true;
-  let copied_shloka_number: number | null = null;
   let viewing_script = BASE_SCRIPT;
   let loaded_viewing_script: string = viewing_script;
   let trans_lang = writable('--');
@@ -45,7 +40,7 @@
   let user_allowed_langs: string[] = [];
   let trans_lang_data: Map<number, string> = new Map();
 
-  let editing_status = false;
+  let editing_status_on = false;
   let loaded_user_info = false; // info related to assigned editable langs
 
   let user_info: z.infer<typeof ID_TOKEN_INFO_SCHEMA> | null = null;
@@ -54,15 +49,18 @@
       user_info = get_id_token_info().user;
     } catch {}
     if (import.meta.env.DEV) {
+      // the options set here are for development purposes
+      // can be disabled or modified based on need
       $kANDa_selected = 1;
       $sarga_selected = 1;
       view_translation_status = true;
+      $trans_lang = 'Hindi';
     }
     load_parivartak_lang_data(BASE_SCRIPT);
     if (browser) ensure_auth_access_status();
     if (browser && import.meta.env.PROD) {
       window.addEventListener('beforeunload', function (e) {
-        if (editing_status) {
+        if (editing_status_on) {
           e.preventDefault(); // If you prevent default behavior in Mozilla Firefox prompt will always be shown
           e.returnValue = ''; // Chrome requires returnValue to be set
         }
@@ -113,8 +111,6 @@
     trans_lang_data = data_map;
     loaded_lang_trans_data = true;
   });
-
-  $: copied_shloka_number !== null && setTimeout(() => (copied_shloka_number = null), 1400);
 
   const sarga_unsub = sarga_selected.subscribe(async () => {
     if ($kANDa_selected === 0 || $sarga_selected === 0) return;
@@ -178,17 +174,21 @@
   <div class="flex justify-between">
     <label class="space-x-4">
       <Icon src={LanguageIcon} class="text-4xl" />
-      <select class="select inline-block w-40" bind:value={viewing_script}>
+      <select
+        class="select inline-block w-40"
+        disabled={editing_status_on}
+        bind:value={viewing_script}
+      >
         {#each SCRIPT_LIST as lang (lang)}
           <option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
         {/each}
       </select>
     </label>
-    <User {editing_status} />
+    <User editing_status={editing_status_on} />
   </div>
   <label class="space-x-4">
     <span class="font-bold">Select kANDa</span>
-    <select bind:value={$kANDa_selected} class="select w-52">
+    <select bind:value={$kANDa_selected} class="select w-52" disabled={editing_status_on}>
       <option value={0}>Select</option>
       {#each rAmAyaNa_map as kANDa}
         {@const kANDa_name = lipi_parivartak(
@@ -204,7 +204,7 @@
     {@const kANDa = rAmAyaNa_map[$kANDa_selected - 1]}
     <label class="space-x-4">
       <span class="font-bold">Select Sarga</span>
-      <select bind:value={$sarga_selected} class="select w-52">
+      <select bind:value={$sarga_selected} class="select w-52" disabled={editing_status_on}>
         <option value={0}>Select</option>
         {#each kANDa.sarga_data as sarga}
           {@const sarga_name = lipi_parivartak(
@@ -232,73 +232,39 @@
       <label class="mr-3 inline-block space-x-4">
         Translation
         <Icon src={LanguageIcon} class="text-2xl" />
-        <select class="select inline-block w-32 px-2 py-1" bind:value={$trans_lang}>
+        <select
+          disabled={editing_status_on}
+          class="select inline-block w-32 px-2 py-1"
+          bind:value={$trans_lang}
+        >
           <option value="--">-- Select --</option>
           {#each LANG_LIST as lang (lang)}
             <option value={lang}>{lang}</option>
           {/each}
         </select>
       </label>
-      {#if $trans_lang !== '--' && loaded_user_info && (get_possibily_not_undefined(user_info).user_type === 'admin' || user_allowed_langs.indexOf($trans_lang) !== -1)}
-        <button class="btn my-1 rounded-lg px-2 py-1 dark:bg-tertiary-600">Edit</button>
+      {#if !editing_status_on && $trans_lang !== '--' && loaded_user_info && (get_possibily_not_undefined(user_info).user_type === 'admin' || user_allowed_langs.indexOf($trans_lang) !== -1)}
+        <button
+          on:click={() => (editing_status_on = true)}
+          class="btn my-1 rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white dark:bg-tertiary-600"
+          >Edit</button
+        >
       {/if}
     {/if}
-    <div class="space-x-3">
-      {#if $sarga_selected !== 1}
-        <button
-          on:click={() => ($sarga_selected -= 1)}
-          in:scale
-          out:slide
-          class="btn rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white"
-        >
-          <Icon class="-mt-1 mr-1 text-xl" src={TiArrowBackOutline} />
-          Previous
-        </button>
-      {/if}
-      {#if $sarga_selected !== kANDa.sarga_data.length}
-        <button
-          on:click={() => ($sarga_selected += 1)}
-          in:scale
-          out:slide
-          class="btn rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white"
-        >
-          Next
-          <Icon class="-mt-1 ml-1 text-xl" src={TiArrowForwardOutline} />
-        </button>
-      {/if}
-    </div>
-    <div class="flex space-x-4">
-      <SlideToggle
-        name="Copy to Clipboard"
-        bind:checked={enable_copy_to_clipbaord}
-        active="bg-primary-500"
-        size="sm"
-      >
-        Doudle Click to Copy
-      </SlideToggle>
-      {#if copied_shloka_number !== null}
-        <span class="cursor-default select-none font-bold text-green-700 dark:text-green-300">
-          <Icon src={BsClipboard2Check} />
-          Copied Shloka {copied_shloka_number} to Clipboard
-        </span>
-      {/if}
-    </div>
-    <div
-      class="h-[65vh] overflow-scroll rounded-xl border-2 border-gray-400 p-0 dark:border-gray-600"
-    >
-      {#if !sarga_loading}
-        <div transition:fade={{ duration: 250 }}>
-          <Display
-            {...{
-              BASE_SCRIPT,
-              loaded_en_trans_data,
-              loaded_viewing_script,
-              sarga_data,
-              trans_en_data
-            }}
-          />
-        </div>
-      {/if}
-    </div>
+    <Display
+      {...{
+        BASE_SCRIPT,
+        loaded_en_trans_data,
+        loaded_viewing_script,
+        sarga_data,
+        trans_en_data,
+        editing_status_on,
+        trans_lang_data,
+        loaded_lang_trans_data,
+        kANDa,
+        sarga_loading,
+        sarga_selected
+      }}
+    />
   {/if}
 </div>
