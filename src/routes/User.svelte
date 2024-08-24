@@ -18,18 +18,13 @@
   import NewUser from './NewUser.svelte';
   import ManageUser from './ManageUser.svelte';
   import UpdatePassword from './UpdatePassword.svelte';
+  import { LanguageIcon } from '@components/icons';
+  import { user_info } from '@state/user';
 
   const modalStore = getModalStore();
 
   export let editing_status: boolean;
   export let user_allowed_langs: string[] = [];
-
-  let user_info: z.infer<typeof ID_TOKEN_INFO_SCHEMA> | null = null;
-  onMount(() => {
-    try {
-      user_info = get_id_token_info().user;
-    } catch {}
-  });
 
   let pass_enterer_status = writable(false);
   let user_input_elmnt_login = writable<HTMLInputElement>(null!);
@@ -48,7 +43,7 @@
       response: (resp: boolean) => {
         if (!resp) return;
         deleteAuthCookies();
-        user_info = null;
+        $user_info = null;
       }
     };
     modalStore.trigger(modal);
@@ -66,18 +61,18 @@
   <Icon class="hover:text-gray-6200 text-3xl dark:hover:text-gray-400" src={VscAccount} />
 </button>
 <div class="card z-40 px-1 py-2 shadow-2xl" data-popup="user_info">
-  {#if user_info}
+  {#if $user_info}
     <div class="select-none space-y-2 p-1">
       <div class="text-center text-base font-bold">
-        {#if user_info.user_type === 'admin'}
+        {#if $user_info.user_type === 'admin'}
           <Icon class="-mt-1 text-2xl" src={RiUserFacesAdminLine} />
         {:else}
           <Icon class="-mt-1 text-2xl" src={AiOutlineUser} />
-        {/if}{user_info.user_name}
-        <span class="text-sm text-gray-500 dark:text-gray-400">({user_info.user_id})</span>
+        {/if}{$user_info.user_name}
+        <span class="text-sm text-gray-500 dark:text-gray-400">({$user_info.user_id})</span>
       </div>
       <div class="space-x-4">
-        {#if user_info.user_type === 'admin'}
+        {#if $user_info.user_type === 'admin'}
           <button
             on:click={() => ($manage_user_modal_status = true)}
             class="btn space-x-2 rounded-md bg-primary-800 pb-1 pl-1 pr-2 pt-1 font-bold text-white"
@@ -103,9 +98,9 @@
         <Icon class="text-2xl" src={BiLock} />
         <span>Update Password</span>
       </button>
-      {#if user_info.user_type !== 'admin'}
+      {#if $user_info.user_type !== 'admin' && user_allowed_langs.length > 0}
         <div>
-          <span class="text-sm text-gray-500 dark:text-gray-300">Languages:</span>
+          <Icon class="text-xl" src={LanguageIcon} /> :
           <span class="text-sm text-gray-500 dark:text-gray-300">
             {user_allowed_langs.join(', ')}
           </span>
@@ -156,7 +151,7 @@
       on_verify={(verified) => {
         if (verified) {
           $pass_enterer_status = false;
-          user_info = get_id_token_info().user;
+          $user_info = get_id_token_info().user;
         }
       }}
     />

@@ -10,10 +10,11 @@
   import { LanguageIcon } from '@components/icons';
   import { FiEdit3 } from 'svelte-icons-pack/fi';
   import { LANG_LIST } from '@tools/lang_list';
+  import { user_info } from '@state/user';
 
   const modal_store = getModalStore();
 
-  const currrent_user_info = get_id_token_info().user;
+  const currrent_user_info = $user_info!;
   let users_info: Awaited<ReturnType<typeof client.user_info.get_all_users_info.query>> | null;
   let admin_users_index: number[] = [];
   let normal_users_index: number[] = [];

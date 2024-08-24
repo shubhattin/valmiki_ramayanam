@@ -17,7 +17,6 @@
   import { browser } from '$app/environment';
   import { main_app_bar_info } from '@state/state';
   import Display from './Display.svelte';
-  import { z } from 'zod';
   import { client } from '@api/client';
   import { get_possibily_not_undefined } from '@tools/kry';
   import { BiEdit } from 'svelte-icons-pack/bi';
@@ -25,6 +24,7 @@
   import { SlideToggle } from '@skeletonlabs/skeleton';
   import { scale, slide } from 'svelte/transition';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
+  import { user_info } from '@state/user';
 
   const BASE_SCRIPT = 'Sanskrit';
 
@@ -48,10 +48,10 @@
   let loaded_user_allowed_langs = false; // info related to assigned editable langs
   let edit_language_typer_status = true;
 
-  let user_info: z.infer<typeof ID_TOKEN_INFO_SCHEMA> | null = null;
-  onMount(() => {
+  onMount(async () => {
+    if (browser) await ensure_auth_access_status();
     try {
-      user_info = get_id_token_info().user;
+      $user_info = get_id_token_info().user;
     } catch {}
     if (import.meta.env.DEV) {
       // the options set here are for development purposes
@@ -63,7 +63,6 @@
       // editing_status_on.set(true);
     }
     load_parivartak_lang_data(BASE_SCRIPT);
-    if (browser) ensure_auth_access_status();
     if (browser && import.meta.env.PROD) {
       window.addEventListener('beforeunload', function (e) {
         if ($editing_status_on) {
@@ -94,10 +93,10 @@
       loaded_en_trans_data = true;
     })();
   $: browser &&
-    user_info &&
+    $user_info &&
     (async () => {
       loaded_user_allowed_langs = false;
-      if (user_info.user_type === 'admin') {
+      if ($user_info.user_type === 'admin') {
         loaded_user_allowed_langs = true;
         return;
       }
@@ -284,7 +283,7 @@
             {/each}
           </select>
         </label>
-        {#if !$editing_status_on && $trans_lang !== '--' && loaded_user_allowed_langs && (get_possibily_not_undefined(user_info).user_type === 'admin' || user_allowed_langs.indexOf($trans_lang) !== -1)}
+        {#if !$editing_status_on && $trans_lang !== '--' && loaded_user_allowed_langs && (get_possibily_not_undefined($user_info).user_type === 'admin' || user_allowed_langs.indexOf($trans_lang) !== -1)}
           <button
             on:click={() => ($editing_status_on = true)}
             class="btn my-1 rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white dark:bg-tertiary-600"
