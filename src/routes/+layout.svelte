@@ -1,20 +1,22 @@
 <script lang="ts">
-	import { ModeWatcher } from 'mode-watcher';
-	import '@fontsource/roboto/latin.css';
-	import '../app.pcss';
-	import { initializeStores, Modal, storePopup } from '@skeletonlabs/skeleton';
-	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
+  import { ModeWatcher } from 'mode-watcher';
+  import '@fontsource/roboto/latin.css';
+  import '../app.pcss';
+  import MainAppBar from '@components/MainAppBar.svelte';
+  import { initializeStores, Modal, storePopup } from '@skeletonlabs/skeleton';
+  import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
 
-	initializeStores();
-	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
+  initializeStores();
+  storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 </script>
 
 <svelte:head>
-	<meta property="og:type" content="app" />
+  <meta property="og:type" content="app" />
 </svelte:head>
 
 <ModeWatcher />
 <Modal />
 <div class="contaiiner mx-auto mb-1 max-w-screen-lg">
-	<slot />
+  <MainAppBar />
+  <slot />
 </div>

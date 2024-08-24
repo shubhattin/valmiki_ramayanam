@@ -1,228 +1,326 @@
 <script lang="ts">
-	import MainAppBar from '@components/MainAppBar.svelte';
-	import Icon from '@tools/Icon.svelte';
-	import rAmAyaNa_map from '@data/ramayan/ramayan_map.json';
-	import { fade, scale, slide } from 'svelte/transition';
-	import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
-	import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
-	import { BsClipboard2Check } from 'svelte-icons-pack/bs';
-	import { transliterate_xlxs_file } from '@tools/excel/transliterate_xlsx_file';
-	import { download_file_in_browser } from '@tools/download_file_browser';
-	import { onDestroy, onMount } from 'svelte';
-	import { delay } from '@tools/delay';
-	import { writable } from 'svelte/store';
-	import ExcelJS from 'exceljs';
-	import { SlideToggle } from '@skeletonlabs/skeleton';
-	import { SCRIPT_LIST } from '@tools/lang_list';
-	import { load_parivartak_lang_data, lipi_parivartak } from '@tools/converter';
-	import { LanguageIcon } from '@components/icons';
-	import MetaTags from '@components/MetaTags.svelte';
+  import Icon from '@tools/Icon.svelte';
+  import rAmAyaNa_map from '@data/ramayan/ramayan_map.json';
+  import { onDestroy, onMount } from 'svelte';
+  import { delay } from '@tools/delay';
+  import { writable } from 'svelte/store';
+  import { LANG_LIST, SCRIPT_LIST } from '@tools/lang_list';
+  import { load_parivartak_lang_data, lipi_parivartak } from '@tools/converter';
+  import { LanguageIcon } from '@components/icons';
+  import MetaTags from '@components/MetaTags.svelte';
+  import User from './User.svelte';
+  import {
+    ensure_auth_access_status,
+    get_id_token_info,
+    ID_TOKEN_INFO_SCHEMA
+  } from '@tools/auth_tools';
+  import { browser } from '$app/environment';
+  import { main_app_bar_info } from '@state/state';
+  import Display from './Display.svelte';
+  import { client } from '@api/client';
+  import { get_possibily_not_undefined } from '@tools/kry';
+  import { BiEdit } from 'svelte-icons-pack/bi';
+  import { BsKeyboard } from 'svelte-icons-pack/bs';
+  import { SlideToggle } from '@skeletonlabs/skeleton';
+  import { scale, slide } from 'svelte/transition';
+  import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
+  import { user_info } from '@state/user';
 
-	const BASE_SCRIPT = 'Sanskrit';
+  const BASE_SCRIPT = 'Sanskrit';
 
-	let kANDa_selected = writable(0);
-	let sarga_selected = writable(0);
-	let sarga_data: string[] = [];
-	let sarga_loading = false;
-	let enable_copy_to_clipbaord = true;
-	let copied_shloka_number: number | null = null;
-	let viewing_script = BASE_SCRIPT;
-	let loaded_viewing_script: string = viewing_script;
+  let kANDa_selected = writable(0);
+  let sarga_selected = writable(0);
+  let sarga_loading = false;
+  let viewing_script = BASE_SCRIPT;
+  let loaded_viewing_script: string = viewing_script;
+  let trans_lang = writable('--');
 
-	$: (async () => {
-		await load_parivartak_lang_data(viewing_script);
-		loaded_viewing_script = viewing_script;
-	})();
-	$: copied_shloka_number !== null && setTimeout(() => (copied_shloka_number = null), 1400);
+  let sarga_data: string[] = [];
+  let trans_en_data: Map<number, string> = new Map();
+  let loaded_en_trans_data = false;
+  let view_translation_status = false;
 
-	onMount(async () => {
-		if (import.meta.env.DEV) {
-			$kANDa_selected = 1;
-			$sarga_selected = 1;
-		}
-		await load_parivartak_lang_data(BASE_SCRIPT);
-	});
+  let loaded_lang_trans_data = false;
+  let user_allowed_langs: string[] = [];
+  let trans_lang_data = writable(new Map<number, string>());
 
-	const sarga_unsub = sarga_selected.subscribe(async () => {
-		if ($kANDa_selected === 0 || $sarga_selected === 0) return;
-		sarga_loading = true;
-		sarga_data = [];
-		const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
-		const data = (
-			(await all_sargas[`/data/ramayan/data/${$kANDa_selected}/${$sarga_selected}.json`]()) as any
-		).default as string[];
-		await delay(400);
-		sarga_loading = false;
-		sarga_data = data;
-	});
-	const kANDa_selected_unsub = kANDa_selected.subscribe(() => {
-		$sarga_selected = 0;
-	});
+  let editing_status_on = writable(false);
+  let loaded_user_allowed_langs = false; // info related to assigned editable langs
+  let edit_language_typer_status = true;
 
-	onDestroy(() => {
-		kANDa_selected_unsub();
-		sarga_unsub();
-	});
+  onMount(async () => {
+    if (browser) await ensure_auth_access_status();
+    try {
+      $user_info = get_id_token_info().user;
+    } catch {}
+    if (import.meta.env.DEV) {
+      // the options set here are for development purposes
+      // can be disabled or modified based on need
+      $kANDa_selected = 1;
+      $sarga_selected = 1;
+      // view_translation_status = true;
+      // $trans_lang = 'Hindi';
+      // editing_status_on.set(true);
+    }
+    load_parivartak_lang_data(BASE_SCRIPT);
+    if (browser && import.meta.env.PROD) {
+      window.addEventListener('beforeunload', function (e) {
+        if ($editing_status_on) {
+          e.preventDefault(); // If you prevent default behavior in Mozilla Firefox prompt will always be shown
+          e.returnValue = ''; // Chrome requires returnValue to be set
+        }
+      });
+    }
+  });
 
-	const download_excel_file = async () => {
-		// the method used below creates a url for both dev and prod
-		const url = new URL('/data/ramayan/template/excel_file_template.xlsx', import.meta.url).href;
-		const req = await fetch(url);
-		const file_blob = await req.blob();
-		const workbook = new ExcelJS.Workbook();
-		await workbook.xlsx.load(await file_blob.arrayBuffer());
-		const worksheet = workbook.getWorksheet(1)!;
-		const COLUMN_FOR_DEV = 2;
-		const TEXT_START_ROW = 2;
-		for (let i = 0; i < sarga_data.length; i++) {
-			worksheet.getCell(i + COLUMN_FOR_DEV, TEXT_START_ROW).value = sarga_data[i];
-		}
-		await transliterate_xlxs_file(workbook, 'all', 1, COLUMN_FOR_DEV, TEXT_START_ROW, 'Sanskrit');
+  $: (async () => {
+    await load_parivartak_lang_data(viewing_script);
+    loaded_viewing_script = viewing_script;
+  })();
+  $: browser &&
+    $trans_lang !== '--' &&
+    (async () => {
+      // loading trnaslation lang data for typing support
+      await load_parivartak_lang_data($trans_lang);
+    })();
+  $: view_translation_status &&
+    browser &&
+    (async () => {
+      loaded_en_trans_data = false;
+      trans_en_data = new Map();
+      const en_trans_data = await load_english_translation($kANDa_selected, $sarga_selected);
+      trans_en_data = en_trans_data;
+      loaded_en_trans_data = true;
+    })();
+  $: browser &&
+    $user_info &&
+    (async () => {
+      loaded_user_allowed_langs = false;
+      if ($user_info.user_type === 'admin') {
+        loaded_user_allowed_langs = true;
+        return;
+      }
+      // fetching user info if allowed to edit languages
+      const data = (await client.user_info.get_user_allowed_langs.query()).allowed_langs;
+      if (!data) user_allowed_langs = [];
+      else user_allowed_langs = data;
+      loaded_user_allowed_langs = true;
+    })();
+  $: browser &&
+    $trans_lang !== '--' &&
+    (async () => {
+      if (!($kANDa_selected !== 0 && $sarga_selected !== 0)) return;
+      loaded_lang_trans_data = false;
+      $trans_lang_data = new Map();
+      const data = await client.translations.get_translations_per_sarga.query({
+        lang: $trans_lang,
+        kANDa_num: $kANDa_selected,
+        sarga_num: $sarga_selected
+      });
+      const data_map = new Map<number, string>();
+      for (let val of data) {
+        // we dont need to manually care abouy 0 or -1, it will be handled while making changes
+        data_map.set(val.shloka_num, val.text);
+      }
+      $trans_lang_data = data_map;
+      loaded_lang_trans_data = true;
+    })();
 
-		// saving file to output path
-		let sarga_name =
-			rAmAyaNa_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].name_normal.split('\n')[0];
-		const buffer = await workbook.xlsx.writeBuffer();
-		const blob = new Blob([buffer], {
-			type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-		});
-		const downloadLink = URL.createObjectURL(blob);
-		download_file_in_browser(downloadLink, `${$sarga_selected}. ${sarga_name}.xlsx`);
-	};
+  const sarga_unsub = sarga_selected.subscribe(async () => {
+    if ($kANDa_selected === 0 || $sarga_selected === 0) return;
+    sarga_loading = true;
+    sarga_data = [];
+    const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
+    const data = (
+      (await all_sargas[`/data/ramayan/data/${$kANDa_selected}/${$sarga_selected}.json`]()) as any
+    ).default as string[];
+    await delay(400);
+    sarga_loading = false;
+    sarga_data = data;
+  });
+  const kANDa_selected_unsub = kANDa_selected.subscribe(() => {
+    $sarga_selected = 0;
+    loaded_en_trans_data = false;
+  });
 
-	const copy_text_to_clipboard = (text: string) => {
-		navigator.clipboard.writeText(text);
-	};
+  const load_english_translation = async (kANDa_num: number, sarga_number: number) => {
+    let data: Record<number, string> = {};
+    const data_map = new Map<number, string>();
+    if (import.meta.env.DEV) {
+      const yaml = (await import('js-yaml')).default;
+      const glob_yaml = import.meta.glob('/data/ramayan/trans_en/*/*.yaml', {
+        query: '?raw'
+      });
+      if (!(`/data/ramayan/trans_en/${kANDa_num}/${sarga_number}.yaml` in glob_yaml))
+        return data_map;
+      const text = (
+        (await glob_yaml[`/data/ramayan/trans_en/${kANDa_num}/${sarga_number}.yaml`]()) as any
+      ).default as string;
+      data = yaml.load(text) as Record<number, string>;
+    } else {
+      const glob_json = import.meta.glob('/data/ramayan/trans_en/json/*/*.json');
+      if (!(`/data/ramayan/trans_en/json/${kANDa_num}/${sarga_number}.json` in glob_json))
+        return data_map;
+      data = (
+        (await glob_json[`/data/ramayan/trans_en/json/${kANDa_num}/${sarga_number}.json`]()) as any
+      ).default as Record<number, string>;
+    }
 
-	const PAGE_INFO = {
-		title: 'श्रीमद्रामायणम्',
-		description: 'श्रीमद्रामायणस्य पठनम्'
-	};
+    for (const [key, value] of Object.entries(data)) {
+      data_map.set(Number(key), value.replaceAll(/\n$/g, '')); // replace the ending newline
+    }
+    return data_map;
+  };
+
+  onDestroy(() => {
+    kANDa_selected_unsub();
+    sarga_unsub();
+  });
+
+  const PAGE_INFO = {
+    title: 'श्रीमद्रामायणम्',
+    description: 'श्रीमद्रामायणस्य पठनम्'
+  };
+
+  main_app_bar_info.set({
+    className: 'text-2xl font-bold',
+    title: PAGE_INFO.title
+  });
 </script>
 
 <MetaTags title={PAGE_INFO.title} description={PAGE_INFO.description} />
 
-<MainAppBar page="home">
-	<span slot="headline">
-		<span class="text-2xl font-bold">{PAGE_INFO.title}</span>
-	</span>
-</MainAppBar>
-
 <div class="mt-4 space-y-4">
-	<label class="space-x-4">
-		<Icon src={LanguageIcon} class="text-4xl" />
-		<select class="select inline-block w-40" bind:value={viewing_script}>
-			{#each SCRIPT_LIST as lang (lang)}
-				<option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
-			{/each}
-		</select>
-	</label>
-	<label class="space-x-4">
-		<span class="font-bold">Select kANDa</span>
-		<select bind:value={$kANDa_selected} class="select w-52">
-			<option value={0}>Select</option>
-			{#each rAmAyaNa_map as kANDa}
-				{@const kANDa_name = lipi_parivartak(
-					kANDa.name_devanagari,
-					BASE_SCRIPT,
-					loaded_viewing_script
-				)}
-				<option value={kANDa.index}>{kANDa.index}. {kANDa_name}</option>
-			{/each}
-		</select>
-	</label>
-	{#if $kANDa_selected !== 0}
-		{@const kANDa = rAmAyaNa_map[$kANDa_selected - 1]}
-		<label class="space-x-4">
-			<span class="font-bold">Select Sarga</span>
-			<select bind:value={$sarga_selected} class="select w-52">
-				<option value={0}>Select</option>
-				{#each kANDa.sarga_data as sarga}
-					{@const sarga_name = lipi_parivartak(
-						sarga.name_devanagari.split('\n')[0],
-						BASE_SCRIPT,
-						loaded_viewing_script
-					)}
-					<option value={sarga.index}>{sarga.index}. {sarga_name}</option>
-				{/each}
-			</select>
-		</label>
-	{/if}
-	{#if $kANDa_selected !== 0 && $sarga_selected !== 0}
-		{@const kANDa = rAmAyaNa_map[$kANDa_selected - 1]}
-		<div class="space-x-3">
-			{#if $sarga_selected !== 1}
-				<button
-					on:click={() => ($sarga_selected -= 1)}
-					in:scale
-					out:slide
-					class="btn rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white"
-				>
-					<Icon class="-mt-1 mr-1 text-xl" src={TiArrowBackOutline} />
-					Previous
-				</button>
-			{/if}
-			{#if $sarga_selected !== kANDa.sarga_data.length}
-				<button
-					on:click={() => ($sarga_selected += 1)}
-					in:scale
-					out:slide
-					class="btn rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white"
-				>
-					Next
-					<Icon class="-mt-1 ml-1 text-xl" src={TiArrowForwardOutline} />
-				</button>
-			{/if}
-			<button
-				on:click={download_excel_file}
-				class="variant-outline-success btn rounded-lg border-2 border-emerald-600 px-2 py-2 font-bold dark:border-emerald-400"
-			>
-				<Icon
-					class="-mt-1 mr-2 text-2xl text-green-600 dark:text-green-400"
-					src={RiDocumentFileExcel2Line}
-				/>
-				Download Excel File
-			</button>
-		</div>
-		<div class="flex space-x-4">
-			<SlideToggle
-				name="Copy to Clipboard"
-				bind:checked={enable_copy_to_clipbaord}
-				active="bg-primary-500"
-				size="sm"
-			>
-				Doudle Click on Shloka to Copy
-			</SlideToggle>
-			{#if copied_shloka_number !== null}
-				<span class="cursor-default select-none font-bold text-green-700 dark:text-green-300">
-					<Icon src={BsClipboard2Check} />
-					Copied Shloka {copied_shloka_number} to Clipboard
-				</span>
-			{/if}
-		</div>
-		<div
-			class="h-[65vh] overflow-scroll rounded-xl border-2 border-red-600 px-2 py-3 dark:border-yellow-300"
-		>
-			{#if !sarga_loading}
-				<div transition:fade={{ duration: 250 }} class="">
-					{#each sarga_data as line, i}
-						{@const line_transliterated = lipi_parivartak(line, BASE_SCRIPT, loaded_viewing_script)}
-						<!-- svelte-ignore a11y-click-events-have-key-events -->
-						<!-- svelte-ignore a11y-no-static-element-interactions -->
-						<div
-							class="rounded-lg px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-800"
-							on:dblclick={() => {
-								if (enable_copy_to_clipbaord) {
-									copied_shloka_number = i;
-									copy_text_to_clipboard(line_transliterated);
-								}
-							}}
-						>
-							<pre>{line_transliterated}</pre>
-						</div>
-					{/each}
-				</div>
-			{/if}
-		</div>
-	{/if}
+  <div class="flex justify-between">
+    <label class="space-x-4">
+      <Icon src={LanguageIcon} class="text-4xl" />
+      <select class="select inline-block w-40" bind:value={viewing_script}>
+        {#each SCRIPT_LIST as lang (lang)}
+          <option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
+        {/each}
+      </select>
+    </label>
+    <User editing_status={$editing_status_on} {user_allowed_langs} />
+  </div>
+  <label class="space-x-4">
+    <span class="font-bold">Select kANDa</span>
+    <select bind:value={$kANDa_selected} class="select w-52" disabled={$editing_status_on}>
+      <option value={0}>Select</option>
+      {#each rAmAyaNa_map as kANDa}
+        {@const kANDa_name = lipi_parivartak(
+          kANDa.name_devanagari,
+          BASE_SCRIPT,
+          loaded_viewing_script
+        )}
+        <option value={kANDa.index}>{kANDa.index}. {kANDa_name}</option>
+      {/each}
+    </select>
+  </label>
+  {#if $kANDa_selected !== 0}
+    {@const kANDa = rAmAyaNa_map[$kANDa_selected - 1]}
+    <label class="space-x-4">
+      <span class="font-bold">Select Sarga</span>
+      <select bind:value={$sarga_selected} class="select w-52" disabled={$editing_status_on}>
+        <option value={0}>Select</option>
+        {#each kANDa.sarga_data as sarga}
+          {@const sarga_name = lipi_parivartak(
+            sarga.name_devanagari.split('\n')[0],
+            BASE_SCRIPT,
+            loaded_viewing_script
+          )}
+          <option value={sarga.index}>{sarga.index}. {sarga_name}</option>
+        {/each}
+      </select>
+    </label>
+  {/if}
+  {#if $kANDa_selected !== 0 && $sarga_selected !== 0}
+    {@const kANDa = rAmAyaNa_map[$kANDa_selected - 1]}
+    <div class="space-x-3">
+      {#if $sarga_selected !== 1}
+        <button
+          on:click={() => ($sarga_selected -= 1)}
+          in:scale
+          out:slide
+          disabled={$editing_status_on}
+          class="btn rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white"
+        >
+          <Icon class="-mt-1 mr-1 text-xl" src={TiArrowBackOutline} />
+          Previous
+        </button>
+      {/if}
+      {#if $sarga_selected !== kANDa.sarga_data.length}
+        <button
+          on:click={() => ($sarga_selected += 1)}
+          in:scale
+          out:slide
+          disabled={$editing_status_on}
+          class="btn rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white"
+        >
+          Next
+          <Icon class="-mt-1 ml-1 text-xl" src={TiArrowForwardOutline} />
+        </button>
+      {/if}
+      {#if !view_translation_status}
+        <button
+          on:click={() => {
+            view_translation_status = true;
+          }}
+          class="btn bg-primary-800 px-2 py-1 font-bold text-white dark:bg-primary-700"
+          >View Translations</button
+        >
+      {:else}
+        <label class="mr-3 inline-block space-x-4">
+          Translation
+          <Icon src={LanguageIcon} class="text-2xl" />
+          <select
+            disabled={$editing_status_on}
+            class="select inline-block w-32 px-2 py-1"
+            bind:value={$trans_lang}
+          >
+            <option value="--">-- Select --</option>
+            {#each LANG_LIST as lang (lang)}
+              <option value={lang}>{lang}</option>
+            {/each}
+          </select>
+        </label>
+        {#if !$editing_status_on && $trans_lang !== '--' && loaded_user_allowed_langs && (get_possibily_not_undefined($user_info).user_type === 'admin' || user_allowed_langs.indexOf($trans_lang) !== -1)}
+          <button
+            on:click={() => ($editing_status_on = true)}
+            class="btn my-1 rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white dark:bg-tertiary-600"
+          >
+            <Icon src={BiEdit} class="mr-1 text-2xl" />
+            Edit
+          </button>
+        {/if}
+        {#if $editing_status_on}
+          <SlideToggle
+            name="edit_lang"
+            active="bg-primary-500"
+            class="mt-1 hover:text-gray-500 dark:hover:text-gray-400"
+            bind:checked={edit_language_typer_status}
+            size="sm"
+          >
+            <Icon src={BsKeyboard} class="text-4xl" />
+          </SlideToggle>
+        {/if}
+      {/if}
+    </div>
+    <Display
+      {...{
+        BASE_SCRIPT,
+        loaded_en_trans_data,
+        loaded_viewing_script,
+        sarga_data,
+        trans_en_data,
+        editing_status_on,
+        trans_lang_data,
+        loaded_lang_trans_data,
+        sarga_loading,
+        sarga_selected,
+        edit_language_typer_status,
+        trans_lang,
+        kANDa_selected
+      }}
+    />
+  {/if}
 </div>
