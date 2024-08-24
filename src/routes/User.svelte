@@ -16,10 +16,11 @@
   import { writable } from 'svelte/store';
   import { AiOutlineUser } from 'svelte-icons-pack/ai';
   import NewUser from './NewUser.svelte';
-  import { IoSettingsOutline } from 'svelte-icons-pack/io';
   import ManageUser from './ManageUser.svelte';
 
   const modalStore = getModalStore();
+
+  export let editing_status: boolean;
 
   let user_info: z.infer<typeof ID_TOKEN_INFO_SCHEMA> | null = null;
   onMount(() => {
@@ -82,6 +83,7 @@
           </button>
         {/if}
         <button
+          disabled={editing_status}
           on:click={log_out}
           class="variant-filled-error btn m-0 rounded-md pb-1 pl-1 pr-2 pt-0 font-bold"
         >

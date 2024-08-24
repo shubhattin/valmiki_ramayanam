@@ -1,4 +1,13 @@
-import { pgTable, serial, varchar, text, pgEnum, integer } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  serial,
+  varchar,
+  text,
+  pgEnum,
+  smallint,
+  integer,
+  primaryKey
+} from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 export const userTypeEnum = pgEnum('user_type', ['admin', 'non-admin']);
@@ -30,6 +39,20 @@ export const user_verification_requests = pgTable('user_verification_requests', 
     .primaryKey()
     .references(() => users.id, { onDelete: 'cascade' })
 });
+
+export const translations = pgTable(
+  'translations',
+  {
+    lang: langEnum('lang').notNull(),
+    kANDa_num: smallint('kANDa_num').notNull(),
+    sarga_num: smallint('sarga_num').notNull(),
+    shloka_num: smallint('shloka_num').notNull(),
+    text: text('text').default('').notNull()
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.lang, table.kANDa_num, table.sarga_num, table.shloka_num] })
+  })
+);
 
 /* The relations defined below are only for the `query` API of drizzle */
 

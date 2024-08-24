@@ -52,3 +52,10 @@ export const from_base64 = (str: string, decode = false) => {
   } catch {}
   return str;
 };
+
+export const get_possibily_not_undefined = <T>(val: T | null) => {
+  return val!;
+};
+export const copy_text_to_clipboard = (text: string) => {
+  navigator.clipboard.writeText(text);
+};
