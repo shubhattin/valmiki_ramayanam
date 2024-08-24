@@ -1,7 +1,7 @@
 <script lang="ts">
   import Icon from '@tools/Icon.svelte';
   import rAmAyaNa_map from '@data/ramayan/ramayan_map.json';
-  import { slide } from 'svelte/transition';
+  import { scale, slide } from 'svelte/transition';
   import { onDestroy, onMount } from 'svelte';
   import { delay } from '@tools/delay';
   import { writable } from 'svelte/store';
@@ -41,9 +41,9 @@
 
   let loaded_lang_trans_data = false;
   let user_allowed_langs: string[] = [];
-  let trans_lang_data: Map<number, string> = new Map();
+  let trans_lang_data = writable(new Map<number, string>());
 
-  let editing_status_on = false;
+  let editing_status_on = writable(false);
   let loaded_user_info = false; // info related to assigned editable langs
   let edit_language_typer_status = true;
 
@@ -57,15 +57,14 @@
       // can be disabled or modified based on need
       $kANDa_selected = 1;
       $sarga_selected = 1;
-      view_translation_status = true;
-      $trans_lang = 'Hindi';
-      editing_status_on = true;
+      // view_translation_status = true;
+      // $trans_lang = 'Hindi';
     }
     load_parivartak_lang_data(BASE_SCRIPT);
     if (browser) ensure_auth_access_status();
     if (browser && import.meta.env.PROD) {
       window.addEventListener('beforeunload', function (e) {
-        if (editing_status_on) {
+        if ($editing_status_on) {
           e.preventDefault(); // If you prevent default behavior in Mozilla Firefox prompt will always be shown
           e.returnValue = ''; // Chrome requires returnValue to be set
         }
@@ -111,6 +110,7 @@
     (async () => {
       if (!($kANDa_selected !== 0 && $sarga_selected !== 0)) return;
       loaded_lang_trans_data = false;
+      $trans_lang_data = new Map();
       const data = await client.translations.get_translations_per_sarga.query({
         lang: $trans_lang,
         kANDa_num: $kANDa_selected,
@@ -121,7 +121,7 @@
         // we dont need to manually care abouy 0 or -1, it will be handled while making changes
         data_map.set(val.shloka_num, val.text);
       }
-      trans_lang_data = data_map;
+      $trans_lang_data = data_map;
       loaded_lang_trans_data = true;
     })();
 
@@ -192,11 +192,11 @@
         {/each}
       </select>
     </label>
-    <User editing_status={editing_status_on} />
+    <User editing_status={$editing_status_on} />
   </div>
   <label class="space-x-4">
     <span class="font-bold">Select kANDa</span>
-    <select bind:value={$kANDa_selected} class="select w-52" disabled={editing_status_on}>
+    <select bind:value={$kANDa_selected} class="select w-52" disabled={$editing_status_on}>
       <option value={0}>Select</option>
       {#each rAmAyaNa_map as kANDa}
         {@const kANDa_name = lipi_parivartak(
@@ -212,7 +212,7 @@
     {@const kANDa = rAmAyaNa_map[$kANDa_selected - 1]}
     <label class="space-x-4">
       <span class="font-bold">Select Sarga</span>
-      <select bind:value={$sarga_selected} class="select w-52" disabled={editing_status_on}>
+      <select bind:value={$sarga_selected} class="select w-52" disabled={$editing_status_on}>
         <option value={0}>Select</option>
         {#each kANDa.sarga_data as sarga}
           {@const sarga_name = lipi_parivartak(
@@ -229,7 +229,6 @@
     {@const kANDa = rAmAyaNa_map[$kANDa_selected - 1]}
     {#if !view_translation_status}
       <button
-        out:slide
         on:click={() => {
           view_translation_status = true;
         }}
@@ -241,7 +240,7 @@
         Translation
         <Icon src={LanguageIcon} class="text-2xl" />
         <select
-          disabled={editing_status_on}
+          disabled={$editing_status_on}
           class="select inline-block w-32 px-2 py-1"
           bind:value={$trans_lang}
         >
@@ -251,16 +250,16 @@
           {/each}
         </select>
       </label>
-      {#if !editing_status_on && $trans_lang !== '--' && loaded_user_info && (get_possibily_not_undefined(user_info).user_type === 'admin' || user_allowed_langs.indexOf($trans_lang) !== -1)}
+      {#if !$editing_status_on && $trans_lang !== '--' && loaded_user_info && (get_possibily_not_undefined(user_info).user_type === 'admin' || user_allowed_langs.indexOf($trans_lang) !== -1)}
         <button
-          on:click={() => (editing_status_on = true)}
+          on:click={() => ($editing_status_on = true)}
           class="btn my-1 rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white dark:bg-tertiary-600"
         >
           <Icon src={BiEdit} class="mr-1 text-2xl" />
           Edit
         </button>
       {/if}
-      {#if editing_status_on}
+      {#if $editing_status_on}
         <SlideToggle
           name="edit_lang"
           active="bg-primary-500"
@@ -286,7 +285,8 @@
         sarga_loading,
         sarga_selected,
         edit_language_typer_status,
-        trans_lang
+        trans_lang,
+        kANDa_selected
       }}
     />
   {/if}

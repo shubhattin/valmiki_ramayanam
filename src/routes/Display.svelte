@@ -12,6 +12,7 @@
   import { BsClipboard2Check } from 'svelte-icons-pack/bs';
   import { cl_join } from '@tools/cl_join';
   import LipiLekhikA from '@tools/converter';
+  import { client } from '@api/client';
 
   export let sarga_data: string[];
   export let loaded_viewing_script: string;
@@ -19,10 +20,11 @@
   export let loaded_en_trans_data: boolean;
   export let trans_en_data: Map<number, string>;
   export let loaded_lang_trans_data: boolean;
-  export let editing_status_on: boolean;
-  export let trans_lang_data: Map<number, string>;
+  export let editing_status_on: Writable<boolean>;
+  export let trans_lang_data: Writable<Map<number, string>>;
   export let sarga_loading: boolean;
   export let sarga_selected: Writable<number>;
+  export let kANDa_selected: Writable<number>;
   export let kANDa: (typeof ramayan_map_type)[0];
   export let edit_language_typer_status: boolean;
   export let trans_lang: Writable<string>;
@@ -34,6 +36,31 @@
   let edited_translations_indexes = new Set<number>();
 
   $: copied_text_status && setTimeout(() => (copied_text_status = false), 1400);
+
+  const save_data = async () => {
+    const added_indexes = added_translations_indexes.map((index) => index);
+    const edited_indexes = Array.from(edited_translations_indexes).map((index) => index);
+
+    const added_texts = added_indexes.map((index) => $trans_lang_data.get(index)!);
+    const edited_texts = edited_indexes.map((index) => $trans_lang_data.get(index)!);
+
+    const res = await client.translations.edit_translation.mutate({
+      data: {
+        add_data: added_texts,
+        edit_data: edited_texts,
+        to_add_indexed: added_indexes,
+        to_edit_indexed: edited_indexes
+      },
+      sarga_num: $sarga_selected,
+      kANDa_num: $kANDa_selected,
+      lang: $trans_lang
+    });
+    if (res.success) {
+      added_translations_indexes = [];
+      edited_translations_indexes = new Set();
+      $editing_status_on = false;
+    }
+  };
 </script>
 
 <div class="space-x-3">
@@ -42,7 +69,7 @@
       on:click={() => ($sarga_selected -= 1)}
       in:scale
       out:slide
-      disabled={editing_status_on}
+      disabled={$editing_status_on}
       class="btn rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white"
     >
       <Icon class="-mt-1 mr-1 text-xl" src={TiArrowBackOutline} />
@@ -54,7 +81,7 @@
       on:click={() => ($sarga_selected += 1)}
       in:scale
       out:slide
-      disabled={editing_status_on}
+      disabled={$editing_status_on}
       class="btn rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white"
     >
       Next
@@ -78,8 +105,9 @@
     </span>
   {/if}
 </div>
-{#if editing_status_on}
+{#if $editing_status_on}
   <button
+    on:click={save_data}
     in:slide
     out:scale
     class="btn rounded-lg bg-primary-700 px-1 py-1 text-white dark:bg-primary-600"
@@ -93,7 +121,7 @@
     'h-[85vh] overflow-scroll rounded-xl border-2 border-gray-400 p-0 dark:border-gray-600',
     loaded_en_trans_data && 'h-[90vh]',
     loaded_lang_trans_data && 'h-[95vh]',
-    editing_status_on && 'h-[100vh]'
+    $editing_status_on && 'h-[100vh]'
   )}
 >
   {#if !sarga_loading}
@@ -147,14 +175,14 @@
                 {/if}
               </div>
             {/if}
-            {#if editing_status_on}
+            {#if $editing_status_on}
               <div transition:slide>
-                {#if !trans_lang_data.has(trans_index)}
+                {#if !$trans_lang_data.has(trans_index)}
                   <button
                     on:click={() => {
-                      trans_lang_data.set(trans_index, '');
+                      $trans_lang_data.set(trans_index, '');
                       added_translations_indexes.push(trans_index);
-                      trans_lang_data = trans_lang_data;
+                      $trans_lang_data = $trans_lang_data;
                     }}
                     class="btn m-0 rounded-md bg-surface-500 p-0 px-1 font-bold text-white dark:bg-surface-500"
                   >
@@ -163,7 +191,8 @@
                 {:else}
                   <textarea
                     on:input={(e) => {
-                      edited_translations_indexes.add(trans_index);
+                      if (!added_translations_indexes.includes(trans_index))
+                        edited_translations_indexes.add(trans_index);
                       if (edit_language_typer_status)
                         LipiLekhikA.mukhya(
                           e.target,
@@ -173,16 +202,16 @@
                           true,
                           // @ts-ignore
                           (val) => {
-                            trans_lang_data.set(trans_index, val);
+                            $trans_lang_data.set(trans_index, val);
                           }
                         );
                       else {
-                        trans_lang_data.set(trans_index, e.currentTarget.value);
+                        $trans_lang_data.set(trans_index, e.currentTarget.value);
                       }
-                      trans_lang_data = trans_lang_data;
+                      $trans_lang_data = $trans_lang_data;
                     }}
                     class="textarea h-16 w-full"
-                    value={trans_lang_data.get(trans_index)}
+                    value={$trans_lang_data.get(trans_index)}
                   ></textarea>
                 {/if}
               </div>
@@ -192,15 +221,15 @@
                 on:dblclick={() => {
                   if (!enable_copy_to_clipbaord) return;
                   copy_text_to_clipboard(
-                    get_possibily_not_undefined(trans_lang_data.get(trans_index))
+                    get_possibily_not_undefined($trans_lang_data.get(trans_index))
                   );
                   copied_text_status = true;
                 }}
                 class="text-yellow-700 dark:text-yellow-500"
               >
-                {#if trans_lang_data.has(trans_index)}
+                {#if $trans_lang_data.has(trans_index)}
                   <!-- Usually translations are single but still... -->
-                  {#each get_possibily_not_undefined(trans_lang_data.get(trans_index)).split('\n') as line_trans}
+                  {#each get_possibily_not_undefined($trans_lang_data.get(trans_index)).split('\n') as line_trans}
                     <div>{line_trans}</div>
                   {/each}
                 {/if}
