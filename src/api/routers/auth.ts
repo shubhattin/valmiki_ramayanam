@@ -161,24 +161,22 @@ const add_new_user_route = publicProcedure
     const slt = gen_salt();
     const hashed_password = (await hash_256(password + slt)) + slt;
 
-    await db.transaction(async (tx) => {
-      const returning_data = await tx
-        .insert(users)
-        .values({
-          user_id: username,
-          user_name: name,
-          user_email: email,
-          password_hash: hashed_password,
-          contact_number: contact_number
-        })
-        .returning();
-      // user_type -> default non-admin
-      // we can be sure that if the insert is success then only it will
-      // proceed else throw a error into trpc and quit
-      const id = returning_data[0].id;
-      await tx.insert(user_verification_requests).values({
-        id: id
-      });
+    const returning_data = await db
+      .insert(users)
+      .values({
+        user_id: username,
+        user_name: name,
+        user_email: email,
+        password_hash: hashed_password,
+        contact_number: contact_number
+      })
+      .returning();
+    // user_type -> default non-admin
+    // we can be sure that if the insert is success then only it will
+    // proceed else throw a error into trpc and quit
+    const id = returning_data[0].id;
+    await db.insert(user_verification_requests).values({
+      id: id
     });
     success = true;
     return { success, status_code: 'success' };

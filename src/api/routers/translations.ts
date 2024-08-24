@@ -66,41 +66,39 @@ export const edit_translation_router = protectedProcedure
           return { success: false };
       }
 
-      await db.transaction(async (tx) => {
-        // add new records
-        if (to_add_indexed.length > 0) {
-          const data_to_add = to_add_indexed.map((index, i) => ({
-            lang: lang as lang_list_type,
-            kANDa_num,
-            sarga_num,
-            shloka_num: index,
-            text: add_data[i]
-          }));
-          await tx.insert(translations).values(data_to_add);
-        }
+      // add new records
+      if (to_add_indexed.length > 0) {
+        const data_to_add = to_add_indexed.map((index, i) => ({
+          lang: lang as lang_list_type,
+          kANDa_num,
+          sarga_num,
+          shloka_num: index,
+          text: add_data[i]
+        }));
+        await db.insert(translations).values(data_to_add);
+      }
 
-        // update existing records
-        const update_promises: Promise<any>[] = [];
-        for (let i = 0; i < to_edit_indexed.length; i++) {
-          const index = to_edit_indexed[i];
-          const text = edit_data[i];
-          update_promises.push(
-            tx
-              .update(translations)
-              .set({ text })
-              .where(
-                and(
-                  eq(translations.lang, lang as lang_list_type),
-                  eq(translations.kANDa_num, kANDa_num),
-                  eq(translations.sarga_num, sarga_num),
-                  eq(translations.shloka_num, index)
-                )
+      // update existing records
+      const update_promises: Promise<any>[] = [];
+      for (let i = 0; i < to_edit_indexed.length; i++) {
+        const index = to_edit_indexed[i];
+        const text = edit_data[i];
+        update_promises.push(
+          db
+            .update(translations)
+            .set({ text })
+            .where(
+              and(
+                eq(translations.lang, lang as lang_list_type),
+                eq(translations.kANDa_num, kANDa_num),
+                eq(translations.sarga_num, sarga_num),
+                eq(translations.shloka_num, index)
               )
-          );
-        }
-        // reolving update promises
-        await Promise.all(update_promises);
-      });
+            )
+        );
+      }
+      // reolving update promises
+      await Promise.all(update_promises);
 
       return {
         success: true
