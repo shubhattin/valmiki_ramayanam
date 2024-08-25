@@ -1,21 +1,21 @@
 {
-	"name": "Lipi Parivartan",
-	"short_name": "Lipi Parivartan",
-	"start_url": "/",
-	"scope": "./",
-	"icons": [
-		{
-			"src": "img/icon_128.png",
-			"sizes": "128x128",
-			"type": "image/png"
-		},
-		{
-			"src": "img/icon_512.png",
-			"sizes": "512x512",
-			"type": "image/png"
-		}
-	],
-	"theme_color": "#181e20",
-	"background_color": "#333",
-	"display": "standalone"
+  "name": "Ṣrīmadrāmāyaṇam",
+  "short_name": "Ṣrīmadrāmāyaṇam",
+  "start_url": "/",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "img/icon_128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "img/icon_512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#181e20",
+  "background_color": "#333",
+  "display": "standalone"
 }
