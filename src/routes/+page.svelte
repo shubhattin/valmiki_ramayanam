@@ -46,7 +46,15 @@
 
   let editing_status_on = writable(false);
   let loaded_user_allowed_langs = false; // info related to assigned editable langs
-  let edit_language_typer_status = true;
+
+  $: kaNDa_names = rAmAyaNa_map.map((kANDa) =>
+    lipi_parivartak(kANDa.name_devanagari, BASE_SCRIPT, loaded_viewing_script)
+  );
+  let sarga_names: string[] = [];
+  $: $kANDa_selected !== 0 &&
+    (sarga_names = rAmAyaNa_map[$kANDa_selected - 1].sarga_data.map((sarga) =>
+      lipi_parivartak(sarga.name_devanagari.split('\n')[0], BASE_SCRIPT, loaded_viewing_script)
+    ));
 
   onMount(async () => {
     if (browser) await ensure_auth_access_status();
@@ -207,29 +215,18 @@
     <span class="font-bold">Select kANDa</span>
     <select bind:value={$kANDa_selected} class="select w-52" disabled={$editing_status_on}>
       <option value={0}>Select</option>
-      {#each rAmAyaNa_map as kANDa}
-        {@const kANDa_name = lipi_parivartak(
-          kANDa.name_devanagari,
-          BASE_SCRIPT,
-          loaded_viewing_script
-        )}
-        <option value={kANDa.index}>{kANDa.index}. {kANDa_name}</option>
+      {#each kaNDa_names as kANDa_name, kANDa_index (kANDa_name)}
+        <option value={kANDa_index + 1}>{kANDa_index + 1}. {kANDa_name}</option>
       {/each}
     </select>
   </label>
   {#if $kANDa_selected !== 0}
-    {@const kANDa = rAmAyaNa_map[$kANDa_selected - 1]}
     <label class="space-x-4">
       <span class="font-bold">Select Sarga</span>
       <select bind:value={$sarga_selected} class="select w-52" disabled={$editing_status_on}>
         <option value={0}>Select</option>
-        {#each kANDa.sarga_data as sarga}
-          {@const sarga_name = lipi_parivartak(
-            sarga.name_devanagari.split('\n')[0],
-            BASE_SCRIPT,
-            loaded_viewing_script
-          )}
-          <option value={sarga.index}>{sarga.index}. {sarga_name}</option>
+        {#each sarga_names as sarga_name, sarga_index (sarga_name)}
+          <option value={sarga_index + 1}>{sarga_index + 1}. {sarga_name}</option>
         {/each}
       </select>
     </label>
@@ -293,17 +290,6 @@
             Edit
           </button>
         {/if}
-        {#if $editing_status_on}
-          <SlideToggle
-            name="edit_lang"
-            active="bg-primary-500"
-            class="mt-1 hover:text-gray-500 dark:hover:text-gray-400"
-            bind:checked={edit_language_typer_status}
-            size="sm"
-          >
-            <Icon src={BsKeyboard} class="text-4xl" />
-          </SlideToggle>
-        {/if}
       {/if}
     </div>
     <Display
@@ -318,7 +304,6 @@
         loaded_lang_trans_data,
         sarga_loading,
         sarga_selected,
-        edit_language_typer_status,
         trans_lang,
         kANDa_selected
       }}

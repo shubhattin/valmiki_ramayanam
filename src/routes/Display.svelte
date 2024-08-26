@@ -8,7 +8,7 @@
   import { SlideToggle, getModalStore } from '@skeletonlabs/skeleton';
   import type { ModalSettings } from '@skeletonlabs/skeleton';
   import { FiSave } from 'svelte-icons-pack/fi';
-  import { BsClipboard2Check } from 'svelte-icons-pack/bs';
+  import { BsKeyboard } from 'svelte-icons-pack/bs';
   import { cl_join } from '@tools/cl_join';
   import LipiLekhikA from '@tools/converter';
   import { client } from '@api/client';
@@ -26,9 +26,9 @@
   export let sarga_loading: boolean;
   export let sarga_selected: Writable<number>;
   export let kANDa_selected: Writable<number>;
-  export let edit_language_typer_status: boolean;
   export let trans_lang: Writable<string>;
 
+  let edit_language_typer_status = false;
   let enable_copy_to_clipbaord = true;
   let copied_text_status = false;
 
@@ -81,8 +81,19 @@
   };
 </script>
 
-<div class="flex space-x-4">
-  <SlideToggle
+<div class="flex space-x-2">
+  {#if $editing_status_on}
+    <SlideToggle
+      name="edit_lang"
+      active="bg-primary-500"
+      class="mt-1 hover:text-gray-500 dark:hover:text-gray-400"
+      bind:checked={edit_language_typer_status}
+      size="sm"
+    >
+      <Icon src={BsKeyboard} class="text-4xl" />
+    </SlideToggle>
+  {/if}
+  <!-- <SlideToggle
     name="Copy to Clipboard"
     bind:checked={enable_copy_to_clipbaord}
     active="bg-primary-500"
@@ -90,12 +101,13 @@
   >
     Doudle Click to Copy
   </SlideToggle>
+  {/if}
   {#if copied_text_status}
     <span class="cursor-default select-none font-bold text-green-700 dark:text-green-300">
       <Icon src={BsClipboard2Check} />
       Copied to Clipboard
     </span>
-  {/if}
+  {/if} -->
 </div>
 {#if $editing_status_on}
   <button
