@@ -88,7 +88,10 @@
       // loading trnaslation lang data for typing support
       await load_parivartak_lang_data($trans_lang);
       $loaded_trans_lang = $trans_lang;
-      viewing_script = $loaded_trans_lang === 'Hindi' ? 'Sanskrit' : $loaded_trans_lang;
+      let script = $loaded_trans_lang;
+      if ($loaded_trans_lang === 'Hindi') script = 'Sanskrit';
+      else if ($loaded_trans_lang === 'Tamil') script = 'Tamil-Extended';
+      viewing_script = script;
     })();
   $: view_translation_status &&
     browser &&
