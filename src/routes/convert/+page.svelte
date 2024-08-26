@@ -78,6 +78,7 @@
     <textarea
       class="textarea h-56"
       placeholder={`Enter text in ${from_lang}`}
+      bind:value={$from_text}
       on:input={(e) => {
         if (from_text_type_enabled)
           // @ts-ignore
@@ -131,6 +132,7 @@
       </SlideToggle>
     </div>
     <textarea
+      bind:value={$to_text}
       class="textarea h-56"
       placeholder={`Enter text in ${to_lang}`}
       on:input={(e) => {

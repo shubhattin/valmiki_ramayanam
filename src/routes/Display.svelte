@@ -3,12 +3,12 @@
   import Icon from '@tools/Icon.svelte';
   import { get_possibily_not_undefined, copy_text_to_clipboard } from '@tools/kry';
   import { RiSystemAddLargeLine } from 'svelte-icons-pack/ri';
-  import type { Writable } from 'svelte/store';
+  import { type Writable } from 'svelte/store';
   import { fade, scale, slide } from 'svelte/transition';
   import { SlideToggle, getModalStore } from '@skeletonlabs/skeleton';
   import type { ModalSettings } from '@skeletonlabs/skeleton';
   import { FiSave } from 'svelte-icons-pack/fi';
-  import { BsClipboard2Check } from 'svelte-icons-pack/bs';
+  import { BsClipboard2Check, BsKeyboard } from 'svelte-icons-pack/bs';
   import { cl_join } from '@tools/cl_join';
   import LipiLekhikA from '@tools/converter';
   import { client } from '@api/client';
@@ -26,14 +26,30 @@
   export let sarga_loading: boolean;
   export let sarga_selected: Writable<number>;
   export let kANDa_selected: Writable<number>;
-  export let edit_language_typer_status: boolean;
-  export let trans_lang: Writable<string>;
+  export let loaded_trans_lang: Writable<string>;
 
+  let edit_language_typer_status = true;
   let enable_copy_to_clipbaord = true;
   let copied_text_status = false;
 
   let added_translations_indexes: number[] = [];
   let edited_translations_indexes = new Set<number>();
+
+  let transliterated_sarga_data = sarga_data;
+
+  $: transliterated_sarga_data = sarga_data.map((shloka_lines) =>
+    lipi_parivartak(shloka_lines, BASE_SCRIPT, loaded_viewing_script)
+  );
+  let sanskrit_mode_texts: string[];
+  let sanskrit_mode: number;
+  $: $loaded_trans_lang !== '--' &&
+    (async () => {
+      sanskrit_mode_texts = ['अजय्', 'अजय'].map((text) =>
+        lipi_parivartak(text, BASE_SCRIPT, $loaded_trans_lang)
+      );
+      const lng = LipiLekhikA.k.normalize($loaded_trans_lang);
+      sanskrit_mode = (LipiLekhikA.k.akSharAH as any)[lng].sa;
+    })();
 
   $: copied_text_status && setTimeout(() => (copied_text_status = false), 1400);
 
@@ -44,8 +60,8 @@
     const modal_options: ModalSettings = {
       title: 'Sure to save Changes ?',
       type: 'confirm',
-      body: `Edits ➔ ${edited_indexes.length} ${edited_indexes.length > 0 ? '[ ' + edited_indexes.join(', ') + ' ]' : ''}
-      <br/>Additions ➔ ${added_indexes.length} ${added_indexes.length > 0 ? '[ ' + added_indexes.join(', ') + ' ]' : ''}`,
+      body: `Edits ➔ ${edited_indexes.length} ${edited_indexes.length > 0 ? '{ ' + edited_indexes.join(', ') + ' }' : ''}
+      <br/>Additions ➔ ${added_indexes.length} ${added_indexes.length > 0 ? '{ ' + added_indexes.join(', ') + ' }' : ''}`,
       response(r: boolean) {
         if (!r) return;
         (async () => {
@@ -61,7 +77,7 @@
             },
             sarga_num: $sarga_selected,
             kANDa_num: $kANDa_selected,
-            lang: $trans_lang
+            lang: $loaded_trans_lang
           });
           if (res.success) {
             added_translations_indexes = [];
@@ -76,16 +92,45 @@
 </script>
 
 <div class="flex space-x-4">
-  <SlideToggle
-    name="Copy to Clipboard"
-    bind:checked={enable_copy_to_clipbaord}
-    active="bg-primary-500"
-    size="sm"
-  >
-    Doudle Click to Copy
-  </SlideToggle>
+  {#if $editing_status_on}
+    <SlideToggle
+      name="edit_lang"
+      active="bg-primary-500"
+      class="mt-1 hover:text-gray-500 dark:hover:text-gray-400"
+      bind:checked={edit_language_typer_status}
+      size="sm"
+    >
+      <Icon src={BsKeyboard} class="text-4xl" />
+    </SlideToggle>
+    {#if edit_language_typer_status}
+      <div transition:scale class="mt-1 flex space-x-2 text-sm">
+        <label class="inline-flex items-center space-x-2">
+          <input
+            bind:group={sanskrit_mode}
+            class="radio"
+            type="radio"
+            name="sanskrit-mode"
+            value={1}
+          />
+          <span>ajay ➔ {sanskrit_mode_texts[0]}</span>
+        </label>
+        <label class="inline-flex items-center space-x-2">
+          <input
+            bind:group={sanskrit_mode}
+            class="radio"
+            type="radio"
+            name="sanskrit-mode"
+            value={0}
+          />
+          <span>ajay ➔ {sanskrit_mode_texts[1]}</span>
+        </label>
+      </div>
+    {/if}
+  {/if}
   {#if copied_text_status}
-    <span class="cursor-default select-none font-bold text-green-700 dark:text-green-300">
+    <span
+      class="fixed bottom-2 right-2 z-50 cursor-default select-none font-bold text-green-700 dark:text-green-300"
+    >
       <Icon src={BsClipboard2Check} />
       Copied to Clipboard
     </span>
@@ -112,25 +157,23 @@
 >
   {#if !sarga_loading}
     <div transition:fade={{ duration: 250 }} class="space-y-2">
-      {#each sarga_data as shloka_lines, i (i)}
-        {@const line_transliterated = lipi_parivartak(
-          shloka_lines,
-          BASE_SCRIPT,
-          loaded_viewing_script
-        )}
-        {@const line_split = line_transliterated.split('\n')}
+      {#each transliterated_sarga_data as shloka_lines, i (i)}
+        {@const line_split = shloka_lines.split('\n')}
         <!-- with 0 and -1 index -->
         {@const trans_index = sarga_data.length - 1 === i ? -1 : i}
         <div class="rounded-lg px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-800">
           {#if i !== 0 && i !== sarga_data.length - 1}
-            <span class="inline-block align-top text-xs text-gray-500 dark:text-gray-300">{i}</span>
+            <span
+              class="inline-block select-none align-top text-xs text-gray-500 dark:text-gray-300"
+              >{i}</span
+            >
           {/if}
           <div class="mt-0 space-y-1">
             <!-- svelte-ignore a11y-no-static-element-interactions -->
             <div
               on:dblclick={() => {
                 if (!enable_copy_to_clipbaord) return;
-                copy_text_to_clipboard(line_transliterated);
+                copy_text_to_clipboard(shloka_lines);
                 copied_text_status = true;
               }}
             >
@@ -181,12 +224,13 @@
                           e.target,
                           // @ts-ignore
                           e.data,
-                          $trans_lang === 'Hindi' ? 'Sanskrit' : $trans_lang,
+                          $loaded_trans_lang,
                           true,
                           // @ts-ignore
                           (val) => {
                             $trans_lang_data.set(trans_index, val);
-                          }
+                          },
+                          sanskrit_mode
                         );
                       else {
                         $trans_lang_data.set(trans_index, e.currentTarget.value);
