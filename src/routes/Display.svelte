@@ -127,14 +127,6 @@
       </div>
     {/if}
   {/if}
-  <!-- <SlideToggle
-    name="Copy to Clipboard"
-    bind:checked={enable_copy_to_clipbaord}
-    active="bg-primary-500"
-    size="sm"
-  >
-    Doudle Click to Copy
-  </SlideToggle> -->
   {#if copied_text_status}
     <span
       class="fixed bottom-2 right-2 z-50 cursor-default select-none font-bold text-green-700 dark:text-green-300"
@@ -171,7 +163,10 @@
         {@const trans_index = sarga_data.length - 1 === i ? -1 : i}
         <div class="rounded-lg px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-800">
           {#if i !== 0 && i !== sarga_data.length - 1}
-            <span class="inline-block align-top text-xs text-gray-500 dark:text-gray-300">{i}</span>
+            <span
+              class="inline-block select-none align-top text-xs text-gray-500 dark:text-gray-300"
+              >{i}</span
+            >
           {/if}
           <div class="mt-0 space-y-1">
             <!-- svelte-ignore a11y-no-static-element-interactions -->

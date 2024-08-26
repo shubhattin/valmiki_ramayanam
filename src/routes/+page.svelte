@@ -203,6 +203,7 @@
 <div class="mt-4 space-y-4">
   <div class="flex justify-between">
     <label class="space-x-4">
+      Script
       <Icon src={LanguageIcon} class="text-4xl" />
       <select class="select inline-block w-40" bind:value={viewing_script}>
         {#each SCRIPT_LIST as lang (lang)}
