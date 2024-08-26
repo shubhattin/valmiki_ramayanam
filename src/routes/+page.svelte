@@ -9,19 +9,13 @@
   import { LanguageIcon } from '@components/icons';
   import MetaTags from '@components/MetaTags.svelte';
   import User from './User.svelte';
-  import {
-    ensure_auth_access_status,
-    get_id_token_info,
-    ID_TOKEN_INFO_SCHEMA
-  } from '@tools/auth_tools';
+  import { ensure_auth_access_status, get_id_token_info } from '@tools/auth_tools';
   import { browser } from '$app/environment';
   import { main_app_bar_info } from '@state/state';
   import Display from './Display.svelte';
   import { client } from '@api/client';
   import { get_possibily_not_undefined } from '@tools/kry';
   import { BiEdit } from 'svelte-icons-pack/bi';
-  import { BsKeyboard } from 'svelte-icons-pack/bs';
-  import { SlideToggle } from '@skeletonlabs/skeleton';
   import { scale, slide } from 'svelte/transition';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import { user_info } from '@state/user';
@@ -33,7 +27,9 @@
   let sarga_loading = false;
   let viewing_script = BASE_SCRIPT;
   let loaded_viewing_script: string = viewing_script;
+
   let trans_lang = writable('--');
+  let loaded_trans_lang = writable('--');
 
   let sarga_data: string[] = [];
   let trans_en_data: Map<number, string> = new Map();
@@ -91,6 +87,8 @@
     (async () => {
       // loading trnaslation lang data for typing support
       await load_parivartak_lang_data($trans_lang);
+      $loaded_trans_lang = $trans_lang;
+      viewing_script = $loaded_trans_lang === 'Hindi' ? 'Sanskrit' : $loaded_trans_lang;
     })();
   $: view_translation_status &&
     browser &&
@@ -116,13 +114,13 @@
       loaded_user_allowed_langs = true;
     })();
   $: browser &&
-    $trans_lang !== '--' &&
+    $loaded_trans_lang !== '--' &&
     (async () => {
       if (!($kANDa_selected !== 0 && $sarga_selected !== 0)) return;
       loaded_lang_trans_data = false;
       $trans_lang_data = new Map();
       const data = await client.translations.get_translations_per_sarga.query({
-        lang: $trans_lang,
+        lang: $loaded_trans_lang,
         kANDa_num: $kANDa_selected,
         sarga_num: $sarga_selected
       });
@@ -281,7 +279,7 @@
             {/each}
           </select>
         </label>
-        {#if !$editing_status_on && $trans_lang !== '--' && loaded_user_allowed_langs && (get_possibily_not_undefined($user_info).user_type === 'admin' || user_allowed_langs.indexOf($trans_lang) !== -1)}
+        {#if !$editing_status_on && $loaded_trans_lang !== '--' && loaded_user_allowed_langs && (get_possibily_not_undefined($user_info).user_type === 'admin' || user_allowed_langs.indexOf($loaded_trans_lang) !== -1)}
           <button
             on:click={() => ($editing_status_on = true)}
             class="btn my-1 rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white dark:bg-tertiary-600"
@@ -304,8 +302,8 @@
         loaded_lang_trans_data,
         sarga_loading,
         sarga_selected,
-        trans_lang,
-        kANDa_selected
+        kANDa_selected,
+        loaded_trans_lang
       }}
     />
   {/if}

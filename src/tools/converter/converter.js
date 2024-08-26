@@ -228,10 +228,11 @@ class LipiParivartak {
    * @param {string} [lang=''] - The lang parameter. Default value is an empty string.
    * @param {boolean} [on_status=true] - The on_status parameter. Default value is true.
    * @param {any} [callback=null] - The callback parameter. Default value is null.
+   * @param {0|1|ndefined|null} [sa_mode=null] - The sa_mode parameter. Default value is null.
    * @returns {void}
    */
 
-  mukhya(elmt, event_data = '', lang = '', on_status = true, callback = null) {
+  mukhya(elmt, event_data = '', lang = '', on_status = true, callback = null, sa_mode = null) {
     // if (!this.karya) return;
     if (!on_status) return;
     if (event_data == null || event_data == undefined) {
@@ -249,7 +250,7 @@ class LipiParivartak {
         text: event_data,
         typing: 1, // sanskrit mode
         lang: lng,
-        mode: 1, // element mode, 0 for text mode
+        mode: sa_mode ?? this.k.akSharAH[lng].sa, // element mode, 0 for text mode
         element: elmt
       });
     } else this.clear_all_val(true);

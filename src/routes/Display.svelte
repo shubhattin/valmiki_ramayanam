@@ -8,7 +8,7 @@
   import { SlideToggle, getModalStore } from '@skeletonlabs/skeleton';
   import type { ModalSettings } from '@skeletonlabs/skeleton';
   import { FiSave } from 'svelte-icons-pack/fi';
-  import { BsKeyboard } from 'svelte-icons-pack/bs';
+  import { BsClipboard2Check, BsKeyboard } from 'svelte-icons-pack/bs';
   import { cl_join } from '@tools/cl_join';
   import LipiLekhikA from '@tools/converter';
   import { client } from '@api/client';
@@ -26,9 +26,9 @@
   export let sarga_loading: boolean;
   export let sarga_selected: Writable<number>;
   export let kANDa_selected: Writable<number>;
-  export let trans_lang: Writable<string>;
+  export let loaded_trans_lang: Writable<string>;
 
-  let edit_language_typer_status = false;
+  let edit_language_typer_status = true;
   let enable_copy_to_clipbaord = true;
   let copied_text_status = false;
 
@@ -40,6 +40,16 @@
   $: transliterated_sarga_data = sarga_data.map((shloka_lines) =>
     lipi_parivartak(shloka_lines, BASE_SCRIPT, loaded_viewing_script)
   );
+  let sanskrit_mode_texts: string[];
+  let sanskrit_mode: number;
+  $: $loaded_trans_lang !== '--' &&
+    (async () => {
+      sanskrit_mode_texts = ['अजय्', 'अजय'].map((text) =>
+        lipi_parivartak(text, BASE_SCRIPT, $loaded_trans_lang)
+      );
+      const lng = LipiLekhikA.k.normalize($loaded_trans_lang);
+      sanskrit_mode = (LipiLekhikA.k.akSharAH as any)[lng].sa;
+    })();
 
   $: copied_text_status && setTimeout(() => (copied_text_status = false), 1400);
 
@@ -67,7 +77,7 @@
             },
             sarga_num: $sarga_selected,
             kANDa_num: $kANDa_selected,
-            lang: $trans_lang
+            lang: $loaded_trans_lang
           });
           if (res.success) {
             added_translations_indexes = [];
@@ -81,7 +91,7 @@
   };
 </script>
 
-<div class="flex space-x-2">
+<div class="flex space-x-4">
   {#if $editing_status_on}
     <SlideToggle
       name="edit_lang"
@@ -92,6 +102,30 @@
     >
       <Icon src={BsKeyboard} class="text-4xl" />
     </SlideToggle>
+    {#if edit_language_typer_status}
+      <div transition:scale class="mt-1 flex space-x-2 text-sm">
+        <label class="inline-flex items-center space-x-2">
+          <input
+            bind:group={sanskrit_mode}
+            class="radio"
+            type="radio"
+            name="sanskrit-mode"
+            value={1}
+          />
+          <span>ajay ➔ {sanskrit_mode_texts[0]}</span>
+        </label>
+        <label class="inline-flex items-center space-x-2">
+          <input
+            bind:group={sanskrit_mode}
+            class="radio"
+            type="radio"
+            name="sanskrit-mode"
+            value={0}
+          />
+          <span>ajay ➔ {sanskrit_mode_texts[1]}</span>
+        </label>
+      </div>
+    {/if}
   {/if}
   <!-- <SlideToggle
     name="Copy to Clipboard"
@@ -100,14 +134,15 @@
     size="sm"
   >
     Doudle Click to Copy
-  </SlideToggle>
-  {/if}
+  </SlideToggle> -->
   {#if copied_text_status}
-    <span class="cursor-default select-none font-bold text-green-700 dark:text-green-300">
+    <span
+      class="fixed bottom-2 right-2 z-50 cursor-default select-none font-bold text-green-700 dark:text-green-300"
+    >
       <Icon src={BsClipboard2Check} />
       Copied to Clipboard
     </span>
-  {/if} -->
+  {/if}
 </div>
 {#if $editing_status_on}
   <button
@@ -194,12 +229,13 @@
                           e.target,
                           // @ts-ignore
                           e.data,
-                          $trans_lang === 'Hindi' ? 'Sanskrit' : $trans_lang,
+                          $loaded_trans_lang,
                           true,
                           // @ts-ignore
                           (val) => {
                             $trans_lang_data.set(trans_index, val);
-                          }
+                          },
+                          sanskrit_mode
                         );
                       else {
                         $trans_lang_data.set(trans_index, e.currentTarget.value);
