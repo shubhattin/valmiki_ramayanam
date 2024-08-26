@@ -9,19 +9,13 @@
   import { LanguageIcon } from '@components/icons';
   import MetaTags from '@components/MetaTags.svelte';
   import User from './User.svelte';
-  import {
-    ensure_auth_access_status,
-    get_id_token_info,
-    ID_TOKEN_INFO_SCHEMA
-  } from '@tools/auth_tools';
+  import { ensure_auth_access_status, get_id_token_info } from '@tools/auth_tools';
   import { browser } from '$app/environment';
   import { main_app_bar_info } from '@state/state';
   import Display from './Display.svelte';
   import { client } from '@api/client';
   import { get_possibily_not_undefined } from '@tools/kry';
   import { BiEdit } from 'svelte-icons-pack/bi';
-  import { BsKeyboard } from 'svelte-icons-pack/bs';
-  import { SlideToggle } from '@skeletonlabs/skeleton';
   import { scale, slide } from 'svelte/transition';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import { user_info } from '@state/user';
@@ -33,7 +27,9 @@
   let sarga_loading = false;
   let viewing_script = BASE_SCRIPT;
   let loaded_viewing_script: string = viewing_script;
+
   let trans_lang = writable('--');
+  let loaded_trans_lang = writable('--');
 
   let sarga_data: string[] = [];
   let trans_en_data: Map<number, string> = new Map();
@@ -46,7 +42,15 @@
 
   let editing_status_on = writable(false);
   let loaded_user_allowed_langs = false; // info related to assigned editable langs
-  let edit_language_typer_status = true;
+
+  $: kaNDa_names = rAmAyaNa_map.map((kANDa) =>
+    lipi_parivartak(kANDa.name_devanagari, BASE_SCRIPT, loaded_viewing_script)
+  );
+  let sarga_names: string[] = [];
+  $: $kANDa_selected !== 0 &&
+    (sarga_names = rAmAyaNa_map[$kANDa_selected - 1].sarga_data.map((sarga) =>
+      lipi_parivartak(sarga.name_devanagari.split('\n')[0], BASE_SCRIPT, loaded_viewing_script)
+    ));
 
   onMount(async () => {
     if (browser) await ensure_auth_access_status();
@@ -60,6 +64,7 @@
       $sarga_selected = 1;
       // view_translation_status = true;
       // $trans_lang = 'Hindi';
+      // viewing_script = 'Telugu';
       // editing_status_on.set(true);
     }
     load_parivartak_lang_data(BASE_SCRIPT);
@@ -82,6 +87,11 @@
     (async () => {
       // loading trnaslation lang data for typing support
       await load_parivartak_lang_data($trans_lang);
+      $loaded_trans_lang = $trans_lang;
+      let script = $loaded_trans_lang;
+      if ($loaded_trans_lang === 'Hindi') script = 'Sanskrit';
+      else if ($loaded_trans_lang === 'Tamil') script = 'Tamil-Extended';
+      viewing_script = script;
     })();
   $: view_translation_status &&
     browser &&
@@ -107,13 +117,13 @@
       loaded_user_allowed_langs = true;
     })();
   $: browser &&
-    $trans_lang !== '--' &&
+    $loaded_trans_lang !== '--' &&
     (async () => {
       if (!($kANDa_selected !== 0 && $sarga_selected !== 0)) return;
       loaded_lang_trans_data = false;
       $trans_lang_data = new Map();
       const data = await client.translations.get_translations_per_sarga.query({
-        lang: $trans_lang,
+        lang: $loaded_trans_lang,
         kANDa_num: $kANDa_selected,
         sarga_num: $sarga_selected
       });
@@ -193,6 +203,7 @@
 <div class="mt-4 space-y-4">
   <div class="flex justify-between">
     <label class="space-x-4">
+      Script
       <Icon src={LanguageIcon} class="text-4xl" />
       <select class="select inline-block w-40" bind:value={viewing_script}>
         {#each SCRIPT_LIST as lang (lang)}
@@ -206,29 +217,18 @@
     <span class="font-bold">Select kANDa</span>
     <select bind:value={$kANDa_selected} class="select w-52" disabled={$editing_status_on}>
       <option value={0}>Select</option>
-      {#each rAmAyaNa_map as kANDa}
-        {@const kANDa_name = lipi_parivartak(
-          kANDa.name_devanagari,
-          BASE_SCRIPT,
-          loaded_viewing_script
-        )}
-        <option value={kANDa.index}>{kANDa.index}. {kANDa_name}</option>
+      {#each kaNDa_names as kANDa_name, kANDa_index (kANDa_name)}
+        <option value={kANDa_index + 1}>{kANDa_index + 1}. {kANDa_name}</option>
       {/each}
     </select>
   </label>
   {#if $kANDa_selected !== 0}
-    {@const kANDa = rAmAyaNa_map[$kANDa_selected - 1]}
     <label class="space-x-4">
       <span class="font-bold">Select Sarga</span>
       <select bind:value={$sarga_selected} class="select w-52" disabled={$editing_status_on}>
         <option value={0}>Select</option>
-        {#each kANDa.sarga_data as sarga}
-          {@const sarga_name = lipi_parivartak(
-            sarga.name_devanagari.split('\n')[0],
-            BASE_SCRIPT,
-            loaded_viewing_script
-          )}
-          <option value={sarga.index}>{sarga.index}. {sarga_name}</option>
+        {#each sarga_names as sarga_name, sarga_index (sarga_name)}
+          <option value={sarga_index + 1}>{sarga_index + 1}. {sarga_name}</option>
         {/each}
       </select>
     </label>
@@ -283,7 +283,7 @@
             {/each}
           </select>
         </label>
-        {#if !$editing_status_on && $trans_lang !== '--' && loaded_user_allowed_langs && (get_possibily_not_undefined($user_info).user_type === 'admin' || user_allowed_langs.indexOf($trans_lang) !== -1)}
+        {#if !$editing_status_on && $loaded_trans_lang !== '--' && loaded_user_allowed_langs && (get_possibily_not_undefined($user_info).user_type === 'admin' || user_allowed_langs.indexOf($loaded_trans_lang) !== -1)}
           <button
             on:click={() => ($editing_status_on = true)}
             class="btn my-1 rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white dark:bg-tertiary-600"
@@ -291,17 +291,6 @@
             <Icon src={BiEdit} class="mr-1 text-2xl" />
             Edit
           </button>
-        {/if}
-        {#if $editing_status_on}
-          <SlideToggle
-            name="edit_lang"
-            active="bg-primary-500"
-            class="mt-1 hover:text-gray-500 dark:hover:text-gray-400"
-            bind:checked={edit_language_typer_status}
-            size="sm"
-          >
-            <Icon src={BsKeyboard} class="text-4xl" />
-          </SlideToggle>
         {/if}
       {/if}
     </div>
@@ -317,9 +306,8 @@
         loaded_lang_trans_data,
         sarga_loading,
         sarga_selected,
-        edit_language_typer_status,
-        trans_lang,
-        kANDa_selected
+        kANDa_selected,
+        loaded_trans_lang
       }}
     />
   {/if}
