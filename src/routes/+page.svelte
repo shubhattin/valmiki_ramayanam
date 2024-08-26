@@ -60,6 +60,7 @@
       $sarga_selected = 1;
       // view_translation_status = true;
       // $trans_lang = 'Hindi';
+      // viewing_script = 'Telugu';
       // editing_status_on.set(true);
     }
     load_parivartak_lang_data(BASE_SCRIPT);

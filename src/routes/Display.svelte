@@ -3,7 +3,7 @@
   import Icon from '@tools/Icon.svelte';
   import { get_possibily_not_undefined, copy_text_to_clipboard } from '@tools/kry';
   import { RiSystemAddLargeLine } from 'svelte-icons-pack/ri';
-  import type { Writable } from 'svelte/store';
+  import { type Writable } from 'svelte/store';
   import { fade, scale, slide } from 'svelte/transition';
   import { SlideToggle, getModalStore } from '@skeletonlabs/skeleton';
   import type { ModalSettings } from '@skeletonlabs/skeleton';
@@ -35,6 +35,12 @@
   let added_translations_indexes: number[] = [];
   let edited_translations_indexes = new Set<number>();
 
+  let transliterated_sarga_data = sarga_data;
+
+  $: transliterated_sarga_data = sarga_data.map((shloka_lines) =>
+    lipi_parivartak(shloka_lines, BASE_SCRIPT, loaded_viewing_script)
+  );
+
   $: copied_text_status && setTimeout(() => (copied_text_status = false), 1400);
 
   const save_data = () => {
@@ -44,8 +50,8 @@
     const modal_options: ModalSettings = {
       title: 'Sure to save Changes ?',
       type: 'confirm',
-      body: `Edits ➔ ${edited_indexes.length} ${edited_indexes.length > 0 ? '[ ' + edited_indexes.join(', ') + ' ]' : ''}
-      <br/>Additions ➔ ${added_indexes.length} ${added_indexes.length > 0 ? '[ ' + added_indexes.join(', ') + ' ]' : ''}`,
+      body: `Edits ➔ ${edited_indexes.length} ${edited_indexes.length > 0 ? '{ ' + edited_indexes.join(', ') + ' }' : ''}
+      <br/>Additions ➔ ${added_indexes.length} ${added_indexes.length > 0 ? '{ ' + added_indexes.join(', ') + ' }' : ''}`,
       response(r: boolean) {
         if (!r) return;
         (async () => {
@@ -112,13 +118,8 @@
 >
   {#if !sarga_loading}
     <div transition:fade={{ duration: 250 }} class="space-y-2">
-      {#each sarga_data as shloka_lines, i (i)}
-        {@const line_transliterated = lipi_parivartak(
-          shloka_lines,
-          BASE_SCRIPT,
-          loaded_viewing_script
-        )}
-        {@const line_split = line_transliterated.split('\n')}
+      {#each transliterated_sarga_data as shloka_lines, i (i)}
+        {@const line_split = shloka_lines.split('\n')}
         <!-- with 0 and -1 index -->
         {@const trans_index = sarga_data.length - 1 === i ? -1 : i}
         <div class="rounded-lg px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-800">
@@ -130,7 +131,7 @@
             <div
               on:dblclick={() => {
                 if (!enable_copy_to_clipbaord) return;
-                copy_text_to_clipboard(line_transliterated);
+                copy_text_to_clipboard(shloka_lines);
                 copied_text_status = true;
               }}
             >
