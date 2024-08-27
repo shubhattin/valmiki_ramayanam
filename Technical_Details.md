@@ -7,8 +7,14 @@
 
 ### **Frontend**
 
-- _JS Framework_: [SvelteKit](https://kit.svelte.dev/) meta framework for [Svelte](https://svelte.dev/), also using [TypeScript](https://www.typescriptlang.org/)
-- _Design and Components_: [TailwindCSS](https://tailwindcss.com/) along with [Skeleton UI](https://www.skeleton.dev/)
+- **JS Framework**: [SvelteKit](https://kit.svelte.dev/) meta framework for [Svelte](https://svelte.dev/), also using [TypeScript](https://www.typescriptlang.org/)
+- **Design and Components**: [TailwindCSS](https://tailwindcss.com/) along with [Skeleton UI](https://www.skeleton.dev/)
+
+### **Backend**
+
+- **API**: [trpc](https://trpc.io/) for API
+- **Database** : [PostgreSQL](https://www.postgresql.org/) hosted on [NeonDB](https://neon.tech/) and with [Drizzle](https://orm.drizzle.team/) for ORM.
+- **Authentication** : Using custom auth with JWT using [jose](https://github.com/panva/jose)
 
 ## Data Processing
 
