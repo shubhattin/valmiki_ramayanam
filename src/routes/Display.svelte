@@ -44,7 +44,7 @@
   let sanskrit_mode: number;
   $: $loaded_trans_lang !== '--' &&
     (async () => {
-      sanskrit_mode_texts = ['अजय्', 'अजय'].map((text) =>
+      sanskrit_mode_texts = ['राम्', 'राम'].map((text) =>
         lipi_parivartak(text, BASE_SCRIPT, $loaded_trans_lang)
       );
       const lng = LipiLekhikA.k.normalize($loaded_trans_lang);
@@ -96,35 +96,17 @@
     <SlideToggle
       name="edit_lang"
       active="bg-primary-500"
-      class="mt-1 hover:text-gray-500 dark:hover:text-gray-400"
+      class="hover:text-gray-500 dark:hover:text-gray-400"
       bind:checked={edit_language_typer_status}
       size="sm"
     >
       <Icon src={BsKeyboard} class="text-4xl" />
     </SlideToggle>
     {#if edit_language_typer_status}
-      <div transition:scale class="mt-1 flex space-x-2 text-sm">
-        <label class="inline-flex items-center space-x-2">
-          <input
-            bind:group={sanskrit_mode}
-            class="radio"
-            type="radio"
-            name="sanskrit-mode"
-            value={1}
-          />
-          <span>ajay ➔ {sanskrit_mode_texts[0]}</span>
-        </label>
-        <label class="inline-flex items-center space-x-2">
-          <input
-            bind:group={sanskrit_mode}
-            class="radio"
-            type="radio"
-            name="sanskrit-mode"
-            value={0}
-          />
-          <span>ajay ➔ {sanskrit_mode_texts[1]}</span>
-        </label>
-      </div>
+      <select bind:value={sanskrit_mode} class="select m-0 w-28 text-clip px-1 py-1 text-sm">
+        <option value={1}>rAm ➔ {sanskrit_mode_texts[0]}</option>
+        <option value={0}>rAm ➔ {sanskrit_mode_texts[1]}</option>
+      </select>
     {/if}
   {/if}
   {#if copied_text_status}
