@@ -11,7 +11,7 @@
   import User from './User.svelte';
   import { ensure_auth_access_status, get_id_token_info } from '@tools/auth_tools';
   import { browser } from '$app/environment';
-  import { main_app_bar_info } from '@state/state';
+  import { main_app_bar_info } from '@state/app_bar';
   import Display from './Display.svelte';
   import { client } from '@api/client';
   import { get_possibily_not_undefined } from '@tools/kry';
@@ -19,11 +19,11 @@
   import { scale, slide } from 'svelte/transition';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import { user_info } from '@state/user';
+  import { get_ramayanam_page_link, kANDa_selected, sarga_selected } from '@state/ramayanam_page';
+  import { goto } from '$app/navigation';
 
   const BASE_SCRIPT = 'Sanskrit';
 
-  let kANDa_selected = writable(0);
-  let sarga_selected = writable(0);
   let sarga_loading = false;
   let viewing_script = BASE_SCRIPT;
   let loaded_viewing_script: string = viewing_script;
@@ -60,8 +60,6 @@
     if (import.meta.env.DEV) {
       // the options set here are for development purposes
       // can be disabled or modified based on need
-      // $kANDa_selected = 1;
-      // $sarga_selected = 1;
       // view_translation_status = true;
       // $trans_lang = 'Hindi';
       // viewing_script = 'Telugu';
@@ -147,8 +145,12 @@
     await delay(400);
     sarga_loading = false;
     sarga_data = data;
+    browser && goto(get_ramayanam_page_link($kANDa_selected, $sarga_selected));
   });
   const kANDa_selected_unsub = kANDa_selected.subscribe(() => {
+    if (browser)
+      if ($kANDa_selected === 0) goto('/');
+      else goto(get_ramayanam_page_link($kANDa_selected, null));
     $sarga_selected = 0;
     loaded_en_trans_data = false;
   });
@@ -227,7 +229,7 @@
       <span class="font-bold">Select Sarga</span>
       <select bind:value={$sarga_selected} class="select w-52" disabled={$editing_status_on}>
         <option value={0}>Select</option>
-        {#each sarga_names as sarga_name, sarga_index (sarga_name)}
+        {#each sarga_names as sarga_name, sarga_index (sarga_index)}
           <option value={sarga_index + 1}>{sarga_index + 1}. {sarga_name}</option>
         {/each}
       </select>

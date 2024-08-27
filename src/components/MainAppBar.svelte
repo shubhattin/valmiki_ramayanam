@@ -10,10 +10,9 @@
   import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
   import { YoutubeIcon } from '@components/icons';
   import { page } from '$app/stores';
-  import { z } from 'zod';
-  import { main_app_bar_info } from '@state/state';
+  import { main_app_bar_info } from '@state/app_bar';
 
-  $: page_url = z.enum(['/', '/convert', '/excel_tool']).parse($page.url.pathname);
+  $: page_url = $page.url.pathname;
 
   const app_menu_popup: PopupSettings = {
     event: 'click',

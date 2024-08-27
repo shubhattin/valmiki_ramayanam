@@ -9,7 +9,7 @@
   import { BsKeyboard } from 'svelte-icons-pack/bs';
   import MetaTags from '@components/tags/MetaTags.svelte';
   import { OiCopy16 } from 'svelte-icons-pack/oi';
-  import { main_app_bar_info } from '@state/state';
+  import { main_app_bar_info } from '@state/app_bar';
 
   let from_lang = 'Sanskrit';
   let to_lang = 'Telugu';

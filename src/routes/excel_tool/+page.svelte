@@ -20,7 +20,7 @@
   import { writable } from 'svelte/store';
   import Preview from './Preview.svelte';
   import MetaTags from '@components/tags/MetaTags.svelte';
-  import { main_app_bar_info } from '@state/state';
+  import { main_app_bar_info } from '@state/app_bar';
 
   export const modalStore = getModalStore();
 
