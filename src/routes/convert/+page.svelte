@@ -7,7 +7,7 @@
   import { writable } from 'svelte/store';
   import type { Writable } from 'svelte/store';
   import { BsKeyboard } from 'svelte-icons-pack/bs';
-  import MetaTags from '@components/MetaTags.svelte';
+  import MetaTags from '@components/tags/MetaTags.svelte';
   import { OiCopy16 } from 'svelte-icons-pack/oi';
   import { main_app_bar_info } from '@state/state';
 

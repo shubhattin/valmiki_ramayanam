@@ -44,6 +44,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@builder.io/partytown": "^0.10.2",
     "@floating-ui/dom": "^1.6.10",
     "@fontsource/roboto": "^5.0.14",
     "@neondatabase/serverless": "^0.9.4",

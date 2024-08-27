@@ -7,7 +7,7 @@
   import { LANG_LIST, SCRIPT_LIST } from '@tools/lang_list';
   import { load_parivartak_lang_data, lipi_parivartak } from '@tools/converter';
   import { LanguageIcon } from '@components/icons';
-  import MetaTags from '@components/MetaTags.svelte';
+  import MetaTags from '@components/tags/MetaTags.svelte';
   import User from './User.svelte';
   import { ensure_auth_access_status, get_id_token_info } from '@tools/auth_tools';
   import { browser } from '$app/environment';

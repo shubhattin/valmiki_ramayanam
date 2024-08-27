@@ -5,6 +5,8 @@
   import MainAppBar from '@components/MainAppBar.svelte';
   import { initializeStores, Modal, storePopup } from '@skeletonlabs/skeleton';
   import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
+  import PartyTown from '@components/tags/PartyTown.svelte';
+  import GA from '@components/tags/GA.svelte';
 
   initializeStores();
   storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
@@ -20,3 +22,5 @@
   <MainAppBar />
   <slot />
 </div>
+<PartyTown />
+<GA />

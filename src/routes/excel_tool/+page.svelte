@@ -19,7 +19,7 @@
   import { download_file_in_browser } from '@tools/download_file_browser';
   import { writable } from 'svelte/store';
   import Preview from './Preview.svelte';
-  import MetaTags from '@components/MetaTags.svelte';
+  import MetaTags from '@components/tags/MetaTags.svelte';
   import { main_app_bar_info } from '@state/state';
 
   export const modalStore = getModalStore();
