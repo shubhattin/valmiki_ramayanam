@@ -60,8 +60,8 @@
     if (import.meta.env.DEV) {
       // the options set here are for development purposes
       // can be disabled or modified based on need
-      $kANDa_selected = 1;
-      $sarga_selected = 1;
+      // $kANDa_selected = 1;
+      // $sarga_selected = 1;
       // view_translation_status = true;
       // $trans_lang = 'Hindi';
       // viewing_script = 'Telugu';
@@ -312,3 +312,4 @@
     />
   {/if}
 </div>
+<slot />
