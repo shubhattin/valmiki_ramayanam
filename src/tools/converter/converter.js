@@ -70,7 +70,7 @@ class LipiParivartak {
       this.callback_func_for_state_update = callback;
       this.prakriyA({
         text: event_data,
-        typing: 1, // sanskrit mode
+        typing: 1,
         lang: lng,
         mode: sa_mode ?? this.k.akSharAH[lng].sa, // element mode, 0 for text mode
         element: elmt
@@ -343,6 +343,21 @@ class LipiParivartak {
       } else this.capital = b;
     }
     this.next_chars = current[current.length - 2];
+    //
+    if (this.sahayika_usage && mode == 1) {
+      let a = {
+        key: [key, this.next_chars],
+        status: [temp, varna_sthiti],
+        elm: $l(elm),
+        mAtrA: this.mAtrA_sthiti,
+        special_cap: cap_0_from_1,
+        lang: lang,
+        sa: sa
+      };
+      if (this.capital[0] == 1) a['cap'] = true;
+      this.sahayika.show(a);
+    }
+    //
     if (varna_sthiti == 3) this.store_last_of_3 = l.last(this.varna[1]);
     if (this.next_chars == '') this.clear_all_val();
     this.pUrva_lekhit[0] = this.pUrva_lekhit[1];
@@ -599,7 +614,7 @@ class lekhan_sahayika {
   constructor() {
     this.c = 0;
     this.d = 0;
-    this.k = lipi_helper;
+    this.k = lipi_hlp;
     this.idAnIma = 0;
     this.reset_capital_status = false;
     this.pUrvavarNa = [['', '', -1], ''];
@@ -623,7 +638,7 @@ class lekhan_sahayika {
       img[0] = `${r[0] + r[1] + r[3]}`;
       img[1] = `${r[0] + r[2] + r[3]}`;
       row1 += `<td><span>${img[0]}</span><span>${img[1]}</span></td>`;
-      row2 += `<td><a rel="noopener" href="https://rebrand.ly/lekhika" target="_blank"></a></td>`;
+      row2 += `<td><a rel="noopener" href="https://app-lipilekhika.pages.dev/" target="_blank"></a></td>`;
       row1 += `<td></td>`;
       row2 += `<td></td>`;
       for (let x = 0; x <= 60; x++) {
@@ -728,7 +743,7 @@ class lekhan_sahayika {
           position: 'absolute',
           left: '4px',
           top: '10px',
-          'background-image': `url(${this.k.sanchit}/icon.png)`,
+          'background-image': `url(/icons/lekhan_sahayika.png)`,
           'background-size': '20px 20px'
         });
         add_css(`#${id} table+div`, {
@@ -819,10 +834,8 @@ class lekhan_sahayika {
     el.style.display = t == 1 ? '' : 'block';
   }
   show(v) {
-    if (v['elm'].attr('lekhan-sahayika') != 'on') return;
     this.reset_capital_status = false;
     let l = this.k;
-
     function reset_capital(k) {
       let elm = LipiLekhikA.sahayika;
       elm.d--;
