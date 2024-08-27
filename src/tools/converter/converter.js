@@ -1,6 +1,4 @@
-import * as fs from 'fs';
 import { lipi_helper } from './helper';
-import { browser } from '$app/environment';
 
 class LipiParivartak {
   constructor() {

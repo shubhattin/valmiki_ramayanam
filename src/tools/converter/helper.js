@@ -116,6 +116,7 @@ export class lipi_helper {
         if (callback) callback();
         this.akSharAH[lang] = data.default[0];
       } else {
+        const fs = (await import('fs')).default;
         // if you run file manually from cli
         const data = JSON.parse(
           fs.readFileSync(
