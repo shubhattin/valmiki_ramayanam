@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import { lipi_helper } from './helper';
 import { browser } from '$app/environment';
+import { $l, $lf } from './lquery';
 
 class LipiParivartak {
   constructor() {
@@ -32,6 +33,11 @@ class LipiParivartak {
       ['', -1]
     ];
     this.second_cap_time = 0;
+    if (browser) {
+      this.sahayika = new lekhan_sahayika();
+      this.set_interface_lang = (lang = 'English') => this.sahayika.set_lang(lang);
+      this.hide = () => this.sahayika.elm.hide();
+    }
     // patch
     this.callback_func_for_state_update = null;
   }
@@ -589,6 +595,410 @@ class LipiParivartak {
     return res;
   }
 }
+class lekhan_sahayika {
+  constructor() {
+    this.c = 0;
+    this.d = 0;
+    this.k = lipi_helper;
+    this.idAnIma = 0;
+    this.reset_capital_status = false;
+    this.pUrvavarNa = [['', '', -1], ''];
+    this.ins_msg = '';
+    this.display = {};
+    // this.set_lang("English");
+    this.abhisthAnam = 0;
+    let id = 'లిಪಿலேഖിକା';
+    this.elm = $l('body').appendHTML(`<div id="${id}" style="display:none;"></div>`);
+    if (true) {
+      // making and adding html
+      let row1 = '',
+        row2 = '',
+        r = [
+          `<svg style="enable-background:new 0 0 26 26;" height="18px" width="18px" viewBox="96 160 320 192"><polygon points="396.6,`,
+          `160 416,180.7 256,352 96,180.7 115.3,160 256,310.5`,
+          `352 416,331.3 256,160 96,331.3 115.3,352 256,201.5`,
+          `"/></svg>`
+        ],
+        img = ['', ''];
+      img[0] = `${r[0] + r[1] + r[3]}`;
+      img[1] = `${r[0] + r[2] + r[3]}`;
+      row1 += `<td><span>${img[0]}</span><span>${img[1]}</span></td>`;
+      row2 += `<td><a rel="noopener" href="https://rebrand.ly/lekhika" target="_blank"></a></td>`;
+      row1 += `<td></td>`;
+      row2 += `<td></td>`;
+      for (let x = 0; x <= 60; x++) {
+        row1 += `<td></td>`;
+        row2 += `<td></td>`;
+      }
+      let table = `<table><tbody><tr>${row2}</tr><tr>${row1}</tr></tbody></table><div></div>`;
+      this.elm.append(table);
+    }
+    setTimeout(() => {
+      if (true) {
+        // adding css
+        let css = [];
+
+        function add_css(pre, dct) {
+          let v = pre + ' {\n';
+          for (let x in dct) v += `${x}:${dct[x]};\n`;
+          css.push(v + '}');
+          return pre;
+        }
+        add_css(`#${id}`, {
+          position: 'absolute',
+          'background-color': 'white',
+          padding: '2.5px',
+          border: '2px solid black',
+          'border-radius': '4.5px',
+          'font-weight': 'bold',
+          'z-index': '1000000',
+          'user-select': 'none',
+          cursor: 'default',
+          'background-color': 'white',
+          'min-width': '58px',
+          'max-width': 'fit-content',
+          'box-shadow': '0 4px 8.25px 0 #00000033, 0 6px 20px 0 #00000030',
+          'font-family': `"Nirmala UI","Calibri"`,
+          'transition-duration': '500ms'
+        });
+        add_css(`#${id} table`, {
+          display: 'block',
+          'max-width': '210px',
+          'overflow-x': 'scroll'
+        });
+        if (!this.k.is_mobile) {
+          add_css(`#${id} table::-webkit-scrollbar`, {
+            height: '4.5px'
+          });
+          add_css(`#${id} table::-webkit-scrollbar-track`, {
+            'background-color': '#e9e9e9',
+            'border-radius': '10px'
+          });
+          add_css(`#${id} table::-webkit-scrollbar-thumb`, {
+            'background-color': '#5353ff',
+            'border-radius': '10px'
+          });
+          add_css(`#${id} table::-webkit-scrollbar-thumb:hover`, {
+            'background-color': 'blue'
+          });
+        }
+        let e = `#${id} table tbody tr`; // defined for reusing
+        add_css(`${e}:nth-child(2) td:nth-child(1) span`, {
+          cursor: 'pointer',
+          display: 'none',
+          position: 'absolute',
+          top: '37px',
+          left: '5px'
+        }); // adding css for up down pointers
+        add_css(`${e} td`, {
+          'font-size': '18px',
+          'text-align': 'center',
+          cursor: 'grab'
+        });
+        add_css(`${e}:nth-child(1) td`, {
+          color: 'black'
+        });
+        add_css(`${e}:nth-child(2) td`, {
+          color: 'green'
+        });
+        let t = add_css(`${e} td:not(:nth-child(1)):not(:nth-child(2))`, {
+          display: 'none'
+        });
+        add_css(`${t}:hover`, {
+          color: 'blue'
+        }); // adding hover effect
+        add_css(`${e} td:nth-child(2)`, {
+          'text-align': 'center',
+          'padding-left': '22.5px',
+          'padding-right': '5.6px',
+          cursor: 'default'
+        });
+        add_css(`${e}:nth-child(1) td:nth-child(2)`, {
+          color: 'brown',
+          'font-size': '19.5px'
+        });
+        add_css(`${e}:nth-child(2) td:nth-child(2)`, {
+          color: 'red',
+          'font-size': '15px'
+        });
+        add_css(`${e}:nth-child(1) td:nth-child(1) a`, {
+          display: 'inline-block',
+          height: '20px',
+          width: '20px',
+          position: 'absolute',
+          left: '4px',
+          top: '10px',
+          'background-image': `url(${this.k.sanchit}/icon.png)`,
+          'background-size': '20px 20px'
+        });
+        add_css(`#${id} table+div`, {
+          'font-size': '10.5px',
+          color: 'purple',
+          'max-width': 'fit-content',
+          'min-width': '200px',
+          display: 'none'
+        });
+        this.elm.append(`<style>${css.join('\n')}</style>`);
+      }
+      if (true) {
+        // storing elements and adding handlers
+        this.bhaNDAra_index = ['sahayika', 'pashchAta', 'akShara', 'key1', 'key2'];
+        let e = `#${id} table tbody tr`; // defined for reusing
+        this.bhaNDAra = {
+          sahayika: $l(`#${id} table+div`)[0],
+          key1: $l(`${e}:nth-child(1) td:nth-child(2)`)[0],
+          key2: $l(`${e}:nth-child(2) td:nth-child(2)`)[0],
+          pashchAta: $l(`${e}:nth-child(1) td`),
+          akShara: $l(`${e}:nth-child(2) td`),
+          table: $l(`#${id} table`),
+          tbody: [$l(`${e}:nth-child(1)`)[0], $l(`${e}:nth-child(2)`)[0]]
+        };
+        this.adhar = 0;
+        let img = $l(`${e}:nth-child(2) td:nth-child(1)`).children();
+        this.ins_button = [$l(img[1]), $l(img[0])];
+        this.ins_sthiti = 1;
+        this.ins_button[this.ins_sthiti].show();
+        this.ins_button[0].on('click', () => this.change_ins(0));
+        this.ins_button[1].on('click', () => this.change_ins(1));
+        if (this.ins_sthiti == 1) this.bhaNDAra.sahayika.style.display = 'none';
+        this.objs = {
+          down: $l(img[0]),
+          up: $l(img[1]),
+          icon: $l(`${e}:nth-child(1) td:nth-child(1) a`)
+        };
+      }
+      $l('body').on('click', (event) => {
+        let obj = LipiLekhikA;
+        let o = obj.sahayika;
+        let bh = o.bhaNDAra;
+        if (o.elm.css('display') == 'none') return;
+        let trgt = event.target;
+        let p = $l(trgt).parents();
+        let sah = p.indexOf(o.elm[0]) != -1; // seeing if the click is inside lekhan sahayika
+        p = $l(trgt).parent()[0];
+        if (this.k.in(bh.tbody, p) && !this.k.in([bh.key1, bh.key2], trgt)) {
+          // above -> checking if a varna has been clicked
+          sah = true;
+          let el = o.adhar;
+          for (let x of trgt.value) {
+            if (this.k.in(['input', 'textarea'], el[0].tagName.toLowerCase())) {
+              obj.from_click = true;
+              let lng = el.attr('lipi-lang') == undefined ? this.k.k.script : el.attr('lipi-lang');
+              lng = this.k.normalize(lng);
+              if (!this.k.in(this.k.langs, lng)) return 'error';
+              obj.prakriyA({
+                text: x,
+                typing: 1,
+                lang: lng,
+                mode:
+                  el.attr('lipi-mode') == undefined
+                    ? this.k.akSharAH[lng].sa
+                    : el.attr('lipi-mode'),
+                element: el
+              });
+            }
+          }
+        }
+        if (!sah) obj.clear_all_val(true);
+      });
+    }, 1);
+  }
+  hide_other() {
+    let elm = LipiLekhikA.sahayika;
+    if (elm.c == 1) elm.elm.hide();
+    elm.c--;
+  }
+  change_ins(i) {
+    let elm = LipiLekhikA.sahayika;
+    elm.ins_button[i].hide();
+    let t = Math.abs(i - 1);
+    elm.ins_sthiti = t;
+    elm.ins_button[Math.abs(i - 1)].show();
+    let el = elm.bhaNDAra.sahayika;
+    elm.set_labels(1, t == 0 ? elm.ins_msg : '');
+    el.style.display = t == 1 ? '' : 'block';
+  }
+  show(v) {
+    if (v['elm'].attr('lekhan-sahayika') != 'on') return;
+    this.reset_capital_status = false;
+    let l = this.k;
+
+    function reset_capital(k) {
+      let elm = LipiLekhikA.sahayika;
+      elm.d--;
+      if (!elm.reset_capital_status) return;
+      if (elm.d == 0) {
+        for (let x = k[0]; x < k[1]; x++) {
+          elm.set_labels(2, '', x);
+          elm.set_labels(3, '', x);
+          elm.hide_elm(1, x);
+          elm.hide_elm(2, x);
+          elm.idAnIma--;
+        }
+      }
+      LipiLekhikA.capital = [0, '', -1, -1, 0, 0, false];
+    }
+    let next = v['key'][1],
+      key = v['key'][0];
+    let matra = v['mAtrA'],
+      extra_cap = v['special_cap'],
+      lang = v['lang'],
+      sa = v['sa'];
+    if (extra_cap[0])
+      this.pUrvavarNa = [
+        [l.akSharAH[lang][extra_cap[1][0]][extra_cap[1][0]][0], '', extra_cap[1][1]],
+        extra_cap[1][0]
+      ];
+    this.adhar = v.elm;
+    let cordinate = v.elm.caret('offset');
+    let top = cordinate.top,
+      hieght = cordinate.height,
+      left = cordinate.left;
+    // abhisthanam is to store the current position in contenteditable as it is lost on click
+    if (!l.in(['input', 'textarea'], v.elm[0].tagName.toLowerCase())) {
+      let caret = new $lf.CaretPos(v.elm[0]);
+      this.abhisthAnam = caret.getPos() + 2;
+    }
+    this.elm[0].style.top = `${top + hieght}px`;
+    this.elm[0].style.left = `${left + 8}px`;
+    let halant = ['', false];
+    if (!l.in(['Urdu', 'Romanized', 'Normal'], lang))
+      halant = [l.akSharAH[lang]['.']['.x'][0], sa == 1];
+    let a = new Map(),
+      b = l.akSharAH[lang][key[0]],
+      count = 0;
+    for (let x of next) {
+      if (key + x in b) {
+        a.set(x, b[key + x]);
+        for (let y of l.last(b[key + x], -2))
+          if (key + x + y in b) {
+            a.set(x + y, b[key + x + y]);
+            count++;
+          }
+        count++;
+      }
+    }
+    let c = 0,
+      cap_count = [0, 0];
+    if ('cap' in v) {
+      cap_count[0] = count;
+      let tmp = l.to_upper(key);
+      let b1 = l.akSharAH[lang][tmp];
+      a.set(key + key, b1[tmp]);
+      let next = l.last(a.get(key + key), -2);
+      for (let x of next)
+        if (tmp + x in b1) {
+          a.set(key + key + x, b1[tmp + x]);
+          for (let y of l.last(b1[tmp + x], -2))
+            if (tmp + x + y in b1) {
+              a.set(key + key + x + y, b1[tmp + x + y]);
+              count++;
+            }
+          count++;
+        }
+      cap_count[1] = count + 1;
+    }
+    if ((l.in([1, 3], l.last(this.pUrvavarNa[0])) || matra) && l.last(b[key]) == 0) {
+      let k12 = this.pUrvavarNa[0][0] + b[key][1];
+      if (l.last(this.pUrvavarNa[0]) == 3 && key != 'a')
+        k12 = l.substring(k12, 0, -2) + l.last(k12) + l.last(k12, -2);
+      this.set_labels(4, this.pUrvavarNa[1] + key);
+      this.set_labels(5, k12);
+    } else {
+      this.set_labels(4, key);
+      let l12 = b[key][0] + (l.in([1, 3], l.last(b[key])) ? halant[0] : '');
+      if (l.last(b[key]) == 3) l12 = l.substring(l12, 0, -2) + l.last(l12) + l.last(l12, -2);
+      this.set_labels(5, l12);
+    }
+    let extra = 0;
+    for (let x of a.keys()) {
+      if (matra && l.in([1, 2], l.last(a.get(x)))) {
+        extra++;
+        continue;
+      }
+      this.set_labels(2, x, c);
+      let k = a.get(x)[0];
+      if (l.last(a.get(x)) == 0 && l.in([1, 3], l.last(this.pUrvavarNa[0]))) k = a.get(x)[1];
+      if (l.in([1, 3], l.last(a.get(x))) && halant[1]) {
+        k += halant[0];
+        if (l.last(a.get(x)) == 3) k = l.substring(k, 0, -2) + l.last(k) + l.last(k, -2);
+      }
+      if ((l.in([1, 3], l.last(this.pUrvavarNa[0])) || matra) && l.last(a.get(x)) == 0) {
+        k = this.pUrvavarNa[0][0] + k;
+        if (l.last(this.pUrvavarNa[0]) == 3) k = l.substring(k, 0, -2) + l.last(k) + l.last(k, -2);
+      }
+      this.set_labels(3, k, c);
+      c++;
+    }
+    let len = 0;
+    for (let x of a.keys()) len++;
+    len -= extra;
+    if (len >= this.idAnIma) {
+      for (let x = this.idAnIma; x < len; x++) {
+        this.show_elm(1, x);
+        this.show_elm(2, x);
+      }
+    } else {
+      for (let x = len; x < this.idAnIma; x++) {
+        this.hide_elm(1, x);
+        this.hide_elm(2, x);
+      }
+    }
+    this.idAnIma = len;
+    this.c++;
+    if (!matra) this.pUrvavarNa = [b[key], key];
+    this.elm.show();
+    if ('cap' in v) {
+      this.d++;
+      this.reset_capital_status = true;
+      setTimeout(function () {
+        reset_capital(cap_count);
+      }, 4000);
+    }
+    let klj = this.hide_other;
+    setTimeout(function () {
+      klj();
+    }, 15000);
+  }
+  hide_elm(type, x) {
+    this.bhaNDAra[['pashchAta', 'akShara'][type - 1]][x + 2].style.removeProperty('display');
+  }
+  show_elm(type, x) {
+    this.bhaNDAra[['pashchAta', 'akShara'][type - 1]][x + 2].style.display = 'table-cell';
+  }
+  set_labels(type, txt, index = -1) {
+    if (index != -1 && (type == 3 || type == 2)) {
+      index += 2;
+      type--;
+      this.bhaNDAra[this.bhaNDAra_index[type]][index].innerHTML = txt;
+      if (type == 2) this.bhaNDAra.pashchAta[index].title = txt;
+      else if (type == 1) {
+        this.bhaNDAra.akShara[index].title = txt;
+        this.bhaNDAra.akShara[index].value = txt;
+        this.bhaNDAra.pashchAta[index].value = txt;
+      }
+    } else this.bhaNDAra[this.bhaNDAra_index[type - 1]].innerHTML = txt;
+  }
+  set_lang(l) {
+    let gh = () => {
+      let data = this.display[l];
+      this.ins_msg = this.k.text_to_html(data['ins'], 'li');
+      this.elm.attr('title', data['title']);
+      for (let x in this.objs) this.objs[x].attr('title', data[x]);
+      if (this.ins_sthiti == 0) this.set_labels(1, this.ins_msg);
+    };
+    if (!(l in this.display)) {
+      $lf.get(`${this.k.sanchit}/sahayika/${l}.json`, {
+        dataType: 'json',
+        success: (result) => {
+          this.display[l] = result;
+          gh();
+        }
+      });
+    } else gh();
+  }
+}
+
 const lipi_hlp = new lipi_helper();
 const LipiLekhikA = new LipiParivartak();
 lipi_hlp.k = LipiLekhikA;
