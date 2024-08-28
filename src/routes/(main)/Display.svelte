@@ -12,6 +12,7 @@
   import { cl_join } from '@tools/cl_join';
   import LipiLekhikA from '@tools/converter';
   import { client } from '@api/client';
+  import { browser } from '$app/environment';
 
   const modal_store = getModalStore();
 
@@ -42,7 +43,8 @@
   );
   let sanskrit_mode_texts: string[];
   let sanskrit_mode: number;
-  $: $loaded_trans_lang !== '--' &&
+  $: browser &&
+    $loaded_trans_lang !== '--' &&
     (async () => {
       sanskrit_mode_texts = ['राम्', 'राम'].map((text) =>
         lipi_parivartak(text, BASE_SCRIPT, $loaded_trans_lang)

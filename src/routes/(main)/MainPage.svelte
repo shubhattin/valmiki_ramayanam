@@ -7,11 +7,11 @@
   import { LANG_LIST, SCRIPT_LIST } from '@tools/lang_list';
   import { load_parivartak_lang_data, lipi_parivartak } from '@tools/converter';
   import { LanguageIcon } from '@components/icons';
-  import MetaTags from '@components/tags/MetaTags.svelte';
+  // import MetaTags from '@components/tags/MetaTags.svelte';
   import User from './User.svelte';
   import { ensure_auth_access_status, get_id_token_info } from '@tools/auth_tools';
   import { browser } from '$app/environment';
-  import { main_app_bar_info } from '@state/state';
+  import { main_app_bar_info } from '@state/app_bar';
   import Display from './Display.svelte';
   import { client } from '@api/client';
   import { get_possibily_not_undefined } from '@tools/kry';
@@ -19,11 +19,11 @@
   import { scale, slide } from 'svelte/transition';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import { user_info } from '@state/user';
+  import { get_ramayanam_page_link, kANDa_selected, sarga_selected } from '@state/ramayanam_page';
+  import { goto } from '$app/navigation';
 
   const BASE_SCRIPT = 'Sanskrit';
 
-  let kANDa_selected = writable(0);
-  let sarga_selected = writable(0);
   let sarga_loading = false;
   let viewing_script = BASE_SCRIPT;
   let loaded_viewing_script: string = viewing_script;
@@ -43,11 +43,14 @@
   let editing_status_on = writable(false);
   let loaded_user_allowed_langs = false; // info related to assigned editable langs
 
-  $: kaNDa_names = rAmAyaNa_map.map((kANDa) =>
-    lipi_parivartak(kANDa.name_devanagari, BASE_SCRIPT, loaded_viewing_script)
-  );
+  let kANDa_names: string[] = [];
+  $: browser &&
+    (kANDa_names = rAmAyaNa_map.map((kANDa) =>
+      lipi_parivartak(kANDa.name_devanagari, BASE_SCRIPT, loaded_viewing_script)
+    ));
   let sarga_names: string[] = [];
-  $: $kANDa_selected !== 0 &&
+  $: browser &&
+    $kANDa_selected !== 0 &&
     (sarga_names = rAmAyaNa_map[$kANDa_selected - 1].sarga_data.map((sarga) =>
       lipi_parivartak(sarga.name_devanagari.split('\n')[0], BASE_SCRIPT, loaded_viewing_script)
     ));
@@ -60,8 +63,6 @@
     if (import.meta.env.DEV) {
       // the options set here are for development purposes
       // can be disabled or modified based on need
-      $kANDa_selected = 1;
-      $sarga_selected = 1;
       // view_translation_status = true;
       // $trans_lang = 'Hindi';
       // viewing_script = 'Telugu';
@@ -136,8 +137,18 @@
       loaded_lang_trans_data = true;
     })();
 
+  $: browser &&
+    $kANDa_selected !== 0 &&
+    $sarga_selected === 0 &&
+    (() => {
+      goto(get_ramayanam_page_link($kANDa_selected));
+    })();
   const sarga_unsub = sarga_selected.subscribe(async () => {
     if ($kANDa_selected === 0 || $sarga_selected === 0) return;
+    if (!browser) return;
+    if (browser) {
+      goto(get_ramayanam_page_link($kANDa_selected, $sarga_selected));
+    }
     sarga_loading = true;
     sarga_data = [];
     const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
@@ -151,6 +162,7 @@
   const kANDa_selected_unsub = kANDa_selected.subscribe(() => {
     $sarga_selected = 0;
     loaded_en_trans_data = false;
+    loaded_lang_trans_data = false;
   });
 
   const load_english_translation = async (kANDa_num: number, sarga_number: number) => {
@@ -198,7 +210,7 @@
   });
 </script>
 
-<MetaTags title={PAGE_INFO.title} description={PAGE_INFO.description} />
+<!-- <MetaTags title={PAGE_INFO.title} description={PAGE_INFO.description} /> -->
 
 <div class="mt-4 space-y-4">
   <div class="flex justify-between">
@@ -217,7 +229,7 @@
     <span class="font-bold">Select kANDa</span>
     <select bind:value={$kANDa_selected} class="select w-52" disabled={$editing_status_on}>
       <option value={0}>Select</option>
-      {#each kaNDa_names as kANDa_name, kANDa_index (kANDa_name)}
+      {#each kANDa_names as kANDa_name, kANDa_index (kANDa_name)}
         <option value={kANDa_index + 1}>{kANDa_index + 1}. {kANDa_name}</option>
       {/each}
     </select>
@@ -227,7 +239,7 @@
       <span class="font-bold">Select Sarga</span>
       <select bind:value={$sarga_selected} class="select w-52" disabled={$editing_status_on}>
         <option value={0}>Select</option>
-        {#each sarga_names as sarga_name, sarga_index (sarga_name)}
+        {#each sarga_names as sarga_name, sarga_index (sarga_index)}
           <option value={sarga_index + 1}>{sarga_index + 1}. {sarga_name}</option>
         {/each}
       </select>
@@ -312,3 +324,4 @@
     />
   {/if}
 </div>
+<slot />

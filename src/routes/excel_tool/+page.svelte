@@ -12,7 +12,6 @@
   import { TiTick } from 'svelte-icons-pack/ti';
   import { BiSolidDownload } from 'svelte-icons-pack/bi';
   import { getModalStore } from '@skeletonlabs/skeleton';
-  import ExcelJS from 'exceljs';
   import type { Workbook } from 'exceljs';
   import { delay } from '@tools/delay';
   import { transliterate_xlxs_file } from '@tools/excel/transliterate_xlsx_file';
@@ -20,7 +19,7 @@
   import { writable } from 'svelte/store';
   import Preview from './Preview.svelte';
   import MetaTags from '@components/tags/MetaTags.svelte';
-  import { main_app_bar_info } from '@state/state';
+  import { main_app_bar_info } from '@state/app_bar';
 
   export const modalStore = getModalStore();
 
@@ -72,6 +71,7 @@
   }
 
   async function start_transliteration() {
+    const ExcelJS = (await import('exceljs')).default;
     const get_workbook_obj_from_file = (file: File) => {
       return new Promise<Workbook>(async (resolve) => {
         const workbook = new ExcelJS.Workbook();

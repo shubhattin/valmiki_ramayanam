@@ -1,6 +1,5 @@
 import { t, protectedAdminProcedure, protectedProcedure } from '@api/trpc_init';
 import { db } from '@db/db';
-import { get } from 'http';
 
 const get_all_user_info_router = protectedAdminProcedure.query(async ({ ctx: { user } }) => {
   const other_users_data = await db.query.users.findMany({
