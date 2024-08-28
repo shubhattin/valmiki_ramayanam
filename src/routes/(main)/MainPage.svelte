@@ -7,7 +7,7 @@
   import { LANG_LIST, SCRIPT_LIST } from '@tools/lang_list';
   import { load_parivartak_lang_data, lipi_parivartak } from '@tools/converter';
   import { LanguageIcon } from '@components/icons';
-  import MetaTags from '@components/tags/MetaTags.svelte';
+  // import MetaTags from '@components/tags/MetaTags.svelte';
   import User from './User.svelte';
   import { ensure_auth_access_status, get_id_token_info } from '@tools/auth_tools';
   import { browser } from '$app/environment';
@@ -137,8 +137,18 @@
       loaded_lang_trans_data = true;
     })();
 
+  $: browser &&
+    $kANDa_selected !== 0 &&
+    $sarga_selected === 0 &&
+    (() => {
+      goto(get_ramayanam_page_link($kANDa_selected));
+    })();
   const sarga_unsub = sarga_selected.subscribe(async () => {
     if ($kANDa_selected === 0 || $sarga_selected === 0) return;
+    if (!browser) return;
+    if (browser) {
+      goto(get_ramayanam_page_link($kANDa_selected, $sarga_selected));
+    }
     sarga_loading = true;
     sarga_data = [];
     const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');

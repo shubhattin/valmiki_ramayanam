@@ -12,7 +12,16 @@ export const load: PageServerLoad = async ({ params }) => {
 
   if (!params_data.success) {
     error(404, {
-      message: 'Not found'
+      message: `kANDa '${params.kANDa}' not found`
     });
+  }
+  const { kANDa, sarga } = params_data.data;
+  if (sarga) {
+    const sarga_count = rAmayaNa_map[kANDa - 1].sarga_count;
+    if (!(sarga >= 1 && sarga <= sarga_count)) {
+      error(404, {
+        message: `Sarga '${sarga}' not found in Kanda ${kANDa}`
+      });
+    }
   }
 };

@@ -9,9 +9,9 @@
   });
 
   // $still_setting_kanda_sarga = true;
-  // const params = params_schema.parse($page.params);
+  const params = params_schema.parse($page.params);
 
-  // $kANDa_selected = params.kANDa;
-  // if (params.sarga) $sarga_selected = params.sarga;
+  $kANDa_selected = params.kANDa;
+  if (params.sarga) $sarga_selected = params.sarga;
   // $still_setting_kanda_sarga = false;
 </script>
