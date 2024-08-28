@@ -1,5 +1,3 @@
-import * as fs from 'fs';
-
 export class lipi_helper {
   constructor() {
     this.akSharAH = {
@@ -117,7 +115,8 @@ export class lipi_helper {
           await langs_data['/src/tools/converter/resources/dattAMsh/' + lang + '.json']();
         if (callback) callback();
         this.akSharAH[lang] = data.default[0];
-      } else {
+      } else if (!import.meta.env.PROD) {
+        const fs = (await import('fs')).default;
         // if you run file manually from cli
         const data = JSON.parse(
           fs.readFileSync(

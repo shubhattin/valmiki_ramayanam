@@ -43,11 +43,14 @@
   let editing_status_on = writable(false);
   let loaded_user_allowed_langs = false; // info related to assigned editable langs
 
-  $: kaNDa_names = rAmAyaNa_map.map((kANDa) =>
-    lipi_parivartak(kANDa.name_devanagari, BASE_SCRIPT, loaded_viewing_script)
-  );
+  let kANDa_names: string[] = [];
+  $: browser &&
+    (kANDa_names = rAmAyaNa_map.map((kANDa) =>
+      lipi_parivartak(kANDa.name_devanagari, BASE_SCRIPT, loaded_viewing_script)
+    ));
   let sarga_names: string[] = [];
-  $: $kANDa_selected !== 0 &&
+  $: browser &&
+    $kANDa_selected !== 0 &&
     (sarga_names = rAmAyaNa_map[$kANDa_selected - 1].sarga_data.map((sarga) =>
       lipi_parivartak(sarga.name_devanagari.split('\n')[0], BASE_SCRIPT, loaded_viewing_script)
     ));
@@ -221,7 +224,7 @@
     <span class="font-bold">Select kANDa</span>
     <select bind:value={$kANDa_selected} class="select w-52" disabled={$editing_status_on}>
       <option value={0}>Select</option>
-      {#each kaNDa_names as kANDa_name, kANDa_index (kANDa_name)}
+      {#each kANDa_names as kANDa_name, kANDa_index (kANDa_name)}
         <option value={kANDa_index + 1}>{kANDa_index + 1}. {kANDa_name}</option>
       {/each}
     </select>

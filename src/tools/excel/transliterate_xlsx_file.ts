@@ -18,8 +18,13 @@ export const transliterate_xlxs_file = async (
   text_col_index: number = 2,
   text_row_start_index: number = 2,
   base_lang_code: string = 'Sanskrit',
-  base_folder_path_lipi_parivartak: string = './src'
+  base_folder_path_lipi_parivartak: string = null!
 ) => {
+  if (base_folder_path_lipi_parivartak) {
+    // setting custom import.meta.env.PROD to false
+    // @ts-ignore
+    import.meta.env = { PROD: false };
+  }
   const TOTAL_SHEETS = workbook.worksheets.length;
   for (let i_worksheet = 0; i_worksheet < TOTAL_SHEETS; i_worksheet++) {
     if (sheets_to_process !== 'all' && !sheets_to_process.includes(i_worksheet + 1)) continue;
