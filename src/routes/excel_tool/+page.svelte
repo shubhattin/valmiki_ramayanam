@@ -12,7 +12,6 @@
   import { TiTick } from 'svelte-icons-pack/ti';
   import { BiSolidDownload } from 'svelte-icons-pack/bi';
   import { getModalStore } from '@skeletonlabs/skeleton';
-  import ExcelJS from 'exceljs';
   import type { Workbook } from 'exceljs';
   import { delay } from '@tools/delay';
   import { transliterate_xlxs_file } from '@tools/excel/transliterate_xlsx_file';
@@ -72,6 +71,7 @@
   }
 
   async function start_transliteration() {
+    const ExcelJS = (await import('exceljs')).default;
     const get_workbook_obj_from_file = (file: File) => {
       return new Promise<Workbook>(async (resolve) => {
         const workbook = new ExcelJS.Workbook();

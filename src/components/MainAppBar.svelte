@@ -25,14 +25,14 @@
 <AppBar>
   <svelte:fragment slot="lead">
     <slot name="start" />
-    {#if page_url !== '/'}
+    <!-- {#if page_url !== '/'}
       <a class="mr-2 text-xl" href="/" title="श्रीरामायणम्">
         <Icon
           src={BiArrowBack}
           class="-mt-1 mr-1 text-2xl hover:fill-blue-600 dark:hover:fill-sky-500"
         />
       </a>
-    {/if}
+    {/if} -->
     <slot name="headline">
       <span class={$main_app_bar_info.className}>{$main_app_bar_info.title}</span>
     </slot>

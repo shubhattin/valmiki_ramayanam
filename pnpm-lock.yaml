@@ -102,6 +102,9 @@ importers:
       '@sveltejs/vite-plugin-svelte':
         specifier: ^3.0.0
         version: 3.1.1(svelte@4.2.18)(vite@5.4.2(@types/node@22.4.2)(sass@1.77.8))
+      '@types/cli-progress':
+        specifier: ^3.11.6
+        version: 3.11.6
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
@@ -986,6 +989,9 @@ packages:
 
   '@trpc/server@10.45.2':
     resolution: {integrity: sha512-wOrSThNNE4HUnuhJG6PfDRp4L2009KDVxsd+2VYH8ro6o/7/jwYZ8Uu5j+VaW+mOmc8EHerHzGcdbGNQSAUPgg==}
+
+  '@types/cli-progress@3.11.6':
+    resolution: {integrity: sha512-cE3+jb9WRlu+uOSAugewNpITJDt1VF8dHOopPO4IABFc3SXYL5WE/+PTz/FCdZRRfIujiWW3n3aMbv1eIGVRWA==}
 
   '@types/cookie@0.6.0':
     resolution: {integrity: sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA==}
@@ -3214,6 +3220,10 @@ snapshots:
       '@trpc/server': 10.45.2
 
   '@trpc/server@10.45.2': {}
+
+  '@types/cli-progress@3.11.6':
+    dependencies:
+      '@types/node': 22.4.2
 
   '@types/cookie@0.6.0': {}
 
