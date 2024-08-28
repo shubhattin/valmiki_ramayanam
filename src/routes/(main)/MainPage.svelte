@@ -150,11 +150,11 @@
     sarga_loading = false;
     sarga_data = data;
     if (browser) {
-      console.log('changing_route', [
-        $kANDa_selected,
-        $sarga_selected,
-        get_ramayanam_page_link($kANDa_selected, $sarga_selected)
-      ]);
+      // console.log('changing_route', [
+      //   $kANDa_selected,
+      //   $sarga_selected,
+      //   get_ramayanam_page_link($kANDa_selected, $sarga_selected)
+      // ]);
       goto(get_ramayanam_page_link($kANDa_selected, $sarga_selected));
     }
   });
@@ -162,9 +162,11 @@
     $sarga_selected = 0;
     loaded_en_trans_data = false;
     loaded_lang_trans_data = false;
-    if (browser && $kANDa_selected !== 0 && $sarga_selected === 0) {
-      console.log('changing kanada route', $kANDa_selected);
-      goto(get_ramayanam_page_link($kANDa_selected));
+    if (browser) {
+      if ($kANDa_selected !== 0 && $sarga_selected === 0)
+        // console.log('changing kanada route', $kANDa_selected);
+        goto(get_ramayanam_page_link($kANDa_selected));
+      else if ($kANDa_selected == 0 && $sarga_selected == 0) goto('/');
     }
   });
 
