@@ -140,7 +140,7 @@
   )}
 >
   {#if !sarga_loading}
-    <div transition:fade={{ duration: 250 }} class="space-y-2">
+    <div transition:fade={{ duration: 250 }} class="space-y-[0.2rem]">
       {#each transliterated_sarga_data as shloka_lines, i (i)}
         {@const line_split = shloka_lines.split('\n')}
         <!-- with 0 and -1 index -->
@@ -148,7 +148,7 @@
         <div class="rounded-lg px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-800">
           {#if i !== 0 && i !== sarga_data.length - 1}
             <span
-              class="inline-block select-none align-top text-xs text-gray-500 dark:text-gray-300"
+              class="inline-block select-none align-top text-[0.75rem] leading-[1.5rem] text-gray-500 dark:text-gray-300"
               >{i}</span
             >
           {/if}
