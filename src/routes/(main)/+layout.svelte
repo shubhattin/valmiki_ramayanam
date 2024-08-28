@@ -135,6 +135,7 @@
     })();
 
   const sarga_unsub = sarga_selected.subscribe(async () => {
+    if (!browser) return;
     if ($kANDa_selected === 0 || $sarga_selected === 0) return;
     sarga_loading = true;
     sarga_data = [];
@@ -145,12 +146,13 @@
     await delay(400);
     sarga_loading = false;
     sarga_data = data;
-    browser && goto(get_ramayanam_page_link($kANDa_selected, $sarga_selected));
+    // browser && goto(get_ramayanam_page_link($kANDa_selected, $sarga_selected));
   });
   const kANDa_selected_unsub = kANDa_selected.subscribe(() => {
-    if (browser)
-      if ($kANDa_selected === 0) goto('/');
-      else goto(get_ramayanam_page_link($kANDa_selected, null));
+    if (!browser) return;
+    // if (browser)
+    //   if ($kANDa_selected === 0) goto('/');
+    //   else goto(get_ramayanam_page_link($kANDa_selected, null));
     $sarga_selected = 0;
     loaded_en_trans_data = false;
   });
