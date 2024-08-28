@@ -137,18 +137,9 @@
       loaded_lang_trans_data = true;
     })();
 
-  $: browser &&
-    $kANDa_selected !== 0 &&
-    $sarga_selected === 0 &&
-    (() => {
-      goto(get_ramayanam_page_link($kANDa_selected));
-    })();
   const sarga_unsub = sarga_selected.subscribe(async () => {
     if ($kANDa_selected === 0 || $sarga_selected === 0) return;
     if (!browser) return;
-    if (browser) {
-      goto(get_ramayanam_page_link($kANDa_selected, $sarga_selected));
-    }
     sarga_loading = true;
     sarga_data = [];
     const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
@@ -158,11 +149,23 @@
     await delay(400);
     sarga_loading = false;
     sarga_data = data;
+    if (browser) {
+      console.log('changing_route', [
+        $kANDa_selected,
+        $sarga_selected,
+        get_ramayanam_page_link($kANDa_selected, $sarga_selected)
+      ]);
+      goto(get_ramayanam_page_link($kANDa_selected, $sarga_selected));
+    }
   });
   const kANDa_selected_unsub = kANDa_selected.subscribe(() => {
     $sarga_selected = 0;
     loaded_en_trans_data = false;
     loaded_lang_trans_data = false;
+    if (browser && $kANDa_selected !== 0 && $sarga_selected === 0) {
+      console.log('changing kanada route', $kANDa_selected);
+      goto(get_ramayanam_page_link($kANDa_selected));
+    }
   });
 
   const load_english_translation = async (kANDa_num: number, sarga_number: number) => {
