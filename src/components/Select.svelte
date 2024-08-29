@@ -1,13 +1,15 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { createEventDispatcher } from 'svelte';
+  import { z } from 'zod';
 
-  export let value: string;
+  export let zodType: any = z.string();
+  export let value: any;
   let className: string = undefined!;
   export let disabled = false;
   export { className as class };
   export let options: {
-    value: string;
+    value: any;
     text: string;
     className?: string | undefined;
   }[];
@@ -15,7 +17,7 @@
 
   const dispatch = createEventDispatcher<{
     change: {
-      value: string;
+      value: any;
       currentTarget: HTMLSelectElement;
     };
   }>();
@@ -36,7 +38,7 @@
   ) => {
     const { currentTarget } = e;
     if (resize) width = resize_select(currentTarget);
-    value = currentTarget.value;
+    value = zodType.parse(currentTarget.value);
     dispatch('change', { value, currentTarget });
   };
 
@@ -63,7 +65,6 @@
 
 <select
   bind:this={elm}
-  bind:value
   {disabled}
   on:change={on_change}
   class={className}
