@@ -23,5 +23,11 @@ export const load: PageServerLoad = async ({ params }) => {
         message: `Sarga '${sarga}' not found in Kanda ${kANDa}`
       });
     }
+    const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
+    const sarga_data = ((await all_sargas[`/data/ramayan/data/${kANDa}/${sarga}.json`]()) as any)
+      .default as string[];
+    return {
+      sarga_data
+    };
   }
 };
