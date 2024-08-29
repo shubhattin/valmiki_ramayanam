@@ -163,8 +163,8 @@
     loaded_en_trans_data = false;
     loaded_lang_trans_data = false;
     if (browser) {
+      // console.log('changing kanada route', $kANDa_selected);
       if ($kANDa_selected !== 0 && $sarga_selected === 0)
-        // console.log('changing kanada route', $kANDa_selected);
         goto(get_ramayanam_page_link($kANDa_selected));
       else if ($kANDa_selected == 0 && $sarga_selected == 0) goto('/');
     }
