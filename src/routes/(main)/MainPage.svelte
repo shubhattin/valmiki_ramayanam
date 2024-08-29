@@ -43,12 +43,15 @@
   let editing_status_on = writable(false);
   let loaded_user_allowed_langs = false; // info related to assigned editable langs
 
-  let kANDa_names: string[] = [];
+  let kANDa_names: string[] = rAmAyaNa_map.map((kANDa) => kANDa.name_devanagari);
   $: browser &&
     (kANDa_names = rAmAyaNa_map.map((kANDa) =>
       lipi_parivartak(kANDa.name_devanagari, BASE_SCRIPT, loaded_viewing_script)
     ));
-  let sarga_names: string[] = [];
+  let sarga_names: string[] =
+    $kANDa_selected !== 0
+      ? rAmAyaNa_map[$kANDa_selected - 1].sarga_data.map((sarga) => sarga.name_devanagari)
+      : [];
   $: browser &&
     $kANDa_selected !== 0 &&
     (sarga_names = rAmAyaNa_map[$kANDa_selected - 1].sarga_data.map((sarga) =>

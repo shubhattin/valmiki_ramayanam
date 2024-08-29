@@ -4,6 +4,7 @@
 
   export let value: string;
   let className: string = undefined!;
+  export let disabled = false;
   export { className as class };
   export let options: {
     value: string;
@@ -63,6 +64,7 @@
 <select
   bind:this={elm}
   bind:value
+  {disabled}
   on:change={on_change}
   class={className}
   style:width={resize && mounted ? `${width}px` : null}
