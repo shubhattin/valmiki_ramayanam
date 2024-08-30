@@ -1,6 +1,6 @@
 <script lang="ts">
   import Icon from '@tools/Icon.svelte';
-  import { client } from '@api/client';
+  import { client_raw } from '@api/client';
   import { getModalStore, popup } from '@skeletonlabs/skeleton';
   import { get_id_token_info } from '@tools/auth_tools';
   import { RiSystemAddLargeFill, RiSystemCloseLargeLine } from 'svelte-icons-pack/ri';
@@ -15,7 +15,7 @@
   const modal_store = getModalStore();
 
   const currrent_user_info = $user_info!;
-  let users_info: Awaited<ReturnType<typeof client.user_info.get_all_users_info.query>> | null;
+  let users_info: Awaited<ReturnType<typeof client_raw.user_info.get_all_users_info.query>> | null;
   let admin_users_index: number[] = [];
   let normal_users_index: number[] = [];
   let unverified_normal_users_index: number[] = [];
@@ -32,7 +32,7 @@
     unverified_normal_users_index = [];
     selected_langs_index = [];
     await delay(600);
-    const info = await client.user_info.get_all_users_info.query();
+    const info = await client_raw.user_info.get_all_users_info.query();
     users_info = info;
 
     for (let i = 0; i < users_info.length; i++) {
@@ -55,7 +55,7 @@
       response(r: boolean) {
         if (!r) return;
         (async () => {
-          await client.auth.verify_unverified_user.mutate({ id: id });
+          await client_raw.auth.verify_unverified_user.mutate({ id: id });
           await fetch_user_info();
         })();
       }
@@ -68,14 +68,14 @@
       response(r: boolean) {
         if (!r) return;
         (async () => {
-          await client.auth.delete_unverified_user.mutate({ id: id });
+          await client_raw.auth.delete_unverified_user.mutate({ id: id });
           await fetch_user_info();
         })();
       }
     });
   };
   const add_allowed_langs = async (id: number, langs: string[]) => {
-    await client.auth.add_user_allowed_langs.mutate({ id: id, langs: langs });
+    await client_raw.auth.add_user_allowed_langs.mutate({ id: id, langs: langs });
     await fetch_user_info();
   };
 </script>

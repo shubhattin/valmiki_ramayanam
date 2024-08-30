@@ -3,7 +3,7 @@
   import { cl_join } from '@tools/cl_join';
   import { LuUserPlus } from 'svelte-icons-pack/lu';
   import Icon from '@tools/Icon.svelte';
-  import { client } from '@api/client';
+  import { client_raw } from '@api/client';
   import { delay } from '@tools/delay';
   import { z } from 'zod';
   export let on_verify: () => void = null!;
@@ -30,7 +30,7 @@
     )
       return;
     creating_new_user_status = true;
-    const res = await client.auth.add_new_user.mutate({
+    const res = await client_raw.auth.add_new_user.mutate({
       email: email,
       password: password,
       username: username,

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { client } from '@api/client';
+  import { client_raw } from '@api/client';
   import { storeAuthInfo } from '@tools/auth_tools';
   import { writable } from 'svelte/store';
   import type { Writable } from 'svelte/store';
@@ -24,7 +24,7 @@
   const check_pass = async () => {
     if (password === '') return;
     is_logging_in_status = true;
-    const res = await client.auth.verify_pass.query({
+    const res = await client_raw.auth.verify_pass.query({
       username_or_email: username_or_email,
       password: password
     });

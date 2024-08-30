@@ -7,20 +7,32 @@
   import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
   import PartyTown from '@components/tags/PartyTown.svelte';
   import GA from '@components/tags/GA.svelte';
+  import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
+  import { browser } from '$app/environment';
 
   initializeStores();
   storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
+
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        enabled: browser
+      }
+    }
+  });
 </script>
 
 <svelte:head>
   <meta property="og:type" content="app" />
 </svelte:head>
 
-<ModeWatcher />
-<Modal />
-<div class="contaiiner mx-auto mb-1 max-w-screen-lg">
-  <MainAppBar />
-  <slot />
-</div>
+<QueryClientProvider client={queryClient}>
+  <ModeWatcher />
+  <Modal />
+  <div class="contaiiner mx-auto mb-1 max-w-screen-lg">
+    <MainAppBar />
+    <slot />
+  </div>
+</QueryClientProvider>
 <PartyTown />
 <GA />

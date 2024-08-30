@@ -11,7 +11,7 @@
   import { BsClipboard2Check, BsKeyboard } from 'svelte-icons-pack/bs';
   import { cl_join } from '@tools/cl_join';
   import LipiLekhikA from '@tools/converter';
-  import { client } from '@api/client';
+  import { client_raw } from '@api/client';
   import { browser } from '$app/environment';
 
   const modal_store = getModalStore();
@@ -70,7 +70,7 @@
           const added_texts = added_indexes.map((index) => $trans_lang_data.get(index)!);
           const edited_texts = edited_indexes.map((index) => $trans_lang_data.get(index)!);
 
-          const res = await client.translations.edit_translation.mutate({
+          const res = await client_raw.translations.edit_translation.mutate({
             data: {
               add_data: added_texts,
               edit_data: edited_texts,

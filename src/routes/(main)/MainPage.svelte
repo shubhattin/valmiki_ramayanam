@@ -12,7 +12,7 @@
   import { browser } from '$app/environment';
   import { main_app_bar_info } from '@state/app_bar';
   import Display from './Display.svelte';
-  import { client } from '@api/client';
+  import { client_raw } from '@api/client';
   import { get_possibily_not_undefined } from '@tools/kry';
   import { BiEdit } from 'svelte-icons-pack/bi';
   import { scale, slide } from 'svelte/transition';
@@ -123,7 +123,7 @@
         return;
       }
       // fetching user info if allowed to edit languages
-      const data = (await client.user_info.get_user_allowed_langs.query()).allowed_langs;
+      const data = (await client_raw.user_info.get_user_allowed_langs.query()).allowed_langs;
       if (!data) user_allowed_langs = [];
       else user_allowed_langs = data;
       loaded_user_allowed_langs = true;
@@ -134,7 +134,7 @@
       if (!($kANDa_selected !== 0 && $sarga_selected !== 0)) return;
       loaded_lang_trans_data = false;
       $trans_lang_data = new Map();
-      const data = await client.translations.get_translations_per_sarga.query({
+      const data = await client_raw.translations.get_translations_per_sarga.query({
         lang: $loaded_trans_lang,
         kANDa_num: $kANDa_selected,
         sarga_num: $sarga_selected

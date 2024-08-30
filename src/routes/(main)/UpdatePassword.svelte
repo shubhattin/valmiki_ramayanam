@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { client } from '@api/client';
+  import { client_raw } from '@api/client';
 
   export let on_done: () => void = null!;
 
@@ -12,7 +12,7 @@
   const update_password = async () => {
     if (!current_password || !new_password) return;
     updating_password_status = true;
-    const res = await client.auth.update_password.mutate({
+    const res = await client_raw.auth.update_password.mutate({
       current_password: current_password,
       new_password: new_password
     });
