@@ -34,7 +34,7 @@
       </a>
     {/if} -->
     <slot name="headline">
-      <span class={$main_app_bar_info.className}>{$main_app_bar_info.title}</span>
+      <span class={$main_app_bar_info.className ?? ''}>{$main_app_bar_info.title ?? ''}</span>
     </slot>
   </svelte:fragment>
   <!-- <svelte:fragment slot="headline">
