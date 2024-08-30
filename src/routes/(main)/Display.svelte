@@ -105,7 +105,11 @@
       <Icon src={BsKeyboard} class="text-4xl" />
     </SlideToggle>
     {#if edit_language_typer_status}
-      <select bind:value={sanskrit_mode} class="select m-0 w-28 text-clip px-1 py-1 text-sm">
+      <select
+        transition:scale
+        bind:value={sanskrit_mode}
+        class="select m-0 w-28 text-clip px-1 py-1 text-sm"
+      >
         <option value={1}>rAm ➔ {sanskrit_mode_texts[0]}</option>
         <option value={0}>rAm ➔ {sanskrit_mode_texts[1]}</option>
       </select>

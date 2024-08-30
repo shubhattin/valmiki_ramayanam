@@ -19,6 +19,8 @@
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import { user_info } from '@state/user';
   import { goto } from '$app/navigation';
+  import Select from '@components/Select.svelte';
+  import { z } from 'zod';
 
   const BASE_SCRIPT = 'Sanskrit';
 
@@ -238,24 +240,38 @@
     </label>
     <User editing_status={$editing_status_on} {user_allowed_langs} />
   </div>
+  <!-- svelte-ignore a11y-label-has-associated-control -->
   <label class="space-x-4">
     <span class="font-bold">Select kANDa</span>
-    <select bind:value={$kANDa_selected} class="select w-52" disabled={$editing_status_on}>
-      <option value={0}>Select</option>
-      {#each kANDa_names as kANDa_name, kANDa_index (kANDa_name)}
-        <option value={kANDa_index + 1}>{kANDa_index + 1}. {kANDa_name}</option>
-      {/each}
-    </select>
+    <Select
+      class="select w-52"
+      zodType={z.coerce.number().int()}
+      bind:value={$kANDa_selected}
+      options={[{ value: 0, text: 'Select' }].concat(
+        kANDa_names.map((name, index) => ({
+          value: index + 1,
+          text: `${index + 1} ${name}`
+        }))
+      )}
+      disabled={$editing_status_on}
+    />
   </label>
   {#if $kANDa_selected !== 0}
+    <!-- svelte-ignore a11y-label-has-associated-control -->
     <label class="space-x-4">
       <span class="font-bold">Select Sarga</span>
-      <select bind:value={$sarga_selected} class="select w-52" disabled={$editing_status_on}>
-        <option value={0}>Select</option>
-        {#each sarga_names as sarga_name, sarga_index (sarga_index)}
-          <option value={sarga_index + 1}>{sarga_index + 1}. {sarga_name}</option>
-        {/each}
-      </select>
+      <Select
+        class="select w-52"
+        zodType={z.coerce.number().int()}
+        bind:value={$sarga_selected}
+        options={[{ value: 0, text: 'Select' }].concat(
+          sarga_names.map((name, index) => ({
+            value: index + 1,
+            text: `${index + 1} ${name}`
+          }))
+        )}
+        disabled={$editing_status_on}
+      />
     </label>
   {/if}
   {#if $kANDa_selected !== 0 && $sarga_selected !== 0}
