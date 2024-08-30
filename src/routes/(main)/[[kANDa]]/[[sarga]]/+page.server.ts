@@ -5,7 +5,7 @@ import rAmayaNa_map from '@data/ramayan/ramayan_map.json';
 
 export const load: PageServerLoad = async ({ params }) => {
   const params_schema = z.object({
-    kANDa: z.coerce.number().int().min(1).max(rAmayaNa_map.length),
+    kANDa: z.coerce.number().int().min(1).max(rAmayaNa_map.length).optional(),
     sarga: z.coerce.number().int().optional()
   });
   const params_data = params_schema.safeParse(params);
@@ -16,7 +16,7 @@ export const load: PageServerLoad = async ({ params }) => {
     });
   }
   const { kANDa, sarga } = params_data.data;
-  if (sarga) {
+  if (kANDa && sarga) {
     const sarga_count = rAmayaNa_map[kANDa - 1].sarga_count;
     if (!(sarga >= 1 && sarga <= sarga_count)) {
       error(404, {

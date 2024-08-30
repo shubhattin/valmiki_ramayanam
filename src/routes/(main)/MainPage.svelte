@@ -7,7 +7,6 @@
   import { LANG_LIST, SCRIPT_LIST } from '@tools/lang_list';
   import { load_parivartak_lang_data, lipi_parivartak } from '@tools/converter';
   import { LanguageIcon } from '@components/icons';
-  // import MetaTags from '@components/tags/MetaTags.svelte';
   import User from './User.svelte';
   import { ensure_auth_access_status, get_id_token_info } from '@tools/auth_tools';
   import { browser } from '$app/environment';
@@ -19,7 +18,6 @@
   import { scale, slide } from 'svelte/transition';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import { user_info } from '@state/user';
-  import { get_ramayanam_page_link, kANDa_selected, sarga_selected } from '@state/ramayanam_page';
   import { goto } from '$app/navigation';
 
   const BASE_SCRIPT = 'Sanskrit';
@@ -43,6 +41,12 @@
   let editing_status_on = writable(false);
   let loaded_user_allowed_langs = false; // info related to assigned editable langs
 
+  export let kANDa_selected = writable(0);
+  export let sarga_selected = writable(0);
+  const get_ramayanam_page_link = (kANDa: number, sarga: number | null = null) => {
+    return `/${kANDa}${sarga ? `/${sarga}` : ''}`;
+  };
+
   let kANDa_names: string[] = rAmAyaNa_map.map((kANDa) => kANDa.name_devanagari);
   $: browser &&
     (kANDa_names = rAmAyaNa_map.map((kANDa) =>
@@ -58,6 +62,7 @@
       lipi_parivartak(sarga.name_devanagari.split('\n')[0], BASE_SCRIPT, loaded_viewing_script)
     ));
 
+  let mounted = false;
   onMount(async () => {
     if (browser) await ensure_auth_access_status();
     try {
@@ -71,7 +76,6 @@
       // viewing_script = 'Telugu';
       // editing_status_on.set(true);
     }
-    load_parivartak_lang_data(BASE_SCRIPT);
     if (browser && import.meta.env.PROD) {
       window.addEventListener('beforeunload', function (e) {
         if ($editing_status_on) {
@@ -80,6 +84,8 @@
         }
       });
     }
+    await load_parivartak_lang_data(BASE_SCRIPT);
+    mounted = true;
   });
 
   $: (async () => {
@@ -152,24 +158,23 @@
     await delay(400);
     sarga_loading = false;
     sarga_data = data;
-    if (browser) {
-      // console.log('changing_route', [
-      //   $kANDa_selected,
-      //   $sarga_selected,
-      //   get_ramayanam_page_link($kANDa_selected, $sarga_selected)
-      // ]);
+    if (browser && mounted) {
+      // console.log([$kANDa_selected, $sarga_selected]);
       goto(get_ramayanam_page_link($kANDa_selected, $sarga_selected));
     }
   });
   const kANDa_selected_unsub = kANDa_selected.subscribe(() => {
-    $sarga_selected = 0;
+    browser && mounted && ($sarga_selected = 0);
     loaded_en_trans_data = false;
     loaded_lang_trans_data = false;
-    if (browser) {
-      // console.log('changing kanada route', $kANDa_selected);
-      if ($kANDa_selected !== 0 && $sarga_selected === 0)
+    if (browser && mounted) {
+      if ($kANDa_selected !== 0 && $sarga_selected === 0) {
+        // console.log('kanda page', [$kANDa_selected, $sarga_selected]);
         goto(get_ramayanam_page_link($kANDa_selected));
-      else if ($kANDa_selected == 0 && $sarga_selected == 0) goto('/');
+      } else if (mounted && $kANDa_selected == 0 && $sarga_selected == 0) {
+        // console.log('home');
+        goto('/');
+      }
     }
   });
 
