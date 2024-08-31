@@ -3,7 +3,7 @@
   import rAmAyaNa_map from '@data/ramayan/ramayan_map.json';
   import { onDestroy, onMount } from 'svelte';
   import { delay } from '@tools/delay';
-  import { writable } from 'svelte/store';
+  import { writable, type Writable, type Unsubscriber } from 'svelte/store';
   import { LANG_LIST, SCRIPT_LIST } from '@tools/lang_list';
   import { load_parivartak_lang_data, lipi_parivartak } from '@tools/converter';
   import { LanguageIcon } from '@components/icons';
@@ -24,16 +24,20 @@
 
   const BASE_SCRIPT = 'Sanskrit';
 
+  const unsubscribers: Unsubscriber[] = [];
+
+  export let kANDa_selected: Writable<number>;
+  export let sarga_selected: Writable<number>;
+
   let sarga_loading = false;
   let viewing_script = BASE_SCRIPT;
+
   let loaded_viewing_script: string = viewing_script;
 
   let trans_lang = writable('--');
   let loaded_trans_lang = writable('--');
 
   let sarga_data: string[] = [];
-  let trans_en_data: Map<number, string> = new Map();
-  let loaded_en_trans_data = false;
   let view_translation_status = false;
 
   let loaded_lang_trans_data = false;
@@ -43,8 +47,6 @@
   let editing_status_on = writable(false);
   let loaded_user_allowed_langs = false; // info related to assigned editable langs
 
-  export let kANDa_selected = writable(0);
-  export let sarga_selected = writable(0);
   const get_ramayanam_page_link = (kANDa: number, sarga: number | null = null) => {
     return `/${kANDa}${sarga ? `/${sarga}` : ''}`;
   };
@@ -105,15 +107,6 @@
       else if ($loaded_trans_lang === 'Tamil') script = 'Tamil-Extended';
       viewing_script = script;
     })();
-  $: view_translation_status &&
-    browser &&
-    (async () => {
-      loaded_en_trans_data = false;
-      trans_en_data = new Map();
-      const en_trans_data = await load_english_translation($kANDa_selected, $sarga_selected);
-      trans_en_data = en_trans_data;
-      loaded_en_trans_data = true;
-    })();
   $: browser &&
     $user_info &&
     (async () => {
@@ -148,70 +141,42 @@
       loaded_lang_trans_data = true;
     })();
 
-  const sarga_unsub = sarga_selected.subscribe(async () => {
-    if ($kANDa_selected === 0 || $sarga_selected === 0) return;
-    if (!browser) return;
-    sarga_loading = true;
-    sarga_data = [];
-    const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
-    const data = (
-      (await all_sargas[`/data/ramayan/data/${$kANDa_selected}/${$sarga_selected}.json`]()) as any
-    ).default as string[];
-    await delay(400);
-    sarga_loading = false;
-    sarga_data = data;
-    if (browser && mounted) {
-      // console.log([$kANDa_selected, $sarga_selected]);
-      goto(get_ramayanam_page_link($kANDa_selected, $sarga_selected));
-    }
-  });
-  const kANDa_selected_unsub = kANDa_selected.subscribe(() => {
-    browser && mounted && ($sarga_selected = 0);
-    loaded_en_trans_data = false;
-    loaded_lang_trans_data = false;
-    if (browser && mounted) {
-      if ($kANDa_selected !== 0 && $sarga_selected === 0) {
-        // console.log('kanda page', [$kANDa_selected, $sarga_selected]);
-        goto(get_ramayanam_page_link($kANDa_selected));
-      } else if (mounted && $kANDa_selected == 0 && $sarga_selected == 0) {
-        // console.log('home');
-        goto('/');
+  unsubscribers.push(
+    sarga_selected.subscribe(async () => {
+      if ($kANDa_selected === 0 || $sarga_selected === 0) return;
+      if (!browser) return;
+      sarga_loading = true;
+      sarga_data = [];
+      const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
+      const data = (
+        (await all_sargas[`/data/ramayan/data/${$kANDa_selected}/${$sarga_selected}.json`]()) as any
+      ).default as string[];
+      await delay(350);
+      sarga_loading = false;
+      sarga_data = data;
+      if (browser && mounted) {
+        // console.log([$kANDa_selected, $sarga_selected]);
+        goto(get_ramayanam_page_link($kANDa_selected, $sarga_selected));
       }
-    }
-  });
-
-  const load_english_translation = async (kANDa_num: number, sarga_number: number) => {
-    let data: Record<number, string> = {};
-    const data_map = new Map<number, string>();
-    if (import.meta.env.DEV) {
-      const yaml = (await import('js-yaml')).default;
-      const glob_yaml = import.meta.glob('/data/ramayan/trans_en/*/*.yaml', {
-        query: '?raw'
-      });
-      if (!(`/data/ramayan/trans_en/${kANDa_num}/${sarga_number}.yaml` in glob_yaml))
-        return data_map;
-      const text = (
-        (await glob_yaml[`/data/ramayan/trans_en/${kANDa_num}/${sarga_number}.yaml`]()) as any
-      ).default as string;
-      data = yaml.load(text) as Record<number, string>;
-    } else {
-      const glob_json = import.meta.glob('/data/ramayan/trans_en/json/*/*.json');
-      if (!(`/data/ramayan/trans_en/json/${kANDa_num}/${sarga_number}.json` in glob_json))
-        return data_map;
-      data = (
-        (await glob_json[`/data/ramayan/trans_en/json/${kANDa_num}/${sarga_number}.json`]()) as any
-      ).default as Record<number, string>;
-    }
-
-    for (const [key, value] of Object.entries(data)) {
-      data_map.set(Number(key), value.replaceAll(/\n$/g, '')); // replace the ending newline
-    }
-    return data_map;
-  };
-
+    })
+  );
+  unsubscribers.push(
+    kANDa_selected.subscribe(() => {
+      browser && mounted && ($sarga_selected = 0);
+      loaded_lang_trans_data = false;
+      if (browser && mounted) {
+        if ($kANDa_selected !== 0 && $sarga_selected === 0) {
+          // console.log('kanda page', [$kANDa_selected, $sarga_selected]);
+          goto(get_ramayanam_page_link($kANDa_selected));
+        } else if (mounted && $kANDa_selected == 0 && $sarga_selected == 0) {
+          // console.log('home');
+          goto('/');
+        }
+      }
+    })
+  );
   onDestroy(() => {
-    kANDa_selected_unsub();
-    sarga_unsub();
+    unsubscribers.forEach((unsub) => unsub());
   });
 
   const PAGE_INFO = {
@@ -338,17 +303,16 @@
     <Display
       {...{
         BASE_SCRIPT,
-        loaded_en_trans_data,
         loaded_viewing_script,
         sarga_data,
-        trans_en_data,
         editing_status_on,
         trans_lang_data,
         loaded_lang_trans_data,
         sarga_loading,
         sarga_selected,
         kANDa_selected,
-        loaded_trans_lang
+        loaded_trans_lang,
+        view_translation_status
       }}
     />
   {/if}

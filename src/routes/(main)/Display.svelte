@@ -13,14 +13,15 @@
   import LipiLekhikA from '@tools/converter';
   import { client_raw } from '@api/client';
   import { browser } from '$app/environment';
+  import { createQuery } from '@tanstack/svelte-query';
+  import { delay } from '@tools/delay';
 
   const modal_store = getModalStore();
 
   export let sarga_data: string[];
   export let loaded_viewing_script: string;
   export let BASE_SCRIPT: string;
-  export let loaded_en_trans_data: boolean;
-  export let trans_en_data: Map<number, string>;
+  export let view_translation_status: boolean;
   export let loaded_lang_trans_data: boolean;
   export let editing_status_on: Writable<boolean>;
   export let trans_lang_data: Writable<Map<number, string>>;
@@ -28,6 +29,14 @@
   export let sarga_selected: Writable<number>;
   export let kANDa_selected: Writable<number>;
   export let loaded_trans_lang: Writable<string>;
+
+  $: trans_en_data = createQuery({
+    queryKey: ['sarga', 'trans', 'en', $kANDa_selected, $sarga_selected],
+    // by also adding the kanda and sarga they are auto invalidated
+    // so we dont have to manually invalidate it if were only sarga,trans,en
+    queryFn: () => load_english_translation($kANDa_selected, $sarga_selected),
+    enabled: browser && view_translation_status
+  });
 
   let edit_language_typer_status = true;
   let enable_copy_to_clipbaord = true;
@@ -43,6 +52,37 @@
   );
   let sanskrit_mode_texts: string[];
   let sanskrit_mode: number;
+
+  const load_english_translation = async (kANDa_num: number, sarga_number: number) => {
+    await delay(250);
+    let data: Record<number, string> = {};
+    const data_map = new Map<number, string>();
+    if (import.meta.env.DEV) {
+      const yaml = (await import('js-yaml')).default;
+      const glob_yaml = import.meta.glob('/data/ramayan/trans_en/*/*.yaml', {
+        query: '?raw'
+      });
+      if (!(`/data/ramayan/trans_en/${kANDa_num}/${sarga_number}.yaml` in glob_yaml))
+        return data_map;
+      const text = (
+        (await glob_yaml[`/data/ramayan/trans_en/${kANDa_num}/${sarga_number}.yaml`]()) as any
+      ).default as string;
+      data = yaml.load(text) as Record<number, string>;
+    } else {
+      const glob_json = import.meta.glob('/data/ramayan/trans_en/json/*/*.json');
+      if (!(`/data/ramayan/trans_en/json/${kANDa_num}/${sarga_number}.json` in glob_json))
+        return data_map;
+      data = (
+        (await glob_json[`/data/ramayan/trans_en/json/${kANDa_num}/${sarga_number}.json`]()) as any
+      ).default as Record<number, string>;
+    }
+
+    for (const [key, value] of Object.entries(data)) {
+      data_map.set(Number(key), value.replaceAll(/\n$/g, '')); // replace the ending newline
+    }
+    return data_map;
+  };
+
   $: browser &&
     $loaded_trans_lang !== '--' &&
     (async () => {
@@ -138,7 +178,7 @@
 <div
   class={cl_join(
     'h-[85vh] overflow-scroll rounded-xl border-2 border-gray-400 p-0 dark:border-gray-600',
-    loaded_en_trans_data && 'h-[90vh]',
+    $trans_en_data.isSuccess && 'h-[90vh]',
     loaded_lang_trans_data && 'h-[95vh]',
     $editing_status_on && 'h-[100vh]'
   )}
@@ -169,21 +209,21 @@
                 <div>{line_shlk}</div>
               {/each}
             </div>
-            {#if loaded_en_trans_data}
+            {#if $trans_en_data.isSuccess && $trans_en_data.data.size !== 0}
               <!-- svelte-ignore a11y-no-static-element-interactions -->
               <div
                 on:dblclick={() => {
                   if (!enable_copy_to_clipbaord) return;
                   copy_text_to_clipboard(
-                    get_possibily_not_undefined(trans_en_data.get(trans_index))
+                    get_possibily_not_undefined($trans_en_data.data.get(trans_index))
                   );
                   copied_text_status = true;
                 }}
                 class="text-stone-500 dark:text-slate-400"
               >
-                {#if trans_en_data.has(trans_index)}
+                {#if $trans_en_data.data.has(trans_index)}
                   <!-- Usually translations are single but still... -->
-                  {#each get_possibily_not_undefined(trans_en_data.get(trans_index)).split('\n') as line_trans}
+                  {#each get_possibily_not_undefined($trans_en_data.data.get(trans_index)).split('\n') as line_trans}
                     <div>{line_trans}</div>
                   {/each}
                 {/if}
@@ -230,7 +270,7 @@
                   ></textarea>
                 {/if}
               </div>
-            {:else if loaded_lang_trans_data}
+            {:else if loaded_lang_trans_data && $trans_lang_data.size !== 0}
               <!-- svelte-ignore a11y-no-static-element-interactions -->
               <div
                 on:dblclick={() => {

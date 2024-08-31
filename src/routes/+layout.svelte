@@ -17,7 +17,8 @@
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        enabled: browser
+        enabled: browser,
+        staleTime: 1000 * 60 * 5 // by default data will stay fresh for 5 minutes
       }
     }
   });
