@@ -9,6 +9,7 @@
   import GA from '@components/tags/GA.svelte';
   import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
   import { browser } from '$app/environment';
+  import { SvelteQueryDevtools } from '@tanstack/svelte-query-devtools';
 
   initializeStores();
   storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
@@ -33,6 +34,7 @@
     <TopAppBar />
     <slot />
   </div>
+  <SvelteQueryDevtools initialIsOpen={false} />
 </QueryClientProvider>
 <PartyTown />
 <GA />
