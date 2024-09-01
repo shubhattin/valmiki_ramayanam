@@ -74,6 +74,7 @@
       <div class="space-x-4">
         {#if $user_info.user_type === 'admin'}
           <button
+            disabled={editing_status}
             on:click={() => ($manage_user_modal_status = true)}
             class="btn space-x-2 rounded-md bg-primary-800 pb-1 pl-1 pr-2 pt-1 font-bold text-white"
           >

@@ -40,9 +40,7 @@
   let sarga_data: string[] = [];
   let view_translation_status = false;
 
-  let loaded_lang_trans_data = false;
   let user_allowed_langs: string[] = [];
-  let trans_lang_data = writable(new Map<number, string>());
 
   let editing_status_on = writable(false);
   let loaded_user_allowed_langs = false; // info related to assigned editable langs
@@ -73,8 +71,6 @@
       $user_info = get_id_token_info().user;
     } catch {}
     if (import.meta.env.DEV) {
-      // the options set here are for development purposes
-      // can be disabled or modified based on need
       // view_translation_status = true;
       // $trans_lang = 'Hindi';
       // viewing_script = 'Telugu';
@@ -121,25 +117,6 @@
       else user_allowed_langs = data;
       loaded_user_allowed_langs = true;
     })();
-  $: browser &&
-    $loaded_trans_lang !== '--' &&
-    (async () => {
-      if (!($kANDa_selected !== 0 && $sarga_selected !== 0)) return;
-      loaded_lang_trans_data = false;
-      $trans_lang_data = new Map();
-      const data = await client_raw.translations.get_translations_per_sarga.query({
-        lang: $loaded_trans_lang,
-        kANDa_num: $kANDa_selected,
-        sarga_num: $sarga_selected
-      });
-      const data_map = new Map<number, string>();
-      for (let val of data) {
-        // we dont need to manually care abouy 0 or -1, it will be handled while making changes
-        data_map.set(val.shloka_num, val.text);
-      }
-      $trans_lang_data = data_map;
-      loaded_lang_trans_data = true;
-    })();
 
   unsubscribers.push(
     sarga_selected.subscribe(async () => {
@@ -163,7 +140,6 @@
   unsubscribers.push(
     kANDa_selected.subscribe(() => {
       browser && mounted && ($sarga_selected = 0);
-      loaded_lang_trans_data = false;
       if (browser && mounted) {
         if ($kANDa_selected !== 0 && $sarga_selected === 0) {
           // console.log('kanda page', [$kANDa_selected, $sarga_selected]);
@@ -306,8 +282,6 @@
         loaded_viewing_script,
         sarga_data,
         editing_status_on,
-        trans_lang_data,
-        loaded_lang_trans_data,
         sarga_loading,
         sarga_selected,
         kANDa_selected,
