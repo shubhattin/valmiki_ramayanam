@@ -30,15 +30,30 @@
     ]
   };
 
-  export let sarga_data: string[];
   export let viewing_script: string;
   export let BASE_SCRIPT: string;
   export let view_translation_status: boolean;
   export let editing_status_on: Writable<boolean>;
-  export let sarga_loading: boolean;
   export let sarga_selected: Writable<number>;
   export let kANDa_selected: Writable<number>;
   export let trans_lang: Writable<string>;
+
+  $: sarga_data = createQuery({
+    queryKey: ['sarga', 'main_dev_text', $kANDa_selected, $sarga_selected],
+    enabled: browser && $kANDa_selected !== 0 && $sarga_selected !== 0,
+    placeholderData: [],
+    queryFn: async () => {
+      const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
+      const data = (
+        (await all_sargas[`/data/ramayan/data/${$kANDa_selected}/${$sarga_selected}.json`]()) as any
+      ).default as string[];
+      await delay(350);
+      return data;
+    }
+  });
+  $: transliterated_sarga_data = $sarga_data.data!.map((shloka_lines) =>
+    lipi_parivartak(shloka_lines, BASE_SCRIPT, viewing_script)
+  );
 
   $: trans_en_data = createQuery({
     queryKey: QUERY_KEYS.trans_lang_data('English', $kANDa_selected, $sarga_selected),
@@ -89,11 +104,6 @@
   let added_translations_indexes: number[] = [];
   let edited_translations_indexes = new Set<number>();
 
-  let transliterated_sarga_data = sarga_data;
-
-  $: transliterated_sarga_data = sarga_data.map((shloka_lines) =>
-    lipi_parivartak(shloka_lines, BASE_SCRIPT, viewing_script)
-  );
   let sanskrit_mode_texts: string[];
   let sanskrit_mode: number;
 
@@ -277,14 +287,14 @@
     $editing_status_on && 'h-[100vh]'
   )}
 >
-  {#if !sarga_loading}
+  {#if !$sarga_data.isLoading}
     <div transition:fade={{ duration: 250 }} class="space-y-[0.2rem]">
       {#each transliterated_sarga_data as shloka_lines, i (i)}
         {@const line_split = shloka_lines.split('\n')}
         <!-- with 0 and -1 index -->
-        {@const trans_index = sarga_data.length - 1 === i ? -1 : i}
+        {@const trans_index = transliterated_sarga_data.length - 1 === i ? -1 : i}
         <div class="rounded-lg px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-800">
-          {#if i !== 0 && i !== sarga_data.length - 1}
+          {#if i !== 0 && i !== transliterated_sarga_data.length - 1}
             <span
               class="inline-block select-none align-top text-[0.75rem] leading-[1.5rem] text-gray-500 dark:text-gray-300"
               >{i}</span

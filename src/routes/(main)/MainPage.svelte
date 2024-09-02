@@ -30,8 +30,6 @@
   export let kANDa_selected: Writable<number>;
   export let sarga_selected: Writable<number>;
 
-  let sarga_loading = false;
-
   const params_viewing_script_mut_schema = z.object({
     script: z.string(),
     update_viewing_script_selection: z.boolean().default(true)
@@ -86,7 +84,6 @@
   );
   let trans_lang = writable($trans_lang_selection);
 
-  let sarga_data: string[] = [];
   let view_translation_status = false;
 
   let user_allowed_langs: string[] = [];
@@ -155,15 +152,6 @@
     sarga_selected.subscribe(async () => {
       if ($kANDa_selected === 0 || $sarga_selected === 0) return;
       if (!browser) return;
-      sarga_loading = true;
-      sarga_data = [];
-      const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
-      const data = (
-        (await all_sargas[`/data/ramayan/data/${$kANDa_selected}/${$sarga_selected}.json`]()) as any
-      ).default as string[];
-      await delay(350);
-      sarga_loading = false;
-      sarga_data = data;
       if (browser && mounted) {
         // console.log([$kANDa_selected, $sarga_selected]);
         goto(get_ramayanam_page_link($kANDa_selected, $sarga_selected));
@@ -307,9 +295,7 @@
       {...{
         BASE_SCRIPT,
         viewing_script,
-        sarga_data,
         editing_status_on,
-        sarga_loading,
         sarga_selected,
         kANDa_selected,
         trans_lang,
