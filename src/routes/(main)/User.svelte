@@ -5,9 +5,7 @@
   import { TrOutlineLogin2 } from 'svelte-icons-pack/tr';
   import { VscAccount } from 'svelte-icons-pack/vsc';
   import { LuSettings, LuUserPlus } from 'svelte-icons-pack/lu';
-  import { onMount } from 'svelte';
-  import { get_id_token_info, ID_TOKEN_INFO_SCHEMA } from '@tools/auth_tools';
-  import { z } from 'zod';
+  import { get_id_token_info } from '@tools/auth_tools';
   import { RiUserFacesAdminLine } from 'svelte-icons-pack/ri';
   import { BiLock, BiLogOut } from 'svelte-icons-pack/bi';
   import { deleteAuthCookies } from '@tools/auth_tools';

@@ -31,7 +31,7 @@
   };
 
   export let sarga_data: string[];
-  export let loaded_viewing_script: string;
+  export let viewing_script: string;
   export let BASE_SCRIPT: string;
   export let view_translation_status: boolean;
   export let editing_status_on: Writable<boolean>;
@@ -93,7 +93,7 @@
   let transliterated_sarga_data = sarga_data;
 
   $: transliterated_sarga_data = sarga_data.map((shloka_lines) =>
-    lipi_parivartak(shloka_lines, BASE_SCRIPT, loaded_viewing_script)
+    lipi_parivartak(shloka_lines, BASE_SCRIPT, viewing_script)
   );
   let sanskrit_mode_texts: string[];
   let sanskrit_mode: number;

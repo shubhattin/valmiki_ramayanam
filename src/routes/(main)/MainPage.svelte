@@ -10,7 +10,6 @@
   import User from './User.svelte';
   import { ensure_auth_access_status, get_id_token_info } from '@tools/auth_tools';
   import { browser } from '$app/environment';
-  import { main_app_bar_info } from '@state/app_bar';
   import Display from './Display.svelte';
   import { client_raw } from '@api/client';
   import { get_possibily_not_undefined } from '@tools/kry';
@@ -21,8 +20,10 @@
   import { goto } from '$app/navigation';
   import Select from '@components/Select.svelte';
   import { z } from 'zod';
+  import { createMutation } from '@tanstack/svelte-query';
 
   const BASE_SCRIPT = 'Sanskrit';
+  let mounted = false;
 
   const unsubscribers: Unsubscriber[] = [];
 
@@ -30,9 +31,33 @@
   export let sarga_selected: Writable<number>;
 
   let sarga_loading = false;
-  let viewing_script = BASE_SCRIPT;
 
-  let loaded_viewing_script: string = viewing_script;
+  const params_viewing_script_mut_schema = z.object({
+    script: z.string(),
+    update_viewing_script_selection: z.boolean().default(true)
+  });
+  let viewing_script_selection = writable(BASE_SCRIPT);
+  let viewing_script = BASE_SCRIPT;
+  let viewing_script_mut = createMutation({
+    mutationFn: async (params: z.infer<typeof params_viewing_script_mut_schema>) => {
+      const { script } = params_viewing_script_mut_schema.parse(params);
+      await load_parivartak_lang_data(script);
+      return script;
+    },
+    onSuccess(script, { update_viewing_script_selection }) {
+      viewing_script = script;
+      if (update_viewing_script_selection) $viewing_script_selection = script;
+    }
+  });
+  unsubscribers.push(
+    viewing_script_selection.subscribe(async (script) => {
+      await delay(500);
+      $viewing_script_mut.mutate({
+        script,
+        update_viewing_script_selection: false
+      });
+    })
+  );
 
   let trans_lang = writable('--');
   let loaded_trans_lang = writable('--');
@@ -52,7 +77,7 @@
   let kANDa_names: string[] = rAmAyaNa_map.map((kANDa) => kANDa.name_devanagari);
   $: browser &&
     (kANDa_names = rAmAyaNa_map.map((kANDa) =>
-      lipi_parivartak(kANDa.name_devanagari, BASE_SCRIPT, loaded_viewing_script)
+      lipi_parivartak(kANDa.name_devanagari, BASE_SCRIPT, viewing_script)
     ));
   let sarga_names: string[] =
     $kANDa_selected !== 0
@@ -61,10 +86,9 @@
   $: browser &&
     $kANDa_selected !== 0 &&
     (sarga_names = rAmAyaNa_map[$kANDa_selected - 1].sarga_data.map((sarga) =>
-      lipi_parivartak(sarga.name_devanagari.split('\n')[0], BASE_SCRIPT, loaded_viewing_script)
+      lipi_parivartak(sarga.name_devanagari.split('\n')[0], BASE_SCRIPT, viewing_script)
     ));
 
-  let mounted = false;
   onMount(async () => {
     if (browser) await ensure_auth_access_status();
     try {
@@ -88,21 +112,19 @@
     mounted = true;
   });
 
-  $: (async () => {
-    await load_parivartak_lang_data(viewing_script);
-    loaded_viewing_script = viewing_script;
-  })();
-  $: browser &&
-    $trans_lang !== '--' &&
-    (async () => {
+  unsubscribers.push(
+    trans_lang.subscribe(async () => {
+      if (!browser || $trans_lang === '--') return;
+      console.log('triggered ');
       // loading trnaslation lang data for typing support
       await load_parivartak_lang_data($trans_lang);
       $loaded_trans_lang = $trans_lang;
       let script = $loaded_trans_lang;
       if ($loaded_trans_lang === 'Hindi') script = 'Sanskrit';
       else if ($loaded_trans_lang === 'Tamil') script = 'Tamil-Extended';
-      viewing_script = script;
-    })();
+      $viewing_script_mut.mutate({ script, update_viewing_script_selection: true });
+    })
+  );
   $: browser &&
     $user_info &&
     (async () => {
@@ -154,26 +176,14 @@
   onDestroy(() => {
     unsubscribers.forEach((unsub) => unsub());
   });
-
-  const PAGE_INFO = {
-    title: 'श्रीमद्रामायणम्',
-    description: 'श्रीमद्रामायणस्य पठनम्'
-  };
-
-  main_app_bar_info.set({
-    className: 'text-2xl font-bold',
-    title: PAGE_INFO.title
-  });
 </script>
-
-<!-- <MetaTags title={PAGE_INFO.title} description={PAGE_INFO.description} /> -->
 
 <div class="mt-4 space-y-4">
   <div class="flex justify-between">
     <label class="space-x-4">
       Script
       <Icon src={LanguageIcon} class="text-4xl" />
-      <select class="select inline-block w-40" bind:value={viewing_script}>
+      <select class="select inline-block w-40" bind:value={$viewing_script_selection}>
         {#each SCRIPT_LIST as lang (lang)}
           <option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
         {/each}
@@ -279,7 +289,7 @@
     <Display
       {...{
         BASE_SCRIPT,
-        loaded_viewing_script,
+        viewing_script,
         sarga_data,
         editing_status_on,
         sarga_loading,
