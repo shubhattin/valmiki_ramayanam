@@ -38,7 +38,7 @@
   export let sarga_loading: boolean;
   export let sarga_selected: Writable<number>;
   export let kANDa_selected: Writable<number>;
-  export let loaded_trans_lang: Writable<string>;
+  export let trans_lang: Writable<string>;
 
   $: trans_en_data = createQuery({
     queryKey: QUERY_KEYS.trans_lang_data('English', $kANDa_selected, $sarga_selected),
@@ -49,14 +49,13 @@
   });
 
   $: trans_en_data_query_key = QUERY_KEYS.trans_lang_data(
-    $loaded_trans_lang,
+    $trans_lang,
     $kANDa_selected,
     $sarga_selected
   );
   $: trans_lang_data = createQuery({
     queryKey: trans_en_data_query_key,
-    enabled:
-      browser && $loaded_trans_lang !== '--' && $kANDa_selected !== 0 && $sarga_selected !== 0,
+    enabled: browser && $trans_lang !== '--' && $kANDa_selected !== 0 && $sarga_selected !== 0,
     ...($editing_status_on
       ? {
           staleTime: Infinity
@@ -65,7 +64,7 @@
       : {}),
     queryFn: async () => {
       const data = await client_raw.translations.get_translations_per_sarga.query({
-        lang: $loaded_trans_lang,
+        lang: $trans_lang,
         kANDa_num: $kANDa_selected,
         sarga_num: $sarga_selected
       });
@@ -129,12 +128,12 @@
   };
 
   $: browser &&
-    $loaded_trans_lang !== '--' &&
+    $trans_lang !== '--' &&
     (async () => {
       sanskrit_mode_texts = ['राम्', 'राम'].map((text) =>
-        lipi_parivartak(text, BASE_SCRIPT, $loaded_trans_lang)
+        lipi_parivartak(text, BASE_SCRIPT, $trans_lang)
       );
-      const lng = LipiLekhikA.k.normalize($loaded_trans_lang);
+      const lng = LipiLekhikA.k.normalize($trans_lang);
       sanskrit_mode = (LipiLekhikA.k.akSharAH as any)[lng].sa;
     })();
 
@@ -161,7 +160,7 @@
         },
         sarga_num: $sarga_selected,
         kANDa_num: $kANDa_selected,
-        lang: $loaded_trans_lang
+        lang: $trans_lang
       });
       if (res.success) {
         added_translations_indexes = [];
@@ -346,7 +345,7 @@
                           e.target,
                           // @ts-ignore
                           e.data,
-                          $loaded_trans_lang,
+                          $trans_lang,
                           true,
                           // @ts-ignore
                           (val) => {

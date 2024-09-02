@@ -41,6 +41,8 @@
   let viewing_script_mut = createMutation({
     mutationFn: async (params: z.infer<typeof params_viewing_script_mut_schema>) => {
       const { script } = params_viewing_script_mut_schema.parse(params);
+      if (!mounted) return script;
+      await delay(500);
       await load_parivartak_lang_data(script);
       return script;
     },
@@ -51,7 +53,6 @@
   });
   unsubscribers.push(
     viewing_script_selection.subscribe(async (script) => {
-      await delay(500);
       $viewing_script_mut.mutate({
         script,
         update_viewing_script_selection: false
@@ -59,8 +60,31 @@
     })
   );
 
-  let trans_lang = writable('--');
-  let loaded_trans_lang = writable('--');
+  let trans_lang_selection = writable('--');
+  const trans_lang_mut = createMutation({
+    mutationFn: async (lang: string) => {
+      if (!mounted || !browser || lang === '--') return lang;
+      // loading trnaslation lang data for typing support
+      await delay(300);
+      let script = lang;
+      if (lang === 'Hindi') script = 'Sanskrit';
+      else if (lang === 'Tamil') script = 'Tamil-Extended';
+      await Promise.all([
+        $viewing_script_mut.mutateAsync({ script, update_viewing_script_selection: true }),
+        load_parivartak_lang_data(lang)
+      ]);
+      return lang;
+    },
+    onSuccess(lang) {
+      $trans_lang = lang;
+    }
+  });
+  unsubscribers.push(
+    trans_lang_selection.subscribe(async (lang) => {
+      $trans_lang_mut.mutate(lang);
+    })
+  );
+  let trans_lang = writable($trans_lang_selection);
 
   let sarga_data: string[] = [];
   let view_translation_status = false;
@@ -112,19 +136,6 @@
     mounted = true;
   });
 
-  unsubscribers.push(
-    trans_lang.subscribe(async () => {
-      if (!browser || $trans_lang === '--') return;
-      console.log('triggered ');
-      // loading trnaslation lang data for typing support
-      await load_parivartak_lang_data($trans_lang);
-      $loaded_trans_lang = $trans_lang;
-      let script = $loaded_trans_lang;
-      if ($loaded_trans_lang === 'Hindi') script = 'Sanskrit';
-      else if ($loaded_trans_lang === 'Tamil') script = 'Tamil-Extended';
-      $viewing_script_mut.mutate({ script, update_viewing_script_selection: true });
-    })
-  );
   $: browser &&
     $user_info &&
     (async () => {
@@ -183,7 +194,11 @@
     <label class="space-x-4">
       Script
       <Icon src={LanguageIcon} class="text-4xl" />
-      <select class="select inline-block w-40" bind:value={$viewing_script_selection}>
+      <select
+        class="select inline-block w-40"
+        disabled={$viewing_script_mut.isPending}
+        bind:value={$viewing_script_selection}
+      >
         {#each SCRIPT_LIST as lang (lang)}
           <option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
         {/each}
@@ -265,9 +280,11 @@
           Translation
           <Icon src={LanguageIcon} class="text-2xl" />
           <select
-            disabled={$editing_status_on}
+            disabled={$editing_status_on ||
+              $trans_lang_mut.isPending ||
+              $viewing_script_mut.isPending}
             class="select inline-block w-32 px-2 py-1"
-            bind:value={$trans_lang}
+            bind:value={$trans_lang_selection}
           >
             <option value="--">-- Select --</option>
             {#each LANG_LIST as lang (lang)}
@@ -275,7 +292,7 @@
             {/each}
           </select>
         </label>
-        {#if !$editing_status_on && $loaded_trans_lang !== '--' && loaded_user_allowed_langs && (get_possibily_not_undefined($user_info).user_type === 'admin' || user_allowed_langs.indexOf($loaded_trans_lang) !== -1)}
+        {#if !$editing_status_on && $trans_lang !== '--' && loaded_user_allowed_langs && (get_possibily_not_undefined($user_info).user_type === 'admin' || user_allowed_langs.indexOf($trans_lang) !== -1)}
           <button
             on:click={() => ($editing_status_on = true)}
             class="btn my-1 rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white dark:bg-tertiary-600"
@@ -295,7 +312,7 @@
         sarga_loading,
         sarga_selected,
         kANDa_selected,
-        loaded_trans_lang,
+        trans_lang,
         view_translation_status
       }}
     />
