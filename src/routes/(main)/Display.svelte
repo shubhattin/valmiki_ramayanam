@@ -43,6 +43,7 @@
     enabled: browser && $kANDa_selected !== 0 && $sarga_selected !== 0,
     placeholderData: [],
     queryFn: async () => {
+      if (!browser) return [];
       const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
       const data = (
         (await all_sargas[`/data/ramayan/data/${$kANDa_selected}/${$sarga_selected}.json`]()) as any
