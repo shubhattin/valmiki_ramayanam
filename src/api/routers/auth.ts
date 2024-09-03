@@ -8,6 +8,7 @@ import { db } from '@db/db';
 import { user_verification_requests, users } from '@db/schema';
 import { eq } from 'drizzle-orm';
 import type { lang_list_type } from '@tools/lang_list';
+import { delay } from '@tools/delay';
 
 const user_info_schema = UsersSchemaZod.pick({
   user_id: true,
@@ -68,8 +69,9 @@ const verify_pass_router = publicProcedure
       })
     ])
   )
-  .query(async ({ input: { password, username_or_email } }) => {
+  .mutation(async ({ input: { password, username_or_email } }) => {
     let verified = false;
+    await delay(600);
 
     const user_info = await db.query.users.findFirst({
       where: ({ user_id, user_email }, { eq, or }) =>
@@ -150,6 +152,7 @@ const add_new_user_route = publicProcedure
   )
   .mutation(async ({ input: { username, password, email, name, contact_number } }) => {
     let success = false;
+    await delay(500);
     if (await db.query.users.findFirst({ where: ({ user_id }, { eq }) => eq(user_id, username) }))
       return { success, status_code: 'user_already_exist' };
     if (
@@ -196,6 +199,7 @@ const update_password_router = protectedProcedure
       },
       where: ({ id }, { eq }) => eq(id, user.id)
     }))!;
+    await delay(500);
     const verified = await puShTi(current_password, user_info.password_hash);
     if (!verified) return { success: false };
     const slt = gen_salt();

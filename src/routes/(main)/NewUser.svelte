@@ -3,8 +3,7 @@
   import { cl_join } from '@tools/cl_join';
   import { LuUserPlus } from 'svelte-icons-pack/lu';
   import Icon from '@tools/Icon.svelte';
-  import { client_raw } from '@api/client';
-  import { delay } from '@tools/delay';
+  import { client } from '@api/client';
   import { z } from 'zod';
   export let on_verify: () => void = null!;
   export let name_input_element: Writable<HTMLInputElement>;
@@ -17,43 +16,43 @@
   let email: string;
   let contact_number: string;
 
-  let creating_new_user_status = false;
   let user_already_exists = false;
   let email_already_exists = false;
 
   let user_created_status = false;
 
-  const create_new_user = async () => {
+  const create_new_user = client.auth.add_new_user.mutation({
+    onSuccess(res) {
+      user_already_exists = false;
+      email_already_exists = false;
+      if (!res.success) {
+        if (res.status_code === 'user_already_exist') {
+          username = '';
+          username_input_element.focus();
+          user_already_exists = true;
+        } else if (res.status_code === 'email_already_exist') {
+          email = '';
+          email_input_element.focus();
+          email_already_exists = true;
+        }
+      } else {
+        user_created_status = true;
+      }
+    }
+  });
+  const create_new_user_func = async () => {
     if (
       [username, name, password, email].some((v) => !v || v === '') ||
       !z.string().email().safeParse(email).success
     )
       return;
-    creating_new_user_status = true;
-    const res = await client_raw.auth.add_new_user.mutate({
+    $create_new_user.mutate({
       email: email,
       password: password,
       username: username,
       name: name,
       contact_number: contact_number
     });
-    await delay(500);
-    creating_new_user_status = false;
-    user_already_exists = false;
-    email_already_exists = false;
-    if (!res.success) {
-      if (res.status_code === 'user_already_exist') {
-        username = '';
-        username_input_element.focus();
-        user_already_exists = true;
-      } else if (res.status_code === 'email_already_exist') {
-        email = '';
-        email_input_element.focus();
-        email_already_exists = true;
-      }
-    } else {
-      user_created_status = true;
-    }
   };
 </script>
 
@@ -74,7 +73,7 @@
     >
   </div>
 {:else}
-  <form on:submit|preventDefault={create_new_user} class="mt-2 space-y-2.5 text-base">
+  <form on:submit|preventDefault={create_new_user_func} class="mt-2 space-y-2.5 text-base">
     <label class="space-y-1">
       <div class="space-x-3 font-bold">
         <span>Name</span>
@@ -154,7 +153,7 @@
     <button
       type="submit"
       class="btn rounded-lg bg-primary-700 px-2 py-1 font-bold text-white"
-      disabled={creating_new_user_status}
+      disabled={$create_new_user.isPending}
     >
       <Icon src={LuUserPlus} class="text-2xl" />
       <span>Signup</span>

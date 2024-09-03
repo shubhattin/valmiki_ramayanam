@@ -28,7 +28,7 @@ const get_user_allowed_langs_router = protectedProcedure.query(async ({ ctx: { u
     },
     where: ({ id }, { eq }) => eq(id, user.id)
   });
-  return user_data!;
+  return (user_data?.allowed_langs ?? []) as string[];
 });
 
 export const user_info_router = t.router({

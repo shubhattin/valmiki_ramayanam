@@ -11,7 +11,7 @@
   import { ensure_auth_access_status, get_id_token_info } from '@tools/auth_tools';
   import { browser } from '$app/environment';
   import Display from './Display.svelte';
-  import { client_raw } from '@api/client';
+  import { client } from '@api/client';
   import { get_possibily_not_undefined } from '@tools/kry';
   import { BiEdit } from 'svelte-icons-pack/bi';
   import { scale, slide } from 'svelte/transition';
@@ -86,10 +86,12 @@
 
   let view_translation_status = false;
 
-  let user_allowed_langs: string[] = [];
+  $: user_allowed_langs = client.user_info.get_user_allowed_langs.query(undefined, {
+    enabled: !!(browser && $user_info && $user_info.user_type !== 'admin'),
+    placeholderData: []
+  });
 
   let editing_status_on = writable(false);
-  let loaded_user_allowed_langs = false; // info related to assigned editable langs
 
   const get_ramayanam_page_link = (kANDa: number, sarga: number | null = null) => {
     return `/${kANDa}${sarga ? `/${sarga}` : ''}`;
@@ -132,21 +134,6 @@
     await load_parivartak_lang_data(BASE_SCRIPT);
     mounted = true;
   });
-
-  $: browser &&
-    $user_info &&
-    (async () => {
-      loaded_user_allowed_langs = false;
-      if ($user_info.user_type === 'admin') {
-        loaded_user_allowed_langs = true;
-        return;
-      }
-      // fetching user info if allowed to edit languages
-      const data = (await client_raw.user_info.get_user_allowed_langs.query()).allowed_langs;
-      if (!data) user_allowed_langs = [];
-      else user_allowed_langs = data;
-      loaded_user_allowed_langs = true;
-    })();
 
   unsubscribers.push(
     sarga_selected.subscribe(async () => {
@@ -192,7 +179,7 @@
         {/each}
       </select>
     </label>
-    <User editing_status={$editing_status_on} {user_allowed_langs} />
+    <User editing_status={$editing_status_on} user_allowed_langs={$user_allowed_langs.data ?? []} />
   </div>
   <!-- svelte-ignore a11y-label-has-associated-control -->
   <label class="space-x-4">
@@ -280,7 +267,7 @@
             {/each}
           </select>
         </label>
-        {#if !$editing_status_on && $trans_lang !== '--' && loaded_user_allowed_langs && (get_possibily_not_undefined($user_info).user_type === 'admin' || user_allowed_langs.indexOf($trans_lang) !== -1)}
+        {#if !$editing_status_on && $trans_lang !== '--' && $user_allowed_langs.isSuccess && $user_info && (get_possibily_not_undefined($user_info).user_type === 'admin' || $user_allowed_langs.data.indexOf($trans_lang) !== -1)}
           <button
             on:click={() => ($editing_status_on = true)}
             class="btn my-1 rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white dark:bg-tertiary-600"

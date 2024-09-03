@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { client_raw } from '@api/client';
+  import { client } from '@api/client';
 
   export let on_done: () => void = null!;
 
@@ -7,27 +7,28 @@
   let new_password: string;
 
   let pass_wrong_status = false;
-  let updating_password_status = false;
 
-  const update_password = async () => {
+  const update_password = client.auth.update_password.mutation({
+    onSuccess(res) {
+      if (!res.success) {
+        pass_wrong_status = true;
+        return;
+      }
+      pass_wrong_status = false;
+      on_done();
+    }
+  });
+  const update_password_func = async () => {
     if (!current_password || !new_password) return;
-    updating_password_status = true;
-    const res = await client_raw.auth.update_password.mutate({
+    $update_password.mutate({
       current_password: current_password,
       new_password: new_password
     });
-    updating_password_status = false;
-    if (!res.success) {
-      pass_wrong_status = true;
-      return;
-    }
-    pass_wrong_status = false;
-    on_done();
   };
 </script>
 
 <div class="text-2xl font-bold text-orange-600 dark:text-yellow-500">Update Password</div>
-<form on:submit|preventDefault={update_password} class="mt-1 space-y-2.5 text-base">
+<form on:submit|preventDefault={update_password_func} class="mt-1 space-y-2.5 text-base">
   <label class="space-y-1">
     <div class="space-x-2 font-bold">
       <span>Current Password</span>
@@ -60,7 +61,7 @@
   <button
     type="submit"
     class="btn rounded-lg bg-primary-700 px-2 py-1 font-bold text-white"
-    disabled={updating_password_status}
+    disabled={$update_password.isPending}
   >
     Update Password
   </button>
