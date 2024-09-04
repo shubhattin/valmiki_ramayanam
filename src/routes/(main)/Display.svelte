@@ -25,24 +25,15 @@
   const query_client = useQueryClient();
   const modal_store = getModalStore();
 
-  const QUERY_KEYS = {
-    trans_lang_data: (lang: string, kANDa_num: number, sarga_num: number) => [
-      'sarga',
-      'trans',
-      lang,
-      kANDa_num,
-      sarga_num
-    ]
-  };
-
   export let viewing_script: string;
   export let BASE_SCRIPT: string;
-  export let view_translation_status: boolean;
   export let editing_status_on: Writable<boolean>;
   export let sarga_selected: Writable<number>;
   export let kANDa_selected: Writable<number>;
   export let trans_lang: Writable<string>;
   export let sarga_data: CreateQueryResult<string[], Error>;
+  export let trans_en_data: CreateQueryResult<Map<number, string>, Error>;
+  export let trans_lang_data_query_key: (string | number)[];
 
   let transliterated_sarga_data: string[] = [];
   $: Promise.all(
@@ -53,19 +44,6 @@
     transliterated_sarga_data = data;
   });
 
-  $: trans_en_data = createQuery({
-    queryKey: QUERY_KEYS.trans_lang_data('English', $kANDa_selected, $sarga_selected),
-    // by also adding the kanda and sarga they are auto invalidated
-    // so we dont have to manually invalidate it if were only sarga,trans,English
-    enabled: browser && view_translation_status && $kANDa_selected !== 0 && $sarga_selected !== 0,
-    queryFn: () => load_english_translation($kANDa_selected, $sarga_selected)
-  });
-
-  $: trans_lang_data_query_key = QUERY_KEYS.trans_lang_data(
-    $trans_lang,
-    $kANDa_selected,
-    $sarga_selected
-  );
   $: trans_lang_data = createQuery({
     queryKey: trans_lang_data_query_key,
     enabled: browser && $trans_lang !== '--' && $kANDa_selected !== 0 && $sarga_selected !== 0,
@@ -104,36 +82,6 @@
 
   let sanskrit_mode_texts: string[];
   let sanskrit_mode: number;
-
-  const load_english_translation = async (kANDa_num: number, sarga_number: number) => {
-    await delay(250);
-    let data: Record<number, string> = {};
-    const data_map = new Map<number, string>();
-    if (import.meta.env.DEV) {
-      const yaml = (await import('js-yaml')).default;
-      const glob_yaml = import.meta.glob('/data/ramayan/trans_en/*/*.yaml', {
-        query: '?raw'
-      });
-      if (!(`/data/ramayan/trans_en/${kANDa_num}/${sarga_number}.yaml` in glob_yaml))
-        return data_map;
-      const text = (
-        (await glob_yaml[`/data/ramayan/trans_en/${kANDa_num}/${sarga_number}.yaml`]()) as any
-      ).default as string;
-      data = yaml.load(text) as Record<number, string>;
-    } else {
-      const glob_json = import.meta.glob('/data/ramayan/trans_en/json/*/*.json');
-      if (!(`/data/ramayan/trans_en/json/${kANDa_num}/${sarga_number}.json` in glob_json))
-        return data_map;
-      data = (
-        (await glob_json[`/data/ramayan/trans_en/json/${kANDa_num}/${sarga_number}.json`]()) as any
-      ).default as Record<number, string>;
-    }
-
-    for (const [key, value] of Object.entries(data)) {
-      data_map.set(Number(key), value.replaceAll(/\n$/g, '')); // replace the ending newline
-    }
-    return data_map;
-  };
 
   $: browser &&
     $trans_lang !== '--' &&

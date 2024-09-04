@@ -189,6 +189,57 @@
     }
   });
 
+  const QUERY_KEYS = {
+    trans_lang_data: (lang: string, kANDa_num: number, sarga_num: number) => [
+      'sarga',
+      'trans',
+      lang,
+      kANDa_num,
+      sarga_num
+    ]
+  };
+  $: trans_en_data = createQuery({
+    queryKey: QUERY_KEYS.trans_lang_data('English', $kANDa_selected, $sarga_selected),
+    // by also adding the kanda and sarga they are auto invalidated
+    // so we dont have to manually invalidate it if were only sarga,trans,English
+    enabled: browser && view_translation_status && $kANDa_selected !== 0 && $sarga_selected !== 0,
+    queryFn: () => load_english_translation($kANDa_selected, $sarga_selected)
+  });
+  $: trans_lang_data_query_key = QUERY_KEYS.trans_lang_data(
+    $trans_lang,
+    $kANDa_selected,
+    $sarga_selected
+  );
+
+  const load_english_translation = async (kANDa_num: number, sarga_number: number) => {
+    await delay(250);
+    let data: Record<number, string> = {};
+    const data_map = new Map<number, string>();
+    if (import.meta.env.DEV) {
+      const yaml = (await import('js-yaml')).default;
+      const glob_yaml = import.meta.glob('/data/ramayan/trans_en/*/*.yaml', {
+        query: '?raw'
+      });
+      if (!(`/data/ramayan/trans_en/${kANDa_num}/${sarga_number}.yaml` in glob_yaml))
+        return data_map;
+      const text = (
+        (await glob_yaml[`/data/ramayan/trans_en/${kANDa_num}/${sarga_number}.yaml`]()) as any
+      ).default as string;
+      data = yaml.load(text) as Record<number, string>;
+    } else {
+      const glob_json = import.meta.glob('/data/ramayan/trans_en/json/*/*.json');
+      if (!(`/data/ramayan/trans_en/json/${kANDa_num}/${sarga_number}.json` in glob_json))
+        return data_map;
+      data = (
+        (await glob_json[`/data/ramayan/trans_en/json/${kANDa_num}/${sarga_number}.json`]()) as any
+      ).default as Record<number, string>;
+    }
+
+    for (const [key, value] of Object.entries(data)) {
+      data_map.set(Number(key), value.replaceAll(/\n$/g, '')); // replace the ending newline
+    }
+    return data_map;
+  };
   const download_excel_file = createMutation({
     mutationKey: ['sarga', 'download_excel_data'],
     mutationFn: async () => {
@@ -202,6 +253,13 @@
       const worksheet = workbook.getWorksheet(1)!;
       const COLUMN_FOR_DEV = 2;
       const TEXT_START_ROW = 2;
+      const translation_texts: Map<string, Map<number, string>> = new Map();
+      //load english translations
+      const english_translation = await load_english_translation($kANDa_selected, $sarga_selected);
+      translation_texts.set('English', english_translation);
+      const shloka_count =
+        rAmAyaNa_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].shloka_count;
+
       for (let i = 0; i < $sarga_data.data!.length; i++) {
         worksheet.getCell(i + COLUMN_FOR_DEV, TEXT_START_ROW).value = $sarga_data.data![i];
       }
@@ -211,7 +269,10 @@
         1,
         COLUMN_FOR_DEV,
         TEXT_START_ROW,
-        BASE_SCRIPT
+        BASE_SCRIPT,
+        null,
+        translation_texts,
+        shloka_count
       );
 
       // saving file to output path
@@ -289,7 +350,7 @@
             target: 'sarga_options',
             placement: 'bottom'
           }}
-          class="btn m-0 rounded-full p-[0.05rem] ring-2 ring-zinc-300"
+          class="btn m-0 rounded-full p-[0.05rem] ring-2 ring-zinc-400 dark:ring-zinc-300"
         >
           <Icon class="text-2xl" src={BsThreeDots} />
         </button>
@@ -385,8 +446,9 @@
         sarga_selected,
         kANDa_selected,
         trans_lang,
-        view_translation_status,
-        sarga_data
+        sarga_data,
+        trans_en_data,
+        trans_lang_data_query_key
       }}
     />
   {/if}

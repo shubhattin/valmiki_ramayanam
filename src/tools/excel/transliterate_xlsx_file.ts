@@ -18,7 +18,9 @@ export const transliterate_xlxs_file = async (
   text_col_index: number = 2,
   text_row_start_index: number = 2,
   base_lang_code: string = 'Sanskrit',
-  base_folder_path_lipi_parivartak: string = null!
+  base_folder_path_lipi_parivartak: string | null = null!,
+  translations: Map<string, Map<number, string>> = new Map(),
+  shloka_count = 0
 ) => {
   const TOTAL_SHEETS = workbook.worksheets.length;
   for (let i_worksheet = 0; i_worksheet < TOTAL_SHEETS; i_worksheet++) {
@@ -30,7 +32,7 @@ export const transliterate_xlxs_file = async (
       null,
       false,
       true,
-      base_folder_path_lipi_parivartak
+      base_folder_path_lipi_parivartak!
     );
 
     const lang_row = worksheet.getRow(lang_row_index);
@@ -44,21 +46,37 @@ export const transliterate_xlxs_file = async (
     const promises: Promise<void>[] = [];
     lang_row.eachCell((cell, col_i) => {
       const promise = (async () => {
-        const lang_name = cell.value!.toLocaleString().trim().replaceAll(' ', ''); // trimming white spaces and
-        const lang_code = normalize_lang_code(lang_name);
-        if (lang_code && lang_code !== base_lang_code) {
+        const lang_split = cell.value!.toLocaleString().trim().split(' ');
+        const script_name = cell.value!.toLocaleString().trim().replaceAll(' ', ''); // trimming white spaces and
+        const script_code = normalize_lang_code(script_name);
+        if (script_code && script_code !== base_lang_code) {
           await LipiLekhikA.k.load_lang(
-            lang_code,
+            script_code,
             null,
             false,
             true,
-            base_folder_path_lipi_parivartak
+            base_folder_path_lipi_parivartak!
           );
           for (let val_pair of texts) {
             const text = val_pair[1];
             const i = val_pair[0];
-            const out = await lipi_parivartak_async(text, base_lang_code, lang_code);
+            const out = await lipi_parivartak_async(text, base_lang_code, script_code);
             worksheet.getCell(i, col_i).value = out;
+          }
+        }
+        if (
+          lang_split.length === 2 &&
+          lang_split[1] === 'Meaning' &&
+          translations.has(lang_split[0])
+        ) {
+          const lang_code = lang_split[0];
+          const texts = translations.get(lang_code)!;
+          for (let val_pair of texts) {
+            const text = val_pair[1];
+            let i = val_pair[0];
+            if (i === -1) i = shloka_count + 1; // +1 as starts with 0
+            i += lang_row_index + 1; // +1 as starts with -1 so to shift +1 forward
+            worksheet.getCell(i, col_i).value = text;
           }
         }
       })();
