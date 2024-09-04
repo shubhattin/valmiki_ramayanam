@@ -235,7 +235,7 @@
     $editing_status_on && 'h-[100vh]'
   )}
 >
-  {#if !$sarga_data.isLoading}
+  {#if !$sarga_data.isFetching}
     <div transition:fade={{ duration: 250 }} class="space-y-[0.2rem]">
       {#each transliterated_sarga_data as shloka_lines, i (i)}
         {@const line_split = shloka_lines.split('\n')}

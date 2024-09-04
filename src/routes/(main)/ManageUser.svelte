@@ -24,7 +24,8 @@
 
   $: users_info = client.user_info.get_all_users_info.query(undefined, {
     enabled: browser && $user_info?.user_type === 'admin',
-    placeholderData: []
+    placeholderData: [],
+    refetchOnMount: 'always'
   });
   // the built in invaliadte in `svelte-trpc-query` is not working! so manually invalidate the query
   const USERS_INFO_QUERY_KEY = [['user_info', 'get_all_users_info'], { type: 'query' }];
