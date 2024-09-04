@@ -20,7 +20,12 @@
   import { goto } from '$app/navigation';
   import Select from '@components/Select.svelte';
   import { z } from 'zod';
-  import { createMutation } from '@tanstack/svelte-query';
+  import { createMutation, createQuery } from '@tanstack/svelte-query';
+  import { BsThreeDots } from 'svelte-icons-pack/bs';
+  import { popup } from '@skeletonlabs/skeleton';
+  import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
+  import { download_file_in_browser } from '@tools/download_file_browser';
+  import { transliterate_xlxs_file } from '@tools/excel/transliterate_xlsx_file';
 
   const BASE_SCRIPT = 'Sanskrit';
   let mounted = false;
@@ -168,6 +173,60 @@
   onDestroy(() => {
     unsubscribers.forEach((unsub) => unsub());
   });
+
+  $: sarga_data = createQuery({
+    queryKey: ['sarga', 'main_dev_text', $kANDa_selected, $sarga_selected],
+    enabled: browser && $kANDa_selected !== 0 && $sarga_selected !== 0,
+    placeholderData: [],
+    queryFn: async () => {
+      if (!browser) return [];
+      const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
+      const data = (
+        (await all_sargas[`/data/ramayan/data/${$kANDa_selected}/${$sarga_selected}.json`]()) as any
+      ).default as string[];
+      await delay(350);
+      return data;
+    }
+  });
+
+  const download_excel_file = createMutation({
+    mutationKey: ['sarga', 'download_excel_data'],
+    mutationFn: async () => {
+      // the method used below creates a url for both dev and prod
+      const ExcelJS = (await import('exceljs')).default;
+      const url = new URL('/data/ramayan/template/excel_file_template.xlsx', import.meta.url).href;
+      const req = await fetch(url);
+      const file_blob = await req.blob();
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(await file_blob.arrayBuffer());
+      const worksheet = workbook.getWorksheet(1)!;
+      const COLUMN_FOR_DEV = 2;
+      const TEXT_START_ROW = 2;
+      for (let i = 0; i < $sarga_data.data!.length; i++) {
+        worksheet.getCell(i + COLUMN_FOR_DEV, TEXT_START_ROW).value = $sarga_data.data![i];
+      }
+      await transliterate_xlxs_file(
+        workbook,
+        'all',
+        1,
+        COLUMN_FOR_DEV,
+        TEXT_START_ROW,
+        BASE_SCRIPT
+      );
+
+      // saving file to output path
+      let sarga_name =
+        rAmAyaNa_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].name_normal.split(
+          '\n'
+        )[0];
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      });
+      const downloadLink = URL.createObjectURL(blob);
+      download_file_in_browser(downloadLink, `${$sarga_selected}. ${sarga_name}.xlsx`);
+    }
+  });
 </script>
 
 <div class="mt-4 space-y-4">
@@ -204,22 +263,56 @@
     />
   </label>
   {#if $kANDa_selected !== 0}
-    <!-- svelte-ignore a11y-label-has-associated-control -->
-    <label class="space-x-4">
-      <span class="font-bold">Select Sarga</span>
-      <Select
-        class="select w-52"
-        zodType={z.coerce.number().int()}
-        bind:value={$sarga_selected}
-        options={[{ value: 0, text: 'Select' }].concat(
-          sarga_names.map((name, index) => ({
-            value: index + 1,
-            text: `${index + 1} ${name}`
-          }))
-        )}
-        disabled={$editing_status_on}
-      />
-    </label>
+    <div class="space-x-8">
+      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <label class="inline-block space-x-4">
+        <span class="font-bold">Select Sarga</span>
+        <Select
+          class="select w-52"
+          zodType={z.coerce.number().int()}
+          bind:value={$sarga_selected}
+          options={[{ value: 0, text: 'Select' }].concat(
+            sarga_names.map((name, index) => ({
+              value: index + 1,
+              text: `${index + 1} ${name}`
+            }))
+          )}
+          disabled={$editing_status_on}
+        />
+      </label>
+      {#if $kANDa_selected !== 0 && $sarga_selected !== 0}
+        <button
+          title="Extra Options"
+          transition:scale
+          use:popup={{
+            event: 'click',
+            target: 'sarga_options',
+            placement: 'bottom'
+          }}
+          class="btn m-0 rounded-full p-[0.05rem] ring-2 ring-zinc-300"
+        >
+          <Icon class="text-2xl" src={BsThreeDots} />
+        </button>
+        <div class="card z-50 space-y-1 rounded-lg px-1 py-1 shadow-xl" data-popup="sarga_options">
+          <button
+            on:click={() => $download_excel_file.mutate()}
+            class="btn block w-full rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
+          >
+            <Icon
+              class="-mt-1 mr-1 text-2xl text-green-600 dark:text-green-400"
+              src={RiDocumentFileExcel2Line}
+            />
+            Download Excel File
+          </button>
+          <!-- <button
+            class="btn block w-full rounded-md px-2 py-1 text-start hover:bg-gray-200 dark:hover:bg-gray-700"
+          >
+            <Icon src={TrOutlineFileTypeTxt} class=" mr-1 text-2xl" />
+            Download Text File
+          </button> -->
+        </div>
+      {/if}
+    </div>
   {/if}
   {#if $kANDa_selected !== 0 && $sarga_selected !== 0}
     {@const kANDa = rAmAyaNa_map[$kANDa_selected - 1]}
@@ -292,7 +385,8 @@
         sarga_selected,
         kANDa_selected,
         trans_lang,
-        view_translation_status
+        view_translation_status,
+        sarga_data
       }}
     />
   {/if}

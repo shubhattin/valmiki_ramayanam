@@ -13,7 +13,12 @@
   import LipiLekhikA from '@tools/converter';
   import { client_raw } from '@api/client';
   import { browser } from '$app/environment';
-  import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
+  import {
+    createMutation,
+    createQuery,
+    useQueryClient,
+    type CreateQueryResult
+  } from '@tanstack/svelte-query';
   import { delay } from '@tools/delay';
   import { AiOutlineClose } from 'svelte-icons-pack/ai';
 
@@ -37,21 +42,8 @@
   export let sarga_selected: Writable<number>;
   export let kANDa_selected: Writable<number>;
   export let trans_lang: Writable<string>;
+  export let sarga_data: CreateQueryResult<string[], Error>;
 
-  $: sarga_data = createQuery({
-    queryKey: ['sarga', 'main_dev_text', $kANDa_selected, $sarga_selected],
-    enabled: browser && $kANDa_selected !== 0 && $sarga_selected !== 0,
-    placeholderData: [],
-    queryFn: async () => {
-      if (!browser) return [];
-      const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
-      const data = (
-        (await all_sargas[`/data/ramayan/data/${$kANDa_selected}/${$sarga_selected}.json`]()) as any
-      ).default as string[];
-      await delay(350);
-      return data;
-    }
-  });
   let transliterated_sarga_data: string[] = [];
   $: Promise.all(
     ($sarga_data.data ?? []).map((shloka_lines) =>
@@ -69,13 +61,13 @@
     queryFn: () => load_english_translation($kANDa_selected, $sarga_selected)
   });
 
-  $: trans_en_data_query_key = QUERY_KEYS.trans_lang_data(
+  $: trans_lang_data_query_key = QUERY_KEYS.trans_lang_data(
     $trans_lang,
     $kANDa_selected,
     $sarga_selected
   );
   $: trans_lang_data = createQuery({
-    queryKey: trans_en_data_query_key,
+    queryKey: trans_lang_data_query_key,
     enabled: browser && $trans_lang !== '--' && $kANDa_selected !== 0 && $sarga_selected !== 0,
     ...($editing_status_on
       ? {
@@ -100,7 +92,7 @@
   async function update_trans_data(index: number, text: string) {
     const new_data = new Map($trans_lang_data.data);
     new_data.set(index, text);
-    await query_client.setQueryData(trans_en_data_query_key, new_data);
+    await query_client.setQueryData(trans_lang_data_query_key, new_data);
   }
 
   let edit_language_typer_status = true;
@@ -208,7 +200,7 @@
     mutationFn: async () => {
       if (!$trans_lang_data.isSuccess) return;
       await delay(500);
-      await query_client.invalidateQueries({ queryKey: trans_en_data_query_key });
+      await query_client.invalidateQueries({ queryKey: trans_lang_data_query_key });
       $editing_status_on = false;
       // ^ reset the data
     }
