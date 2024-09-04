@@ -37,6 +37,7 @@
   let viewing_script_selection = writable(BASE_SCRIPT);
   let viewing_script = BASE_SCRIPT;
   let viewing_script_mut = createMutation({
+    mutationKey: ['viewing_script'],
     mutationFn: async (params: z.infer<typeof params_viewing_script_mut_schema>) => {
       const { script } = params_viewing_script_mut_schema.parse(params);
       if (!mounted) return script;
@@ -60,6 +61,7 @@
 
   let trans_lang_selection = writable('--');
   const trans_lang_mut = createMutation({
+    mutationKey: ['trans_lang'],
     mutationFn: async (lang: string) => {
       if (!mounted || !browser || lang === '--') return lang;
       // loading trnaslation lang data for typing support

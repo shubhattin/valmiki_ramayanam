@@ -151,6 +151,7 @@
   $: copied_text_status && setTimeout(() => (copied_text_status = false), 1400);
 
   const save_data = createMutation({
+    mutationKey: ['sarga', 'save_edited_data'],
     mutationFn: async ({
       added_indexes,
       edited_indexes
@@ -198,6 +199,7 @@
   };
 
   $: cancel_edit_data = createMutation({
+    mutationKey: ['sarga', 'cancel_edit_data'],
     mutationFn: async () => {
       if (!$trans_lang_data.isSuccess) return;
       await delay(500);

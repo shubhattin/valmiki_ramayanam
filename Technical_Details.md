@@ -9,12 +9,14 @@
 
 - **JS Framework**: [SvelteKit](https://kit.svelte.dev/) meta framework for [Svelte](https://svelte.dev/), also using [TypeScript](https://www.typescriptlang.org/)
 - **Design and Components**: [TailwindCSS](https://tailwindcss.com/) along with [Skeleton UI](https://www.skeleton.dev/)
+- **Query Helper** : [Tanstack Query](https://tanstack.com/query/latest) for fetching and managing asynchronous data.
 
 ### **Backend**
 
 - **API**: [trpc](https://trpc.io/) for API
 - **Database** : [PostgreSQL](https://www.postgresql.org/) hosted on [NeonDB](https://neon.tech/) and with [Drizzle](https://orm.drizzle.team/) for ORM.
 - **Authentication** : Using custom auth with JWT using [jose](https://github.com/panva/jose)
+- **Hosting Provider** : [Vercel](https://vercel.com/) for hosting our website and API. As currently our backend is Edge Compatible so we are using Vercel Edge Functions for API.
 
 ## Data Processing
 

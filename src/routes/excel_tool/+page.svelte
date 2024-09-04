@@ -43,6 +43,7 @@
   let current_file_name: string;
 
   const excel_transliteration = createMutation({
+    mutationKey: ['excel', 'start_transliteration'],
     mutationFn: start_transliteration_func
   });
 
