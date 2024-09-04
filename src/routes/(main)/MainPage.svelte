@@ -5,7 +5,7 @@
   import { delay } from '@tools/delay';
   import { writable, type Writable, type Unsubscriber } from 'svelte/store';
   import { LANG_LIST, SCRIPT_LIST } from '@tools/lang_list';
-  import { load_parivartak_lang_data, lipi_parivartak } from '@tools/converter';
+  import { load_parivartak_lang_data, lipi_parivartak_async } from '@tools/converter';
   import { LanguageIcon } from '@components/icons';
   import User from './User.svelte';
   import { ensure_auth_access_status, get_id_token_info } from '@tools/auth_tools';
@@ -101,18 +101,22 @@
 
   let kANDa_names: string[] = rAmAyaNa_map.map((kANDa) => kANDa.name_devanagari);
   $: browser &&
-    (kANDa_names = rAmAyaNa_map.map((kANDa) =>
-      lipi_parivartak(kANDa.name_devanagari, BASE_SCRIPT, viewing_script)
-    ));
+    Promise.all(
+      rAmAyaNa_map.map((kANDa) =>
+        lipi_parivartak_async(kANDa.name_devanagari, BASE_SCRIPT, viewing_script)
+      )
+    ).then((_kANDa_names) => (kANDa_names = _kANDa_names));
   let sarga_names: string[] =
     $kANDa_selected !== 0
       ? rAmAyaNa_map[$kANDa_selected - 1].sarga_data.map((sarga) => sarga.name_devanagari)
       : [];
   $: browser &&
     $kANDa_selected !== 0 &&
-    (sarga_names = rAmAyaNa_map[$kANDa_selected - 1].sarga_data.map((sarga) =>
-      lipi_parivartak(sarga.name_devanagari.split('\n')[0], BASE_SCRIPT, viewing_script)
-    ));
+    Promise.all(
+      rAmAyaNa_map[$kANDa_selected - 1].sarga_data.map((sarga) =>
+        lipi_parivartak_async(sarga.name_devanagari.split('\n')[0], BASE_SCRIPT, viewing_script)
+      )
+    ).then((_sarga_names) => (sarga_names = _sarga_names));
 
   onMount(async () => {
     if (browser) await ensure_auth_access_status();

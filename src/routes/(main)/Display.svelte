@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { lipi_parivartak } from '@tools/converter';
+  import { lipi_parivartak_async } from '@tools/converter';
   import Icon from '@tools/Icon.svelte';
   import { get_possibily_not_undefined, copy_text_to_clipboard } from '@tools/kry';
   import { RiSystemAddLargeLine } from 'svelte-icons-pack/ri';
@@ -52,9 +52,14 @@
       return data;
     }
   });
-  $: transliterated_sarga_data = $sarga_data.data!.map((shloka_lines) =>
-    lipi_parivartak(shloka_lines, BASE_SCRIPT, viewing_script)
-  );
+  let transliterated_sarga_data: string[] = [];
+  $: Promise.all(
+    ($sarga_data.data ?? []).map((shloka_lines) =>
+      lipi_parivartak_async(shloka_lines, BASE_SCRIPT, viewing_script)
+    )
+  ).then((data) => {
+    transliterated_sarga_data = data;
+  });
 
   $: trans_en_data = createQuery({
     queryKey: QUERY_KEYS.trans_lang_data('English', $kANDa_selected, $sarga_selected),
@@ -141,8 +146,8 @@
   $: browser &&
     $trans_lang !== '--' &&
     (async () => {
-      sanskrit_mode_texts = ['राम्', 'राम'].map((text) =>
-        lipi_parivartak(text, BASE_SCRIPT, $trans_lang)
+      sanskrit_mode_texts = await Promise.all(
+        ['राम्', 'राम'].map((text) => lipi_parivartak_async(text, BASE_SCRIPT, $trans_lang))
       );
       const lng = LipiLekhikA.k.normalize($trans_lang);
       sanskrit_mode = (LipiLekhikA.k.akSharAH as any)[lng].sa;
