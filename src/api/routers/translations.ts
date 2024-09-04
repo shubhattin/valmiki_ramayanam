@@ -30,6 +30,25 @@ export const get_translations_per_sarga_router = publicProcedure
     return data;
   });
 
+export const get_all_langs_translations_per_sarga_router = publicProcedure
+  .input(
+    z.object({
+      kANDa_num: z.number().int(),
+      sarga_num: z.number().int()
+    })
+  )
+  .query(async ({ input: { kANDa_num, sarga_num } }) => {
+    const data = await db.query.translations.findMany({
+      columns: {
+        lang: true,
+        text: true,
+        shloka_num: true
+      },
+      where: (struct, { eq }) => eq(struct.kANDa_num, kANDa_num) && eq(struct.sarga_num, sarga_num)
+    });
+    return data;
+  });
+
 export const edit_translation_router = protectedProcedure
   .input(
     z.object({
@@ -108,5 +127,6 @@ export const edit_translation_router = protectedProcedure
 
 export const translations_router = t.router({
   get_translations_per_sarga: get_translations_per_sarga_router,
-  edit_translation: edit_translation_router
+  edit_translation: edit_translation_router,
+  get_all_langs_translations_per_sarga: get_all_langs_translations_per_sarga_router
 });

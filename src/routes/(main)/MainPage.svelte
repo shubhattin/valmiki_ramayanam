@@ -11,7 +11,7 @@
   import { ensure_auth_access_status, get_id_token_info } from '@tools/auth_tools';
   import { browser } from '$app/environment';
   import Display from './Display.svelte';
-  import { client } from '@api/client';
+  import { client, client_raw } from '@api/client';
   import { get_possibily_not_undefined } from '@tools/kry';
   import { BiEdit } from 'svelte-icons-pack/bi';
   import { scale, slide } from 'svelte/transition';
@@ -259,6 +259,16 @@
       translation_texts.set('English', english_translation);
       const shloka_count =
         rAmAyaNa_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].shloka_count;
+      // loading other language translations
+      const other_translations =
+        await client_raw.translations.get_all_langs_translations_per_sarga.query({
+          kANDa_num: $kANDa_selected,
+          sarga_num: $sarga_selected
+        });
+      for (let data of other_translations) {
+        if (!translation_texts.has(data.lang)) translation_texts.set(data.lang, new Map());
+        translation_texts.get(data.lang)!.set(data.shloka_num, data.text);
+      }
 
       for (let i = 0; i < $sarga_data.data!.length; i++) {
         worksheet.getCell(i + COLUMN_FOR_DEV, TEXT_START_ROW).value = $sarga_data.data![i];
