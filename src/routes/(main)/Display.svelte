@@ -11,23 +11,92 @@
   import { BsClipboard2Check, BsKeyboard } from 'svelte-icons-pack/bs';
   import { cl_join } from '@tools/cl_join';
   import LipiLekhikA from '@tools/converter';
-  import { client } from '@api/client';
+  import { client_raw } from '@api/client';
   import { browser } from '$app/environment';
+  import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
+  import { delay } from '@tools/delay';
+  import { AiOutlineClose } from 'svelte-icons-pack/ai';
 
+  const query_client = useQueryClient();
   const modal_store = getModalStore();
 
-  export let sarga_data: string[];
-  export let loaded_viewing_script: string;
+  const QUERY_KEYS = {
+    trans_lang_data: (lang: string, kANDa_num: number, sarga_num: number) => [
+      'sarga',
+      'trans',
+      lang,
+      kANDa_num,
+      sarga_num
+    ]
+  };
+
+  export let viewing_script: string;
   export let BASE_SCRIPT: string;
-  export let loaded_en_trans_data: boolean;
-  export let trans_en_data: Map<number, string>;
-  export let loaded_lang_trans_data: boolean;
+  export let view_translation_status: boolean;
   export let editing_status_on: Writable<boolean>;
-  export let trans_lang_data: Writable<Map<number, string>>;
-  export let sarga_loading: boolean;
   export let sarga_selected: Writable<number>;
   export let kANDa_selected: Writable<number>;
-  export let loaded_trans_lang: Writable<string>;
+  export let trans_lang: Writable<string>;
+
+  $: sarga_data = createQuery({
+    queryKey: ['sarga', 'main_dev_text', $kANDa_selected, $sarga_selected],
+    enabled: browser && $kANDa_selected !== 0 && $sarga_selected !== 0,
+    placeholderData: [],
+    queryFn: async () => {
+      if (!browser) return [];
+      const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
+      const data = (
+        (await all_sargas[`/data/ramayan/data/${$kANDa_selected}/${$sarga_selected}.json`]()) as any
+      ).default as string[];
+      await delay(350);
+      return data;
+    }
+  });
+  $: transliterated_sarga_data = $sarga_data.data!.map((shloka_lines) =>
+    lipi_parivartak(shloka_lines, BASE_SCRIPT, viewing_script)
+  );
+
+  $: trans_en_data = createQuery({
+    queryKey: QUERY_KEYS.trans_lang_data('English', $kANDa_selected, $sarga_selected),
+    // by also adding the kanda and sarga they are auto invalidated
+    // so we dont have to manually invalidate it if were only sarga,trans,English
+    enabled: browser && view_translation_status && $kANDa_selected !== 0 && $sarga_selected !== 0,
+    queryFn: () => load_english_translation($kANDa_selected, $sarga_selected)
+  });
+
+  $: trans_en_data_query_key = QUERY_KEYS.trans_lang_data(
+    $trans_lang,
+    $kANDa_selected,
+    $sarga_selected
+  );
+  $: trans_lang_data = createQuery({
+    queryKey: trans_en_data_query_key,
+    enabled: browser && $trans_lang !== '--' && $kANDa_selected !== 0 && $sarga_selected !== 0,
+    ...($editing_status_on
+      ? {
+          staleTime: Infinity
+          // while editing the data should not go stale, else it would refetch lead to data loss
+        }
+      : {}),
+    queryFn: async () => {
+      const data = await client_raw.translations.get_translations_per_sarga.query({
+        lang: $trans_lang,
+        kANDa_num: $kANDa_selected,
+        sarga_num: $sarga_selected
+      });
+      const data_map = new Map<number, string>();
+      for (let val of data) {
+        // we dont need to manually care abouy 0 or -1, it will be handled while making changes
+        data_map.set(val.shloka_num, val.text);
+      }
+      return data_map;
+    }
+  });
+  async function update_trans_data(index: number, text: string) {
+    const new_data = new Map($trans_lang_data.data);
+    new_data.set(index, text);
+    await query_client.setQueryData(trans_en_data_query_key, new_data);
+  }
 
   let edit_language_typer_status = true;
   let enable_copy_to_clipbaord = true;
@@ -36,26 +105,82 @@
   let added_translations_indexes: number[] = [];
   let edited_translations_indexes = new Set<number>();
 
-  let transliterated_sarga_data = sarga_data;
-
-  $: transliterated_sarga_data = sarga_data.map((shloka_lines) =>
-    lipi_parivartak(shloka_lines, BASE_SCRIPT, loaded_viewing_script)
-  );
   let sanskrit_mode_texts: string[];
   let sanskrit_mode: number;
+
+  const load_english_translation = async (kANDa_num: number, sarga_number: number) => {
+    await delay(250);
+    let data: Record<number, string> = {};
+    const data_map = new Map<number, string>();
+    if (import.meta.env.DEV) {
+      const yaml = (await import('js-yaml')).default;
+      const glob_yaml = import.meta.glob('/data/ramayan/trans_en/*/*.yaml', {
+        query: '?raw'
+      });
+      if (!(`/data/ramayan/trans_en/${kANDa_num}/${sarga_number}.yaml` in glob_yaml))
+        return data_map;
+      const text = (
+        (await glob_yaml[`/data/ramayan/trans_en/${kANDa_num}/${sarga_number}.yaml`]()) as any
+      ).default as string;
+      data = yaml.load(text) as Record<number, string>;
+    } else {
+      const glob_json = import.meta.glob('/data/ramayan/trans_en/json/*/*.json');
+      if (!(`/data/ramayan/trans_en/json/${kANDa_num}/${sarga_number}.json` in glob_json))
+        return data_map;
+      data = (
+        (await glob_json[`/data/ramayan/trans_en/json/${kANDa_num}/${sarga_number}.json`]()) as any
+      ).default as Record<number, string>;
+    }
+
+    for (const [key, value] of Object.entries(data)) {
+      data_map.set(Number(key), value.replaceAll(/\n$/g, '')); // replace the ending newline
+    }
+    return data_map;
+  };
+
   $: browser &&
-    $loaded_trans_lang !== '--' &&
+    $trans_lang !== '--' &&
     (async () => {
       sanskrit_mode_texts = ['राम्', 'राम'].map((text) =>
-        lipi_parivartak(text, BASE_SCRIPT, $loaded_trans_lang)
+        lipi_parivartak(text, BASE_SCRIPT, $trans_lang)
       );
-      const lng = LipiLekhikA.k.normalize($loaded_trans_lang);
+      const lng = LipiLekhikA.k.normalize($trans_lang);
       sanskrit_mode = (LipiLekhikA.k.akSharAH as any)[lng].sa;
     })();
 
   $: copied_text_status && setTimeout(() => (copied_text_status = false), 1400);
 
-  const save_data = () => {
+  const save_data = createMutation({
+    mutationFn: async ({
+      added_indexes,
+      edited_indexes
+    }: {
+      added_indexes: number[];
+      edited_indexes: number[];
+    }) => {
+      if (!$trans_lang_data.isSuccess) return;
+      await delay(500);
+      const added_texts = added_indexes.map((index) => $trans_lang_data.data?.get(index)!);
+      const edited_texts = edited_indexes.map((index) => $trans_lang_data.data?.get(index)!);
+      const res = await client_raw.translations.edit_translation.mutate({
+        data: {
+          add_data: added_texts,
+          edit_data: edited_texts,
+          to_add_indexed: added_indexes,
+          to_edit_indexed: edited_indexes
+        },
+        sarga_num: $sarga_selected,
+        kANDa_num: $kANDa_selected,
+        lang: $trans_lang
+      });
+      if (res.success) {
+        added_translations_indexes = [];
+        edited_translations_indexes = new Set();
+        $editing_status_on = false;
+      }
+    }
+  });
+  const save_data_func = () => {
     if (edited_translations_indexes.size + added_translations_indexes.length === 0) return;
     const added_indexes = added_translations_indexes.map((index) => index);
     const edited_indexes = Array.from(edited_translations_indexes).map((index) => index);
@@ -66,27 +191,36 @@
       <br/>Additions ➔ ${added_indexes.length} ${added_indexes.length > 0 ? '{ ' + added_indexes.join(', ') + ' }' : ''}`,
       response(r: boolean) {
         if (!r) return;
-        (async () => {
-          const added_texts = added_indexes.map((index) => $trans_lang_data.get(index)!);
-          const edited_texts = edited_indexes.map((index) => $trans_lang_data.get(index)!);
+        $save_data.mutate({ added_indexes, edited_indexes });
+      }
+    };
+    modal_store.trigger(modal_options);
+  };
 
-          const res = await client.translations.edit_translation.mutate({
-            data: {
-              add_data: added_texts,
-              edit_data: edited_texts,
-              to_add_indexed: added_indexes,
-              to_edit_indexed: edited_indexes
-            },
-            sarga_num: $sarga_selected,
-            kANDa_num: $kANDa_selected,
-            lang: $loaded_trans_lang
-          });
-          if (res.success) {
-            added_translations_indexes = [];
-            edited_translations_indexes = new Set();
-            $editing_status_on = false;
-          }
-        })();
+  $: cancel_edit_data = createMutation({
+    mutationFn: async () => {
+      if (!$trans_lang_data.isSuccess) return;
+      await delay(500);
+      await query_client.invalidateQueries({ queryKey: trans_en_data_query_key });
+      $editing_status_on = false;
+      // ^ reset the data
+    }
+  });
+  const cancel_edit_func = () => {
+    if (edited_translations_indexes.size + added_translations_indexes.length === 0) {
+      $cancel_edit_data.mutate();
+      return;
+    }
+    const added_indexes = added_translations_indexes.map((index) => index);
+    const edited_indexes = Array.from(edited_translations_indexes).map((index) => index);
+    const modal_options: ModalSettings = {
+      title: 'Sure to discard Changes ?',
+      type: 'confirm',
+      body: `Edits ➔ ${edited_indexes.length} ${edited_indexes.length > 0 ? '{ ' + edited_indexes.join(', ') + ' }' : ''}
+      <br/>Additions ➔ ${added_indexes.length} ${added_indexes.length > 0 ? '{ ' + added_indexes.join(', ') + ' }' : ''}`,
+      response(r: boolean) {
+        if (!r) return;
+        $cancel_edit_data.mutate();
       }
     };
     modal_store.trigger(modal_options);
@@ -126,31 +260,42 @@
 </div>
 {#if $editing_status_on}
   <button
-    on:click={save_data}
+    on:click={save_data_func}
     in:slide
     out:scale
+    disabled={$save_data.isPending}
     class="btn rounded-lg bg-primary-700 px-1 py-1 text-white dark:bg-primary-600"
   >
     <Icon src={FiSave} class="text-2xl" />
     <span>Save</span>
   </button>
+  <button
+    on:click={cancel_edit_func}
+    in:slide
+    out:scale
+    disabled={$cancel_edit_data.isPending}
+    class="btn ml-3 rounded-lg bg-error-700 px-1 py-1 text-white dark:bg-error-600"
+  >
+    <Icon src={AiOutlineClose} class="text-2xl" />
+    <span>Cancel</span>
+  </button>
 {/if}
 <div
   class={cl_join(
     'h-[85vh] overflow-scroll rounded-xl border-2 border-gray-400 p-0 dark:border-gray-600',
-    loaded_en_trans_data && 'h-[90vh]',
-    loaded_lang_trans_data && 'h-[95vh]',
+    $trans_en_data.isSuccess && 'h-[90vh]',
+    $trans_lang_data.isSuccess && 'h-[95vh]',
     $editing_status_on && 'h-[100vh]'
   )}
 >
-  {#if !sarga_loading}
+  {#if !$sarga_data.isLoading}
     <div transition:fade={{ duration: 250 }} class="space-y-[0.2rem]">
       {#each transliterated_sarga_data as shloka_lines, i (i)}
         {@const line_split = shloka_lines.split('\n')}
         <!-- with 0 and -1 index -->
-        {@const trans_index = sarga_data.length - 1 === i ? -1 : i}
+        {@const trans_index = transliterated_sarga_data.length - 1 === i ? -1 : i}
         <div class="rounded-lg px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-800">
-          {#if i !== 0 && i !== sarga_data.length - 1}
+          {#if i !== 0 && i !== transliterated_sarga_data.length - 1}
             <span
               class="inline-block select-none align-top text-[0.75rem] leading-[1.5rem] text-gray-500 dark:text-gray-300"
               >{i}</span
@@ -169,34 +314,33 @@
                 <div>{line_shlk}</div>
               {/each}
             </div>
-            {#if loaded_en_trans_data}
+            {#if $trans_en_data.isSuccess && $trans_en_data.data.size !== 0}
               <!-- svelte-ignore a11y-no-static-element-interactions -->
               <div
                 on:dblclick={() => {
                   if (!enable_copy_to_clipbaord) return;
                   copy_text_to_clipboard(
-                    get_possibily_not_undefined(trans_en_data.get(trans_index))
+                    get_possibily_not_undefined($trans_en_data.data.get(trans_index))
                   );
                   copied_text_status = true;
                 }}
                 class="text-stone-500 dark:text-slate-400"
               >
-                {#if trans_en_data.has(trans_index)}
+                {#if $trans_en_data.data.has(trans_index)}
                   <!-- Usually translations are single but still... -->
-                  {#each get_possibily_not_undefined(trans_en_data.get(trans_index)).split('\n') as line_trans}
+                  {#each get_possibily_not_undefined($trans_en_data.data.get(trans_index)).split('\n') as line_trans}
                     <div>{line_trans}</div>
                   {/each}
                 {/if}
               </div>
             {/if}
-            {#if $editing_status_on}
+            {#if $editing_status_on && $trans_lang_data.isSuccess}
               <div transition:slide>
-                {#if !$trans_lang_data.has(trans_index)}
+                {#if !$trans_lang_data.data?.has(trans_index)}
                   <button
-                    on:click={() => {
-                      $trans_lang_data.set(trans_index, '');
+                    on:click={async () => {
+                      await update_trans_data(trans_index, '');
                       added_translations_indexes.push(trans_index);
-                      $trans_lang_data = $trans_lang_data;
                     }}
                     class="btn m-0 rounded-md bg-surface-500 p-0 px-1 font-bold text-white dark:bg-surface-500"
                   >
@@ -212,39 +356,38 @@
                           e.target,
                           // @ts-ignore
                           e.data,
-                          $loaded_trans_lang,
+                          $trans_lang,
                           true,
                           // @ts-ignore
                           (val) => {
-                            $trans_lang_data.set(trans_index, val);
+                            update_trans_data(trans_index, val);
                           },
                           sanskrit_mode
                         );
                       else {
-                        $trans_lang_data.set(trans_index, e.currentTarget.value);
+                        update_trans_data(trans_index, e.currentTarget.value);
                       }
-                      $trans_lang_data = $trans_lang_data;
                     }}
                     class="textarea h-16 w-full"
-                    value={$trans_lang_data.get(trans_index)}
+                    value={$trans_lang_data.data?.get(trans_index)}
                   ></textarea>
                 {/if}
               </div>
-            {:else if loaded_lang_trans_data}
+            {:else if $trans_lang_data.isSuccess && $trans_lang_data.data.size !== 0}
               <!-- svelte-ignore a11y-no-static-element-interactions -->
               <div
                 on:dblclick={() => {
                   if (!enable_copy_to_clipbaord) return;
                   copy_text_to_clipboard(
-                    get_possibily_not_undefined($trans_lang_data.get(trans_index))
+                    get_possibily_not_undefined($trans_lang_data.data?.get(trans_index))
                   );
                   copied_text_status = true;
                 }}
                 class="text-yellow-700 dark:text-yellow-500"
               >
-                {#if $trans_lang_data.has(trans_index)}
+                {#if $trans_lang_data.data?.has(trans_index)}
                   <!-- Usually translations are single but still... -->
-                  {#each get_possibily_not_undefined($trans_lang_data.get(trans_index)).split('\n') as line_trans}
+                  {#each get_possibily_not_undefined($trans_lang_data.data?.get(trans_index)).split('\n') as line_trans}
                     <div>{line_trans}</div>
                   {/each}
                 {/if}

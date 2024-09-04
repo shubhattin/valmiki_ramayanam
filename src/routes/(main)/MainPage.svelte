@@ -3,14 +3,13 @@
   import rAmAyaNa_map from '@data/ramayan/ramayan_map.json';
   import { onDestroy, onMount } from 'svelte';
   import { delay } from '@tools/delay';
-  import { writable } from 'svelte/store';
+  import { writable, type Writable, type Unsubscriber } from 'svelte/store';
   import { LANG_LIST, SCRIPT_LIST } from '@tools/lang_list';
   import { load_parivartak_lang_data, lipi_parivartak } from '@tools/converter';
   import { LanguageIcon } from '@components/icons';
   import User from './User.svelte';
   import { ensure_auth_access_status, get_id_token_info } from '@tools/auth_tools';
   import { browser } from '$app/environment';
-  import { main_app_bar_info } from '@state/app_bar';
   import Display from './Display.svelte';
   import { client } from '@api/client';
   import { get_possibily_not_undefined } from '@tools/kry';
@@ -21,30 +20,79 @@
   import { goto } from '$app/navigation';
   import Select from '@components/Select.svelte';
   import { z } from 'zod';
+  import { createMutation } from '@tanstack/svelte-query';
 
   const BASE_SCRIPT = 'Sanskrit';
+  let mounted = false;
 
-  let sarga_loading = false;
+  const unsubscribers: Unsubscriber[] = [];
+
+  export let kANDa_selected: Writable<number>;
+  export let sarga_selected: Writable<number>;
+
+  const params_viewing_script_mut_schema = z.object({
+    script: z.string(),
+    update_viewing_script_selection: z.boolean().default(true)
+  });
+  let viewing_script_selection = writable(BASE_SCRIPT);
   let viewing_script = BASE_SCRIPT;
-  let loaded_viewing_script: string = viewing_script;
+  let viewing_script_mut = createMutation({
+    mutationFn: async (params: z.infer<typeof params_viewing_script_mut_schema>) => {
+      const { script } = params_viewing_script_mut_schema.parse(params);
+      if (!mounted) return script;
+      await delay(500);
+      await load_parivartak_lang_data(script);
+      return script;
+    },
+    onSuccess(script, { update_viewing_script_selection }) {
+      viewing_script = script;
+      if (update_viewing_script_selection) $viewing_script_selection = script;
+    }
+  });
+  unsubscribers.push(
+    viewing_script_selection.subscribe(async (script) => {
+      $viewing_script_mut.mutate({
+        script,
+        update_viewing_script_selection: false
+      });
+    })
+  );
 
-  let trans_lang = writable('--');
-  let loaded_trans_lang = writable('--');
+  let trans_lang_selection = writable('--');
+  const trans_lang_mut = createMutation({
+    mutationFn: async (lang: string) => {
+      if (!mounted || !browser || lang === '--') return lang;
+      // loading trnaslation lang data for typing support
+      await delay(300);
+      let script = lang;
+      if (lang === 'Hindi') script = 'Sanskrit';
+      else if (lang === 'Tamil') script = 'Tamil-Extended';
+      await Promise.all([
+        $viewing_script_mut.mutateAsync({ script, update_viewing_script_selection: true }),
+        load_parivartak_lang_data(lang)
+      ]);
+      return lang;
+    },
+    onSuccess(lang) {
+      $trans_lang = lang;
+    }
+  });
+  unsubscribers.push(
+    trans_lang_selection.subscribe(async (lang) => {
+      $trans_lang_mut.mutate(lang);
+    })
+  );
+  let trans_lang = writable($trans_lang_selection);
 
-  let sarga_data: string[] = [];
-  let trans_en_data: Map<number, string> = new Map();
-  let loaded_en_trans_data = false;
   let view_translation_status = false;
 
-  let loaded_lang_trans_data = false;
-  let user_allowed_langs: string[] = [];
-  let trans_lang_data = writable(new Map<number, string>());
+  $: user_allowed_langs = client.user_info.get_user_allowed_langs.query(undefined, {
+    enabled: !!(browser && $user_info && $user_info.user_type !== 'admin'),
+    placeholderData: []
+  });
 
   let editing_status_on = writable(false);
-  let loaded_user_allowed_langs = false; // info related to assigned editable langs
 
-  export let kANDa_selected = writable(0);
-  export let sarga_selected = writable(0);
   const get_ramayanam_page_link = (kANDa: number, sarga: number | null = null) => {
     return `/${kANDa}${sarga ? `/${sarga}` : ''}`;
   };
@@ -52,7 +100,7 @@
   let kANDa_names: string[] = rAmAyaNa_map.map((kANDa) => kANDa.name_devanagari);
   $: browser &&
     (kANDa_names = rAmAyaNa_map.map((kANDa) =>
-      lipi_parivartak(kANDa.name_devanagari, BASE_SCRIPT, loaded_viewing_script)
+      lipi_parivartak(kANDa.name_devanagari, BASE_SCRIPT, viewing_script)
     ));
   let sarga_names: string[] =
     $kANDa_selected !== 0
@@ -61,18 +109,15 @@
   $: browser &&
     $kANDa_selected !== 0 &&
     (sarga_names = rAmAyaNa_map[$kANDa_selected - 1].sarga_data.map((sarga) =>
-      lipi_parivartak(sarga.name_devanagari.split('\n')[0], BASE_SCRIPT, loaded_viewing_script)
+      lipi_parivartak(sarga.name_devanagari.split('\n')[0], BASE_SCRIPT, viewing_script)
     ));
 
-  let mounted = false;
   onMount(async () => {
     if (browser) await ensure_auth_access_status();
     try {
       $user_info = get_id_token_info().user;
     } catch {}
     if (import.meta.env.DEV) {
-      // the options set here are for development purposes
-      // can be disabled or modified based on need
       // view_translation_status = true;
       // $trans_lang = 'Hindi';
       // viewing_script = 'Telugu';
@@ -90,155 +135,51 @@
     mounted = true;
   });
 
-  $: (async () => {
-    await load_parivartak_lang_data(viewing_script);
-    loaded_viewing_script = viewing_script;
-  })();
-  $: browser &&
-    $trans_lang !== '--' &&
-    (async () => {
-      // loading trnaslation lang data for typing support
-      await load_parivartak_lang_data($trans_lang);
-      $loaded_trans_lang = $trans_lang;
-      let script = $loaded_trans_lang;
-      if ($loaded_trans_lang === 'Hindi') script = 'Sanskrit';
-      else if ($loaded_trans_lang === 'Tamil') script = 'Tamil-Extended';
-      viewing_script = script;
-    })();
-  $: view_translation_status &&
-    browser &&
-    (async () => {
-      loaded_en_trans_data = false;
-      trans_en_data = new Map();
-      const en_trans_data = await load_english_translation($kANDa_selected, $sarga_selected);
-      trans_en_data = en_trans_data;
-      loaded_en_trans_data = true;
-    })();
-  $: browser &&
-    $user_info &&
-    (async () => {
-      loaded_user_allowed_langs = false;
-      if ($user_info.user_type === 'admin') {
-        loaded_user_allowed_langs = true;
-        return;
+  unsubscribers.push(
+    sarga_selected.subscribe(async () => {
+      if ($kANDa_selected === 0 || $sarga_selected === 0) return;
+      if (!browser) return;
+      if (browser && mounted) {
+        // console.log([$kANDa_selected, $sarga_selected]);
+        goto(get_ramayanam_page_link($kANDa_selected, $sarga_selected));
       }
-      // fetching user info if allowed to edit languages
-      const data = (await client.user_info.get_user_allowed_langs.query()).allowed_langs;
-      if (!data) user_allowed_langs = [];
-      else user_allowed_langs = data;
-      loaded_user_allowed_langs = true;
-    })();
-  $: browser &&
-    $loaded_trans_lang !== '--' &&
-    (async () => {
-      if (!($kANDa_selected !== 0 && $sarga_selected !== 0)) return;
-      loaded_lang_trans_data = false;
-      $trans_lang_data = new Map();
-      const data = await client.translations.get_translations_per_sarga.query({
-        lang: $loaded_trans_lang,
-        kANDa_num: $kANDa_selected,
-        sarga_num: $sarga_selected
-      });
-      const data_map = new Map<number, string>();
-      for (let val of data) {
-        // we dont need to manually care abouy 0 or -1, it will be handled while making changes
-        data_map.set(val.shloka_num, val.text);
+    })
+  );
+  unsubscribers.push(
+    kANDa_selected.subscribe(() => {
+      browser && mounted && ($sarga_selected = 0);
+      if (browser && mounted) {
+        if ($kANDa_selected !== 0 && $sarga_selected === 0) {
+          // console.log('kanda page', [$kANDa_selected, $sarga_selected]);
+          goto(get_ramayanam_page_link($kANDa_selected));
+        } else if (mounted && $kANDa_selected == 0 && $sarga_selected == 0) {
+          // console.log('home');
+          goto('/');
+        }
       }
-      $trans_lang_data = data_map;
-      loaded_lang_trans_data = true;
-    })();
-
-  const sarga_unsub = sarga_selected.subscribe(async () => {
-    if ($kANDa_selected === 0 || $sarga_selected === 0) return;
-    if (!browser) return;
-    sarga_loading = true;
-    sarga_data = [];
-    const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
-    const data = (
-      (await all_sargas[`/data/ramayan/data/${$kANDa_selected}/${$sarga_selected}.json`]()) as any
-    ).default as string[];
-    await delay(400);
-    sarga_loading = false;
-    sarga_data = data;
-    if (browser && mounted) {
-      // console.log([$kANDa_selected, $sarga_selected]);
-      goto(get_ramayanam_page_link($kANDa_selected, $sarga_selected));
-    }
-  });
-  const kANDa_selected_unsub = kANDa_selected.subscribe(() => {
-    browser && mounted && ($sarga_selected = 0);
-    loaded_en_trans_data = false;
-    loaded_lang_trans_data = false;
-    if (browser && mounted) {
-      if ($kANDa_selected !== 0 && $sarga_selected === 0) {
-        // console.log('kanda page', [$kANDa_selected, $sarga_selected]);
-        goto(get_ramayanam_page_link($kANDa_selected));
-      } else if (mounted && $kANDa_selected == 0 && $sarga_selected == 0) {
-        // console.log('home');
-        goto('/');
-      }
-    }
-  });
-
-  const load_english_translation = async (kANDa_num: number, sarga_number: number) => {
-    let data: Record<number, string> = {};
-    const data_map = new Map<number, string>();
-    if (import.meta.env.DEV) {
-      const yaml = (await import('js-yaml')).default;
-      const glob_yaml = import.meta.glob('/data/ramayan/trans_en/*/*.yaml', {
-        query: '?raw'
-      });
-      if (!(`/data/ramayan/trans_en/${kANDa_num}/${sarga_number}.yaml` in glob_yaml))
-        return data_map;
-      const text = (
-        (await glob_yaml[`/data/ramayan/trans_en/${kANDa_num}/${sarga_number}.yaml`]()) as any
-      ).default as string;
-      data = yaml.load(text) as Record<number, string>;
-    } else {
-      const glob_json = import.meta.glob('/data/ramayan/trans_en/json/*/*.json');
-      if (!(`/data/ramayan/trans_en/json/${kANDa_num}/${sarga_number}.json` in glob_json))
-        return data_map;
-      data = (
-        (await glob_json[`/data/ramayan/trans_en/json/${kANDa_num}/${sarga_number}.json`]()) as any
-      ).default as Record<number, string>;
-    }
-
-    for (const [key, value] of Object.entries(data)) {
-      data_map.set(Number(key), value.replaceAll(/\n$/g, '')); // replace the ending newline
-    }
-    return data_map;
-  };
-
+    })
+  );
   onDestroy(() => {
-    kANDa_selected_unsub();
-    sarga_unsub();
-  });
-
-  const PAGE_INFO = {
-    title: 'श्रीमद्रामायणम्',
-    description: 'श्रीमद्रामायणस्य पठनम्'
-  };
-
-  main_app_bar_info.set({
-    className: 'text-2xl font-bold',
-    title: PAGE_INFO.title
+    unsubscribers.forEach((unsub) => unsub());
   });
 </script>
-
-<!-- <MetaTags title={PAGE_INFO.title} description={PAGE_INFO.description} /> -->
 
 <div class="mt-4 space-y-4">
   <div class="flex justify-between">
     <label class="space-x-4">
       Script
       <Icon src={LanguageIcon} class="text-4xl" />
-      <select class="select inline-block w-40" bind:value={viewing_script}>
+      <select
+        class="select inline-block w-40"
+        disabled={$viewing_script_mut.isPending}
+        bind:value={$viewing_script_selection}
+      >
         {#each SCRIPT_LIST as lang (lang)}
           <option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
         {/each}
       </select>
     </label>
-    <User editing_status={$editing_status_on} {user_allowed_langs} />
+    <User editing_status={$editing_status_on} user_allowed_langs={$user_allowed_langs.data ?? []} />
   </div>
   <!-- svelte-ignore a11y-label-has-associated-control -->
   <label class="space-x-4">
@@ -314,9 +255,11 @@
           Translation
           <Icon src={LanguageIcon} class="text-2xl" />
           <select
-            disabled={$editing_status_on}
+            disabled={$editing_status_on ||
+              $trans_lang_mut.isPending ||
+              $viewing_script_mut.isPending}
             class="select inline-block w-32 px-2 py-1"
-            bind:value={$trans_lang}
+            bind:value={$trans_lang_selection}
           >
             <option value="--">-- Select --</option>
             {#each LANG_LIST as lang (lang)}
@@ -324,7 +267,7 @@
             {/each}
           </select>
         </label>
-        {#if !$editing_status_on && $loaded_trans_lang !== '--' && loaded_user_allowed_langs && (get_possibily_not_undefined($user_info).user_type === 'admin' || user_allowed_langs.indexOf($loaded_trans_lang) !== -1)}
+        {#if !$editing_status_on && $trans_lang !== '--' && $user_allowed_langs.isSuccess && $user_info && (get_possibily_not_undefined($user_info).user_type === 'admin' || $user_allowed_langs.data.indexOf($trans_lang) !== -1)}
           <button
             on:click={() => ($editing_status_on = true)}
             class="btn my-1 rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white dark:bg-tertiary-600"
@@ -338,17 +281,12 @@
     <Display
       {...{
         BASE_SCRIPT,
-        loaded_en_trans_data,
-        loaded_viewing_script,
-        sarga_data,
-        trans_en_data,
+        viewing_script,
         editing_status_on,
-        trans_lang_data,
-        loaded_lang_trans_data,
-        sarga_loading,
         sarga_selected,
         kANDa_selected,
-        loaded_trans_lang
+        trans_lang,
+        view_translation_status
       }}
     />
   {/if}
