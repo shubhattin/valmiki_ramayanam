@@ -243,6 +243,7 @@
   const download_excel_file = createMutation({
     mutationKey: ['sarga', 'download_excel_data'],
     mutationFn: async () => {
+      if (!browser) return;
       // the method used below creates a url for both dev and prod
       const ExcelJS = (await import('exceljs')).default;
       const url = new URL('/data/ramayan/template/excel_file_template.xlsx', import.meta.url).href;
