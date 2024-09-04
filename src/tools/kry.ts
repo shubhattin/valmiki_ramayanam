@@ -54,7 +54,7 @@ export const from_base64 = (str: string, decode = false) => {
 };
 
 export const get_possibily_not_undefined = <T>(val: T | null, fallback_val: T | null = null) => {
-  if (!val) val = fallback_val;
+  if (val === undefined || val === null) val = fallback_val;
   return val!;
 };
 export const copy_text_to_clipboard = (text: string) => {
