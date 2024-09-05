@@ -4,14 +4,14 @@ import { defineConfig } from 'vitest/config';
 import { purgeCss } from 'vite-plugin-tailwind-purgecss';
 import { build_json_files } from './src/tools/vite_plugin_build_json_from_yaml';
 import { partytownVite } from '@builder.io/partytown/utils';
-import * as fs from 'fs';
 
 export default defineConfig({
   plugins: [
     sveltekit(),
     purgeCss(),
     partytownVite({
-      dest: join(__dirname, 'static', '~partytown')
+      dest: join(__dirname, 'static', '~partytown'),
+      debug: false
     }),
     build_json_files(
       'data/ramayan/trans_en',
