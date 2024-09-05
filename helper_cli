@@ -33,10 +33,12 @@ OPTIONS = [
         "[bold]The test report has been generated as 'data/ramayan/test_output.md'. Open that file and press `[yellow]Ctrl+Shift+V[/]` to view the report[/]",
     ],
     ["Launch the web app", ["pnpm dev"]],
+    ["Update Dependencies", ["cd data/ramayan/","pip install -r requirements.txt","cd ../..","pnpm install"]],
 ]
 
 
 def main():
+    OPTIONS.append(["Exit", [""]])
     print("[bold yellow]Select an option to run:[/]")
     for i, option in enumerate(OPTIONS):
         print(f"[blue]{i+1}. {option[0]}[/]")
