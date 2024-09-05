@@ -18,7 +18,7 @@ const user_info_schema = UsersSchemaZod.pick({
 });
 type user_info_type = z.infer<typeof user_info_schema>;
 
-const ID_TOKREN_EXPIRE = '20d';
+const ID_TOKREN_EXPIRE = '30d';
 const ACCESS_TOKEN_EXPIRE = '16h';
 
 const get_id_and_aceess_token = async (user_info: user_info_type) => {
