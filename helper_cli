@@ -42,6 +42,7 @@ OPTIONS = [
             "pnpm install",
         ],
     ],
+    ["Sync Repository", ["git fetch"]],
 ]
 
 
