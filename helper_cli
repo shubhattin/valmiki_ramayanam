@@ -42,20 +42,19 @@ OPTIONS = [
             "pnpm install",
         ],
     ],
-    ["Sync Repository", ["git fetch"]],
 ]
 
 
 def main():
-    OPTIONS.append(["Exit", [""]])
     print("[bold yellow]Select an option to run:[/]")
     for i, option in enumerate(OPTIONS):
         print(f"[blue]{i+1}. {option[0]}[/]")
-
-    choice = Prompt.ask(
-        "Choose an option", choices=[str(i + 1) for i in range(len(OPTIONS))]
-    )
-
+    print(f"[blue]e. Exit[/]")
+    CHOICES = [str(i + 1) for i in range(len(OPTIONS))]
+    CHOICES.append("e")
+    choice = Prompt.ask("Choose an option", choices=CHOICES)
+    if choice == "e":
+        return
     command_info = OPTIONS[int(choice) - 1]
     command = " && ".join(command_info[1])
     os.system(command)
