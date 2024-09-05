@@ -236,111 +236,114 @@
   )}
 >
   {#if !$sarga_data.isFetching}
-    <div transition:fade={{ duration: 250 }} class="space-y-[0.2rem]">
+    <div transition:fade={{ duration: 250 }} class="space-y-[0.15rem]">
       {#each transliterated_sarga_data as shloka_lines, i (i)}
         {@const line_split = shloka_lines.split('\n')}
         <!-- with 0 and -1 index -->
         {@const trans_index = transliterated_sarga_data.length - 1 === i ? -1 : i}
         <div class="rounded-lg px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-800">
-          {#if i !== 0 && i !== transliterated_sarga_data.length - 1}
-            <span
-              class="inline-block select-none align-top text-[0.75rem] leading-[1.5rem] text-gray-500 dark:text-gray-300"
-              >{i}</span
-            >
-          {/if}
-          <div class="mt-0 space-y-1">
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
-            <div
-              on:dblclick={() => {
-                if (!enable_copy_to_clipbaord) return;
-                copy_text_to_clipboard(shloka_lines);
-                copied_text_status = true;
-              }}
-            >
-              {#each line_split as line_shlk}
-                <!-- if needed add 'whitespace-pre-wrap'2 -->
-                <div class="font">{line_shlk}</div>
-              {/each}
+          <div class="flex space-x-2">
+            {#if i !== 0 && i !== transliterated_sarga_data.length - 1}
+              <div
+                class="flex select-none items-center align-top text-[0.75rem] leading-[1.5rem] text-gray-500 dark:text-gray-300"
+              >
+                {i}
+              </div>
+            {/if}
+            <div class="mt-0 space-y-1">
+              <!-- svelte-ignore a11y-no-static-element-interactions -->
+              <div
+                on:dblclick={() => {
+                  if (!enable_copy_to_clipbaord) return;
+                  copy_text_to_clipboard(shloka_lines);
+                  copied_text_status = true;
+                }}
+              >
+                {#each line_split as line_shlk}
+                  <!-- if needed add 'whitespace-pre-wrap'2 -->
+                  <div class="font">{line_shlk}</div>
+                {/each}
+              </div>
+              {#if $trans_en_data.isSuccess && $trans_en_data.data.size !== 0}
+                <!-- svelte-ignore a11y-no-static-element-interactions -->
+                <div
+                  on:dblclick={() => {
+                    if (!enable_copy_to_clipbaord) return;
+                    copy_text_to_clipboard(
+                      get_possibily_not_undefined($trans_en_data.data.get(trans_index))
+                    );
+                    copied_text_status = true;
+                  }}
+                  class="text-stone-500 dark:text-slate-400"
+                >
+                  {#if $trans_en_data.data.has(trans_index)}
+                    <!-- Usually translations are single but still... -->
+                    {#each get_possibily_not_undefined($trans_en_data.data.get(trans_index)).split('\n') as line_trans}
+                      <div>{line_trans}</div>
+                    {/each}
+                  {/if}
+                </div>
+              {/if}
+              {#if $editing_status_on && $trans_lang_data.isSuccess}
+                <div transition:slide>
+                  {#if !$trans_lang_data.data?.has(trans_index)}
+                    <button
+                      on:click={async () => {
+                        await update_trans_data(trans_index, '');
+                        added_translations_indexes.push(trans_index);
+                      }}
+                      class="btn m-0 rounded-md bg-surface-500 p-0 px-1 font-bold text-white dark:bg-surface-500"
+                    >
+                      <Icon src={RiSystemAddLargeLine} />
+                    </button>
+                  {:else}
+                    <textarea
+                      on:input={(e) => {
+                        if (!added_translations_indexes.includes(trans_index))
+                          edited_translations_indexes.add(trans_index);
+                        if (edit_language_typer_status)
+                          LipiLekhikA.mukhya(
+                            e.target,
+                            // @ts-ignore
+                            e.data,
+                            $trans_lang,
+                            true,
+                            // @ts-ignore
+                            (val) => {
+                              update_trans_data(trans_index, val);
+                            },
+                            sanskrit_mode
+                          );
+                        else {
+                          update_trans_data(trans_index, e.currentTarget.value);
+                        }
+                      }}
+                      class="font textarea h-16 w-full"
+                      value={$trans_lang_data.data?.get(trans_index)}
+                    ></textarea>
+                  {/if}
+                </div>
+              {:else if $trans_lang_data.isSuccess && $trans_lang_data.data.size !== 0}
+                <!-- svelte-ignore a11y-no-static-element-interactions -->
+                <div
+                  on:dblclick={() => {
+                    if (!enable_copy_to_clipbaord) return;
+                    copy_text_to_clipboard(
+                      get_possibily_not_undefined($trans_lang_data.data?.get(trans_index))
+                    );
+                    copied_text_status = true;
+                  }}
+                  class="text-yellow-700 dark:text-yellow-500"
+                >
+                  {#if $trans_lang_data.data?.has(trans_index)}
+                    <!-- Usually translations are single but still... -->
+                    {#each get_possibily_not_undefined($trans_lang_data.data?.get(trans_index)).split('\n') as line_trans}
+                      <div class="font">{line_trans}</div>
+                    {/each}
+                  {/if}
+                </div>
+              {/if}
             </div>
-            {#if $trans_en_data.isSuccess && $trans_en_data.data.size !== 0}
-              <!-- svelte-ignore a11y-no-static-element-interactions -->
-              <div
-                on:dblclick={() => {
-                  if (!enable_copy_to_clipbaord) return;
-                  copy_text_to_clipboard(
-                    get_possibily_not_undefined($trans_en_data.data.get(trans_index))
-                  );
-                  copied_text_status = true;
-                }}
-                class="text-stone-500 dark:text-slate-400"
-              >
-                {#if $trans_en_data.data.has(trans_index)}
-                  <!-- Usually translations are single but still... -->
-                  {#each get_possibily_not_undefined($trans_en_data.data.get(trans_index)).split('\n') as line_trans}
-                    <div>{line_trans}</div>
-                  {/each}
-                {/if}
-              </div>
-            {/if}
-            {#if $editing_status_on && $trans_lang_data.isSuccess}
-              <div transition:slide>
-                {#if !$trans_lang_data.data?.has(trans_index)}
-                  <button
-                    on:click={async () => {
-                      await update_trans_data(trans_index, '');
-                      added_translations_indexes.push(trans_index);
-                    }}
-                    class="btn m-0 rounded-md bg-surface-500 p-0 px-1 font-bold text-white dark:bg-surface-500"
-                  >
-                    <Icon src={RiSystemAddLargeLine} />
-                  </button>
-                {:else}
-                  <textarea
-                    on:input={(e) => {
-                      if (!added_translations_indexes.includes(trans_index))
-                        edited_translations_indexes.add(trans_index);
-                      if (edit_language_typer_status)
-                        LipiLekhikA.mukhya(
-                          e.target,
-                          // @ts-ignore
-                          e.data,
-                          $trans_lang,
-                          true,
-                          // @ts-ignore
-                          (val) => {
-                            update_trans_data(trans_index, val);
-                          },
-                          sanskrit_mode
-                        );
-                      else {
-                        update_trans_data(trans_index, e.currentTarget.value);
-                      }
-                    }}
-                    class="font textarea h-16 w-full"
-                    value={$trans_lang_data.data?.get(trans_index)}
-                  ></textarea>
-                {/if}
-              </div>
-            {:else if $trans_lang_data.isSuccess && $trans_lang_data.data.size !== 0}
-              <!-- svelte-ignore a11y-no-static-element-interactions -->
-              <div
-                on:dblclick={() => {
-                  if (!enable_copy_to_clipbaord) return;
-                  copy_text_to_clipboard(
-                    get_possibily_not_undefined($trans_lang_data.data?.get(trans_index))
-                  );
-                  copied_text_status = true;
-                }}
-                class="text-yellow-700 dark:text-yellow-500"
-              >
-                {#if $trans_lang_data.data?.has(trans_index)}
-                  <!-- Usually translations are single but still... -->
-                  {#each get_possibily_not_undefined($trans_lang_data.data?.get(trans_index)).split('\n') as line_trans}
-                    <div class="font">{line_trans}</div>
-                  {/each}
-                {/if}
-              </div>
-            {/if}
           </div>
         </div>
       {/each}
