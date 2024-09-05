@@ -23,20 +23,7 @@ export default defineConfig({
         }
         return new_data;
       }
-    ),
-    {
-      name: 'Add ~partytown to config.json',
-      async buildEnd() {
-        const file = JSON.parse(fs.readFileSync('.vercel/output/config.json', 'utf8'));
-        file.routes.push({
-          src: '/~partytown/.+',
-          headers: {
-            'cache-control': 'public, immutable, max-age=31536000'
-          }
-        });
-        fs.writeFileSync('.vercel/output/config.json', JSON.stringify(file, null, 4));
-      }
-    }
+    )
   ],
   test: {
     include: ['src/**/*.{test,spec}.{js,ts}']
