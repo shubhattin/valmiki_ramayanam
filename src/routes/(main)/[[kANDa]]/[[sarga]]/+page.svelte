@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { z } from 'zod';
-  import MainPage from '../../../MainPage.svelte';
+  import MainPage from '../../MainPage.svelte';
   import { writable } from 'svelte/store';
   import MetaTags from '@components/tags/MetaTags.svelte';
   import { main_app_bar_info } from '@state/app_bar';
