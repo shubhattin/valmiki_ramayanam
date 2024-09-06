@@ -132,8 +132,8 @@
       $user_info = get_id_token_info().user;
     } catch {}
     if (import.meta.env.DEV) {
-      // view_translation_status = true;
-      // $trans_lang_mut.mutateAsync('Hindi').then(() => editing_status_on.set(true));
+      view_translation_status = true;
+      $trans_lang_mut.mutateAsync('Hindi').then(() => editing_status_on.set(true));
     }
     if (browser && import.meta.env.PROD) {
       window.addEventListener('beforeunload', function (e) {

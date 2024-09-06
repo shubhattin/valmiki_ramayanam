@@ -3,7 +3,7 @@
   import Icon from '@tools/Icon.svelte';
   import { get_possibily_not_undefined, copy_text_to_clipboard } from '@tools/kry';
   import { RiSystemAddLargeLine } from 'svelte-icons-pack/ri';
-  import { type Writable } from 'svelte/store';
+  import { type Unsubscriber, type Writable } from 'svelte/store';
   import { fade, scale, slide } from 'svelte/transition';
   import { SlideToggle, getModalStore } from '@skeletonlabs/skeleton';
   import type { ModalSettings } from '@skeletonlabs/skeleton';
@@ -21,9 +21,11 @@
   } from '@tanstack/svelte-query';
   import { delay } from '@tools/delay';
   import { AiOutlineClose } from 'svelte-icons-pack/ai';
+  import { onDestroy, onMount } from 'svelte';
 
   const query_client = useQueryClient();
   const modal_store = getModalStore();
+  const unsubscribers: Unsubscriber[] = [];
 
   export let viewing_script: string;
   export let BASE_SCRIPT: string;
@@ -90,13 +92,15 @@
         ['राम्', 'राम'].map((text) => lipi_parivartak_async(text, BASE_SCRIPT, $trans_lang))
       )
   });
-  $: $editing_status_on &&
-    $sanskrit_mode_texts.isSuccess &&
-    !$sanskrit_mode_texts.isFetching &&
-    (() => {
-      const lng = LipiLekhikA.k.normalize($trans_lang);
-      sanskrit_mode = (LipiLekhikA.k.akSharAH as any)[lng].sa;
-    })();
+  onMount(() => {
+    unsubscribers.push(
+      sanskrit_mode_texts.subscribe(({ isFetching, isSuccess }) => {
+        if (!$editing_status_on || isFetching || !isSuccess) return;
+        const lng = LipiLekhikA.k.normalize($trans_lang);
+        sanskrit_mode = (LipiLekhikA.k.akSharAH as any)[lng].sa;
+      })
+    );
+  });
 
   $: copied_text_status && setTimeout(() => (copied_text_status = false), 1400);
 
@@ -154,6 +158,8 @@
       if (!$trans_lang_data.isSuccess) return;
       await delay(500);
       await query_client.invalidateQueries({ queryKey: trans_lang_data_query_key });
+      added_translations_indexes = [];
+      edited_translations_indexes = new Set();
       $editing_status_on = false;
       // ^ reset the data
     }
@@ -177,6 +183,10 @@
     };
     modal_store.trigger(modal_options);
   };
+
+  onDestroy(() => {
+    unsubscribers.forEach((unsub) => unsub());
+  });
 </script>
 
 <div class="flex space-x-4">
