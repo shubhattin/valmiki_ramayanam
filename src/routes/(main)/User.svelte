@@ -156,7 +156,7 @@
     />
   </div>
 </Modal>
-<Modal modal_open={user_create_modal_status}>
+<Modal modal_open={user_create_modal_status} close_on_click_outside={false}>
   <div class="p-2">
     <NewUser
       name_input_element={name_input_elmnt_new_user}
@@ -166,7 +166,7 @@
     />
   </div>
 </Modal>
-<Modal modal_open={manage_user_modal_status}>
+<Modal modal_open={manage_user_modal_status} close_on_click_outside={false}>
   <div class="p-2">
     <ManageUser />
   </div>

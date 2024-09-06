@@ -12,6 +12,7 @@
   export let onOpen: () => void = null!;
   export let onClose: () => void = null!;
   export let onConfirm: () => void = null!;
+  export let close_on_click_outside = true;
 
   let modalElement: HTMLElement;
   let opened = false;
@@ -59,9 +60,13 @@
   };
   onMount(() => {
     document.addEventListener('click', (e) => {
-      // if (visibleModal && !visibleModal.querySelector('article')?.contains(e.target as Node)) {
-      //   closeModal();
-      // }
+      if (
+        close_on_click_outside &&
+        visibleModal &&
+        !visibleModal.querySelector('article')?.contains(e.target as Node)
+      ) {
+        closeModal();
+      }
     });
 
     document.addEventListener('keydown', (e) => {
