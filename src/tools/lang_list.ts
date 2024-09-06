@@ -36,3 +36,7 @@ export type lang_list_type =
   | 'Malayalam'
   | 'Odia'
   | 'Sinhala';
+
+export const ALL_LANG_SCRIPT_LIST = Array.from(new Set([...LANG_LIST, ...SCRIPT_LIST])).filter(
+  (src) => !['Normal'].includes(src)
+);

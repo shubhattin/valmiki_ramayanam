@@ -3,7 +3,7 @@
   import Icon from '@tools/Icon.svelte';
   import { get_possibily_not_undefined, copy_text_to_clipboard } from '@tools/kry';
   import { RiSystemAddLargeLine } from 'svelte-icons-pack/ri';
-  import { type Unsubscriber, type Writable } from 'svelte/store';
+  import { writable, type Unsubscriber, type Writable } from 'svelte/store';
   import { fade, scale, slide } from 'svelte/transition';
   import { SlideToggle, getModalStore } from '@skeletonlabs/skeleton';
   import type { ModalSettings } from '@skeletonlabs/skeleton';
@@ -22,6 +22,10 @@
   import { delay } from '@tools/delay';
   import { AiOutlineClose } from 'svelte-icons-pack/ai';
   import { onDestroy, onMount } from 'svelte';
+  import { BiHelpCircle } from 'svelte-icons-pack/bi';
+  import Modal from '@components/Modal.svelte';
+  import { CgClose } from 'svelte-icons-pack/cg';
+  import { ALL_LANG_SCRIPT_LIST } from '@tools/lang_list';
 
   const query_client = useQueryClient();
   const modal_store = getModalStore();
@@ -81,6 +85,9 @@
 
   let added_translations_indexes: number[] = [];
   let edited_translations_indexes = new Set<number>();
+
+  let typing_assistance_modal_opened = writable(false);
+  $: typing_assistance_lang = $trans_lang;
 
   let sanskrit_mode: number;
 
@@ -187,8 +194,44 @@
   onDestroy(() => {
     unsubscribers.forEach((unsub) => unsub());
   });
+  // const URLS = import.meta.glob('/src/tools/converter/resources/images/*.png', {
+  //   eager: true,
+  //   query: '?url'
+  // });
 </script>
 
+<Modal modal_open={typing_assistance_modal_opened}>
+  <div
+    in:fade
+    out:scale
+    class="h-11/12 fixed left-2 top-2 z-10 block max-h-[94%] min-h-[87%] w-11/12 overflow-scroll rounded-lg border-2 border-blue-700 bg-[aliceblue] pl-2 pt-2 dark:border-blue-500 dark:bg-slate-800"
+  >
+    <div class="flex justify-between">
+      <select class="select w-40" bind:value={typing_assistance_lang}>
+        {#each ALL_LANG_SCRIPT_LIST as lang_script}
+          <option value={lang_script}>{lang_script}</option>
+        {/each}
+      </select>
+      <button
+        on:click={() => {
+          $typing_assistance_modal_opened = false;
+        }}
+      >
+        <Icon
+          src={CgClose}
+          class="cursor-button text-4xl text-red-500 active:text-black dark:text-red-400 dark:active:text-white"
+        />
+      </button>
+    </div>
+    <div class="mt-4 space-y-4">
+      <!-- <img
+        class="h-3/4 max-h-[70-vh]"
+        alt={typing_assistance_lang}
+        src={URLS[`/src/tools/converter/resources/images/${typing_assistance_lang}.png`].default}
+      /> -->
+    </div>
+  </div>
+</Modal>
 <div class="flex space-x-4">
   {#if $editing_status_on}
     <SlideToggle
@@ -210,6 +253,13 @@
         <option value={0}>rAm ➔ {$sanskrit_mode_texts.data[1]}</option>
       </select>
     {/if}
+    <button
+      class="btn rounded-md p-0 text-sm"
+      title={'Language Typing Assistance'}
+      on:click={() => ($typing_assistance_modal_opened = true)}
+    >
+      <Icon src={BiHelpCircle} class="mt-1 text-3xl text-sky-500 dark:text-sky-400" />
+    </button>
   {/if}
   {#if copied_text_status}
     <span
