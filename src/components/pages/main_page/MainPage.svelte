@@ -10,7 +10,7 @@
   import User from './user/User.svelte';
   import { ensure_auth_access_status, get_id_token_info } from '@tools/auth_tools';
   import { browser } from '$app/environment';
-  import Display from './display/Area.svelte';
+  import DisplayArea from './display/Area.svelte';
   import { client, client_raw } from '@api/client';
   import { get_possibily_not_undefined } from '@tools/kry';
   import { BiEdit } from 'svelte-icons-pack/bi';
@@ -26,22 +26,26 @@
   import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
   import { download_file_in_browser } from '@tools/download_file_browser';
   import { transliterate_xlxs_file } from '@tools/excel/transliterate_xlsx_file';
+  import {
+    kANDa_selected,
+    sarga_selected,
+    editing_status_on,
+    BASE_SCRIPT,
+    viewing_script,
+    trans_lang
+  } from '@state/main_page/main_page_state';
 
-  const BASE_SCRIPT = 'Sanskrit';
   let mounted = false;
 
   const unsubscribers: Unsubscriber[] = [];
   const query_client = useQueryClient();
-
-  export let kANDa_selected: Writable<number>;
-  export let sarga_selected: Writable<number>;
 
   const params_viewing_script_mut_schema = z.object({
     script: z.string(),
     update_viewing_script_selection: z.boolean().default(true)
   });
   let viewing_script_selection = writable(BASE_SCRIPT);
-  let viewing_script = BASE_SCRIPT;
+  $viewing_script = BASE_SCRIPT;
   let viewing_script_mut = createMutation({
     mutationKey: ['viewing_script'],
     mutationFn: async (params: z.infer<typeof params_viewing_script_mut_schema>) => {
@@ -52,7 +56,7 @@
       return script;
     },
     onSuccess(script, { update_viewing_script_selection }) {
-      viewing_script = script;
+      $viewing_script = script;
       if (update_viewing_script_selection) $viewing_script_selection = script;
     }
   });
@@ -92,7 +96,7 @@
       $trans_lang_mut.mutate(lang);
     })
   );
-  let trans_lang = writable($trans_lang_selection);
+  $trans_lang = $trans_lang_selection;
 
   let view_translation_status = false;
 
@@ -100,8 +104,6 @@
     enabled: !!(browser && $user_info && $user_info.user_type !== 'admin'),
     placeholderData: []
   });
-
-  let editing_status_on = writable(false);
 
   const get_ramayanam_page_link = (kANDa: number, sarga: number | null = null) => {
     return `/${kANDa}${sarga ? `/${sarga}` : ''}`;
@@ -111,7 +113,7 @@
   $: browser &&
     Promise.all(
       rAmAyaNa_map.map((kANDa) =>
-        lipi_parivartak_async(kANDa.name_devanagari, BASE_SCRIPT, viewing_script)
+        lipi_parivartak_async(kANDa.name_devanagari, BASE_SCRIPT, $viewing_script)
       )
     ).then((_kANDa_names) => (kANDa_names = _kANDa_names));
   let sarga_names: string[] =
@@ -122,7 +124,7 @@
     $kANDa_selected !== 0 &&
     Promise.all(
       rAmAyaNa_map[$kANDa_selected - 1].sarga_data.map((sarga) =>
-        lipi_parivartak_async(sarga.name_devanagari.split('\n')[0], BASE_SCRIPT, viewing_script)
+        lipi_parivartak_async(sarga.name_devanagari.split('\n')[0], BASE_SCRIPT, $viewing_script)
       )
     ).then((_sarga_names) => (sarga_names = _sarga_names));
 
@@ -450,14 +452,8 @@
         {/if}
       {/if}
     </div>
-    <Display
+    <DisplayArea
       {...{
-        BASE_SCRIPT,
-        viewing_script,
-        editing_status_on,
-        sarga_selected,
-        kANDa_selected,
-        trans_lang,
         sarga_data,
         trans_en_data,
         trans_lang_data_query_key

@@ -7,6 +7,7 @@
   import { RiSystemAddLargeLine } from 'svelte-icons-pack/ri';
   import type { Writable } from 'svelte/store';
   import { slide } from 'svelte/transition';
+  import { editing_status_on } from '@state/main_page/main_page_state';
 
   const query_client = useQueryClient();
 
@@ -15,14 +16,13 @@
   export let trans_en_data: CreateQueryResult<Map<number, string>, Error>;
   export let trans_lang_data: CreateQueryResult<Map<number, string>, Error>;
   export let trans_lang_data_query_key: (string | number)[];
-  export let editing_status_on: Writable<boolean>;
   export let added_translations_indexes: number[];
   export let edited_translations_indexes: Set<number>;
   export let trans_lang: Writable<string>;
   export let sanskrit_mode: number;
   export let edit_language_typer_status: boolean;
 
-  let line_split = shloka_lines.split('\n');
+  $: line_split = shloka_lines.split('\n');
 
   // clipboard related
   let enable_copy_to_clipbaord = true;

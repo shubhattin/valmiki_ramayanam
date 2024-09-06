@@ -25,17 +25,19 @@
   import { CgClose } from 'svelte-icons-pack/cg';
   import { ALL_LANG_SCRIPT_LIST } from '@tools/lang_list';
   import TextDisplay from './TextDisplay.svelte';
+  import {
+    kANDa_selected,
+    sarga_selected,
+    editing_status_on,
+    BASE_SCRIPT,
+    viewing_script,
+    trans_lang
+  } from '@state/main_page/main_page_state';
 
   const query_client = useQueryClient();
   const modal_store = getModalStore();
   const unsubscribers: Unsubscriber[] = [];
 
-  export let viewing_script: string;
-  export let BASE_SCRIPT: string;
-  export let editing_status_on: Writable<boolean>;
-  export let sarga_selected: Writable<number>;
-  export let kANDa_selected: Writable<number>;
-  export let trans_lang: Writable<string>;
   export let sarga_data: CreateQueryResult<string[], Error>;
   export let trans_en_data: CreateQueryResult<Map<number, string>, Error>;
   export let trans_lang_data_query_key: (string | number)[];
@@ -43,7 +45,7 @@
   let transliterated_sarga_data: string[] = [];
   $: Promise.all(
     ($sarga_data.data ?? []).map((shloka_lines) =>
-      lipi_parivartak_async(shloka_lines, BASE_SCRIPT, viewing_script)
+      lipi_parivartak_async(shloka_lines, BASE_SCRIPT, $viewing_script)
     )
   ).then((data) => {
     transliterated_sarga_data = data;
@@ -302,7 +304,6 @@
                   added_translations_indexes,
                   edit_language_typer_status,
                   edited_translations_indexes,
-                  editing_status_on,
                   shloka_lines,
                   trans_en_data,
                   trans_index,
