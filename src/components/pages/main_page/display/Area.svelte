@@ -34,7 +34,7 @@
     trans_lang,
     sanskrit_mode,
     sarga_data
-  } from '@state/main_page/main_page_state';
+  } from '@state/main_page/main_state';
 
   const query_client = useQueryClient();
   const modal_store = getModalStore();

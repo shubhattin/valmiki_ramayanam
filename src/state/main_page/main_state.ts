@@ -16,12 +16,20 @@ export let trans_lang = writable<string>();
 
 export let sanskrit_mode = writable<number>();
 
-const get_query = <W, Val, E, SvelteQuery extends CreateQueryResult<Val, E>>(
-  stores: Writable<W>[],
-  query_func: (val: W[]) => SvelteQuery
+const get_query = <
+  Stores extends Writable<any>[],
+  Val,
+  E,
+  SvelteQuery extends CreateQueryResult<Val, E>
+>(
+  stores: [...Stores],
+  query_func: (vals: {
+    [K in keyof Stores]: Stores[K] extends Writable<infer T> ? T : never;
+  }) => SvelteQuery // Map stores to their inner values
 ) => {
   type result = Parameters<Parameters<SvelteQuery['subscribe']>[0]>[0];
   return derived<typeof stores, result>(stores, (vals, set) => {
+    // @ts-ignore
     const query = query_func(vals);
     const unsub = query.subscribe((state) => set(state));
     return () => {
@@ -29,7 +37,6 @@ const get_query = <W, Val, E, SvelteQuery extends CreateQueryResult<Val, E>>(
     };
   });
 };
-
 export const sarga_data = get_query([kANDa_selected, sarga_selected], ([kanda, sarga]) =>
   createQuery(
     {

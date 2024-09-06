@@ -6,7 +6,7 @@
   import { BsClipboard2Check } from 'svelte-icons-pack/bs';
   import { RiSystemAddLargeLine } from 'svelte-icons-pack/ri';
   import { slide } from 'svelte/transition';
-  import { editing_status_on, trans_lang, sanskrit_mode } from '@state/main_page/main_page_state';
+  import { editing_status_on, trans_lang, sanskrit_mode } from '@state/main_page/main_state';
 
   const query_client = useQueryClient();
 

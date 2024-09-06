@@ -34,7 +34,7 @@
     viewing_script,
     trans_lang,
     sarga_data
-  } from '@state/main_page/main_page_state';
+  } from '@state/main_page/main_state';
 
   let mounted = false;
 

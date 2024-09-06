@@ -4,7 +4,7 @@
   import MainPage from '@components/pages/main_page/MainPage.svelte';
   import MetaTags from '@components/tags/MetaTags.svelte';
   import { main_app_bar_info } from '@state/app_bar';
-  import { kANDa_selected, sarga_selected } from '@state/main_page/main_page_state';
+  import { kANDa_selected, sarga_selected } from '@state/main_page/main_state';
 
   const PAGE_INFO = {
     title: 'श्रीमद्रामायणम्',
