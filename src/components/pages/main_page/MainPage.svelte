@@ -7,7 +7,7 @@
   import { LANG_LIST, SCRIPT_LIST } from '@tools/lang_list';
   import { load_parivartak_lang_data, lipi_parivartak_async } from '@tools/converter';
   import { LanguageIcon } from '@components/icons';
-  import User from './User.svelte';
+  import User from './user/User.svelte';
   import { ensure_auth_access_status, get_id_token_info } from '@tools/auth_tools';
   import { browser } from '$app/environment';
   import Display from './Display.svelte';
@@ -132,8 +132,8 @@
       $user_info = get_id_token_info().user;
     } catch {}
     if (import.meta.env.DEV) {
-      view_translation_status = true;
-      $trans_lang_mut.mutateAsync('Hindi').then(() => editing_status_on.set(true));
+      // view_translation_status = true;
+      // $trans_lang_mut.mutateAsync('Hindi').then(() => editing_status_on.set(true));
     }
     if (browser && import.meta.env.PROD) {
       window.addEventListener('beforeunload', function (e) {
