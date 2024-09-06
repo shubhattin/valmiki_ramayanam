@@ -32,7 +32,8 @@
     editing_status_on,
     BASE_SCRIPT,
     viewing_script,
-    trans_lang
+    trans_lang,
+    sarga_data
   } from '@state/main_page/main_page_state';
 
   let mounted = false;
@@ -175,21 +176,6 @@
   );
   onDestroy(() => {
     unsubscribers.forEach((unsub) => unsub());
-  });
-
-  $: sarga_data = createQuery({
-    queryKey: ['sarga', 'main_dev_text', $kANDa_selected, $sarga_selected],
-    enabled: browser && $kANDa_selected !== 0 && $sarga_selected !== 0,
-    placeholderData: [],
-    queryFn: async () => {
-      if (!browser) return [];
-      const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
-      const data = (
-        (await all_sargas[`/data/ramayan/data/${$kANDa_selected}/${$sarga_selected}.json`]()) as any
-      ).default as string[];
-      await delay(350);
-      return data;
-    }
   });
 
   const QUERY_KEYS = {
@@ -454,7 +440,6 @@
     </div>
     <DisplayArea
       {...{
-        sarga_data,
         trans_en_data,
         trans_lang_data_query_key
       }}

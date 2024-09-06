@@ -31,14 +31,15 @@
     editing_status_on,
     BASE_SCRIPT,
     viewing_script,
-    trans_lang
+    trans_lang,
+    sanskrit_mode,
+    sarga_data
   } from '@state/main_page/main_page_state';
 
   const query_client = useQueryClient();
   const modal_store = getModalStore();
   const unsubscribers: Unsubscriber[] = [];
 
-  export let sarga_data: CreateQueryResult<string[], Error>;
   export let trans_en_data: CreateQueryResult<Map<number, string>, Error>;
   export let trans_lang_data_query_key: (string | number)[];
 
@@ -83,8 +84,6 @@
   let typing_assistance_modal_opened = writable(false);
   $: typing_assistance_lang = $trans_lang;
 
-  let sanskrit_mode: number;
-
   $: sanskrit_mode_texts = createQuery({
     queryKey: ['sanskrit_mode_texts'],
     enabled: browser && $editing_status_on && $trans_lang !== '--',
@@ -98,7 +97,7 @@
       sanskrit_mode_texts.subscribe(({ isFetching, isSuccess }) => {
         if (!$editing_status_on || isFetching || !isSuccess) return;
         const lng = LipiLekhikA.k.normalize($trans_lang);
-        sanskrit_mode = (LipiLekhikA.k.akSharAH as any)[lng].sa;
+        $sanskrit_mode = (LipiLekhikA.k.akSharAH as any)[lng].sa;
       })
     );
   });
@@ -238,7 +237,7 @@
     {#if edit_language_typer_status && $sanskrit_mode_texts.isSuccess && !$sanskrit_mode_texts.isFetching}
       <select
         transition:scale
-        bind:value={sanskrit_mode}
+        bind:value={$sanskrit_mode}
         class="select m-0 w-28 text-clip px-1 py-1 text-sm"
       >
         <option value={1}>rAm ➔ {$sanskrit_mode_texts.data[0]}</option>
@@ -308,9 +307,7 @@
                   trans_en_data,
                   trans_index,
                   trans_lang_data,
-                  trans_lang_data_query_key,
-                  trans_lang,
-                  sanskrit_mode
+                  trans_lang_data_query_key
                 }}
               />
             </div>

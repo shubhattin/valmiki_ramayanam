@@ -5,9 +5,8 @@
   import { copy_text_to_clipboard, get_possibily_not_undefined } from '@tools/kry';
   import { BsClipboard2Check } from 'svelte-icons-pack/bs';
   import { RiSystemAddLargeLine } from 'svelte-icons-pack/ri';
-  import type { Writable } from 'svelte/store';
   import { slide } from 'svelte/transition';
-  import { editing_status_on } from '@state/main_page/main_page_state';
+  import { editing_status_on, trans_lang, sanskrit_mode } from '@state/main_page/main_page_state';
 
   const query_client = useQueryClient();
 
@@ -18,8 +17,6 @@
   export let trans_lang_data_query_key: (string | number)[];
   export let added_translations_indexes: number[];
   export let edited_translations_indexes: Set<number>;
-  export let trans_lang: Writable<string>;
-  export let sanskrit_mode: number;
   export let edit_language_typer_status: boolean;
 
   $: line_split = shloka_lines.split('\n');
@@ -103,7 +100,7 @@
               (val) => {
                 update_trans_data(trans_index, val);
               },
-              sanskrit_mode
+              $sanskrit_mode
             );
           else {
             update_trans_data(trans_index, e.currentTarget.value);
