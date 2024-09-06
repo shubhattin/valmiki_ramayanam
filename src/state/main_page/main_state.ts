@@ -2,7 +2,7 @@ import { browser } from '$app/environment';
 import { createQuery, type CreateQueryResult } from '@tanstack/svelte-query';
 import { delay } from '@tools/delay';
 import { derived, writable } from 'svelte/store';
-import type { Writable } from 'svelte/store';
+import type { StoresValues, Writable } from 'svelte/store';
 import { queryClient } from '@state/query';
 
 export let kANDa_selected = writable(0);
@@ -23,20 +23,20 @@ const get_query = <
   SvelteQuery extends CreateQueryResult<Val, E>
 >(
   stores: [...Stores],
-  query_func: (vals: {
-    [K in keyof Stores]: Stores[K] extends Writable<infer T> ? T : never;
-  }) => SvelteQuery // Map stores to their inner values
+  query_func: (vals: StoresValues<Stores>) => SvelteQuery // Map stores to their inner values
 ) => {
-  type result = Parameters<Parameters<SvelteQuery['subscribe']>[0]>[0];
+  type result = StoresValues<SvelteQuery>;
+  // OR
+  // type result = Parameters<Parameters<SvelteQuery['subscribe']>[0]>[0];
   return derived<typeof stores, result>(stores, (vals, set) => {
-    // @ts-ignore
     const query = query_func(vals);
-    const unsub = query.subscribe((state) => set(state));
+    const unsub = query.subscribe((state) => set(state as result));
     return () => {
       unsub();
     };
   });
 };
+
 export const sarga_data = get_query([kANDa_selected, sarga_selected], ([kanda, sarga]) =>
   createQuery(
     {
