@@ -80,15 +80,20 @@
   let added_translations_indexes: number[] = [];
   let edited_translations_indexes = new Set<number>();
 
-  let sanskrit_mode_texts: string[];
   let sanskrit_mode: number;
 
-  $: browser &&
-    $trans_lang !== '--' &&
-    (async () => {
-      sanskrit_mode_texts = await Promise.all(
+  $: sanskrit_mode_texts = createQuery({
+    queryKey: ['sanskrit_mode_texts'],
+    enabled: browser && $editing_status_on && $trans_lang !== '--',
+    queryFn: () =>
+      Promise.all(
         ['राम्', 'राम'].map((text) => lipi_parivartak_async(text, BASE_SCRIPT, $trans_lang))
-      );
+      )
+  });
+  $: $editing_status_on &&
+    $sanskrit_mode_texts.isSuccess &&
+    !$sanskrit_mode_texts.isFetching &&
+    (() => {
       const lng = LipiLekhikA.k.normalize($trans_lang);
       sanskrit_mode = (LipiLekhikA.k.akSharAH as any)[lng].sa;
     })();
@@ -185,14 +190,14 @@
     >
       <Icon src={BsKeyboard} class="text-4xl" />
     </SlideToggle>
-    {#if edit_language_typer_status}
+    {#if edit_language_typer_status && $sanskrit_mode_texts.isSuccess && !$sanskrit_mode_texts.isFetching}
       <select
         transition:scale
         bind:value={sanskrit_mode}
         class="select m-0 w-28 text-clip px-1 py-1 text-sm"
       >
-        <option value={1}>rAm ➔ {sanskrit_mode_texts[0]}</option>
-        <option value={0}>rAm ➔ {sanskrit_mode_texts[1]}</option>
+        <option value={1}>rAm ➔ {$sanskrit_mode_texts.data[0]}</option>
+        <option value={0}>rAm ➔ {$sanskrit_mode_texts.data[1]}</option>
       </select>
     {/if}
   {/if}
@@ -250,7 +255,7 @@
                 {i}
               </div>
             {/if}
-            <div class="mt-0 space-y-1">
+            <div class="mt-0 w-full space-y-1">
               <!-- svelte-ignore a11y-no-static-element-interactions -->
               <div
                 on:dblclick={() => {

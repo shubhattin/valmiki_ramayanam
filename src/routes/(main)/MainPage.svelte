@@ -20,7 +20,7 @@
   import { goto } from '$app/navigation';
   import Select from '@components/Select.svelte';
   import { z } from 'zod';
-  import { createMutation, createQuery } from '@tanstack/svelte-query';
+  import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
   import { BsThreeDots } from 'svelte-icons-pack/bs';
   import { popup } from '@skeletonlabs/skeleton';
   import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
@@ -31,6 +31,7 @@
   let mounted = false;
 
   const unsubscribers: Unsubscriber[] = [];
+  const query_client = useQueryClient();
 
   export let kANDa_selected: Writable<number>;
   export let sarga_selected: Writable<number>;
@@ -81,7 +82,9 @@
       return lang;
     },
     onSuccess(lang) {
+      $trans_lang_selection = lang;
       $trans_lang = lang;
+      query_client.invalidateQueries({ queryKey: ['sanskrit_mode_texts'] });
     }
   });
   unsubscribers.push(
@@ -130,9 +133,7 @@
     } catch {}
     if (import.meta.env.DEV) {
       // view_translation_status = true;
-      // $trans_lang = 'Hindi';
-      // viewing_script = 'Telugu';
-      // editing_status_on.set(true);
+      // $trans_lang_mut.mutateAsync('Hindi').then(() => editing_status_on.set(true));
     }
     if (browser && import.meta.env.PROD) {
       window.addEventListener('beforeunload', function (e) {
