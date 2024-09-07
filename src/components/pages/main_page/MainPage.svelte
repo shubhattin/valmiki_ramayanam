@@ -10,7 +10,7 @@
   import User from './user/User.svelte';
   import { ensure_auth_access_status, get_id_token_info } from '@tools/auth_tools';
   import { browser } from '$app/environment';
-  import DisplayArea from './display/Area.svelte';
+  import DisplayArea from './display/DisplayArea.svelte';
   import { client_raw } from '@api/client';
   import { get_possibily_not_undefined } from '@tools/kry';
   import { BiEdit } from 'svelte-icons-pack/bi';

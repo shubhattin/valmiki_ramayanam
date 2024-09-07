@@ -19,7 +19,7 @@
   import Modal from '@components/Modal.svelte';
   import { CgClose } from 'svelte-icons-pack/cg';
   import { ALL_LANG_SCRIPT_LIST } from '@tools/lang_list';
-  import TextDisplay from './TextDisplay.svelte';
+  import TextDisplay from './ShlokaDisplay.svelte';
   import {
     kANDa_selected,
     sarga_selected,
