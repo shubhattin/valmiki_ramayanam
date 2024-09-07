@@ -32,9 +32,9 @@
     editing_status_on,
     BASE_SCRIPT,
     viewing_script,
-    trans_lang,
-    sarga_data
+    trans_lang
   } from '@state/main_page/main_state';
+  import { sarga_data } from '@state/main_page/data';
 
   let mounted = false;
 

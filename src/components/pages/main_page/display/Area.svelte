@@ -32,9 +32,9 @@
     BASE_SCRIPT,
     viewing_script,
     trans_lang,
-    sanskrit_mode,
-    sarga_data
+    sanskrit_mode
   } from '@state/main_page/main_state';
+  import { sarga_data } from '@state/main_page/data';
 
   const query_client = useQueryClient();
   const modal_store = getModalStore();
