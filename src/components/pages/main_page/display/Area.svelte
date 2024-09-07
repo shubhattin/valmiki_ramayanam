@@ -90,7 +90,8 @@
     queryFn: () =>
       Promise.all(
         ['राम्', 'राम'].map((text) => lipi_parivartak_async(text, BASE_SCRIPT, $trans_lang))
-      )
+      ),
+    placeholderData: ['राम्', 'राम']
   });
   onMount(() => {
     unsubscribers.push(

@@ -10,7 +10,7 @@
   import { BiLock, BiLogOut } from 'svelte-icons-pack/bi';
   import { deleteAuthCookies } from '@tools/auth_tools';
   import Modal from '@components/Modal.svelte';
-  import Authenticate from '@components/Authenticate.svelte';
+  import Authenticate from '@components/pages/main_page/user/Authenticate.svelte';
   import { writable } from 'svelte/store';
   import { AiOutlineUser } from 'svelte-icons-pack/ai';
   import NewUser from './NewUser.svelte';
