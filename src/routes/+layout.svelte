@@ -7,21 +7,12 @@
   import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
   import PartyTown from '@components/tags/PartyTown.svelte';
   import GA from '@components/tags/GA.svelte';
-  import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
-  import { browser } from '$app/environment';
+  import { QueryClientProvider } from '@tanstack/svelte-query';
   import { SvelteQueryDevtools } from '@tanstack/svelte-query-devtools';
+  import { queryClient } from '@state/query';
 
   initializeStores();
   storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
-
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        enabled: browser,
-        staleTime: 1000 * 60 * 8 // by default data will stay fresh for 8 minutes
-      }
-    }
-  });
 </script>
 
 <svelte:head>
