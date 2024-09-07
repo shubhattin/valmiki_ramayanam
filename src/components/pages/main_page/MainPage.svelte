@@ -32,9 +32,9 @@
     typing_assistance_modal_opened
   } from '@state/main_page/main_state';
   import { user_allowed_langs } from '@state/main_page/user';
-  import { VscAccount } from 'svelte-icons-pack/vsc';
-  import { popup, SlideToggle } from '@skeletonlabs/skeleton';
+  import { SlideToggle } from '@skeletonlabs/skeleton';
   import { BsKeyboard } from 'svelte-icons-pack/bs';
+  import User from './user/User.svelte';
 
   const unsubscribers: Unsubscriber[] = [];
   const query_client = useQueryClient();
@@ -208,23 +208,7 @@
         {/each}
       </select>
     </label>
-    <!-- User -->
-    <button
-      class="btn m-2 p-0"
-      use:popup={{
-        event: 'click',
-        target: 'user_info',
-        placement: 'left-start'
-      }}
-    >
-      <Icon class="hover:text-gray-6200 text-3xl dark:hover:text-gray-400" src={VscAccount} />
-    </button>
-    <div class="card z-40 px-1 py-2 shadow-2xl" data-popup="user_info">
-      {#await import('./user/User.svelte') then User}
-        <User.default />
-      {/await}
-    </div>
-    <!-- /User -->
+    <User />
   </div>
   <!-- svelte-ignore a11y-label-has-associated-control -->
   <label class="space-x-4">
