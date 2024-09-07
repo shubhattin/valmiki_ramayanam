@@ -4,8 +4,15 @@ import { delay } from '@tools/delay';
 import { get_derived_query } from '@tools/query';
 import { queryClient } from '@state/query';
 import { derived } from 'svelte/store';
+import { client_raw } from '@api/client';
 
-import { kANDa_selected, sarga_selected, trans_lang, view_translation_status } from './main_state';
+import {
+  editing_status_on,
+  kANDa_selected,
+  sarga_selected,
+  trans_lang,
+  view_translation_status
+} from './main_state';
 
 // SARGA_DATA
 export const sarga_data = get_derived_query(
@@ -90,4 +97,40 @@ export const trans_lang_data_query_key = derived(
   ([$trans_lang, $kANDa_selected, $sarga_selected], set: (value: (string | number)[]) => void) => {
     set(QUERY_KEYS.trans_lang_data($trans_lang, $kANDa_selected, $sarga_selected));
   }
+);
+export const trans_lang_data = get_derived_query(
+  [trans_lang_data_query_key, trans_lang, kANDa_selected, sarga_selected, editing_status_on],
+  ([
+    $trans_lang_data_query_key,
+    $trans_lang,
+    $kANDa_selected,
+    $sarga_selected,
+    $editing_status_on
+  ]) =>
+    createQuery(
+      {
+        queryKey: $trans_lang_data_query_key,
+        enabled: browser && $trans_lang !== '--' && $kANDa_selected !== 0 && $sarga_selected !== 0,
+        ...($editing_status_on
+          ? {
+              staleTime: Infinity
+              // while editing the data should not go stale, else it would refetch lead to data loss
+            }
+          : {}),
+        queryFn: async () => {
+          const data = await client_raw.translations.get_translations_per_sarga.query({
+            lang: $trans_lang,
+            kANDa_num: $kANDa_selected,
+            sarga_num: $sarga_selected
+          });
+          const data_map = new Map<number, string>();
+          for (let val of data) {
+            // we dont need to manually care abouy 0 or -1, it will be handled while making changes
+            data_map.set(val.shloka_num, val.text);
+          }
+          return data_map;
+        }
+      },
+      queryClient
+    )
 );

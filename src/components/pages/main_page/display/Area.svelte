@@ -27,9 +27,17 @@
     BASE_SCRIPT,
     viewing_script,
     trans_lang,
-    sanskrit_mode
+    sanskrit_mode,
+    added_translations_indexes,
+    edit_language_typer_status,
+    edited_translations_indexes
   } from '@state/main_page/main_state';
-  import { sarga_data, trans_en_data, trans_lang_data_query_key } from '@state/main_page/data';
+  import {
+    sarga_data,
+    trans_en_data,
+    trans_lang_data_query_key,
+    trans_lang_data
+  } from '@state/main_page/data';
 
   const query_client = useQueryClient();
   const modal_store = getModalStore();
@@ -43,35 +51,6 @@
   ).then((data) => {
     transliterated_sarga_data = data;
   });
-
-  $: trans_lang_data = createQuery({
-    queryKey: $trans_lang_data_query_key,
-    enabled: browser && $trans_lang !== '--' && $kANDa_selected !== 0 && $sarga_selected !== 0,
-    ...($editing_status_on
-      ? {
-          staleTime: Infinity
-          // while editing the data should not go stale, else it would refetch lead to data loss
-        }
-      : {}),
-    queryFn: async () => {
-      const data = await client_raw.translations.get_translations_per_sarga.query({
-        lang: $trans_lang,
-        kANDa_num: $kANDa_selected,
-        sarga_num: $sarga_selected
-      });
-      const data_map = new Map<number, string>();
-      for (let val of data) {
-        // we dont need to manually care abouy 0 or -1, it will be handled while making changes
-        data_map.set(val.shloka_num, val.text);
-      }
-      return data_map;
-    }
-  });
-
-  let edit_language_typer_status = true;
-
-  let added_translations_indexes: number[] = [];
-  let edited_translations_indexes = new Set<number>();
 
   let typing_assistance_modal_opened = writable(false);
   $: typing_assistance_lang = $trans_lang;
@@ -120,16 +99,16 @@
         lang: $trans_lang
       });
       if (res.success) {
-        added_translations_indexes = [];
-        edited_translations_indexes = new Set();
+        $added_translations_indexes = [];
+        $edited_translations_indexes = new Set();
         $editing_status_on = false;
       }
     }
   });
   const save_data_func = () => {
-    if (edited_translations_indexes.size + added_translations_indexes.length === 0) return;
-    const added_indexes = added_translations_indexes.map((index) => index);
-    const edited_indexes = Array.from(edited_translations_indexes).map((index) => index);
+    if ($edited_translations_indexes.size + $added_translations_indexes.length === 0) return;
+    const added_indexes = $added_translations_indexes.map((index) => index);
+    const edited_indexes = Array.from($edited_translations_indexes).map((index) => index);
     const modal_options: ModalSettings = {
       title: 'Sure to save Changes ?',
       type: 'confirm',
@@ -149,19 +128,19 @@
       if (!$trans_lang_data.isSuccess) return;
       await delay(500);
       await query_client.invalidateQueries({ queryKey: $trans_lang_data_query_key });
-      added_translations_indexes = [];
-      edited_translations_indexes = new Set();
+      $added_translations_indexes = [];
+      $edited_translations_indexes = new Set();
       $editing_status_on = false;
       // ^ reset the data
     }
   });
   const cancel_edit_func = () => {
-    if (edited_translations_indexes.size + added_translations_indexes.length === 0) {
+    if ($edited_translations_indexes.size + $added_translations_indexes.length === 0) {
       $cancel_edit_data.mutate();
       return;
     }
-    const added_indexes = added_translations_indexes.map((index) => index);
-    const edited_indexes = Array.from(edited_translations_indexes).map((index) => index);
+    const added_indexes = $added_translations_indexes.map((index) => index);
+    const edited_indexes = Array.from($edited_translations_indexes).map((index) => index);
     const modal_options: ModalSettings = {
       title: 'Sure to discard Changes ?',
       type: 'confirm',
@@ -222,12 +201,12 @@
       name="edit_lang"
       active="bg-primary-500"
       class="hover:text-gray-500 dark:hover:text-gray-400"
-      bind:checked={edit_language_typer_status}
+      bind:checked={$edit_language_typer_status}
       size="sm"
     >
       <Icon src={BsKeyboard} class="text-4xl" />
     </SlideToggle>
-    {#if edit_language_typer_status && $sanskrit_mode_texts.isSuccess && !$sanskrit_mode_texts.isFetching}
+    {#if $edit_language_typer_status && $sanskrit_mode_texts.isSuccess && !$sanskrit_mode_texts.isFetching}
       <select
         transition:scale
         bind:value={$sanskrit_mode}
@@ -293,13 +272,8 @@
             <div class="mt-0 w-full space-y-1">
               <TextDisplay
                 {...{
-                  added_translations_indexes,
-                  edit_language_typer_status,
-                  edited_translations_indexes,
                   shloka_lines,
-                  trans_en_data,
-                  trans_index,
-                  trans_lang_data
+                  trans_index
                 }}
               />
             </div>

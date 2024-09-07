@@ -6,18 +6,20 @@
   import { BsClipboard2Check } from 'svelte-icons-pack/bs';
   import { RiSystemAddLargeLine } from 'svelte-icons-pack/ri';
   import { slide } from 'svelte/transition';
-  import { editing_status_on, trans_lang, sanskrit_mode } from '@state/main_page/main_state';
-  import { trans_lang_data_query_key } from '@state/main_page/data';
+  import {
+    editing_status_on,
+    trans_lang,
+    sanskrit_mode,
+    added_translations_indexes,
+    edit_language_typer_status,
+    edited_translations_indexes
+  } from '@state/main_page/main_state';
+  import { trans_lang_data_query_key, trans_en_data, trans_lang_data } from '@state/main_page/data';
 
   const query_client = useQueryClient();
 
   export let shloka_lines: string;
   export let trans_index: number;
-  export let trans_en_data: CreateQueryResult<Map<number, string>, Error>;
-  export let trans_lang_data: CreateQueryResult<Map<number, string>, Error>;
-  export let added_translations_indexes: number[];
-  export let edited_translations_indexes: Set<number>;
-  export let edit_language_typer_status: boolean;
 
   $: line_split = shloka_lines.split('\n');
 
@@ -78,7 +80,7 @@
       <button
         on:click={async () => {
           await update_trans_data(trans_index, '');
-          added_translations_indexes.push(trans_index);
+          $added_translations_indexes.push(trans_index);
         }}
         class="btn m-0 rounded-md bg-surface-500 p-0 px-1 font-bold text-white dark:bg-surface-500"
       >
@@ -87,9 +89,9 @@
     {:else}
       <textarea
         on:input={(e) => {
-          if (!added_translations_indexes.includes(trans_index))
-            edited_translations_indexes.add(trans_index);
-          if (edit_language_typer_status)
+          if (!$added_translations_indexes.includes(trans_index))
+            $edited_translations_indexes.add(trans_index);
+          if ($edit_language_typer_status)
             LipiLekhikA.mukhya(
               e.target,
               // @ts-ignore

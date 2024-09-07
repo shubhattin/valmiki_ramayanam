@@ -1,12 +1,12 @@
 import type { CreateQueryResult } from '@tanstack/svelte-query';
-import type { StoresValues, Writable } from 'svelte/store';
+import type { Readable, StoresValues } from 'svelte/store';
 import { derived } from 'svelte/store';
 
 /**
  * Get a derived store from a `svelte-query` function and a list of stores
  */
 export const get_derived_query = <
-  Stores extends Writable<any>[],
+  Stores extends Readable<any>[],
   Val,
   E,
   SvelteQuery extends CreateQueryResult<Val, E>

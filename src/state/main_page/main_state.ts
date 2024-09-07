@@ -12,3 +12,7 @@ export let view_translation_status = writable(false);
 // Edit
 export let editing_status_on = writable(false);
 export let sanskrit_mode = writable<number>();
+
+export let added_translations_indexes = writable<number[]>([]);
+export let edited_translations_indexes = writable<Set<number>>(new Set());
+export let edit_language_typer_status = writable<boolean>(true);
