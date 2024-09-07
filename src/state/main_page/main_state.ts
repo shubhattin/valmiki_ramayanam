@@ -16,3 +16,4 @@ export let sanskrit_mode = writable<number>();
 export let added_translations_indexes = writable<number[]>([]);
 export let edited_translations_indexes = writable<Set<number>>(new Set());
 export let edit_language_typer_status = writable<boolean>(true);
+export let typing_assistance_modal_opened = writable(false);

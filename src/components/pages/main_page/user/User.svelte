@@ -1,9 +1,8 @@
 <script lang="ts">
   import Icon from '@tools/Icon.svelte';
-  import { popup, getModalStore } from '@skeletonlabs/skeleton';
+  import { getModalStore } from '@skeletonlabs/skeleton';
   import type { ModalSettings } from '@skeletonlabs/skeleton';
   import { TrOutlineLogin2 } from 'svelte-icons-pack/tr';
-  import { VscAccount } from 'svelte-icons-pack/vsc';
   import { LuSettings, LuUserPlus } from 'svelte-icons-pack/lu';
   import { get_id_token_info } from '@tools/auth_tools';
   import { RiUserFacesAdminLine } from 'svelte-icons-pack/ri';
@@ -46,99 +45,87 @@
   };
 </script>
 
-<button
-  class="btn m-2 p-0"
-  use:popup={{
-    event: 'click',
-    target: 'user_info',
-    placement: 'left-start'
-  }}
->
-  <Icon class="hover:text-gray-6200 text-3xl dark:hover:text-gray-400" src={VscAccount} />
-</button>
-<div class="card z-40 px-1 py-2 shadow-2xl" data-popup="user_info">
-  {#if $user_info}
-    <div class="select-none space-y-2 p-1">
-      <div class="text-center text-base font-bold">
-        {#if $user_info.user_type === 'admin'}
-          <Icon class="-mt-1 text-2xl" src={RiUserFacesAdminLine} />
-        {:else}
-          <Icon class="-mt-1 text-2xl" src={AiOutlineUser} />
-        {/if}{$user_info.user_name}
-        <span class="text-sm text-gray-500 dark:text-gray-400">({$user_info.user_id})</span>
-      </div>
-      <div class="space-x-4">
-        {#if $user_info.user_type === 'admin'}
-          <button
-            disabled={$editing_status_on}
-            on:click={() => ($manage_user_modal_status = true)}
-            class="btn space-x-2 rounded-md bg-primary-800 pb-1 pl-1 pr-2 pt-1 font-bold text-white"
-          >
-            <Icon class="text-2xl" src={LuSettings} />
-            <span>Settings</span>
-          </button>
-        {/if}
+{#if $user_info}
+  <div class="select-none space-y-2 p-1">
+    <div class="text-center text-base font-bold">
+      {#if $user_info.user_type === 'admin'}
+        <Icon class="-mt-1 text-2xl" src={RiUserFacesAdminLine} />
+      {:else}
+        <Icon class="-mt-1 text-2xl" src={AiOutlineUser} />
+      {/if}{$user_info.user_name}
+      <span class="text-sm text-gray-500 dark:text-gray-400">({$user_info.user_id})</span>
+    </div>
+    <div class="space-x-4">
+      {#if $user_info.user_type === 'admin'}
         <button
           disabled={$editing_status_on}
-          on:click={log_out}
-          class="variant-filled-error btn m-0 rounded-md pb-1 pl-1 pr-2 pt-0 font-bold"
+          on:click={() => ($manage_user_modal_status = true)}
+          class="btn space-x-2 rounded-md bg-primary-800 pb-1 pl-1 pr-2 pt-1 font-bold text-white"
         >
-          <Icon class="text-2xl" src={BiLogOut} />
-          <span>Logout</span>
+          <Icon class="text-2xl" src={LuSettings} />
+          <span>Settings</span>
         </button>
-      </div>
+      {/if}
       <button
         disabled={$editing_status_on}
-        on:click={() => ($update_password_modal_status = true)}
-        class="btn m-0 rounded-md bg-secondary-800 pb-1 pl-1 pr-2 pt-0 font-bold text-white dark:bg-secondary-700"
+        on:click={log_out}
+        class="variant-filled-error btn m-0 rounded-md pb-1 pl-1 pr-2 pt-0 font-bold"
       >
-        <Icon class="text-2xl" src={BiLock} />
-        <span>Update Password</span>
-      </button>
-      {#if $user_info.user_type !== 'admin' && ($user_allowed_langs.data ?? []).length > 0}
-        <div>
-          <Icon class="text-xl" src={LanguageIcon} /> :
-          <span class="text-sm text-gray-500 dark:text-gray-300">
-            {($user_allowed_langs.data ?? []).join(', ')}
-          </span>
-        </div>
-      {/if}
-    </div>
-  {:else}
-    <div class="space-y-2">
-      <button
-        on:click={() => {
-          $pass_enterer_status = true;
-          setTimeout(() => {
-            $user_input_elmnt_login.focus();
-          }, 500);
-        }}
-        class="group flex w-full space-x-2 rounded-md px-2 py-1 font-bold hover:bg-gray-200 dark:hover:bg-gray-700"
-      >
-        <Icon
-          src={TrOutlineLogin2}
-          class="-ml-1 -mt-1 text-3xl group-hover:text-gray-600 dark:group-hover:text-stone-400"
-        />
-        <span>Login</span>
-      </button>
-      <button
-        on:click={() => {
-          $user_create_modal_status = true;
-          setTimeout(() => {
-            $user_input_elmnt_login.focus();
-          }, 500);
-        }}
-        class="group flex w-full space-x-2 rounded-md px-2 py-1 font-bold hover:bg-gray-200 dark:hover:bg-gray-700"
-      >
-        <Icon
-          src={LuUserPlus}
-          class="text-2xl group-hover:text-gray-600 dark:group-hover:text-stone-400"
-        />
-        <span>Signup</span>
+        <Icon class="text-2xl" src={BiLogOut} />
+        <span>Logout</span>
       </button>
     </div>
-  {/if}
-</div>
+    <button
+      disabled={$editing_status_on}
+      on:click={() => ($update_password_modal_status = true)}
+      class="btn m-0 rounded-md bg-secondary-800 pb-1 pl-1 pr-2 pt-0 font-bold text-white dark:bg-secondary-700"
+    >
+      <Icon class="text-2xl" src={BiLock} />
+      <span>Update Password</span>
+    </button>
+    {#if $user_info.user_type !== 'admin' && ($user_allowed_langs.data ?? []).length > 0}
+      <div>
+        <Icon class="text-xl" src={LanguageIcon} /> :
+        <span class="text-sm text-gray-500 dark:text-gray-300">
+          {($user_allowed_langs.data ?? []).join(', ')}
+        </span>
+      </div>
+    {/if}
+  </div>
+{:else}
+  <div class="space-y-2">
+    <button
+      on:click={() => {
+        $pass_enterer_status = true;
+        setTimeout(() => {
+          $user_input_elmnt_login.focus();
+        }, 500);
+      }}
+      class="group flex w-full space-x-2 rounded-md px-2 py-1 font-bold hover:bg-gray-200 dark:hover:bg-gray-700"
+    >
+      <Icon
+        src={TrOutlineLogin2}
+        class="-ml-1 -mt-1 text-3xl group-hover:text-gray-600 dark:group-hover:text-stone-400"
+      />
+      <span>Login</span>
+    </button>
+    <button
+      on:click={() => {
+        $user_create_modal_status = true;
+        setTimeout(() => {
+          $user_input_elmnt_login.focus();
+        }, 500);
+      }}
+      class="group flex w-full space-x-2 rounded-md px-2 py-1 font-bold hover:bg-gray-200 dark:hover:bg-gray-700"
+    >
+      <Icon
+        src={LuUserPlus}
+        class="text-2xl group-hover:text-gray-600 dark:group-hover:text-stone-400"
+      />
+      <span>Signup</span>
+    </button>
+  </div>
+{/if}
 <Modal modal_open={pass_enterer_status}>
   <div class="p-2">
     <Authenticate
