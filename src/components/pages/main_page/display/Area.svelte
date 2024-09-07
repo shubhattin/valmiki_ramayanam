@@ -11,12 +11,7 @@
   import LipiLekhikA from '@tools/converter';
   import { client_raw } from '@api/client';
   import { browser } from '$app/environment';
-  import {
-    createMutation,
-    createQuery,
-    useQueryClient,
-    type CreateQueryResult
-  } from '@tanstack/svelte-query';
+  import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
   import { delay } from '@tools/delay';
   import { AiOutlineClose } from 'svelte-icons-pack/ai';
   import { onDestroy, onMount } from 'svelte';
@@ -34,14 +29,11 @@
     trans_lang,
     sanskrit_mode
   } from '@state/main_page/main_state';
-  import { sarga_data } from '@state/main_page/data';
+  import { sarga_data, trans_en_data, trans_lang_data_query_key } from '@state/main_page/data';
 
   const query_client = useQueryClient();
   const modal_store = getModalStore();
   const unsubscribers: Unsubscriber[] = [];
-
-  export let trans_en_data: CreateQueryResult<Map<number, string>, Error>;
-  export let trans_lang_data_query_key: (string | number)[];
 
   let transliterated_sarga_data: string[] = [];
   $: Promise.all(
@@ -53,7 +45,7 @@
   });
 
   $: trans_lang_data = createQuery({
-    queryKey: trans_lang_data_query_key,
+    queryKey: $trans_lang_data_query_key,
     enabled: browser && $trans_lang !== '--' && $kANDa_selected !== 0 && $sarga_selected !== 0,
     ...($editing_status_on
       ? {
@@ -156,7 +148,7 @@
     mutationFn: async () => {
       if (!$trans_lang_data.isSuccess) return;
       await delay(500);
-      await query_client.invalidateQueries({ queryKey: trans_lang_data_query_key });
+      await query_client.invalidateQueries({ queryKey: $trans_lang_data_query_key });
       added_translations_indexes = [];
       edited_translations_indexes = new Set();
       $editing_status_on = false;
@@ -307,8 +299,7 @@
                   shloka_lines,
                   trans_en_data,
                   trans_index,
-                  trans_lang_data,
-                  trans_lang_data_query_key
+                  trans_lang_data
                 }}
               />
             </div>

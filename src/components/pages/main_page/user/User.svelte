@@ -17,12 +17,10 @@
   import ManageUser from './ManageUser.svelte';
   import UpdatePassword from './UpdatePassword.svelte';
   import { LanguageIcon } from '@components/icons';
-  import { user_info } from '@state/user';
+  import { user_info, user_allowed_langs } from '@state/main_page/user';
+  import { editing_status_on } from '@state/main_page/main_state';
 
   const modalStore = getModalStore();
-
-  export let editing_status: boolean;
-  export let user_allowed_langs: string[] = [];
 
   let pass_enterer_status = writable(false);
   let user_input_elmnt_login = writable<HTMLInputElement>(null!);
@@ -72,7 +70,7 @@
       <div class="space-x-4">
         {#if $user_info.user_type === 'admin'}
           <button
-            disabled={editing_status}
+            disabled={$editing_status_on}
             on:click={() => ($manage_user_modal_status = true)}
             class="btn space-x-2 rounded-md bg-primary-800 pb-1 pl-1 pr-2 pt-1 font-bold text-white"
           >
@@ -81,7 +79,7 @@
           </button>
         {/if}
         <button
-          disabled={editing_status}
+          disabled={$editing_status_on}
           on:click={log_out}
           class="variant-filled-error btn m-0 rounded-md pb-1 pl-1 pr-2 pt-0 font-bold"
         >
@@ -90,18 +88,18 @@
         </button>
       </div>
       <button
-        disabled={editing_status}
+        disabled={$editing_status_on}
         on:click={() => ($update_password_modal_status = true)}
         class="btn m-0 rounded-md bg-secondary-800 pb-1 pl-1 pr-2 pt-0 font-bold text-white dark:bg-secondary-700"
       >
         <Icon class="text-2xl" src={BiLock} />
         <span>Update Password</span>
       </button>
-      {#if $user_info.user_type !== 'admin' && user_allowed_langs.length > 0}
+      {#if $user_info.user_type !== 'admin' && ($user_allowed_langs.data ?? []).length > 0}
         <div>
           <Icon class="text-xl" src={LanguageIcon} /> :
           <span class="text-sm text-gray-500 dark:text-gray-300">
-            {user_allowed_langs.join(', ')}
+            {($user_allowed_langs.data ?? []).join(', ')}
           </span>
         </div>
       {/if}

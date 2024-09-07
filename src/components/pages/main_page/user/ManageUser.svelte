@@ -8,7 +8,7 @@
   import { LanguageIcon } from '@components/icons';
   import { FiEdit3 } from 'svelte-icons-pack/fi';
   import { LANG_LIST } from '@tools/lang_list';
-  import { user_info } from '@state/user';
+  import { user_info } from '@state/main_page/user';
   import type { Unsubscriber } from 'svelte/store';
   import { useQueryClient } from '@tanstack/svelte-query';
 

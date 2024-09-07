@@ -3,7 +3,7 @@
   import rAmAyaNa_map from '@data/ramayan/ramayan_map.json';
   import { onDestroy, onMount } from 'svelte';
   import { delay } from '@tools/delay';
-  import { writable, type Writable, type Unsubscriber } from 'svelte/store';
+  import { writable, type Unsubscriber } from 'svelte/store';
   import { LANG_LIST, SCRIPT_LIST } from '@tools/lang_list';
   import { load_parivartak_lang_data, lipi_parivartak_async } from '@tools/converter';
   import { LanguageIcon } from '@components/icons';
@@ -11,16 +11,16 @@
   import { ensure_auth_access_status, get_id_token_info } from '@tools/auth_tools';
   import { browser } from '$app/environment';
   import DisplayArea from './display/Area.svelte';
-  import { client, client_raw } from '@api/client';
+  import { client_raw } from '@api/client';
   import { get_possibily_not_undefined } from '@tools/kry';
   import { BiEdit } from 'svelte-icons-pack/bi';
   import { scale, slide } from 'svelte/transition';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
-  import { user_info } from '@state/user';
+  import { user_info } from '@state/main_page/user';
   import { goto } from '$app/navigation';
   import Select from '@components/Select.svelte';
   import { z } from 'zod';
-  import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
+  import { createMutation, useQueryClient } from '@tanstack/svelte-query';
   import { BsThreeDots } from 'svelte-icons-pack/bs';
   import { popup } from '@skeletonlabs/skeleton';
   import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
@@ -32,9 +32,11 @@
     editing_status_on,
     BASE_SCRIPT,
     viewing_script,
-    trans_lang
+    trans_lang,
+    view_translation_status
   } from '@state/main_page/main_state';
-  import { sarga_data } from '@state/main_page/data';
+  import { load_english_translation, sarga_data } from '@state/main_page/data';
+  import { user_allowed_langs } from '@state/main_page/user';
 
   let mounted = false;
 
@@ -98,13 +100,6 @@
     })
   );
   $trans_lang = $trans_lang_selection;
-
-  let view_translation_status = false;
-
-  $: user_allowed_langs = client.user_info.get_user_allowed_langs.query(undefined, {
-    enabled: !!(browser && $user_info && $user_info.user_type !== 'admin'),
-    placeholderData: []
-  });
 
   const get_ramayanam_page_link = (kANDa: number, sarga: number | null = null) => {
     return `/${kANDa}${sarga ? `/${sarga}` : ''}`;
@@ -178,57 +173,6 @@
     unsubscribers.forEach((unsub) => unsub());
   });
 
-  const QUERY_KEYS = {
-    trans_lang_data: (lang: string, kANDa_num: number, sarga_num: number) => [
-      'sarga',
-      'trans',
-      lang,
-      kANDa_num,
-      sarga_num
-    ]
-  };
-  $: trans_en_data = createQuery({
-    queryKey: QUERY_KEYS.trans_lang_data('English', $kANDa_selected, $sarga_selected),
-    // by also adding the kanda and sarga they are auto invalidated
-    // so we dont have to manually invalidate it if were only sarga,trans,English
-    enabled: browser && view_translation_status && $kANDa_selected !== 0 && $sarga_selected !== 0,
-    queryFn: () => load_english_translation($kANDa_selected, $sarga_selected)
-  });
-  $: trans_lang_data_query_key = QUERY_KEYS.trans_lang_data(
-    $trans_lang,
-    $kANDa_selected,
-    $sarga_selected
-  );
-
-  const load_english_translation = async (kANDa_num: number, sarga_number: number) => {
-    await delay(250);
-    let data: Record<number, string> = {};
-    const data_map = new Map<number, string>();
-    if (import.meta.env.DEV) {
-      const yaml = (await import('js-yaml')).default;
-      const glob_yaml = import.meta.glob('/data/ramayan/trans_en/*/*.yaml', {
-        query: '?raw'
-      });
-      if (!(`/data/ramayan/trans_en/${kANDa_num}/${sarga_number}.yaml` in glob_yaml))
-        return data_map;
-      const text = (
-        (await glob_yaml[`/data/ramayan/trans_en/${kANDa_num}/${sarga_number}.yaml`]()) as any
-      ).default as string;
-      data = yaml.load(text) as Record<number, string>;
-    } else {
-      const glob_json = import.meta.glob('/data/ramayan/trans_en/json/*/*.json');
-      if (!(`/data/ramayan/trans_en/json/${kANDa_num}/${sarga_number}.json` in glob_json))
-        return data_map;
-      data = (
-        (await glob_json[`/data/ramayan/trans_en/json/${kANDa_num}/${sarga_number}.json`]()) as any
-      ).default as Record<number, string>;
-    }
-
-    for (const [key, value] of Object.entries(data)) {
-      data_map.set(Number(key), value.replaceAll(/\n$/g, '')); // replace the ending newline
-    }
-    return data_map;
-  };
   const download_excel_file = createMutation({
     mutationKey: ['sarga', 'download_excel_data'],
     mutationFn: async () => {
@@ -305,7 +249,7 @@
         {/each}
       </select>
     </label>
-    <User editing_status={$editing_status_on} user_allowed_langs={$user_allowed_langs.data ?? []} />
+    <User />
   </div>
   <!-- svelte-ignore a11y-label-has-associated-control -->
   <label class="space-x-4">
@@ -402,10 +346,10 @@
           <Icon class="-mt-1 ml-1 text-xl" src={TiArrowForwardOutline} />
         </button>
       {/if}
-      {#if !view_translation_status}
+      {#if !$view_translation_status}
         <button
           on:click={() => {
-            view_translation_status = true;
+            $view_translation_status = true;
           }}
           class="btn bg-primary-800 px-2 py-1 font-bold text-white dark:bg-primary-700"
           >View Translations</button
@@ -438,12 +382,7 @@
         {/if}
       {/if}
     </div>
-    <DisplayArea
-      {...{
-        trans_en_data,
-        trans_lang_data_query_key
-      }}
-    />
+    <DisplayArea />
   {/if}
 </div>
 <slot />

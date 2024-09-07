@@ -17,7 +17,7 @@ export const get_derived_query = <
   type result = StoresValues<SvelteQuery>;
   // OR
   // type result = Parameters<Parameters<SvelteQuery['subscribe']>[0]>[0];
-  return derived<typeof stores, result>(stores, (vals, set) => {
+  return derived(stores, (vals, set: (value: result) => void) => {
     const query = query_func(vals);
     const unsub = query.subscribe((state) => set(state as result));
     return () => {

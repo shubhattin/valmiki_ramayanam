@@ -7,6 +7,7 @@
   import { RiSystemAddLargeLine } from 'svelte-icons-pack/ri';
   import { slide } from 'svelte/transition';
   import { editing_status_on, trans_lang, sanskrit_mode } from '@state/main_page/main_state';
+  import { trans_lang_data_query_key } from '@state/main_page/data';
 
   const query_client = useQueryClient();
 
@@ -14,7 +15,6 @@
   export let trans_index: number;
   export let trans_en_data: CreateQueryResult<Map<number, string>, Error>;
   export let trans_lang_data: CreateQueryResult<Map<number, string>, Error>;
-  export let trans_lang_data_query_key: (string | number)[];
   export let added_translations_indexes: number[];
   export let edited_translations_indexes: Set<number>;
   export let edit_language_typer_status: boolean;
@@ -29,7 +29,7 @@
   async function update_trans_data(index: number, text: string) {
     const new_data = new Map($trans_lang_data.data);
     new_data.set(index, text);
-    await query_client.setQueryData(trans_lang_data_query_key, new_data);
+    await query_client.setQueryData($trans_lang_data_query_key, new_data);
   }
 </script>
 
