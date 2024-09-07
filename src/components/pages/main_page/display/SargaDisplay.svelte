@@ -4,12 +4,10 @@
   import { fade, slide } from 'svelte/transition';
   import { cl_join } from '@tools/cl_join';
   import { onDestroy } from 'svelte';
-  import Modal from '@components/Modal.svelte';
   import {
     editing_status_on,
     BASE_SCRIPT,
     viewing_script,
-    typing_assistance_modal_opened,
     trans_lang,
     sanskrit_mode,
     added_translations_indexes,
@@ -192,6 +190,5 @@
     </div>
   {/if}
 </div>
-<Modal modal_open={typing_assistance_modal_opened}>
-  <TypingAssistance />
-</Modal>
+
+<TypingAssistance />

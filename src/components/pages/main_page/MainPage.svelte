@@ -36,11 +36,33 @@
   import { popup, SlideToggle } from '@skeletonlabs/skeleton';
   import { BsKeyboard } from 'svelte-icons-pack/bs';
 
-  let mounted = false;
-
   const unsubscribers: Unsubscriber[] = [];
   const query_client = useQueryClient();
 
+  let mounted = false;
+  onMount(async () => {
+    if (browser) await ensure_auth_access_status();
+    try {
+      $user_info = get_id_token_info().user;
+    } catch {}
+    if (import.meta.env.DEV) {
+      // $view_translation_status = true;
+      // $trans_lang_mut.mutateAsync('Hindi').then(() => {
+      //   editing_status_on.set(true);
+      //   $typing_assistance_modal_opened = true;
+      // });
+    }
+    if (browser && import.meta.env.PROD) {
+      window.addEventListener('beforeunload', function (e) {
+        if ($editing_status_on) {
+          e.preventDefault(); // If you prevent default behavior in Mozilla Firefox prompt will always be shown
+          e.returnValue = ''; // Chrome requires returnValue to be set
+        }
+      });
+    }
+    await load_parivartak_lang_data(BASE_SCRIPT);
+    mounted = true;
+  });
   const params_viewing_script_mut_schema = z.object({
     script: z.string(),
     update_viewing_script_selection: z.boolean().default(true)
@@ -121,27 +143,6 @@
         lipi_parivartak_async(sarga.name_devanagari.split('\n')[0], BASE_SCRIPT, $viewing_script)
       )
     ).then((_sarga_names) => (sarga_names = _sarga_names));
-
-  onMount(async () => {
-    if (browser) await ensure_auth_access_status();
-    try {
-      $user_info = get_id_token_info().user;
-    } catch {}
-    if (import.meta.env.DEV) {
-      // view_translation_status = true;
-      // $trans_lang_mut.mutateAsync('Hindi').then(() => editing_status_on.set(true));
-    }
-    if (browser && import.meta.env.PROD) {
-      window.addEventListener('beforeunload', function (e) {
-        if ($editing_status_on) {
-          e.preventDefault(); // If you prevent default behavior in Mozilla Firefox prompt will always be shown
-          e.returnValue = ''; // Chrome requires returnValue to be set
-        }
-      });
-    }
-    await load_parivartak_lang_data(BASE_SCRIPT);
-    mounted = true;
-  });
 
   unsubscribers.push(
     sarga_selected.subscribe(async () => {

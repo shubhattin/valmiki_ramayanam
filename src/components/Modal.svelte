@@ -6,6 +6,8 @@
   import { AiOutlineClose } from 'svelte-icons-pack/ai';
   import Icon from '@tools/Icon.svelte';
 
+  let className: string | null = null!;
+  export { className as class };
   export let modal_open: Writable<boolean>;
   export let cancel_btn_txt: string | null = null!;
   export let confirm_btn_txt: string | null = null!;
@@ -90,7 +92,7 @@
     <div
       in:scale={{ duration: animationDuration }}
       out:slide={{ duration: animationDuration }}
-      class="mx-3 max-h-[90%] max-w-screen-lg overflow-scroll"
+      class={cl_join('mx-3 max-h-[90%] max-w-screen-xl overflow-scroll', className)}
     >
       <article class="rounded-lg bg-white p-3 pt-0 shadow-lg dark:bg-gray-800">
         <div class="flex justify-end">
