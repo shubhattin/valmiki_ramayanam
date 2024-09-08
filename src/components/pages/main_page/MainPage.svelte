@@ -29,7 +29,8 @@
     view_translation_status,
     edit_language_typer_status,
     sanskrit_mode,
-    typing_assistance_modal_opened
+    typing_assistance_modal_opened,
+    get_text_font
   } from '@state/main_page/main_state';
   import { user_allowed_langs } from '@state/main_page/user';
   import { SlideToggle } from '@skeletonlabs/skeleton';
@@ -214,7 +215,7 @@
   <label class="space-x-4">
     <span class="font-bold">Select kANDa</span>
     <Select
-      class="indic-font select w-52"
+      class={`${get_text_font($viewing_script)} select w-52`}
       zodType={z.coerce.number().int()}
       bind:value={$kANDa_selected}
       options={[{ value: 0, text: 'Select' }].concat(
@@ -232,7 +233,7 @@
       <label class="inline-block space-x-4">
         <span class="font-bold">Select Sarga</span>
         <Select
-          class="font-indic select w-52"
+          class={`${get_text_font($viewing_script)} select w-52`}
           zodType={z.coerce.number().int()}
           bind:value={$sarga_selected}
           options={[{ value: 0, text: 'Select' }].concat(

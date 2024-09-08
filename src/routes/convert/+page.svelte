@@ -12,6 +12,7 @@
   import { main_app_bar_info } from '@state/app_bar';
   import { BiHelpCircle } from 'svelte-icons-pack/bi';
   import TypingAssistance from '@components/TypingAssistance.svelte';
+  import { get_text_font } from '@state/main_page/main_state';
 
   let from_lang = writable('Sanskrit');
   let to_lang = writable('Telugu');
@@ -80,7 +81,7 @@
       </SlideToggle>
     </div>
     <textarea
-      class="indic-font textarea h-56"
+      class={`${get_text_font($from_lang)} textarea h-56`}
       placeholder={`Enter text in ${$from_lang}`}
       bind:value={$from_text}
       on:input={(e) => {
@@ -144,7 +145,7 @@
     </div>
     <textarea
       bind:value={$to_text}
-      class="indic-font textarea h-56"
+      class={`${get_text_font($to_lang)} textarea h-56`}
       placeholder={`Enter text in ${$to_lang}`}
       on:input={(e) => {
         if (to_text_type_enabled)

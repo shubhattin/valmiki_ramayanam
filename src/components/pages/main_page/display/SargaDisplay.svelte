@@ -13,7 +13,8 @@
     added_translations_indexes,
     edit_language_typer_status,
     edited_translations_indexes,
-    typing_assistance_modal_opened
+    typing_assistance_modal_opened,
+    get_text_font
   } from '@state/main_page/main_state';
   import {
     sarga_data,
@@ -102,7 +103,7 @@
               >
                 {#each line_split as line_shlk}
                   <!-- if needed add 'whitespace-pre-wrap'2 -->
-                  <div class="indic-font">{line_shlk}</div>
+                  <div class={`${get_text_font($viewing_script)}`}>{line_shlk}</div>
                 {/each}
               </div>
               {#if $trans_en_data.isSuccess && $trans_en_data.data.size !== 0}
@@ -159,7 +160,7 @@
                           update_trans_data(trans_index, e.currentTarget.value);
                         }
                       }}
-                      class="indic-font textarea h-16 w-full"
+                      class={`${get_text_font($viewing_script)} textarea h-16 w-full`}
                       value={$trans_lang_data.data?.get(trans_index)}
                     ></textarea>
                   {/if}
@@ -179,7 +180,7 @@
                   {#if $trans_lang_data.data?.has(trans_index)}
                     <!-- Usually translations are single but still... -->
                     {#each get_possibily_not_undefined($trans_lang_data.data?.get(trans_index)).split('\n') as line_trans}
-                      <div class="indic-font">{line_trans}</div>
+                      <div class={`${get_text_font($viewing_script)}`}>{line_trans}</div>
                     {/each}
                   {/if}
                 </div>
