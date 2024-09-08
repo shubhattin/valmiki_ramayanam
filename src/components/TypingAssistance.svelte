@@ -13,6 +13,9 @@
   $: typing_assistance_lang = $sync_lang_script;
 
   const IMAGE_SCALING = 0.85;
+  const ONE_PX = 1;
+  const HEIGHT = 682 * IMAGE_SCALING;
+  const WIDTH = 658 * IMAGE_SCALING;
 
   $: usage_table = createQuery({
     queryKey: ['usage_table', typing_assistance_lang],
@@ -30,7 +33,6 @@
         return new Promise<{ width: number; height: number }>((resolve, reject) => {
           let img = new Image();
           img.onload = function () {
-            const ONE_PX = 1;
             resolve({
               // @ts-ignore
               width: this.width * ONE_PX * IMAGE_SCALING,
@@ -61,6 +63,12 @@
       'mt-4 max-w-full',
       !$usage_table.isFetching ? 'min-h-[580px] min-w-[560px]' : 'h-[580px] w-[560px]'
     )}
+    style="
+     min-height: {!$usage_table.isFetching ? `${HEIGHT}px` : 'auto'};
+     min-width: {!$usage_table.isFetching ? `${WIDTH}px` : 'auto'};
+     height: {$usage_table.isFetching ? `${HEIGHT}px` : 'auto'};
+     width: {$usage_table.isFetching ? `${WIDTH}px` : 'auto'};
+   "
   >
     {#if $usage_table.isFetching}
       <div class="h-full w-full space-y-2">
