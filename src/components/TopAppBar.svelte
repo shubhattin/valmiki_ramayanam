@@ -16,16 +16,17 @@
 
   $: {
     if (page_url in PAGE_TITLES) {
-      const [TITLE, CLASS]: string[] = PAGE_TITLES[page_url as keyof typeof PAGE_TITLES];
-      main_app_bar_info.set({
-        title: TITLE,
-        className: CLASS
-      });
+      // @ts-ignore
+      const info = PAGE_TITLES[page_url];
+      $main_app_bar_info = {
+        title: info[0],
+        className: info[1]
+      };
     } else if ($page.error) {
-      main_app_bar_info.set({
+      $main_app_bar_info = {
         title: null,
         className: null
-      });
+      };
     }
   }
 

@@ -169,7 +169,7 @@
                       >Update</button
                     >
                   </div>
-                  <div class="bg-surface-100-800-token arrow" />
+                  <div class="bg-surface-100-800-token arrow"></div>
                 </div>
               </span>
             </div>
@@ -208,17 +208,17 @@
       <section class="card w-full space-y-3">
         {#each Array.from({ length: 3 }) as _, i}
           <div class="space-y-2">
-            <div class="placeholder animate-pulse" />
+            <div class="placeholder animate-pulse"></div>
             <div class="grid grid-cols-3 gap-8">
-              <div class="placeholder animate-pulse" />
-              <div class="placeholder animate-pulse" />
-              <div class="placeholder animate-pulse" />
+              <div class="placeholder animate-pulse"></div>
+              <div class="placeholder animate-pulse"></div>
+              <div class="placeholder animate-pulse"></div>
             </div>
             <div class="grid grid-cols-4 gap-4">
-              <div class="placeholder animate-pulse" />
-              <div class="placeholder animate-pulse" />
-              <div class="placeholder animate-pulse" />
-              <div class="placeholder animate-pulse" />
+              <div class="placeholder animate-pulse"></div>
+              <div class="placeholder animate-pulse"></div>
+              <div class="placeholder animate-pulse"></div>
+              <div class="placeholder animate-pulse"></div>
             </div>
           </div>
         {/each}

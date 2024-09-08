@@ -5,4 +5,5 @@
   export let src: string;
 </script>
 
-<span class={cl_join('inline-block bg-cover', className)} style:background-image={`url(${src})`} />
+<span class={cl_join('inline-block bg-cover', className)} style:background-image={`url(${src})`}
+></span>
