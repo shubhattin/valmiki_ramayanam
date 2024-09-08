@@ -22,7 +22,7 @@
     "@sveltejs/adapter-vercel": "^5.4.3",
     "@sveltejs/kit": "^2.5.26",
     "@sveltejs/vite-plugin-svelte": "^3.1.2",
-    "@tanstack/svelte-query-devtools": "^5.54.2",
+    "@tanstack/svelte-query-devtools": "^5.55.1",
     "@types/cli-progress": "^3.11.6",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.5.4",

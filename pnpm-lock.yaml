@@ -109,8 +109,8 @@ importers:
         specifier: ^3.1.2
         version: 3.1.2(svelte@4.2.19)(vite@5.4.3(@types/node@22.5.4)(sass@1.78.0))
       '@tanstack/svelte-query-devtools':
-        specifier: ^5.54.2
-        version: 5.54.2(@tanstack/svelte-query@5.54.2(svelte@4.2.19))(svelte@4.2.19)
+        specifier: ^5.55.1
+        version: 5.55.1(@tanstack/svelte-query@5.54.2(svelte@4.2.19))(svelte@4.2.19)
       '@types/cli-progress':
         specifier: ^3.11.6
         version: 3.11.6
@@ -994,11 +994,11 @@ packages:
   '@tanstack/query-core@5.54.1':
     resolution: {integrity: sha512-hKS+WRpT5zBFip21pB6Jx1C0hranWQrbv5EJ7qPoiV5MYI3C8rTCqWC9DdBseiPT1JgQWh8Y55YthuYZNiw3Xw==}
 
-  '@tanstack/query-devtools@5.54.0':
-    resolution: {integrity: sha512-B8Sa6mh7/4m2fyk2/YnUXeOZ1/us7G/C/i1It8YcCbieXc8vf1AdSYjR+mZIoJeKOKLqA741hZqfj8d4F1NCVg==}
+  '@tanstack/query-devtools@5.55.1':
+    resolution: {integrity: sha512-2g0TWQGlkyHs9maHIU5A7lRunG4Rj3Y5lOEenE+fydE4zk7GqRs7rKJBp7F74iqRo/cA9V6t1YYQWqd6YRBmcQ==}
 
-  '@tanstack/svelte-query-devtools@5.54.2':
-    resolution: {integrity: sha512-9TOiVOJfYyRoFhJJBCUl6Gztf76WzkTMFY8T3PVYEMSmd/1uM4rBnC5NDZGG2BxGaL/Ug/1p3ooz3J8MaS8R9g==}
+  '@tanstack/svelte-query-devtools@5.55.1':
+    resolution: {integrity: sha512-R4pN7AYbg991du4L/gzHiSXwb8UvRSlPjk6StUG3XcfobOqXUJFaqH3gUqRMKae+UwDCjvBSgQmbB7girhXAQw==}
     peerDependencies:
       '@tanstack/svelte-query': ^5.54.2
       svelte: ^3.54.0 || ^4.0.0 || ^5.0.0-next.0
@@ -3196,11 +3196,11 @@ snapshots:
 
   '@tanstack/query-core@5.54.1': {}
 
-  '@tanstack/query-devtools@5.54.0': {}
+  '@tanstack/query-devtools@5.55.1': {}
 
-  '@tanstack/svelte-query-devtools@5.54.2(@tanstack/svelte-query@5.54.2(svelte@4.2.19))(svelte@4.2.19)':
+  '@tanstack/svelte-query-devtools@5.55.1(@tanstack/svelte-query@5.54.2(svelte@4.2.19))(svelte@4.2.19)':
     dependencies:
-      '@tanstack/query-devtools': 5.54.0
+      '@tanstack/query-devtools': 5.55.1
       '@tanstack/svelte-query': 5.54.2(svelte@4.2.19)
       esm-env: 1.0.0
       svelte: 4.2.19
