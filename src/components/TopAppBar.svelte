@@ -2,7 +2,6 @@
   import { AppBar, popup } from '@skeletonlabs/skeleton';
   import type { PopupSettings } from '@skeletonlabs/skeleton';
   import ThemeChanger from './ThemeChanger.svelte';
-  import { BiArrowBack } from 'svelte-icons-pack/bi';
   import Icon from '@tools/Icon.svelte';
   import { SiGithub } from 'svelte-icons-pack/si';
   import { SiConvertio } from './icons';
@@ -11,8 +10,24 @@
   import { YoutubeIcon } from '@components/icons';
   import { page } from '$app/stores';
   import { main_app_bar_info } from '@state/app_bar';
+  import { PAGE_TITLES } from '@state/page_titles';
 
   $: page_url = $page.url.pathname;
+
+  $: {
+    if (page_url in PAGE_TITLES) {
+      const [TITLE, CLASS]: string[] = PAGE_TITLES[page_url as keyof typeof PAGE_TITLES];
+      main_app_bar_info.set({
+        title: TITLE,
+        className: CLASS
+      });
+    } else if ($page.error) {
+      main_app_bar_info.set({
+        title: null,
+        className: null
+      });
+    }
+  }
 
   const app_menu_popup: PopupSettings = {
     event: 'click',

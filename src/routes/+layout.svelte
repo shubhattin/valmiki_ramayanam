@@ -24,7 +24,9 @@
   <Modal />
   <div class="contaiiner mx-auto mb-1 max-w-screen-lg">
     <TopAppBar />
-    <slot />
+    <div class="mx-2">
+      <slot />
+    </div>
   </div>
   <SvelteQueryDevtools initialIsOpen={false} />
 </QueryClientProvider>

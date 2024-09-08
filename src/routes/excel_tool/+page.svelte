@@ -19,8 +19,8 @@
   import { writable } from 'svelte/store';
   import Preview from './Preview.svelte';
   import MetaTags from '@components/tags/MetaTags.svelte';
-  import { main_app_bar_info } from '@state/app_bar';
   import { createMutation } from '@tanstack/svelte-query';
+  import { PAGE_TITLES } from '@state/page_titles';
 
   export const modalStore = getModalStore();
 
@@ -126,15 +126,11 @@
     return `${file_name_prefix}${base_name}${file_name_postfix}.xlsx`;
   };
 
+  const [TITLE] = PAGE_TITLES['/excel_tool'];
   const PAGE_INFO = {
-    title: 'Lipi Parivartan for Excel Files',
+    title: TITLE,
     description: 'A Utility to transliterate text in Excel files for Indian Scripts'
   };
-
-  main_app_bar_info.set({
-    className: 'text-xl font-bold',
-    title: PAGE_INFO.title
-  });
 </script>
 
 <MetaTags title={PAGE_INFO.title} description={PAGE_INFO.description} />

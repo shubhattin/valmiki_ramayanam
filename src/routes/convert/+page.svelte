@@ -9,10 +9,10 @@
   import { BsKeyboard } from 'svelte-icons-pack/bs';
   import MetaTags from '@components/tags/MetaTags.svelte';
   import { OiCopy16 } from 'svelte-icons-pack/oi';
-  import { main_app_bar_info } from '@state/app_bar';
   import { BiHelpCircle } from 'svelte-icons-pack/bi';
   import TypingAssistance from '@components/TypingAssistance.svelte';
   import { get_text_font } from '@tools/font_tools';
+  import { PAGE_TITLES } from '@state/page_titles';
 
   let from_lang = writable('Sanskrit');
   let to_lang = writable('Telugu');
@@ -40,15 +40,11 @@
     navigator.clipboard.writeText(text);
   };
 
+  const [TITLE] = PAGE_TITLES['/convert'];
   const PAGE_INFO = {
-    title: 'Lipi Parivartak',
+    title: TITLE,
     description: 'A Indian Script Transliteration Utility'
   };
-
-  main_app_bar_info.set({
-    className: 'text-2xl font-bold',
-    title: PAGE_INFO.title
-  });
 
   let typing_assistance_modal_opened = writable(false);
 </script>
