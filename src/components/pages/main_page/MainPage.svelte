@@ -50,7 +50,6 @@
       // $view_translation_status = true;
       // $trans_lang_mut.mutateAsync('Hindi').then(() => {
       //   editing_status_on.set(true);
-      //   $typing_assistance_modal_opened = true;
       // });
     }
     if (browser && import.meta.env.PROD) {

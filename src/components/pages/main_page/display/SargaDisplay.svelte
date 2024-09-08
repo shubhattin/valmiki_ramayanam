@@ -143,6 +143,7 @@
                       on:input={(e) => {
                         if (!$added_translations_indexes.includes(trans_index))
                           $edited_translations_indexes.add(trans_index);
+                        let callback_function_called_from_lipi_lekhika = false;
                         if ($edit_language_typer_status)
                           LipiLekhikA.mukhya(
                             e.target,
@@ -153,10 +154,11 @@
                             // @ts-ignore
                             (val) => {
                               update_trans_data(trans_index, val);
+                              callback_function_called_from_lipi_lekhika = true;
                             },
                             $sanskrit_mode
                           );
-                        else {
+                        if (!callback_function_called_from_lipi_lekhika) {
                           update_trans_data(trans_index, e.currentTarget.value);
                         }
                       }}
