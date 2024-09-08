@@ -102,7 +102,7 @@
               >
                 {#each line_split as line_shlk}
                   <!-- if needed add 'whitespace-pre-wrap'2 -->
-                  <div class="font">{line_shlk}</div>
+                  <div class="indic-font">{line_shlk}</div>
                 {/each}
               </div>
               {#if $trans_en_data.isSuccess && $trans_en_data.data.size !== 0}
@@ -159,7 +159,7 @@
                           update_trans_data(trans_index, e.currentTarget.value);
                         }
                       }}
-                      class="font textarea h-16 w-full"
+                      class="indic-font textarea h-16 w-full"
                       value={$trans_lang_data.data?.get(trans_index)}
                     ></textarea>
                   {/if}
@@ -179,7 +179,7 @@
                   {#if $trans_lang_data.data?.has(trans_index)}
                     <!-- Usually translations are single but still... -->
                     {#each get_possibily_not_undefined($trans_lang_data.data?.get(trans_index)).split('\n') as line_trans}
-                      <div class="font">{line_trans}</div>
+                      <div class="indic-font">{line_trans}</div>
                     {/each}
                   {/if}
                 </div>

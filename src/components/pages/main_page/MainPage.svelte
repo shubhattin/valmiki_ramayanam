@@ -214,7 +214,7 @@
   <label class="space-x-4">
     <span class="font-bold">Select kANDa</span>
     <Select
-      class="select w-52"
+      class="indic-font select w-52"
       zodType={z.coerce.number().int()}
       bind:value={$kANDa_selected}
       options={[{ value: 0, text: 'Select' }].concat(
@@ -232,7 +232,7 @@
       <label class="inline-block space-x-4">
         <span class="font-bold">Select Sarga</span>
         <Select
-          class="select w-52"
+          class="font-indic select w-52"
           zodType={z.coerce.number().int()}
           bind:value={$sarga_selected}
           options={[{ value: 0, text: 'Select' }].concat(
@@ -347,4 +347,3 @@
     <SargaDisplay />
   {/if}
 </div>
-<slot />
