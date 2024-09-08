@@ -5,6 +5,8 @@
   import { ALL_LANG_SCRIPT_LIST } from '@tools/lang_list';
   import Modal from '@components/Modal.svelte';
   import type { Writable } from 'svelte/store';
+  import { cl_join } from '@tools/cl_join';
+  import { onDestroy } from 'svelte';
 
   export let sync_lang_script: Writable<string>;
   export let modal_opended: Writable<boolean>;
@@ -39,31 +41,32 @@
         });
       };
       const { height, width } = await get_image_dimensiona(url);
-      console.log({ url, height, width });
       return { url, height, width };
     }
   });
+  onDestroy(() => {
+    $modal_opended = false;
+  });
 </script>
 
-<Modal class="max-h-[96%] max-w-[90%]" modal_open={modal_opended}>
+<Modal modal_open={modal_opended}>
   <select class="select w-40" bind:value={typing_assistance_lang}>
     {#each ALL_LANG_SCRIPT_LIST as lang_script}
       <option value={lang_script}>{lang_script}</option>
     {/each}
   </select>
-  <div class="mt-4 h-[580px] w-[506px]">
+  <div class={cl_join('mt-4 max-w-full', 'min-h-[580px] min-w-[560px]')}>
     {#if $usage_table.isFetching}
-      <div class="h-full w-full space-y-1">
-        <div class="placeholder animate-pulse"></div>
+      <div class="h-full w-full space-y-2">
+        <div class="placeholder animate-pulse rounded-md"></div>
         <!-- <div class="placeholder animate-pulse"></div> -->
-        <div class="placeholder h-full w-full animate-pulse rounded-lg"></div>
+        <div class="placeholder h-[96%] w-full animate-pulse rounded-lg"></div>
       </div>
     {:else if $usage_table.isSuccess}
       {@const { url, height, width } = $usage_table.data}
       <img
-        class="max-h-[70-vh]"
-        height={`${height}px`}
-        width={`${width}px`}
+        style:height={`${height}px`}
+        style:width={`${width}px`}
         alt={typing_assistance_lang}
         src={url}
       />

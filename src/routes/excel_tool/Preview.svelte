@@ -18,9 +18,9 @@
 <div
   in:slide
   out:scale
-  class="h-11/12 fixed left-2 top-2 z-10 block max-h-[94%] min-h-[80%] w-11/12 overflow-scroll rounded-lg border-2 border-blue-700 bg-[aliceblue] p-2 dark:border-blue-500 dark:bg-slate-800"
+  class="fixed left-2 top-2 z-10 block max-h-[94%] min-h-[80%] max-w-[95%] overflow-scroll rounded-lg border-2 border-blue-700 bg-[aliceblue] p-2 dark:border-blue-500 dark:bg-slate-800"
 >
-  <div class="ml-4 flex" style="justify-content: space-between;">
+  <div class="ml-4 flex justify-between">
     <span class="text-2xl">
       <a href={file_link} class="ml-2" download={file_name}>
         <Icon

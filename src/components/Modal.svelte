@@ -84,7 +84,7 @@
   transition:slide
   bind:this={modalElement}
   class={cl_join(
-    'duration-400 fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-all',
+    'duration-400 fixed inset-0  z-50 flex max-h-full max-w-full items-center justify-center bg-black bg-opacity-50 transition-all',
     !opened && 'hidden bg-opacity-0'
   )}
 >
@@ -92,16 +92,16 @@
     <div
       in:scale={{ duration: animationDuration }}
       out:slide={{ duration: animationDuration }}
-      class={cl_join('mx-3 max-h-[90%] max-w-screen-xl overflow-scroll', className)}
+      class={cl_join('mx-3 max-h-[97%] max-w-[97%] overflow-scroll', className)}
     >
-      <article class="rounded-lg bg-white p-3 pt-0 shadow-lg dark:bg-gray-800">
-        <div class="flex justify-end">
-          <button
-            aria-label="Close"
-            class="cursor-pointer text-gray-500 hover:text-gray-700"
-            on:click={closeModal}><Icon src={AiOutlineClose} /></button
-          >
-        </div>
+      <div class="flex w-[97%] justify-end">
+        <button
+          aria-label="Close"
+          class="absolute cursor-pointer text-gray-500 hover:text-gray-700"
+          on:click={closeModal}><Icon src={AiOutlineClose} /></button
+        >
+      </div>
+      <article class="overflow-scroll rounded-lg bg-white p-3 pt-0 shadow-lg dark:bg-gray-800">
         <slot />
         {#if cancel_btn_txt || confirm_btn_txt}
           <footer class="mt-4 flex justify-end space-x-2">

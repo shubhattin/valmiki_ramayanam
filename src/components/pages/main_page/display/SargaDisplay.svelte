@@ -133,7 +133,7 @@
                         await update_trans_data(trans_index, '');
                         $added_translations_indexes.push(trans_index);
                       }}
-                      class="btn m-0 rounded-md bg-surface-500 p-0 px-1 font-bold text-white dark:bg-surface-500"
+                      class="btn m-0 rounded-md bg-surface-500 p-1 font-bold text-white dark:bg-surface-500"
                     >
                       <Icon src={RiSystemAddLargeLine} />
                     </button>

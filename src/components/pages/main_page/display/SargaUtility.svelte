@@ -80,7 +80,7 @@
   use:popup={{
     event: 'click',
     target: 'sarga_options',
-    placement: 'bottom'
+    placement: 'left-end'
   }}
   class="btn m-0 rounded-full p-[0.05rem] ring-2 ring-zinc-400 dark:ring-zinc-300"
 >
