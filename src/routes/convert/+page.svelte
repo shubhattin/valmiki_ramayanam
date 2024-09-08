@@ -12,7 +12,7 @@
   import { main_app_bar_info } from '@state/app_bar';
   import { BiHelpCircle } from 'svelte-icons-pack/bi';
   import TypingAssistance from '@components/TypingAssistance.svelte';
-  import { get_text_font } from '@state/main_page/main_state';
+  import { get_text_font } from '@tools/font_tools';
 
   let from_lang = writable('Sanskrit');
   let to_lang = writable('Telugu');

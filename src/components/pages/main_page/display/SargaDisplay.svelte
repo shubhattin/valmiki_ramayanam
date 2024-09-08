@@ -13,8 +13,7 @@
     added_translations_indexes,
     edit_language_typer_status,
     edited_translations_indexes,
-    typing_assistance_modal_opened,
-    get_text_font
+    typing_assistance_modal_opened
   } from '@state/main_page/main_state';
   import {
     sarga_data,
@@ -29,6 +28,7 @@
   import { BsClipboard2Check } from 'svelte-icons-pack/bs';
   import { copy_text_to_clipboard, get_possibily_not_undefined } from '@tools/kry';
   import { RiSystemAddLargeLine } from 'svelte-icons-pack/ri';
+  import { get_text_font } from '@tools/font_tools';
 
   const query_client = useQueryClient();
   const unsubscribers: Unsubscriber[] = [];

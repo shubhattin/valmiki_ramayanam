@@ -29,13 +29,13 @@
     view_translation_status,
     edit_language_typer_status,
     sanskrit_mode,
-    typing_assistance_modal_opened,
-    get_text_font
+    typing_assistance_modal_opened
   } from '@state/main_page/main_state';
   import { user_allowed_langs } from '@state/main_page/user';
   import { SlideToggle } from '@skeletonlabs/skeleton';
   import { BsKeyboard } from 'svelte-icons-pack/bs';
   import User from './user/User.svelte';
+  import { get_text_font } from '@tools/font_tools';
 
   const unsubscribers: Unsubscriber[] = [];
   const query_client = useQueryClient();
