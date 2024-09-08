@@ -101,7 +101,7 @@
           on:click={closeModal}><Icon src={AiOutlineClose} /></button
         >
       </div>
-      <article class="overflow-scroll rounded-lg bg-white p-3 pt-0 shadow-lg dark:bg-gray-800">
+      <article class="overflow-scroll rounded-lg bg-white p-3 pt-2 shadow-lg dark:bg-gray-800">
         <slot />
         {#if cancel_btn_txt || confirm_btn_txt}
           <footer class="mt-4 flex justify-end space-x-2">

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createQuery } from '@tanstack/svelte-query';
+  import { createQuery, useIsFetching } from '@tanstack/svelte-query';
   import { load_parivartak_lang_data } from '@tools/converter';
   import { delay } from '@tools/delay';
   import { ALL_LANG_SCRIPT_LIST } from '@tools/lang_list';
@@ -11,6 +11,8 @@
   export let sync_lang_script: Writable<string>;
   export let modal_opended: Writable<boolean>;
   $: typing_assistance_lang = $sync_lang_script;
+
+  const IMAGE_SCALING = 0.85;
 
   $: usage_table = createQuery({
     queryKey: ['usage_table', typing_assistance_lang],
@@ -29,7 +31,6 @@
           let img = new Image();
           img.onload = function () {
             const ONE_PX = 1;
-            const IMAGE_SCALING = 0.85;
             resolve({
               // @ts-ignore
               width: this.width * ONE_PX * IMAGE_SCALING,
@@ -55,12 +56,17 @@
       <option value={lang_script}>{lang_script}</option>
     {/each}
   </select>
-  <div class={cl_join('mt-4 max-w-full', 'min-h-[580px] min-w-[560px]')}>
+  <div
+    class={cl_join(
+      'mt-4 max-w-full',
+      !$usage_table.isFetching ? 'min-h-[580px] min-w-[560px]' : 'h-[580px] w-[560px]'
+    )}
+  >
     {#if $usage_table.isFetching}
       <div class="h-full w-full space-y-2">
         <div class="placeholder animate-pulse rounded-md"></div>
         <!-- <div class="placeholder animate-pulse"></div> -->
-        <div class="placeholder h-[96%] w-full animate-pulse rounded-lg"></div>
+        <div class="placeholder h-full w-full animate-pulse rounded-lg"></div>
       </div>
     {:else if $usage_table.isSuccess}
       {@const { url, height, width } = $usage_table.data}
