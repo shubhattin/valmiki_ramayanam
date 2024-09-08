@@ -12,7 +12,8 @@
     sanskrit_mode,
     added_translations_indexes,
     edit_language_typer_status,
-    edited_translations_indexes
+    edited_translations_indexes,
+    typing_assistance_modal_opened
   } from '@state/main_page/main_state';
   import {
     sarga_data,
@@ -21,7 +22,7 @@
     trans_lang_data_query_key
   } from '@state/main_page/data';
   import SaveEdit from './SaveEdit.svelte';
-  import TypingAssistance from './TypingAssistance.svelte';
+  import TypingAssistance from '../../../TypingAssistance.svelte';
   import { useQueryClient } from '@tanstack/svelte-query';
   import { Icon } from 'svelte-icons-pack';
   import { BsClipboard2Check } from 'svelte-icons-pack/bs';
@@ -191,4 +192,4 @@
   {/if}
 </div>
 
-<TypingAssistance />
+<TypingAssistance sync_lang_script={trans_lang} modal_opended={typing_assistance_modal_opened} />
