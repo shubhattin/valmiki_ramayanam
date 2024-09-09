@@ -2,11 +2,13 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { join } from 'path';
 import { defineConfig } from 'vitest/config';
 import { purgeCss } from 'vite-plugin-tailwind-purgecss';
+import react from '@vitejs/plugin-react';
 import { build_json_files } from './src/tools/vite_plugin_build_json_from_yaml';
 
 export default defineConfig({
   plugins: [
     sveltekit(),
+    react(),
     purgeCss(),
     build_json_files(
       'data/ramayan/trans_en',
