@@ -20,7 +20,10 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
-    "composite": true
+    "composite": true,
+    "paths": {
+      "@api/*": ["../src/api/*"]
+    }
   },
-  "include": ["src"]
+  "include": ["src", "../src/api/*"]
 }
