@@ -1,7 +1,12 @@
 <script lang="ts">
   import { browser } from '$app/environment';
   import { load_english_translation, sarga_data } from '@state/main_page/data';
-  import { sarga_selected, kANDa_selected, BASE_SCRIPT } from '@state/main_page/main_state';
+  import {
+    sarga_selected,
+    kANDa_selected,
+    BASE_SCRIPT,
+    image_tool_opened
+  } from '@state/main_page/main_state';
   import { createMutation } from '@tanstack/svelte-query';
   import { download_file_in_browser } from '@tools/download_file_browser';
   import { BsThreeDots } from 'svelte-icons-pack/bs';
@@ -12,6 +17,8 @@
   import rAmAyaNa_map from '@data/ramayan/ramayan_map.json';
   import { scale } from 'svelte/transition';
   import Icon from '@tools/Icon.svelte';
+  import ImageTool from '../image_tool/ImageTool.svelte';
+  import Modal from '@components/Modal.svelte';
 
   const download_excel_file = createMutation({
     mutationKey: ['sarga', 'download_excel_data'],
@@ -97,10 +104,23 @@
     />
     Download Excel File
   </button>
+  <button
+    on:click={() => image_tool_opened.set(true)}
+    class="btn block w-full rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
+  >
+    Image Tool
+  </button>
   <!-- <button
             class="btn block w-full rounded-md px-2 py-1 text-start hover:bg-gray-200 dark:hover:bg-gray-700"
           >
             <Icon src={TrOutlineFileTypeTxt} class=" mr-1 text-2xl" />
             Download Text File
           </button> -->
+</div>
+<div>
+  <Modal modal_open={image_tool_opened}>
+    <div class="p-2">
+      <ImageTool />
+    </div>
+  </Modal>
 </div>

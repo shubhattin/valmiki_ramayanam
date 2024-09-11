@@ -29,7 +29,8 @@
     view_translation_status,
     edit_language_typer_status,
     sanskrit_mode,
-    typing_assistance_modal_opened
+    typing_assistance_modal_opened,
+    image_tool_opened
   } from '@state/main_page/main_state';
   import { user_allowed_langs } from '@state/main_page/user';
   import { SlideToggle } from '@skeletonlabs/skeleton';
@@ -51,6 +52,7 @@
       // $trans_lang_mut.mutateAsync('Hindi').then(() => {
       //   editing_status_on.set(true);
       // });
+      $image_tool_opened = true;
     }
     if (browser && import.meta.env.PROD) {
       window.addEventListener('beforeunload', function (e) {
