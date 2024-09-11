@@ -17,7 +17,6 @@
   import rAmAyaNa_map from '@data/ramayan/ramayan_map.json';
   import { scale } from 'svelte/transition';
   import Icon from '@tools/Icon.svelte';
-  import ImageTool from '../image_tool/ImageTool.svelte';
   import Modal from '@components/Modal.svelte';
 
   const download_excel_file = createMutation({
@@ -120,7 +119,9 @@
 <div>
   <Modal modal_open={image_tool_opened}>
     <div class="p-2">
-      <ImageTool />
+      {#await import('../image_tool/ImageTool.svelte') then ImageTool}
+        <ImageTool.default />
+      {/await}
     </div>
   </Modal>
 </div>
