@@ -117,11 +117,9 @@
           </button> -->
 </div>
 <div>
-  <Modal modal_open={image_tool_opened}>
-    <div class="p-2">
-      {#await import('../image_tool/ImageTool.svelte') then ImageTool}
-        <ImageTool.default />
-      {/await}
-    </div>
+  <Modal modal_open={image_tool_opened} close_on_click_outside={false}>
+    {#await import('../image_tool/ImageTool.svelte') then ImageTool}
+      <ImageTool.default />
+    {/await}
   </Modal>
 </div>
