@@ -1,5 +1,5 @@
 <script lang="ts">
-  import background_image from './background_vr.png';
+  import background_image_url from './background_vr.png';
   import { onMount } from 'svelte';
   import { download_file_in_browser } from '@tools/download_file_browser';
   import * as fabric from 'fabric';
@@ -7,8 +7,11 @@
 
   let canvas_element: HTMLCanvasElement;
   let canvas = writable<fabric.Canvas>();
+  let background_image: fabric.FabricImage;
 
   const DIMENSIONS = [1920, 1080]; // Background image dimensions
+  const INDIC_FONT_NAME = 'Nirmala UI';
+  const ADOBE_DEVANGARI = 'AdobeDevanagari';
   let scaling_factor = writable<number>(0); // Scale factor for the background image
 
   const get_units = (value: number) => {
@@ -35,10 +38,9 @@
     $canvas = new fabric.Canvas(canvas_element, {
       width: get_units(DIMENSIONS[0]),
       height: get_units(DIMENSIONS[1])
-      // backgroundImage: background_image
     });
-    const img = await fabric.util.loadImage(background_image);
-    const fabricImage = new fabric.Image(img, {
+    const img = await fabric.util.loadImage(background_image_url);
+    background_image = new fabric.Image(img, {
       originX: 'left',
       originY: 'top',
       scaleX: $scaling_factor,
@@ -50,7 +52,7 @@
     });
 
     // Add the image to the canvas
-    $canvas.add(fabricImage);
+    $canvas.add(background_image);
 
     const rect = new fabric.Rect({
       left: get_units(100),
@@ -60,6 +62,25 @@
       height: get_units(200)
     });
     $canvas.add(rect);
+    const text = new fabric.Text('कॄपादृष्ट्वा युद्ध्या द्युतिऽन  द्यतिऽ 1', {
+      textAlign: 'center',
+      left: get_units(400),
+      top: get_units(600),
+      fill: 'brown',
+      fontFamily: INDIC_FONT_NAME,
+      fontSize: get_units(100)
+    });
+    $canvas.add(text);
+    const text1 = new fabric.Text('कॄपादृष्ट्वा युद्ध्या द्युतिऽन  द्यतिऽ 2', {
+      textAlign: 'center',
+      left: get_units(650),
+      top: get_units(400),
+      fill: 'brown',
+      fontFamily: ADOBE_DEVANGARI,
+      // fontWeight: ,
+      fontSize: get_units(100)
+    });
+    $canvas.add(text1);
     $canvas.renderAll();
   };
   $: canvas_element &&
