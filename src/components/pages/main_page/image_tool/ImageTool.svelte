@@ -4,6 +4,7 @@
   import * as fabric from 'fabric';
   import { canvas, background_image, scaling_factor } from './state';
   import ImageOptions from './ImageOptions.svelte';
+  import { load_font } from '@tools/font_tools';
 
   let canvas_element: HTMLCanvasElement;
 
@@ -49,7 +50,8 @@
     });
     // Add the image to the canvas
     $canvas.add($background_image);
-
+    await load_font(INDIC_FONT_NAME);
+    await load_font(ADOBE_DEVANGARI);
     const text = new fabric.Text('कॄदृष्ट्वा कॣ कॢ युद्ध्या द्यु द्य ऽ 1', {
       textAlign: 'center',
       left: get_units(400),
@@ -80,9 +82,6 @@
       // this is a flickering effect but we will figure out a better way later on
     })();
 </script>
-
-<span class="normal-font"></span>
-<!-- ^ This forces to load the font the font -->
 
 <div class="space-y-2">
   <ImageOptions />
