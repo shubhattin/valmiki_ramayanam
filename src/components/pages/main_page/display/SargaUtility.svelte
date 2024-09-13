@@ -1,6 +1,11 @@
 <script lang="ts">
   import { browser } from '$app/environment';
-  import { get_translations, sarga_data, LOCALS_TRANS_LANGS } from '@state/main_page/data';
+  import {
+    get_translations,
+    sarga_data,
+    LOCALS_TRANS_LANGS,
+    rAmAyaNam_map
+  } from '@state/main_page/data';
   import {
     sarga_selected,
     kANDa_selected,
@@ -14,7 +19,6 @@
   import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
   import { transliterate_xlxs_file } from '@tools/excel/transliterate_xlsx_file';
   import { client_raw } from '@api/client';
-  import rAmAyaNa_map from '@data/ramayan/ramayan_map.json';
   import { scale } from 'svelte/transition';
   import Icon from '@tools/Icon.svelte';
   import Modal from '@components/Modal.svelte';
@@ -40,7 +44,7 @@
         translation_texts.set(local_lang, trans);
       }
       const shloka_count =
-        rAmAyaNa_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].shloka_count;
+        rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].shloka_count;
       // loading other online databased language translations
       const other_translations =
         await client_raw.translations.get_all_langs_translations_per_sarga.query({
@@ -69,7 +73,7 @@
 
       // saving file to output path
       let sarga_name =
-        rAmAyaNa_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].name_normal.split(
+        rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].name_normal.split(
           '\n'
         )[0];
       const buffer = await workbook.xlsx.writeBuffer();

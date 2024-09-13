@@ -3,10 +3,13 @@ import { createQuery } from '@tanstack/svelte-query';
 import { delay } from '@tools/delay';
 import { get_derived_query } from '@tools/query';
 import { queryClient } from '@state/query';
-import { derived } from 'svelte/store';
+import { derived, get } from 'svelte/store';
 import { client_raw } from '@api/client';
+import rAmAyaNam_map from '@data/ramayan/ramayan_map.json';
+import { lipi_parivartak_async } from '@tools/converter';
 
 import {
+  BASE_SCRIPT,
   editing_status_on,
   kANDa_selected,
   sarga_selected,
@@ -14,6 +17,7 @@ import {
   view_translation_status
 } from './main_state';
 
+export { rAmAyaNam_map };
 export const QUERY_KEYS = {
   trans_lang_data: (lang: string, kANDa_num: number, sarga_num: number) => [
     'sarga',
@@ -30,6 +34,22 @@ export const QUERY_KEYS = {
   ]
 };
 
+// NAMES
+export const get_kANDa_names = async (lang: string) => {
+  const data = rAmAyaNam_map.map((kANDa) => kANDa.name_devanagari);
+  if (!browser) return data;
+  return Promise.all(data.map((kANDa) => lipi_parivartak_async(kANDa, BASE_SCRIPT, lang)));
+};
+
+export const get_sarga_names = async (kANDa_num: number, lang: string) => {
+  const data =
+    kANDa_num !== 0
+      ? rAmAyaNam_map[kANDa_num - 1].sarga_data.map((sarga) => sarga.name_devanagari)
+      : [];
+  if (!browser) return data;
+  return Promise.all(data.map((sarga) => lipi_parivartak_async(sarga, BASE_SCRIPT, lang)));
+};
+
 // SARGA_DATA
 export const sarga_data = get_derived_query(
   [kANDa_selected, sarga_selected],
@@ -39,17 +59,7 @@ export const sarga_data = get_derived_query(
         queryKey: QUERY_KEYS.sarga_data($kANDa_selected, $sarga_selected),
         enabled: browser && $kANDa_selected !== 0 && $sarga_selected !== 0,
         placeholderData: [],
-        queryFn: async () => {
-          if (!browser) return [];
-          const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
-          const data = (
-            (await all_sargas[
-              `/data/ramayan/data/${$kANDa_selected}/${$sarga_selected}.json`
-            ]()) as any
-          ).default as string[];
-          await delay(350);
-          return data;
-        }
+        queryFn: () => get_sarga_data($kANDa_selected, $sarga_selected)
       },
       queryClient
     )
@@ -103,6 +113,14 @@ export const trans_lang_data = get_derived_query(
     )
 );
 export const LOCALS_TRANS_LANGS = ['English'];
+
+export async function get_sarga_data(kANDa_num: number, sarga_num: number) {
+  const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
+  const data = ((await all_sargas[`/data/ramayan/data/${kANDa_num}/${sarga_num}.json`]()) as any)
+    .default as string[];
+  await delay(350);
+  return data;
+}
 
 export async function get_translations(kanda: number, sarga: number, lang: string) {
   if (LOCALS_TRANS_LANGS.includes(lang)) {

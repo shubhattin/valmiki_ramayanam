@@ -1,6 +1,5 @@
 <script lang="ts">
   import Icon from '@tools/Icon.svelte';
-  import rAmAyaNa_map from '@data/ramayan/ramayan_map.json';
   import { onDestroy, onMount } from 'svelte';
   import { delay } from '@tools/delay';
   import { writable, type Unsubscriber } from 'svelte/store';
@@ -29,15 +28,19 @@
     view_translation_status,
     edit_language_typer_status,
     sanskrit_mode,
-    typing_assistance_modal_opened,
-    image_tool_opened
+    typing_assistance_modal_opened
   } from '@state/main_page/main_state';
   import { user_allowed_langs } from '@state/main_page/user';
   import { SlideToggle } from '@skeletonlabs/skeleton';
   import { BsKeyboard } from 'svelte-icons-pack/bs';
   import User from './user/User.svelte';
   import { get_text_font } from '@tools/font_tools';
-  import { LOCALS_TRANS_LANGS } from '@state/main_page/data';
+  import {
+    LOCALS_TRANS_LANGS,
+    rAmAyaNam_map,
+    get_kANDa_names,
+    get_sarga_names
+  } from '@state/main_page/data';
 
   const unsubscribers: Unsubscriber[] = [];
   const query_client = useQueryClient();
@@ -71,7 +74,6 @@
     update_viewing_script_selection: z.boolean().default(true)
   });
   let viewing_script_selection = writable(BASE_SCRIPT);
-  $viewing_script = BASE_SCRIPT;
   let viewing_script_mut = createMutation({
     mutationKey: ['viewing_script'],
     mutationFn: async (params: z.infer<typeof params_viewing_script_mut_schema>) => {
@@ -128,24 +130,13 @@
     return `/${kANDa}${sarga ? `/${sarga}` : ''}`;
   };
 
-  let kANDa_names: string[] = rAmAyaNa_map.map((kANDa) => kANDa.name_devanagari);
-  $: browser &&
-    Promise.all(
-      rAmAyaNa_map.map((kANDa) =>
-        lipi_parivartak_async(kANDa.name_devanagari, BASE_SCRIPT, $viewing_script)
-      )
-    ).then((_kANDa_names) => (kANDa_names = _kANDa_names));
-  let sarga_names: string[] =
+  let kANDa_names = rAmAyaNam_map.map((kANDa) => kANDa.name_devanagari);
+  $: get_kANDa_names($viewing_script).then((names) => (kANDa_names = names));
+  let sarga_names =
     $kANDa_selected !== 0
-      ? rAmAyaNa_map[$kANDa_selected - 1].sarga_data.map((sarga) => sarga.name_devanagari)
+      ? rAmAyaNam_map[$kANDa_selected - 1].sarga_data.map((sarga) => sarga.name_devanagari)
       : [];
-  $: browser &&
-    $kANDa_selected !== 0 &&
-    Promise.all(
-      rAmAyaNa_map[$kANDa_selected - 1].sarga_data.map((sarga) =>
-        lipi_parivartak_async(sarga.name_devanagari.split('\n')[0], BASE_SCRIPT, $viewing_script)
-      )
-    ).then((_sarga_names) => (sarga_names = _sarga_names));
+  $: get_sarga_names($kANDa_selected, $viewing_script).then((names) => (sarga_names = names));
 
   unsubscribers.push(
     sarga_selected.subscribe(async () => {
@@ -255,7 +246,7 @@
     </div>
   {/if}
   {#if $kANDa_selected !== 0 && $sarga_selected !== 0}
-    {@const kANDa = rAmAyaNa_map[$kANDa_selected - 1]}
+    {@const kANDa = rAmAyaNam_map[$kANDa_selected - 1]}
     <div class="space-x-3">
       {#if $sarga_selected !== 1}
         <button

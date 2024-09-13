@@ -5,7 +5,7 @@ export let sarga_selected = writable(0);
 
 export const BASE_SCRIPT = 'Sanskrit';
 
-export let viewing_script = writable<string>();
+export let viewing_script = writable(BASE_SCRIPT);
 export let trans_lang = writable<string>();
 export let view_translation_status = writable(false);
 

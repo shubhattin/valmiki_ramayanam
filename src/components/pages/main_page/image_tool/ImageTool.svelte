@@ -5,6 +5,7 @@
   import * as fabric from 'fabric';
   import { writable } from 'svelte/store';
   import { canvas, background_image } from './state';
+  import Selections from './Selections.svelte';
 
   let canvas_element: HTMLCanvasElement;
 
@@ -86,16 +87,19 @@
 <span class="normal-font"></span>
 <!-- ^ This forces to load the font the font -->
 
-<button
-  on:click={() => {
-    const URL = $canvas.toDataURL({
-      format: 'jpeg',
-      quality: 1,
-      multiplier: 1 / $scaling_factor
-    });
-    download_file_in_browser(URL, 'image.jpeg');
-  }}>Down</button
->
+<div>
+  <Selections />
+  <button
+    on:click={() => {
+      const URL = $canvas.toDataURL({
+        format: 'jpeg',
+        quality: 1,
+        multiplier: 1 / $scaling_factor
+      });
+      download_file_in_browser(URL, 'image.jpeg');
+    }}>Down</button
+  >
+</div>
 <div class="mt-4 space-y-2">
   <canvas bind:this={canvas_element}></canvas>
 </div>
