@@ -3,7 +3,7 @@ import { createQuery } from '@tanstack/svelte-query';
 import { delay } from '@tools/delay';
 import { get_derived_query } from '@tools/query';
 import { queryClient } from '@state/query';
-import { derived, get } from 'svelte/store';
+import { derived } from 'svelte/store';
 import { client_raw } from '@api/client';
 import rAmAyaNam_map from '@data/ramayan/ramayan_map.json';
 import { lipi_parivartak_async } from '@tools/converter';

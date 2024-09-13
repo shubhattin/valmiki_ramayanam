@@ -22,6 +22,7 @@
   import { scale } from 'svelte/transition';
   import Icon from '@tools/Icon.svelte';
   import Modal from '@components/Modal.svelte';
+  import { BiImage } from 'svelte-icons-pack/bi';
 
   const download_excel_file = createMutation({
     mutationKey: ['sarga', 'download_excel_data'],
@@ -44,7 +45,7 @@
         translation_texts.set(local_lang, trans);
       }
       const shloka_count =
-        rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].shloka_count;
+        rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].shloka_count_extracted;
       // loading other online databased language translations
       const other_translations =
         await client_raw.translations.get_all_langs_translations_per_sarga.query({
@@ -81,7 +82,10 @@
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       });
       const downloadLink = URL.createObjectURL(blob);
-      download_file_in_browser(downloadLink, `${$sarga_selected}. ${sarga_name}.xlsx`);
+      download_file_in_browser(
+        downloadLink,
+        `${kANDa_selected}-${$sarga_selected}. ${sarga_name}.xlsx`
+      );
     }
   });
 </script>
@@ -92,7 +96,7 @@
   use:popup={{
     event: 'click',
     target: 'sarga_options',
-    placement: 'left-end'
+    placement: 'bottom'
   }}
   class="btn m-0 rounded-full p-[0.05rem] ring-2 ring-zinc-400 dark:ring-zinc-300"
 >
@@ -111,8 +115,9 @@
   </button>
   <button
     on:click={() => image_tool_opened.set(true)}
-    class="btn block w-full rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
+    class="btn block w-full rounded-md px-2 py-1 text-start hover:bg-gray-200 dark:hover:bg-gray-700"
   >
+    <Icon src={BiImage} class="-mt-1 fill-sky-500 text-2xl dark:fill-sky-400" />
     Image Tool
   </button>
   <!-- <button

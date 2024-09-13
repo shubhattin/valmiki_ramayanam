@@ -1,18 +1,15 @@
 <script lang="ts">
   import background_image_url from './background_vr.png';
   import { onMount } from 'svelte';
-  import { download_file_in_browser } from '@tools/download_file_browser';
   import * as fabric from 'fabric';
-  import { writable } from 'svelte/store';
-  import { canvas, background_image } from './state';
-  import Selections from './Selections.svelte';
+  import { canvas, background_image, scaling_factor } from './state';
+  import ImageOptions from './ImageOptions.svelte';
 
   let canvas_element: HTMLCanvasElement;
 
   const DIMENSIONS = [1920, 1080]; // Background image dimensions
   const INDIC_FONT_NAME = 'Nirmala UI';
   const ADOBE_DEVANGARI = 'AdobeDevanagari';
-  let scaling_factor = writable<number>(0); // Scale factor for the background image
 
   const get_units = (value: number) => {
     return value * $scaling_factor;
@@ -87,18 +84,8 @@
 <span class="normal-font"></span>
 <!-- ^ This forces to load the font the font -->
 
-<div>
-  <Selections />
-  <button
-    on:click={() => {
-      const URL = $canvas.toDataURL({
-        format: 'jpeg',
-        quality: 1,
-        multiplier: 1 / $scaling_factor
-      });
-      download_file_in_browser(URL, 'image.jpeg');
-    }}>Down</button
-  >
+<div class="space-y-2">
+  <ImageOptions />
 </div>
 <div class="mt-4 space-y-2">
   <canvas bind:this={canvas_element}></canvas>

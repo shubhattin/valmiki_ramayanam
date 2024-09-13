@@ -8,12 +8,13 @@ import { queryClient } from '@state/query';
 
 export let canvas = writable<fabric.Canvas>();
 export let background_image = writable<fabric.FabricImage>();
+export let scaling_factor = writable<number>(0); // Scale factor for the background image
 
 export let image_script = writable<string>('');
 export let image_lang = writable<string>('Hindi');
 export let image_kANDa = writable<number>(0);
 export let image_sarga = writable<number>(0);
-export let image_shloka = writable<number>(0);
+export let image_shloka = writable<number>(1);
 
 export const image_sarga_data = get_derived_query(
   [image_kANDa, image_sarga],
