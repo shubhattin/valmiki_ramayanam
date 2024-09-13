@@ -65,6 +65,15 @@ export const sarga_data = get_derived_query(
     )
 );
 
+export async function get_sarga_data(kANDa_num: number, sarga_num: number) {
+  if (!browser) return [];
+  // ^ This is to prevent this to be bundled in edge functions as it a limit of 1mb(gzip)
+  const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
+  const data = ((await all_sargas[`/data/ramayan/data/${kANDa_num}/${sarga_num}.json`]()) as any)
+    .default as string[];
+  await delay(350);
+  return data;
+}
 // Translations
 export const trans_en_data = get_derived_query(
   [kANDa_selected, sarga_selected, view_translation_status],
@@ -114,14 +123,6 @@ export const trans_lang_data = get_derived_query(
 );
 export const LOCALS_TRANS_LANGS = ['English'];
 
-export async function get_sarga_data(kANDa_num: number, sarga_num: number) {
-  const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
-  const data = ((await all_sargas[`/data/ramayan/data/${kANDa_num}/${sarga_num}.json`]()) as any)
-    .default as string[];
-  await delay(350);
-  return data;
-}
-
 export async function get_translations(kanda: number, sarga: number, lang: string) {
   if (LOCALS_TRANS_LANGS.includes(lang)) {
     if (lang === 'English') return await load_english_translation(kanda, sarga);
@@ -143,6 +144,8 @@ const load_english_translation = async (kANDa_num: number, sarga_number: number)
   await delay(250);
   let data: Record<number, string> = {};
   const data_map = new Map<number, string>();
+  if (!browser) return data_map;
+  // ^ This is to prevent this to be bundled in edge functions as it a limit of 1mb(gzip)
   if (import.meta.env.DEV) {
     const yaml = (await import('js-yaml')).default;
     const glob_yaml = import.meta.glob('/data/ramayan/trans_en/*/*.yaml', {
