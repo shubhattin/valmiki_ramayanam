@@ -4,10 +4,9 @@
   import { download_file_in_browser } from '@tools/download_file_browser';
   import * as fabric from 'fabric';
   import { writable } from 'svelte/store';
+  import { canvas, background_image } from './state';
 
   let canvas_element: HTMLCanvasElement;
-  let canvas = writable<fabric.Canvas>();
-  let background_image: fabric.FabricImage;
 
   const DIMENSIONS = [1920, 1080]; // Background image dimensions
   const INDIC_FONT_NAME = 'Nirmala UI';
@@ -40,7 +39,7 @@
       height: get_units(DIMENSIONS[1])
     });
     const img = await fabric.util.loadImage(background_image_url);
-    background_image = new fabric.Image(img, {
+    $background_image = new fabric.Image(img, {
       originX: 'left',
       originY: 'top',
       scaleX: $scaling_factor,
@@ -50,35 +49,27 @@
       evented: false,
       selection: false
     });
-
     // Add the image to the canvas
-    $canvas.add(background_image);
+    $canvas.add($background_image);
 
-    const rect = new fabric.Rect({
-      left: get_units(100),
-      top: get_units(100),
-      fill: 'red',
-      width: get_units(400),
-      height: get_units(200)
-    });
-    $canvas.add(rect);
-    const text = new fabric.Text('कॄपादृष्ट्वा युद्ध्या द्युतिऽन  द्यतिऽ 1', {
+    const text = new fabric.Text('कॄदृष्ट्वा कॣ कॢ युद्ध्या द्यु द्य ऽ 1', {
       textAlign: 'center',
       left: get_units(400),
       top: get_units(600),
       fill: 'brown',
       fontFamily: INDIC_FONT_NAME,
-      fontSize: get_units(100)
+      fontSize: get_units(100),
+      lockRotation: true
     });
     $canvas.add(text);
-    const text1 = new fabric.Text('कॄपादृष्ट्वा युद्ध्या द्युतिऽन  द्यतिऽ 2', {
+    const text1 = new fabric.Text('कॄदृष्ट्वा कॣ कॢ युद्ध्या द्यु द्य ऽ 2', {
       textAlign: 'center',
       left: get_units(650),
       top: get_units(400),
       fill: 'brown',
       fontFamily: ADOBE_DEVANGARI,
-      // fontWeight: ,
-      fontSize: get_units(100)
+      fontSize: get_units(100),
+      lockRotation: true
     });
     $canvas.add(text1);
     $canvas.renderAll();
@@ -91,6 +82,9 @@
       // this is a flickering effect but we will figure out a better way later on
     })();
 </script>
+
+<span class="normal-font"></span>
+<!-- ^ This forces to load the font the font -->
 
 <button
   on:click={() => {
