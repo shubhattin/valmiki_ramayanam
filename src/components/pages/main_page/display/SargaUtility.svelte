@@ -1,7 +1,17 @@
 <script lang="ts">
   import { browser } from '$app/environment';
-  import { load_english_translation, sarga_data } from '@state/main_page/data';
-  import { sarga_selected, kANDa_selected, BASE_SCRIPT } from '@state/main_page/main_state';
+  import {
+    get_translations,
+    sarga_data,
+    LOCALS_TRANS_LANGS,
+    rAmAyaNam_map
+  } from '@state/main_page/data';
+  import {
+    sarga_selected,
+    kANDa_selected,
+    BASE_SCRIPT,
+    image_tool_opened
+  } from '@state/main_page/main_state';
   import { createMutation } from '@tanstack/svelte-query';
   import { download_file_in_browser } from '@tools/download_file_browser';
   import { BsThreeDots } from 'svelte-icons-pack/bs';
@@ -9,9 +19,10 @@
   import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
   import { transliterate_xlxs_file } from '@tools/excel/transliterate_xlsx_file';
   import { client_raw } from '@api/client';
-  import rAmAyaNa_map from '@data/ramayan/ramayan_map.json';
   import { scale } from 'svelte/transition';
   import Icon from '@tools/Icon.svelte';
+  import Modal from '@components/Modal.svelte';
+  import { BiImage } from 'svelte-icons-pack/bi';
 
   const download_excel_file = createMutation({
     mutationKey: ['sarga', 'download_excel_data'],
@@ -28,12 +39,14 @@
       const COLUMN_FOR_DEV = 2;
       const TEXT_START_ROW = 2;
       const translation_texts: Map<string, Map<number, string>> = new Map();
-      //load english translations
-      const english_translation = await load_english_translation($kANDa_selected, $sarga_selected);
-      translation_texts.set('English', english_translation);
+      // load local translations
+      for (let local_lang of LOCALS_TRANS_LANGS) {
+        const trans = await get_translations($kANDa_selected, $sarga_selected, local_lang);
+        translation_texts.set(local_lang, trans);
+      }
       const shloka_count =
-        rAmAyaNa_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].shloka_count;
-      // loading other language translations
+        rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].shloka_count_extracted;
+      // loading other online databased language translations
       const other_translations =
         await client_raw.translations.get_all_langs_translations_per_sarga.query({
           kANDa_num: $kANDa_selected,
@@ -61,7 +74,7 @@
 
       // saving file to output path
       let sarga_name =
-        rAmAyaNa_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].name_normal.split(
+        rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].name_normal.split(
           '\n'
         )[0];
       const buffer = await workbook.xlsx.writeBuffer();
@@ -69,7 +82,10 @@
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       });
       const downloadLink = URL.createObjectURL(blob);
-      download_file_in_browser(downloadLink, `${$sarga_selected}. ${sarga_name}.xlsx`);
+      download_file_in_browser(
+        downloadLink,
+        `${kANDa_selected}-${$sarga_selected}. ${sarga_name}.xlsx`
+      );
     }
   });
 </script>
@@ -80,7 +96,7 @@
   use:popup={{
     event: 'click',
     target: 'sarga_options',
-    placement: 'left-end'
+    placement: 'bottom'
   }}
   class="btn m-0 rounded-full p-[0.05rem] ring-2 ring-zinc-400 dark:ring-zinc-300"
 >
@@ -97,10 +113,24 @@
     />
     Download Excel File
   </button>
+  <button
+    on:click={() => image_tool_opened.set(true)}
+    class="btn block w-full rounded-md px-2 py-1 text-start hover:bg-gray-200 dark:hover:bg-gray-700"
+  >
+    <Icon src={BiImage} class="-mt-1 fill-sky-500 text-2xl dark:fill-sky-400" />
+    Image Tool
+  </button>
   <!-- <button
             class="btn block w-full rounded-md px-2 py-1 text-start hover:bg-gray-200 dark:hover:bg-gray-700"
           >
             <Icon src={TrOutlineFileTypeTxt} class=" mr-1 text-2xl" />
             Download Text File
           </button> -->
+</div>
+<div>
+  <Modal modal_open={image_tool_opened} close_on_click_outside={false}>
+    {#await import('../image_tool/ImageTool.svelte') then ImageTool}
+      <ImageTool.default />
+    {/await}
+  </Modal>
 </div>

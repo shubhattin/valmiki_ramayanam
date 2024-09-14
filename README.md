@@ -1,5 +1,6 @@
 # श्रीमद्वाल्मीकीयरामायणम् (Ṣrīmadvālmīkīya*rāmāyaṇam*)
 
+![Ramayanam](./others/image_files//Project%20Banner.webp)
 **[श्रीमद्रामायणस्य पठनम्](https://ramayanam.thesanskritchannel.org/)**
 
 This Project is an effort to provide the text of the Valmiki Ramayanam in a structured format. The text is fetched from the [Valmiki Ramayanam - Wikisource](https://sa.wikisource.org/wiki/रामायणम्) crosschecking from the Book [`ShrimadValmikiRamayanam by R.Narayanaswamy`](https://archive.org/details/361952998SrimadValmikiRamayanaSanskrit1933AD/page/n5/mode/2up) (can be downloaded from [here](https://github.com/shubhattin/valmiki_ramayanam/releases/tag/book)) and processed to provide the text in various formats.

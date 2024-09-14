@@ -1,5 +1,4 @@
 import { sveltekit } from '@sveltejs/kit/vite';
-import { join } from 'path';
 import { defineConfig } from 'vitest/config';
 import { purgeCss } from 'vite-plugin-tailwind-purgecss';
 import { build_json_files } from './src/tools/vite_plugin_build_json_from_yaml';

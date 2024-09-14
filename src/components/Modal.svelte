@@ -27,14 +27,6 @@
     document.body.style.overflow = '';
   };
 
-  const mode_open_unsubscriber = modal_open.subscribe((value) => {
-    if (value && !opened) openModal();
-    else if (!value && opened) closeModal();
-  });
-  onDestroy(() => {
-    mode_open_unsubscriber();
-  });
-
   const animationDuration = 400;
   let is_closing = false; // to fix transition not being displayed while exiting
   let visibleModal: HTMLElement | null = null;
@@ -76,6 +68,13 @@
         closeModal();
       }
     });
+  });
+  const mode_open_unsubscriber = modal_open.subscribe((value) => {
+    if (value && !opened) openModal();
+    else if (!value && opened) closeModal();
+  });
+  onDestroy(() => {
+    mode_open_unsubscriber();
   });
 </script>
 
