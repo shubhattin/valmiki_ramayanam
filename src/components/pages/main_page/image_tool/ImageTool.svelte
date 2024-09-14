@@ -121,9 +121,10 @@
   };
 
   $: mounted &&
-    $image_sarga_data.length !== 0 &&
+    !$image_sarga_data.isFetching &&
+    $image_sarga_data.isSuccess &&
     (() => {
-      $sarga_texts.set('text', $image_sarga_data[0].split('\n')[0]);
+      $sarga_texts.set('text', $image_sarga_data.data[0].split('\n')[0]);
       $sarga_texts.setCoords();
       $canvas.renderAll();
     })();

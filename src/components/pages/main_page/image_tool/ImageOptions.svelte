@@ -92,19 +92,13 @@
     <div class="inline-block space-x-1">
       <button
         class="btn m-0 p-0"
-        disabled={$image_shloka === 1}
+        disabled={$image_shloka === -1}
         on:click={() => ($image_shloka -= 1)}
       >
         <Icon src={TiArrowBackOutline} class="-mt-1 text-lg" />
       </button>
-      <select
-        class={`${get_text_font($viewing_script)} select inline-block w-14 p-1 text-sm`}
-        bind:value={$image_shloka}
-      >
-        {#each Array(shloka_count) as _, index}
-          <option value={index + 1}>{index + 1}</option>
-        {/each}
-      </select>
+      <input class="input m-0 w-14 rounded-md px-1 py-0" type="number" bind:value={$image_shloka} />
+      <!-- TODO: Add a comobox like selector -->
       <button
         class="btn m-0 p-0"
         on:click={() => ($image_shloka += 1)}
