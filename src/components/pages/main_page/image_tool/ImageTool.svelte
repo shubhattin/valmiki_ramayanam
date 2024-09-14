@@ -1,34 +1,16 @@
 <script lang="ts">
   import background_image_url from './background_vr.png';
+  import background_image_template_url from './background_vr_template.jpg';
   import { onMount } from 'svelte';
   import * as fabric from 'fabric';
-  import {
-    canvas,
-    background_image,
-    scaling_factor,
-    shloka_texts,
-    trans_texts,
-    image_sarga_data,
-    image_trans_data,
-    image_shloka,
-    image_lang,
-    image_script
-  } from './state';
+  import { canvas, background_image, scaling_factor, get_units } from './state';
   import ImageOptions from './ImageOptions.svelte';
-  import { load_font } from '@tools/font_tools';
-  import { lipi_parivartak_async } from '@tools/converter';
-  import { BASE_SCRIPT } from '@state/main_page/main_state';
+  import RenderText from './RenderText.svelte';
 
   let canvas_element: HTMLCanvasElement;
   let mounted = false;
 
   const DIMENSIONS = [1920, 1080]; // Background image dimensions
-  const INDIC_FONT_NAME = 'Nirmala UI';
-  const ADOBE_DEVANGARI = 'AdobeDevanagari';
-
-  const get_units = (value: number) => {
-    return value * $scaling_factor;
-  };
 
   function update_scaling_factor() {
     // we can improve the method of calculating the scaling factor later on
@@ -51,7 +33,7 @@
       width: get_units(DIMENSIONS[0]),
       height: get_units(DIMENSIONS[1])
     });
-    const img = await fabric.util.loadImage(background_image_url);
+    const img = await fabric.util.loadImage(background_image_template_url);
     $background_image = new fabric.Image(img, {
       originX: 'left',
       originY: 'top',
@@ -64,9 +46,7 @@
     });
     // Add the image to the canvas
     $canvas.add($background_image);
-    (await get_all_texts()).forEach((text) => {
-      $canvas.add(text);
-    });
+
     $canvas.requestRenderAll();
   };
 
@@ -94,56 +74,6 @@
     $canvas.requestRenderAll();
   };
   $: mounted && $scaling_factor && update_canvas_dimensions();
-
-  const get_all_texts = async () => {
-    const texts: fabric.FabricText[] = [];
-
-    // load necessary fonts
-    await load_font(INDIC_FONT_NAME);
-    await load_font(ADOBE_DEVANGARI);
-
-    $shloka_texts = new fabric.Text('', {
-      textAlign: 'center',
-      left: get_units(520),
-      top: get_units(150),
-      fill: 'black',
-      fontFamily: INDIC_FONT_NAME,
-      fontSize: get_units(80),
-      lockRotation: true
-    });
-    $trans_texts = new fabric.Text('j', {
-      textAlign: 'center',
-      left: get_units(530),
-      top: get_units(245),
-      fill: 'black',
-      fontFamily: ADOBE_DEVANGARI,
-      fontSize: get_units(55),
-      lockRotation: true
-    });
-    texts.push($shloka_texts);
-    texts.push($trans_texts);
-    return texts;
-  };
-
-  $: mounted &&
-    !$image_sarga_data.isFetching &&
-    $image_sarga_data.isSuccess &&
-    (async () => {
-      const shloka = (
-        await lipi_parivartak_async(
-          $image_sarga_data.data[$image_shloka],
-          BASE_SCRIPT,
-          $image_script
-        )
-      ).split('\n')[0];
-      const eng = (
-        await lipi_parivartak_async($image_sarga_data.data[$image_shloka], BASE_SCRIPT, 'Normal')
-      ).split('\n')[0];
-      $shloka_texts.set('text', shloka);
-      $trans_texts.set('text', eng);
-      // $sarga_texts.setCoords();
-      $canvas.requestRenderAll();
-    })();
 </script>
 
 <div class="space-y-2">
@@ -152,3 +82,4 @@
 <div class="mt-4 space-y-2">
   <canvas bind:this={canvas_element}></canvas>
 </div>
+<RenderText {mounted} />

@@ -1,4 +1,4 @@
-import { derived, writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import type * as fabric from 'fabric';
 import { get_derived_query } from '@tools/query';
 import { browser } from '$app/environment';
@@ -9,10 +9,12 @@ import { queryClient } from '@state/query';
 export let canvas = writable<fabric.Canvas>();
 export let background_image = writable<fabric.FabricImage>();
 export let scaling_factor = writable<number>(0); // Scale factor for the background image
-export let shloka_texts = writable<fabric.FabricText>();
-export let trans_texts = writable<fabric.FabricText>();
-export let shloka_group = writable<fabric.Group>();
-export let trans_group = writable<fabric.Group>();
+export let shloka_texts = writable<fabric.FabricText[]>();
+export let trans_text = writable<fabric.Textbox>();
+
+export const get_units = (value: number) => {
+  return value * get(scaling_factor);
+};
 
 export let image_script = writable<string>('');
 export let image_lang = writable<string>('English');

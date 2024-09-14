@@ -67,6 +67,18 @@
   }
 
   $: sarga_loading = $image_sarga_data.isFetching || !$image_sarga_data.isSuccess;
+
+  const download_image = () => {
+    const URL = $canvas.toDataURL({
+      format: 'jpeg',
+      quality: 1,
+      multiplier: 1 / $scaling_factor
+    });
+    download_file_in_browser(
+      URL,
+      `${$image_kANDa}-${$image_sarga} Shloka No. ${$image_shloka}.jpeg`
+    );
+  };
 </script>
 
 {#if sarga_names.length !== 0 && kANDa_names.length !== 0}
@@ -159,20 +171,7 @@
         {/each}
       </select>
     </label>
-    <button
-      class="btn inline-flex rounded-lg px-2 py-1"
-      on:click={() => {
-        const URL = $canvas.toDataURL({
-          format: 'jpeg',
-          quality: 1,
-          multiplier: 1 / $scaling_factor
-        });
-        download_file_in_browser(
-          URL,
-          `${$image_kANDa}-${$image_sarga} Shloka No. ${$image_shloka}.jpeg`
-        );
-      }}
-    >
+    <button class="btn inline-flex rounded-lg px-2 py-1" on:click={download_image}>
       <Icon src={BsDownload} class="-mt-1 mr-1 text-lg" />
       Download Image
     </button>
