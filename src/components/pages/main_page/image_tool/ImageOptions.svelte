@@ -116,6 +116,7 @@
     <label class="inline-block space-x-1">
       <Icon src={LanguageIcon} class="text-xl" />
       <select class="select inline-block w-24 p-1 text-sm" bind:value={$image_lang}>
+        <option value="English">English</option>
         {#each LANG_LIST as lang (lang)}
           <option value={lang}>{lang}</option>
         {/each}
