@@ -35,9 +35,9 @@
     const shloka_data = $image_sarga_data.data![$image_shloka];
     const shloka_lines = shloka_data.split('\n');
 
-    const START_LEFT_DEV = 620;
+    const START_LEFT_DEV = 600;
     const START_TOP_DEV = 190;
-    const START_LEFT_NORMAL = 680;
+    const START_LEFT_NORMAL = 620;
     const START_TOP_NORMAL = 270;
 
     for (let i = 0; i < shloka_lines.length; i++) {
@@ -48,7 +48,7 @@
         top: get_units(START_TOP_DEV + i * 180),
         fill: '#4f3200',
         fontFamily: FONT_NAMES.INDIC_FONT_NAME,
-        fontSize: get_units(72),
+        fontSize: get_units(68),
         lockRotation: true,
         fontWeight: 700
       });
@@ -83,7 +83,7 @@
         top: get_units(650),
         fill: '#352700',
         fontFamily: FONT_NAMES.ADOBE_DEVANGARI,
-        fontSize: get_units(70),
+        fontSize: get_units(62),
         lockRotation: true,
         width: get_units(1200)
       });

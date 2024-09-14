@@ -9,7 +9,8 @@
     scaling_factor,
     canvas,
     image_sarga_data,
-    image_trans_data
+    image_trans_data,
+    set_background_image_type
   } from './state';
   import {
     sarga_selected,
@@ -68,7 +69,8 @@
 
   $: sarga_loading = $image_sarga_data.isFetching || !$image_sarga_data.isSuccess;
 
-  const download_image = () => {
+  const download_image = async () => {
+    await set_background_image_type(false);
     const URL = $canvas.toDataURL({
       format: 'jpeg',
       quality: 1,
@@ -78,6 +80,7 @@
       URL,
       `${$image_kANDa}-${$image_sarga} Shloka No. ${$image_shloka}.jpeg`
     );
+    await set_background_image_type(true);
   };
 </script>
 

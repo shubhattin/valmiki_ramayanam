@@ -1,9 +1,14 @@
 <script lang="ts">
-  import background_image_url from './background_vr.png';
-  import background_image_template_url from './background_vr_template.jpg';
   import { onMount } from 'svelte';
   import * as fabric from 'fabric';
-  import { canvas, background_image, scaling_factor, get_units } from './state';
+  import {
+    canvas,
+    background_image,
+    scaling_factor,
+    get_units,
+    shaded_background_image_status,
+    set_background_image_type
+  } from './state';
   import ImageOptions from './ImageOptions.svelte';
   import RenderText from './RenderText.svelte';
 
@@ -33,7 +38,7 @@
       width: get_units(DIMENSIONS[0]),
       height: get_units(DIMENSIONS[1])
     });
-    const img = await fabric.util.loadImage(background_image_template_url);
+    const img = await fabric.util.loadImage('');
     $background_image = new fabric.Image(img, {
       originX: 'left',
       originY: 'top',
@@ -60,20 +65,28 @@
     $background_image.scaleX = $scaling_factor;
     $background_image.scaleY = $scaling_factor;
     // Update positions and scales of text objects
-    $canvas.getObjects('text').forEach((obj, index) => {
+    $canvas.getObjects().forEach((obj) => {
+      if (!obj || obj.type === 'image') return;
+      // not yet working for Textbox
       const base_top = obj.get('top') / prev_scaling_factor;
       const base_left = obj.get('left') / prev_scaling_factor;
       const base_font_size = obj.get('fontSize') / prev_scaling_factor;
-      obj.set({
+      const options: Record<string, any> = {
         left: get_units(base_left),
         top: get_units(base_top),
         fontSize: get_units(base_font_size)
-      });
+      };
+      if (obj.type === 'textbox') {
+        const base_width = obj.get('width') / prev_scaling_factor;
+        options['width'] = get_units(base_width);
+      }
+      obj.set(options);
       obj.setCoords(); // Update object's corner positions
     });
     $canvas.requestRenderAll();
   };
   $: mounted && $scaling_factor && update_canvas_dimensions();
+  $: mounted && set_background_image_type($shaded_background_image_status);
 </script>
 
 <div class="space-y-2">
