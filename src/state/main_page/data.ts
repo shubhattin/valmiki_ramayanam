@@ -124,6 +124,7 @@ export const trans_lang_data = get_derived_query(
 export const LOCALS_TRANS_LANGS = ['English'];
 
 export async function get_translations(kanda: number, sarga: number, lang: string) {
+  await delay(400);
   if (LOCALS_TRANS_LANGS.includes(lang)) {
     if (lang === 'English') return await load_english_translation(kanda, sarga);
   }
@@ -141,7 +142,6 @@ export async function get_translations(kanda: number, sarga: number, lang: strin
 }
 
 const load_english_translation = async (kANDa_num: number, sarga_number: number) => {
-  await delay(250);
   let data: Record<number, string> = {};
   const data_map = new Map<number, string>();
   if (!browser) return data_map;

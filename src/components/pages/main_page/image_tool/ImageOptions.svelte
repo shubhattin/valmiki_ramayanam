@@ -7,7 +7,9 @@
     image_script,
     image_shloka,
     scaling_factor,
-    canvas
+    canvas,
+    image_sarga_data,
+    image_trans_data
   } from './state';
   import {
     sarga_selected,
@@ -44,6 +46,12 @@
     $image_shloka = 1;
     // reset after change
   }
+  $: if ($image_sarga) {
+    $image_shloka = 1;
+    // reset after change
+  }
+
+  $: sarga_loading = $image_sarga_data.isFetching || !$image_sarga_data.isSuccess;
 </script>
 
 {#if sarga_names.length !== 0 && kANDa_names.length !== 0}
@@ -55,6 +63,7 @@
     </select>
     <Select
       class={`${get_text_font($image_lang)} select inline-block w-36 p-1 text-sm`}
+      disabled={sarga_loading}
       zodType={z.coerce.number().int()}
       bind:value={$image_kANDa}
       options={kANDa_names.map((name, index) => ({
@@ -65,7 +74,7 @@
     <div class="inline-block space-x-1">
       <button
         class="btn m-0 p-0"
-        disabled={$image_sarga === 1}
+        disabled={$image_sarga === 1 || sarga_loading}
         on:click={() => ($image_sarga -= 1)}
       >
         <Icon src={TiArrowBackOutline} class="-mt-1 text-lg" />
@@ -73,6 +82,7 @@
       <Select
         class={`${get_text_font($viewing_script)} select inline-block w-40 p-1 text-sm`}
         zodType={z.coerce.number().int()}
+        disabled={sarga_loading}
         bind:value={$image_sarga}
         options={sarga_names.map((name, index) => ({
           value: index + 1,
@@ -82,7 +92,7 @@
       <button
         class="btn m-0 p-0"
         on:click={() => ($image_sarga += 1)}
-        disabled={$image_sarga === rAmAyaNam_map[$image_kANDa - 1].sarga_count}
+        disabled={$image_sarga === rAmAyaNam_map[$image_kANDa - 1].sarga_count || sarga_loading}
       >
         <Icon src={TiArrowForwardOutline} class="-mt-1 text-lg" />
       </button>
@@ -109,7 +119,11 @@
     </div>
     <label class="inline-block space-x-1">
       <Icon src={LanguageIcon} class="text-xl" />
-      <select class="select inline-block w-24 p-1 text-sm" bind:value={$image_lang}>
+      <select
+        class="select inline-block w-24 p-1 text-sm"
+        bind:value={$image_lang}
+        disabled={$image_trans_data.isFetching || !$image_trans_data.isSuccess}
+      >
         <option value="English">English</option>
         {#each LANG_LIST as lang (lang)}
           <option value={lang}>{lang}</option>

@@ -99,6 +99,7 @@
   );
 
   let trans_lang_selection = writable('--');
+  $trans_lang = $trans_lang_selection;
   const trans_lang_mut = createMutation({
     mutationKey: ['trans_lang'],
     mutationFn: async (lang: string) => {
@@ -125,7 +126,8 @@
       $trans_lang_mut.mutate(lang);
     })
   );
-  $trans_lang = $trans_lang_selection;
+  // the trans_lang_mut is used to get the translation language
+  // this could be removed in future in favour of a simple query
 
   const get_ramayanam_page_link = (kANDa: number, sarga: number | null = null) => {
     return `/${kANDa}${sarga ? `/${sarga}` : ''}`;
