@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { derived, writable } from 'svelte/store';
 import type * as fabric from 'fabric';
 import { get_derived_query } from '@tools/query';
 import { browser } from '$app/environment';
@@ -9,6 +9,8 @@ import { queryClient } from '@state/query';
 export let canvas = writable<fabric.Canvas>();
 export let background_image = writable<fabric.FabricImage>();
 export let scaling_factor = writable<number>(0); // Scale factor for the background image
+export let sarga_texts = writable<fabric.FabricText>();
+export let trans_texts = writable<fabric.FabricText>();
 
 export let image_script = writable<string>('');
 export let image_lang = writable<string>('English');
@@ -17,7 +19,7 @@ export let image_sarga = writable<number>(0);
 // ^ kanda and sarga will be inherited from the main during mount
 export let image_shloka = writable<number>(1);
 
-export const image_sarga_data = get_derived_query(
+export const image_sarga_data_base = get_derived_query(
   [image_kANDa, image_sarga],
   ([$image_kANDa, $image_sarga]) => {
     return createQuery(
@@ -30,6 +32,16 @@ export const image_sarga_data = get_derived_query(
       queryClient
     );
   }
+);
+export const image_sarga_data = derived(
+  [image_sarga_data_base],
+  ([$image_sarga_data_base], set: (v: string[]) => void) => {
+    const { isFetching, isSuccess, data } = $image_sarga_data_base;
+    if (!isFetching && isSuccess && data) {
+      set(data);
+    }
+  },
+  []
 );
 export const image_trans_data = get_derived_query(
   [image_kANDa, image_sarga, image_lang],
