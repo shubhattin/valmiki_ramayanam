@@ -26,6 +26,18 @@
   import { LanguageIcon } from '@components/icons';
   import { download_file_in_browser } from '@tools/download_file_browser';
   import { BsDownload } from 'svelte-icons-pack/bs';
+  import type { Unsubscriber } from 'svelte/store';
+  import { onMount } from 'svelte';
+
+  const unsubscribers: Unsubscriber[] = [];
+  let mounted = false;
+  onMount(() => {
+    mounted = true;
+    return () => {
+      mounted = false;
+      unsubscribers.forEach((unsub) => unsub());
+    };
+  });
 
   // in our case we dont need to initialize inside of onMount
   $image_kANDa = $kANDa_selected;
@@ -41,11 +53,14 @@
   $: kANDa_info = rAmAyaNam_map[$image_kANDa - 1];
   $: shloka_count = kANDa_info.sarga_data[$image_sarga - 1].shloka_count_extracted;
 
-  $: if ($image_kANDa) {
-    $image_sarga = 1;
-    $image_shloka = 1;
-    // reset after change
-  }
+  unsubscribers.push(
+    image_kANDa.subscribe(() => {
+      if (!mounted) return;
+      $image_sarga = 1;
+      $image_shloka = 1;
+    })
+  );
+
   $: if ($image_sarga) {
     $image_shloka = 1;
     // reset after change
@@ -102,17 +117,31 @@
     <div class="inline-block space-x-1">
       <button
         class="btn m-0 p-0"
-        disabled={$image_shloka === -1}
-        on:click={() => ($image_shloka -= 1)}
+        disabled={$image_shloka === 0}
+        on:click={() => {
+          if ($image_shloka !== -1) $image_shloka -= 1;
+          else $image_shloka = shloka_count;
+        }}
       >
         <Icon src={TiArrowBackOutline} class="-mt-1 text-lg" />
       </button>
-      <input class="input m-0 w-14 rounded-md px-1 py-0" type="number" bind:value={$image_shloka} />
-      <!-- TODO: Add a comobox like selector -->
+      <select
+        class={`${get_text_font($viewing_script)} select inline-block w-14 p-1 text-sm`}
+        bind:value={$image_shloka}
+      >
+        <option value={0}>0</option>
+        {#each Array(shloka_count) as _, index}
+          <option value={index + 1}>{index + 1}</option>
+        {/each}
+        <option value={-1}>-1</option>
+      </select>
       <button
         class="btn m-0 p-0"
-        on:click={() => ($image_shloka += 1)}
-        disabled={$image_shloka === shloka_count}
+        on:click={() => {
+          if ($image_shloka !== shloka_count) $image_shloka += 1;
+          else $image_shloka = -1;
+        }}
+        disabled={$image_shloka === -1}
       >
         <Icon src={TiArrowForwardOutline} class="-mt-1 text-lg" />
       </button>

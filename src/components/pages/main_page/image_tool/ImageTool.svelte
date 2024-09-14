@@ -9,10 +9,15 @@
     sarga_texts,
     trans_texts,
     image_sarga_data,
-    image_trans_data
+    image_trans_data,
+    image_shloka,
+    image_lang,
+    image_script
   } from './state';
   import ImageOptions from './ImageOptions.svelte';
   import { load_font } from '@tools/font_tools';
+  import { lipi_parivartak_async } from '@tools/converter';
+  import { BASE_SCRIPT } from '@state/main_page/main_state';
 
   let canvas_element: HTMLCanvasElement;
   let mounted = false;
@@ -99,20 +104,20 @@
 
     $sarga_texts = new fabric.Text('', {
       textAlign: 'center',
-      left: get_units(400),
-      top: get_units(600),
-      fill: 'brown',
+      left: get_units(520),
+      top: get_units(200),
+      fill: 'black',
       fontFamily: INDIC_FONT_NAME,
-      fontSize: get_units(50),
+      fontSize: get_units(80),
       lockRotation: true
     });
-    $trans_texts = new fabric.Text('', {
+    $trans_texts = new fabric.Text('j', {
       textAlign: 'center',
-      left: get_units(650),
+      left: get_units(540),
       top: get_units(300),
-      fill: 'brown',
+      fill: 'black',
       fontFamily: ADOBE_DEVANGARI,
-      fontSize: get_units(120),
+      fontSize: get_units(55),
       lockRotation: true
     });
     texts.push($sarga_texts);
@@ -123,9 +128,20 @@
   $: mounted &&
     !$image_sarga_data.isFetching &&
     $image_sarga_data.isSuccess &&
-    (() => {
-      $sarga_texts.set('text', $image_sarga_data.data[0].split('\n')[0]);
-      $sarga_texts.setCoords();
+    (async () => {
+      const shloka = (
+        await lipi_parivartak_async(
+          $image_sarga_data.data[$image_shloka],
+          BASE_SCRIPT,
+          $image_script
+        )
+      ).split('\n')[0];
+      const eng = (
+        await lipi_parivartak_async($image_sarga_data.data[$image_shloka], BASE_SCRIPT, 'Normal')
+      ).split('\n')[0];
+      $sarga_texts.set('text', shloka);
+      $trans_texts.set('text', eng);
+      // $sarga_texts.setCoords();
       $canvas.renderAll();
     })();
 </script>
