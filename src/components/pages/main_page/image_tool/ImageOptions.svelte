@@ -10,7 +10,8 @@
     canvas,
     image_sarga_data,
     image_trans_data,
-    set_background_image_type
+    set_background_image_type,
+    shaded_background_image_status
   } from './state';
   import {
     sarga_selected,
@@ -29,6 +30,7 @@
   import { BsDownload } from 'svelte-icons-pack/bs';
   import type { Unsubscriber } from 'svelte/store';
   import { onMount } from 'svelte';
+  import { SlideToggle } from '@skeletonlabs/skeleton';
 
   const unsubscribers: Unsubscriber[] = [];
   let mounted = false;
@@ -70,7 +72,7 @@
   $: sarga_loading = $image_sarga_data.isFetching || !$image_sarga_data.isSuccess;
 
   const download_image = async () => {
-    await set_background_image_type(false);
+    if ($shaded_background_image_status) await set_background_image_type(false);
     const URL = $canvas.toDataURL({
       format: 'jpeg',
       quality: 1,
@@ -80,7 +82,7 @@
       URL,
       `${$image_kANDa}-${$image_sarga} Shloka No. ${$image_shloka}.jpeg`
     );
-    await set_background_image_type(true);
+    await set_background_image_type($shaded_background_image_status);
   };
 </script>
 
@@ -128,7 +130,7 @@
       </button>
     </div>
   </div>
-  <div class="space-x-2 text-sm">
+  <div class="flex space-x-2 text-sm">
     <div class="inline-block space-x-1">
       <button
         class="btn m-0 p-0"
@@ -178,5 +180,16 @@
       <Icon src={BsDownload} class="-mt-1 mr-1 text-lg" />
       Download Image
     </button>
+    <span class="inline-flex flex-col">
+      <SlideToggle
+        name="from_text_type"
+        active="bg-primary-500"
+        class="mt-1 hover:text-gray-500 dark:hover:text-gray-400"
+        bind:checked={$shaded_background_image_status}
+        size="sm"
+      >
+        <!-- <Icon src={BsKeyboard} class="text-4xl" /> -->
+      </SlideToggle>
+    </span>
   </div>
 {/if}

@@ -32,7 +32,10 @@
 
     // shloka
     $shloka_texts = [];
-    const shloka_data = $image_sarga_data.data![$image_shloka];
+    const shloka_data =
+      $image_sarga_data.data![
+        $image_shloka !== -1 ? $image_shloka : $image_sarga_data.data!.length - 1
+      ];
     const shloka_lines = shloka_data.split('\n');
 
     const START_LEFT_DEV = 600;
@@ -83,7 +86,7 @@
         top: get_units(650),
         fill: '#352700',
         fontFamily: FONT_NAMES.ADOBE_DEVANGARI,
-        fontSize: get_units(62),
+        fontSize: get_units(58),
         lockRotation: true,
         width: get_units(1200)
       });
@@ -99,10 +102,11 @@
     $image_trans_data.isSuccess &&
     $image_sarga &&
     $image_kANDa &&
-    $image_shloka &&
     $image_script &&
     $image_lang &&
     (async () => {
+      $image_shloka;
+      // ^ accessing its value to trigger upadte on change
       await render_all_texts();
     })();
 </script>

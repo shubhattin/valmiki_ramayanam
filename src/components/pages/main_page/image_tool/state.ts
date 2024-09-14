@@ -21,7 +21,6 @@ export const get_units = (value: number) => {
 
 export async function set_background_image_type(shaded_image: boolean) {
   const $background_image = get(background_image);
-  console.log([$background_image, shaded_image]);
   if (!$background_image) return;
   await $background_image.setSrc(
     shaded_image ? background_image_template_url : background_image_url
