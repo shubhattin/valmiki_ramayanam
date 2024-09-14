@@ -9,8 +9,10 @@ import { queryClient } from '@state/query';
 export let canvas = writable<fabric.Canvas>();
 export let background_image = writable<fabric.FabricImage>();
 export let scaling_factor = writable<number>(0); // Scale factor for the background image
-export let sarga_texts = writable<fabric.FabricText>();
+export let shloka_texts = writable<fabric.FabricText>();
 export let trans_texts = writable<fabric.FabricText>();
+export let shloka_group = writable<fabric.Group>();
+export let trans_group = writable<fabric.Group>();
 
 export let image_script = writable<string>('');
 export let image_lang = writable<string>('English');

@@ -8,7 +8,8 @@
     edited_translations_indexes,
     sanskrit_mode,
     edit_language_typer_status,
-    trans_lang
+    trans_lang,
+    view_translation_status
   } from '@state/main_page/main_state';
   import { trans_en_data, trans_lang_data } from '@state/main_page/data';
   import { slide } from 'svelte/transition';
@@ -32,7 +33,7 @@
       <div class={`${get_text_font($viewing_script)}`}>{line_shlk}</div>
     {/each}
   </div>
-  {#if $trans_en_data.isSuccess && $trans_en_data.data.size !== 0}
+  {#if $view_translation_status && $trans_en_data.isSuccess && $trans_en_data.data.size !== 0}
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
       on:dblclick={() =>
@@ -47,7 +48,7 @@
       {/if}
     </div>
   {/if}
-  {#if $editing_status_on && $trans_lang_data.isSuccess}
+  {#if $view_translation_status && $editing_status_on && $trans_lang_data.isSuccess}
     <div transition:slide>
       {#if !$trans_lang_data.data?.has(trans_index)}
         <button
@@ -88,7 +89,7 @@
         ></textarea>
       {/if}
     </div>
-  {:else if $trans_lang_data.isSuccess && $trans_lang_data.data.size !== 0}
+  {:else if $view_translation_status && $trans_lang !== '--' && $trans_lang_data.isSuccess && $trans_lang_data.data.size !== 0}
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
       on:dblclick={() =>

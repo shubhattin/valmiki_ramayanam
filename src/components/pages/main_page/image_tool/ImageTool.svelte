@@ -6,7 +6,7 @@
     canvas,
     background_image,
     scaling_factor,
-    sarga_texts,
+    shloka_texts,
     trans_texts,
     image_sarga_data,
     image_trans_data,
@@ -67,7 +67,7 @@
     (await get_all_texts()).forEach((text) => {
       $canvas.add(text);
     });
-    $canvas.renderAll();
+    $canvas.requestRenderAll();
   };
 
   const update_canvas_dimensions = () => {
@@ -91,7 +91,7 @@
       });
       obj.setCoords(); // Update object's corner positions
     });
-    $canvas.renderAll();
+    $canvas.requestRenderAll();
   };
   $: mounted && $scaling_factor && update_canvas_dimensions();
 
@@ -102,10 +102,10 @@
     await load_font(INDIC_FONT_NAME);
     await load_font(ADOBE_DEVANGARI);
 
-    $sarga_texts = new fabric.Text('', {
+    $shloka_texts = new fabric.Text('', {
       textAlign: 'center',
       left: get_units(520),
-      top: get_units(200),
+      top: get_units(150),
       fill: 'black',
       fontFamily: INDIC_FONT_NAME,
       fontSize: get_units(80),
@@ -113,14 +113,14 @@
     });
     $trans_texts = new fabric.Text('j', {
       textAlign: 'center',
-      left: get_units(540),
-      top: get_units(300),
+      left: get_units(530),
+      top: get_units(245),
       fill: 'black',
       fontFamily: ADOBE_DEVANGARI,
       fontSize: get_units(55),
       lockRotation: true
     });
-    texts.push($sarga_texts);
+    texts.push($shloka_texts);
     texts.push($trans_texts);
     return texts;
   };
@@ -139,10 +139,10 @@
       const eng = (
         await lipi_parivartak_async($image_sarga_data.data[$image_shloka], BASE_SCRIPT, 'Normal')
       ).split('\n')[0];
-      $sarga_texts.set('text', shloka);
+      $shloka_texts.set('text', shloka);
       $trans_texts.set('text', eng);
       // $sarga_texts.setCoords();
-      $canvas.renderAll();
+      $canvas.requestRenderAll();
     })();
 </script>
 
