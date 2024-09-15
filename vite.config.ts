@@ -24,7 +24,7 @@ export default defineConfig({
   },
   server: {
     fs: {
-      allow: ['./data/ramayan']
+      allow: ['./data/ramayan', './static/img']
     }
   }
 });
