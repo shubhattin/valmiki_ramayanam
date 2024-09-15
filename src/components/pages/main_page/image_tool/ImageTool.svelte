@@ -19,8 +19,11 @@
 
   function update_scaling_factor() {
     // we can improve the method of calculating the scaling factor later on
-    const availableWidth = window.innerWidth;
-    $scaling_factor = availableWidth / 2500;
+    const availableWidth = window.innerWidth * 0.8;
+    const availableHeight = window.innerHeight * 0.799;
+    const scale = [availableWidth / DIMENSIONS[0], availableHeight / DIMENSIONS[1]];
+    let min_value = Math.min(...scale);
+    $scaling_factor = min_value;
   }
   onMount(() => {
     update_scaling_factor();
