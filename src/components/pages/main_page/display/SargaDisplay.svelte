@@ -56,6 +56,12 @@
     copy_text_to_clipboard(text);
     copied_text_status = true;
   };
+
+  let sarga_hovered = false;
+
+  const copy_sarga = () => {
+    copy_text(transliterated_sarga_data.join('\n\n'));
+  };
 </script>
 
 {#if $editing_status_on}
@@ -69,25 +75,32 @@
     Copied to Clipboard
   </div>
 {/if}
+<div class="relative w-full">
+  <button
+    title="Copy Sarga Text"
+    on:click={copy_sarga}
+    class={cl_join(
+      'btn absolute right-5 top-2 z-20 hidden  select-none p-0 outline-none',
+      sarga_hovered && 'inline-block'
+    )}
+    on:mouseenter={() => (sarga_hovered = true)}
+  >
+    <Icon src={OiCopy16} class="text-lg" />
+  </button>
+</div>
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
   class={cl_join(
-    'group h-[85vh] overflow-scroll rounded-xl border-2 border-gray-400 p-0 dark:border-gray-600',
+    'h-[85vh] overflow-scroll rounded-xl border-2 border-gray-400 p-0 dark:border-gray-600',
     $trans_en_data.isSuccess && 'h-[90vh]',
     $trans_lang_data.isSuccess && 'h-[95vh]',
     $editing_status_on && 'h-[100vh]'
   )}
+  on:mouseenter={() => (sarga_hovered = true)}
+  on:mouseleave={() => (sarga_hovered = false)}
 >
   {#if !$sarga_data.isFetching}
-    <div transition:fade={{ duration: 250 }} class="relative space-y-[0.15rem]">
-      <div>
-        <button
-          title="Copy Sarga Text"
-          on:click={() => copy_text(transliterated_sarga_data.join('\n\n'))}
-          class="btn absolute right-1 top-1 m-0 hidden select-none p-0 outline-none group-hover:inline-block"
-        >
-          <Icon src={OiCopy16} class="text-lg" />
-        </button>
-      </div>
+    <div transition:fade={{ duration: 250 }} class="space-y-[0.15rem]">
       {#each transliterated_sarga_data as shloka_lines, i (i)}
         <!-- with 0 and -1 index -->
         {@const trans_index = transliterated_sarga_data.length - 1 === i ? -1 : i}
