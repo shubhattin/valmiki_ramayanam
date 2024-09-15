@@ -28,17 +28,15 @@
   import { LanguageIcon } from '@components/icons';
   import { download_file_in_browser } from '@tools/download_file_browser';
   import { BsDownload } from 'svelte-icons-pack/bs';
-  import type { Unsubscriber } from 'svelte/store';
+  import { get, writable } from 'svelte/store';
   import { onMount } from 'svelte';
   import { SlideToggle } from '@skeletonlabs/skeleton';
 
-  const unsubscribers: Unsubscriber[] = [];
-  let mounted = false;
+  let mounted = writable(false);
   onMount(() => {
-    mounted = true;
+    $mounted = true;
     return () => {
-      mounted = false;
-      unsubscribers.forEach((unsub) => unsub());
+      $mounted = false;
     };
   });
 
@@ -56,13 +54,11 @@
   $: kANDa_info = rAmAyaNam_map[$image_kANDa - 1];
   $: shloka_count = kANDa_info.sarga_data[$image_sarga - 1].shloka_count_extracted;
 
-  unsubscribers.push(
-    image_kANDa.subscribe(() => {
-      if (!mounted) return;
-      $image_sarga = 1;
-      $image_shloka = 1;
-    })
-  );
+  $: if ($image_kANDa && get(mounted)) {
+    // ^ accessing writable's value without $ wont trigger it on change
+    $image_sarga = 1;
+    $image_shloka = 1;
+  }
 
   $: if ($image_sarga) {
     $image_shloka = 1;

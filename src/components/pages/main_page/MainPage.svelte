@@ -2,7 +2,7 @@
   import Icon from '@tools/Icon.svelte';
   import { onDestroy, onMount } from 'svelte';
   import { delay } from '@tools/delay';
-  import { writable, type Unsubscriber } from 'svelte/store';
+  import { get, writable, type Unsubscriber } from 'svelte/store';
   import { LANG_LIST, SCRIPT_LIST } from '@tools/lang_list';
   import LipiLekhikA, { load_parivartak_lang_data, lipi_parivartak_async } from '@tools/converter';
   import { LanguageIcon } from '@components/icons';

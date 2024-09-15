@@ -10,7 +10,8 @@
     sarga_selected,
     kANDa_selected,
     BASE_SCRIPT,
-    image_tool_opened
+    image_tool_opened,
+    viewing_script
   } from '@state/main_page/main_state';
   import { createMutation } from '@tanstack/svelte-query';
   import { BsThreeDots } from 'svelte-icons-pack/bs';
@@ -25,6 +26,9 @@
   import type { Workbook } from 'exceljs';
   import { writable } from 'svelte/store';
   import PreviewExcel from '@components/PreviewExcel.svelte';
+  import { TrOutlineFileTypeTxt } from 'svelte-icons-pack/tr';
+  import { download_file_in_browser } from '@tools/download_file_browser';
+  import { lipi_parivartak_async } from '@tools/converter';
 
   let current_workbook: Workbook;
   let current_file_name: string;
@@ -94,6 +98,38 @@
       $excel_preview_opened = true;
     }
   });
+
+  const download_text_file = createMutation({
+    mutationKey: ['sarga', 'download_text_data'],
+    mutationFn: async () => {
+      if (!browser) return;
+      const text = (
+        await Promise.all(
+          $sarga_data.data!.map((shloka_lines) =>
+            lipi_parivartak_async(shloka_lines, BASE_SCRIPT, $viewing_script)
+          )
+        )
+      ).join('\n\n');
+      const blob = new Blob([text], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const sarga_name_normal =
+        rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].name_normal.split(
+          '\n'
+        )[0];
+      const sarga_name_script = await lipi_parivartak_async(
+        rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].name_devanagari.split(
+          '\n'
+        )[0],
+        BASE_SCRIPT,
+        $viewing_script
+      );
+      const is_not_brahmic_script = ['Normal', 'Romanized'].includes($viewing_script);
+      download_file_in_browser(
+        url,
+        `${$kANDa_selected}-${$sarga_selected} ${sarga_name_script}${is_not_brahmic_script ? '' : ` (${sarga_name_normal})`}.txt`
+      );
+    }
+  });
 </script>
 
 <button
@@ -126,12 +162,13 @@
     <Icon src={BiImage} class="-mt-1 fill-sky-500 text-2xl dark:fill-sky-400" />
     Image Tool
   </button>
-  <!-- <button
-            class="btn block w-full rounded-md px-2 py-1 text-start hover:bg-gray-200 dark:hover:bg-gray-700"
-          >
-            <Icon src={TrOutlineFileTypeTxt} class=" mr-1 text-2xl" />
-            Download Text File
-          </button> -->
+  <button
+    class="btn block w-full rounded-md px-2 py-1 text-start hover:bg-gray-200 dark:hover:bg-gray-700"
+    on:click={() => $download_text_file.mutate()}
+  >
+    <Icon src={TrOutlineFileTypeTxt} class=" mr-1 text-2xl" />
+    Download Text File
+  </button>
 </div>
 <div>
   <Modal modal_open={image_tool_opened} close_on_click_outside={false}>

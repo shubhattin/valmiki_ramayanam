@@ -19,7 +19,7 @@
 
   export let mounted: boolean;
 
-  const render_all_texts = async () => {
+  const render_all_texts = async ($image_shloka: number, $image_script: string) => {
     // load necessary fonts
     await load_font(FONT_NAMES.INDIC_FONT_NAME);
     await load_font(FONT_NAMES.ADOBE_DEVANGARI);
@@ -102,11 +102,8 @@
     $image_trans_data.isSuccess &&
     $image_sarga &&
     $image_kANDa &&
-    $image_script &&
     $image_lang &&
     (async () => {
-      $image_shloka;
-      // ^ accessing its value to trigger upadte on change
-      await render_all_texts();
+      await render_all_texts($image_shloka, $image_script);
     })();
 </script>

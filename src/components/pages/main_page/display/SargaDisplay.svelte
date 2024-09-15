@@ -24,6 +24,7 @@
   import { BsClipboard2Check } from 'svelte-icons-pack/bs';
   import ShlokaDisplay from './ShlokaDisplay.svelte';
   import { copy_text_to_clipboard } from '@tools/kry';
+  import { OiCopy16 } from 'svelte-icons-pack/oi';
 
   const query_client = useQueryClient();
   const unsubscribers: Unsubscriber[] = [];
@@ -70,14 +71,23 @@
 {/if}
 <div
   class={cl_join(
-    'h-[85vh] overflow-scroll rounded-xl border-2 border-gray-400 p-0 dark:border-gray-600',
+    'group h-[85vh] overflow-scroll rounded-xl border-2 border-gray-400 p-0 dark:border-gray-600',
     $trans_en_data.isSuccess && 'h-[90vh]',
     $trans_lang_data.isSuccess && 'h-[95vh]',
     $editing_status_on && 'h-[100vh]'
   )}
 >
   {#if !$sarga_data.isFetching}
-    <div transition:fade={{ duration: 250 }} class="space-y-[0.15rem]">
+    <div transition:fade={{ duration: 250 }} class="relative space-y-[0.15rem]">
+      <div>
+        <button
+          title="Copy Sarga Text"
+          on:click={() => copy_text(transliterated_sarga_data.join('\n\n'))}
+          class="btn absolute right-1 top-1 m-0 hidden select-none p-0 outline-none group-hover:inline-block"
+        >
+          <Icon src={OiCopy16} class="text-lg" />
+        </button>
+      </div>
       {#each transliterated_sarga_data as shloka_lines, i (i)}
         <!-- with 0 and -1 index -->
         {@const trans_index = transliterated_sarga_data.length - 1 === i ? -1 : i}
