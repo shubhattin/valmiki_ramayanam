@@ -12,15 +12,15 @@
   import { TiTick } from 'svelte-icons-pack/ti';
   import { BiSolidDownload } from 'svelte-icons-pack/bi';
   import { getModalStore } from '@skeletonlabs/skeleton';
-  import ExcelJS from 'exceljs';
   import type { Workbook } from 'exceljs';
   import { delay } from '@tools/delay';
   import { transliterate_xlxs_file } from '@tools/excel/transliterate_xlsx_file';
   import { download_file_in_browser } from '@tools/download_file_browser';
   import { writable } from 'svelte/store';
   import Preview from './Preview.svelte';
-  import MetaTags from '@components/MetaTags.svelte';
-  import { main_app_bar_info } from '@state/state';
+  import MetaTags from '@components/tags/MetaTags.svelte';
+  import { createMutation } from '@tanstack/svelte-query';
+  import { PAGE_TITLES } from '@state/page_titles';
 
   export const modalStore = getModalStore();
 
@@ -37,13 +37,15 @@
   let file_name_prefix = '';
   let file_name_postfix = '_transliterated';
 
-  let transliterated_atleast_once = false;
-  let now_processing = false;
-
   let file_preview_opened = writable(false);
   let current_workbook: Workbook;
   let current_file_preview_link: string;
   let current_file_name: string;
+
+  const excel_transliteration = createMutation({
+    mutationKey: ['excel', 'start_transliteration'],
+    mutationFn: start_transliteration_func
+  });
 
   function clear_file_list() {
     const modal: ModalSettings = {
@@ -57,7 +59,7 @@
         current_workbook = null!;
         current_file_name = null!;
         current_file_preview_link = null!;
-        transliterated_atleast_once = false;
+        $excel_transliteration.reset();
 
         // resetting the defaults as well
         lang_row_index = 1;
@@ -71,7 +73,8 @@
     modalStore.trigger(modal);
   }
 
-  async function start_transliteration() {
+  async function start_transliteration_func() {
+    const ExcelJS = (await import('exceljs')).default;
     const get_workbook_obj_from_file = (file: File) => {
       return new Promise<Workbook>(async (resolve) => {
         const workbook = new ExcelJS.Workbook();
@@ -87,7 +90,6 @@
         reader.readAsArrayBuffer(file);
       });
     };
-    now_processing = true;
     file_download_links = [];
     file_workbooks = [];
     for (let file of file_list) {
@@ -110,8 +112,6 @@
       file_download_links.push(downloadLink);
     }
     await delay(400);
-    now_processing = false;
-    transliterated_atleast_once = true;
   }
 
   const download_file = (file_index: number) => {
@@ -126,15 +126,11 @@
     return `${file_name_prefix}${base_name}${file_name_postfix}.xlsx`;
   };
 
+  const [TITLE] = PAGE_TITLES['/excel_tool'];
   const PAGE_INFO = {
-    title: 'Lipi Parivartan for Excel Files',
+    title: TITLE,
     description: 'A Utility to transliterate text in Excel files for Indian Scripts'
   };
-
-  main_app_bar_info.set({
-    className: 'text-xl font-bold',
-    title: PAGE_INFO.title
-  });
 </script>
 
 <MetaTags title={PAGE_INFO.title} description={PAGE_INFO.description} />
@@ -205,18 +201,18 @@
       {#each file_list as file, file_index (file.name)}
         <li class="font-bold">
           <span class="mr-2.5">
-            {#if now_processing}
+            {#if $excel_transliteration.isPending}
               <Icon src={OiGear16} class="animate-spin text-xl" />
-            {:else if !transliterated_atleast_once}
+            {:else if !$excel_transliteration.isSuccess}
               <Icon src={FiCircle} class="text-xl text-zinc-500" />
             {:else}
               <Icon src={TiTick} class="text-xl text-green-600 dark:text-green-500" />
             {/if}
-            {#if transliterated_atleast_once}
+            {#if $excel_transliteration.isSuccess}
               <span in:fly>
                 <button
                   class="btn m-0 p-0"
-                  disabled={now_processing}
+                  disabled={$excel_transliteration.isPending}
                   on:click={() => download_file(file_index)}
                   ><Icon
                     src={BiSolidDownload}
@@ -225,7 +221,7 @@
                 >
                 <button
                   class="btn m-0 p-0"
-                  disabled={now_processing}
+                  disabled={$excel_transliteration.isPending}
                   on:click={() => {
                     current_workbook = file_workbooks[file_index];
                     current_file_preview_link = file_download_links[file_index];
@@ -246,8 +242,8 @@
     </ul>
 
     <button
-      on:click={start_transliteration}
-      disabled={now_processing}
+      on:click={() => $excel_transliteration.mutate()}
+      disabled={$excel_transliteration.isPending}
       class="variant-outline-success btn flex font-bold text-green-700 dark:text-white"
     >
       <Icon src={VscDebugStart} class="mr-1 text-2xl" />

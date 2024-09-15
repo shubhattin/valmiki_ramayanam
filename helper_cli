@@ -18,8 +18,9 @@ OPTIONS = [
             "rm -f rAmAyaNam.zip",
             "cd data/ramayan/",
             "python3 get_json.py",
-            "npx tsx make_excel_files.ts",
-            "cp zipped/rAmAyaNam.zip ../../",
+            "cd ../..",
+            "npx vite-node data/ramayan/make_excel_files.ts",
+            "cp ./data/ramayan/zipped/rAmAyaNam.zip .",
         ],
         "[bold]The zip file has been generated as 'rAmAyaNam.zip'[/]",
     ],
@@ -32,6 +33,15 @@ OPTIONS = [
         "[bold]The test report has been generated as 'data/ramayan/test_output.md'. Open that file and press `[yellow]Ctrl+Shift+V[/]` to view the report[/]",
     ],
     ["Launch the web app", ["pnpm dev"]],
+    [
+        "Update Dependencies",
+        [
+            "cd data/ramayan/",
+            "pip install -r requirements.txt",
+            "cd ../..",
+            "pnpm install",
+        ],
+    ],
 ]
 
 
@@ -39,11 +49,12 @@ def main():
     print("[bold yellow]Select an option to run:[/]")
     for i, option in enumerate(OPTIONS):
         print(f"[blue]{i+1}. {option[0]}[/]")
-
-    choice = Prompt.ask(
-        "Choose an option", choices=[str(i + 1) for i in range(len(OPTIONS))]
-    )
-
+    print(f"[blue]e. Exit[/]")
+    CHOICES = [str(i + 1) for i in range(len(OPTIONS))]
+    CHOICES.append("e")
+    choice = Prompt.ask("Choose an option", choices=CHOICES)
+    if choice == "e":
+        return
     command_info = OPTIONS[int(choice) - 1]
     command = " && ".join(command_info[1])
     os.system(command)

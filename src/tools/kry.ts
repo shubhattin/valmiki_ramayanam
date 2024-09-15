@@ -53,7 +53,8 @@ export const from_base64 = (str: string, decode = false) => {
   return str;
 };
 
-export const get_possibily_not_undefined = <T>(val: T | null) => {
+export const get_possibily_not_undefined = <T>(val: T | null, fallback_val: T | null = null) => {
+  if (val === undefined || val === null) val = fallback_val;
   return val!;
 };
 export const copy_text_to_clipboard = (text: string) => {

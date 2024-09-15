@@ -18,7 +18,9 @@ export const transliterate_xlxs_file = async (
   text_col_index: number = 2,
   text_row_start_index: number = 2,
   base_lang_code: string = 'Sanskrit',
-  base_folder_path_lipi_parivartak: string = './src'
+  base_folder_path_lipi_parivartak: string | null = null!,
+  translations: Map<string, Map<number, string>> = new Map(),
+  shloka_count = 0
 ) => {
   const TOTAL_SHEETS = workbook.worksheets.length;
   for (let i_worksheet = 0; i_worksheet < TOTAL_SHEETS; i_worksheet++) {
@@ -30,7 +32,7 @@ export const transliterate_xlxs_file = async (
       null,
       false,
       true,
-      base_folder_path_lipi_parivartak
+      base_folder_path_lipi_parivartak!
     );
 
     const lang_row = worksheet.getRow(lang_row_index);
@@ -44,21 +46,37 @@ export const transliterate_xlxs_file = async (
     const promises: Promise<void>[] = [];
     lang_row.eachCell((cell, col_i) => {
       const promise = (async () => {
-        const lang_name = cell.value!.toLocaleString().trim().replaceAll(' ', ''); // trimming white spaces and
-        const lang_code = normalize_lang_code(lang_name);
-        if (lang_code && lang_code !== base_lang_code) {
+        const lang_split = cell.value!.toLocaleString().trim().split(' ');
+        const script_name = cell.value!.toLocaleString().trim().replaceAll(' ', ''); // trimming white spaces and
+        const script_code = normalize_lang_code(script_name);
+        if (script_code && script_code !== base_lang_code) {
           await LipiLekhikA.k.load_lang(
-            lang_code,
+            script_code,
             null,
             false,
             true,
-            base_folder_path_lipi_parivartak
+            base_folder_path_lipi_parivartak!
           );
           for (let val_pair of texts) {
             const text = val_pair[1];
             const i = val_pair[0];
-            const out = await lipi_parivartak_async(text, base_lang_code, lang_code);
+            const out = await lipi_parivartak_async(text, base_lang_code, script_code);
             worksheet.getCell(i, col_i).value = out;
+          }
+        }
+        if (
+          lang_split.length === 2 &&
+          lang_split[1] === 'Meaning' &&
+          translations.has(lang_split[0])
+        ) {
+          const lang_code = lang_split[0];
+          const texts = translations.get(lang_code)!;
+          for (let val_pair of texts) {
+            const text = val_pair[1];
+            let i = val_pair[0];
+            if (i === -1) i = shloka_count + 1; // +1 as starts with 0
+            i += lang_row_index + 1; // +1 as starts with -1 so to shift +1 forward
+            worksheet.getCell(i, col_i).value = text;
           }
         }
       })();
@@ -68,43 +86,3 @@ export const transliterate_xlxs_file = async (
   }
   return workbook;
 };
-
-// other unused code
-
-// const download_excel_file = async () => {
-//   // the method used below creates a url for both dev and prod
-//   const ExcelJS = (await import('exceljs')).default;
-//   const url = new URL('/data/ramayan/template/excel_file_template.xlsx', import.meta.url).href;
-//   const req = await fetch(url);
-//   const file_blob = await req.blob();
-//   const workbook = new ExcelJS.Workbook();
-//   await workbook.xlsx.load(await file_blob.arrayBuffer());
-//   const worksheet = workbook.getWorksheet(1)!;
-//   const COLUMN_FOR_DEV = 2;
-//   const TEXT_START_ROW = 2;
-//   for (let i = 0; i < sarga_data.length; i++) {
-//     worksheet.getCell(i + COLUMN_FOR_DEV, TEXT_START_ROW).value = sarga_data[i];
-//   }
-//   await transliterate_xlxs_file(workbook, 'all', 1, COLUMN_FOR_DEV, TEXT_START_ROW, 'Sanskrit');
-
-//   // saving file to output path
-//   let sarga_name =
-//     rAmAyaNa_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].name_normal.split('\n')[0];
-//   const buffer = await workbook.xlsx.writeBuffer();
-//   const blob = new Blob([buffer], {
-//     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-//   });
-//   const downloadLink = URL.createObjectURL(blob);
-//   download_file_in_browser(downloadLink, `${$sarga_selected}. ${sarga_name}.xlsx`);
-// };
-
-// <!-- <button
-// on:click={download_excel_file}
-// class="variant-outline-success btn rounded-lg border-2 border-emerald-600 px-2 py-2 font-bold dark:border-emerald-400"
-// >
-// <Icon
-//   class="-mt-1 mr-2 text-2xl text-green-600 dark:text-green-400"
-//   src={RiDocumentFileExcel2Line}
-// />
-// Download Excel File
-// </button> -->

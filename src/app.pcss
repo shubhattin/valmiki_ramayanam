@@ -9,6 +9,24 @@
   } */
   /* the above approach dos'nt work as Skeleton UI overrides these behaviours */
 }
+@font-face {
+  font-family: 'Niramala UI';
+  src:
+    url('./fonts/woff2/Nirmala.woff2') format('woff2'),
+    url('./fonts/Nirmala.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'AdobeDevanagari';
+  src:
+    url('./fonts/woff2/AdobeDevanagari.woff2') format('woff2'),
+    url('./fonts/AdobeDevanagari.otf') format('opentype');
+}
+.indic-font {
+  font-family: 'Niramala UI';
+}
+.normal-font {
+  font-family: 'AdobeDevanagari';
+}
 
 :root [data-theme='wintry'] {
   --theme-font-family-base: 'Roboto', 'Nirmala UI', sans-serif;

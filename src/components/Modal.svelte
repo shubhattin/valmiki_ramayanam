@@ -6,12 +6,15 @@
   import { AiOutlineClose } from 'svelte-icons-pack/ai';
   import Icon from '@tools/Icon.svelte';
 
+  let className: string | null = null!;
+  export { className as class };
   export let modal_open: Writable<boolean>;
   export let cancel_btn_txt: string | null = null!;
   export let confirm_btn_txt: string | null = null!;
   export let onOpen: () => void = null!;
   export let onClose: () => void = null!;
   export let onConfirm: () => void = null!;
+  export let close_on_click_outside = true;
 
   let modalElement: HTMLElement;
   let opened = false;
@@ -23,14 +26,6 @@
   const unlockScroll = () => {
     document.body.style.overflow = '';
   };
-
-  const mode_open_unsubscriber = modal_open.subscribe((value) => {
-    if (value && !opened) openModal();
-    else if (!value && opened) closeModal();
-  });
-  onDestroy(() => {
-    mode_open_unsubscriber();
-  });
 
   const animationDuration = 400;
   let is_closing = false; // to fix transition not being displayed while exiting
@@ -59,9 +54,13 @@
   };
   onMount(() => {
     document.addEventListener('click', (e) => {
-      // if (visibleModal && !visibleModal.querySelector('article')?.contains(e.target as Node)) {
-      //   closeModal();
-      // }
+      if (
+        close_on_click_outside &&
+        visibleModal &&
+        !visibleModal.querySelector('article')?.contains(e.target as Node)
+      ) {
+        closeModal();
+      }
     });
 
     document.addEventListener('keydown', (e) => {
@@ -70,6 +69,13 @@
       }
     });
   });
+  const mode_open_unsubscriber = modal_open.subscribe((value) => {
+    if (value && !opened) openModal();
+    else if (!value && opened) closeModal();
+  });
+  onDestroy(() => {
+    mode_open_unsubscriber();
+  });
 </script>
 
 <!-- Modal -->
@@ -77,7 +83,7 @@
   transition:slide
   bind:this={modalElement}
   class={cl_join(
-    'duration-400 fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-all',
+    'duration-400 fixed inset-0  z-50 flex max-h-full max-w-full items-center justify-center bg-black bg-opacity-50 transition-all',
     !opened && 'hidden bg-opacity-0'
   )}
 >
@@ -85,16 +91,16 @@
     <div
       in:scale={{ duration: animationDuration }}
       out:slide={{ duration: animationDuration }}
-      class="mx-3 max-h-[90%] max-w-screen-lg overflow-scroll"
+      class={cl_join('mx-3 max-h-[97%] max-w-[97%] overflow-scroll', className)}
     >
-      <article class="rounded-lg bg-white p-3 pt-0 shadow-lg dark:bg-gray-800">
-        <div class="flex justify-end">
-          <button
-            aria-label="Close"
-            class="cursor-pointer text-gray-500 hover:text-gray-700"
-            on:click={closeModal}><Icon src={AiOutlineClose} /></button
-          >
-        </div>
+      <div class="flex w-[97%] justify-end">
+        <button
+          aria-label="Close"
+          class="absolute cursor-pointer text-gray-500 hover:text-gray-700"
+          on:click={closeModal}><Icon src={AiOutlineClose} /></button
+        >
+      </div>
+      <article class="overflow-scroll rounded-lg bg-white p-3 pt-2 shadow-lg dark:bg-gray-800">
         <slot />
         {#if cancel_btn_txt || confirm_btn_txt}
           <footer class="mt-4 flex justify-end space-x-2">

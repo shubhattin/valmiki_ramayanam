@@ -1,7 +1,7 @@
 import { setCookie, getCookie, getTime, deleteCookie } from '@tools/cookies';
 import { from_base64 } from '@tools/kry';
 import { z } from 'zod';
-import { client, setAccessToken } from '@api/client';
+import { client_raw, setAccessToken } from '@api/client';
 
 export const ID_TOKEN_INFO_SCHEMA = z.object({
   id: z.number().int(),
@@ -104,7 +104,7 @@ export const deleteAuthCookies = () => {
 };
 
 export async function renew_tokens_after_access_expire() {
-  const res = await client.auth.renew_access_token.query({
+  const res = await client_raw.auth.renew_access_token.query({
     id_token: getCookie(AUTH_ID)!
   });
   if (!res.verified) return;
