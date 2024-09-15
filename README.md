@@ -1,6 +1,6 @@
 # श्रीमद्वाल्मीकीयरामायणम् (Ṣrīmadvālmīkīya*rāmāyaṇam*)
 
-![Ramayanam](./static/img/Project_Banner.webp)
+![Ramayanam](./static/img/Project_Banner.jpg)
 
 **[श्रीमद्रामायणस्य पठनम्](https://ramayanam.thesanskritchannel.org/)**
 

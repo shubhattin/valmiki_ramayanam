@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ProjectBannerURL from '../../../static/img/Project_Banner.webp';
+  import ProjectBannerURL from '../../../static/img/Project_Banner.jpg';
 
   export let title: string;
   export let description: string | null = null;
