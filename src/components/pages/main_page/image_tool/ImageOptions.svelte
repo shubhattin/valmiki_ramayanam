@@ -74,13 +74,12 @@
   const download_image = async () => {
     if ($shaded_background_image_status) await set_background_image_type(false);
     const URL = $canvas.toDataURL({
-      format: 'jpeg',
-      quality: 1,
+      format: 'png',
       multiplier: 1 / $scaling_factor
     });
     download_file_in_browser(
       URL,
-      `${$image_kANDa}-${$image_sarga} Shloka No. ${$image_shloka}.jpeg`
+      `${$image_kANDa}-${$image_sarga} Shloka No. ${$image_shloka}.png`
     );
     await set_background_image_type($shaded_background_image_status);
   };
