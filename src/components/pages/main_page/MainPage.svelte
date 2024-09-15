@@ -42,6 +42,7 @@
     get_kANDa_names,
     get_sarga_names
   } from '@state/main_page/data';
+  import MetaTags from '@components/tags/MetaTags.svelte';
 
   const unsubscribers: Unsubscriber[] = [];
   const query_client = useQueryClient();
@@ -188,8 +189,38 @@
       })
     );
   });
+
+  const get_page_info = () => {
+    let title = 'श्रीमद्रामायणम्';
+    let description = 'श्रीमद्रामायणस्य पठनम्';
+    if ($kANDa_selected !== 0 && $sarga_selected !== 0) {
+      const kANDa = rAmAyaNam_map[$kANDa_selected - 1];
+      const sarga = kANDa.sarga_data[$sarga_selected - 1];
+      title = `${sarga.name_devanagari} - ${kANDa.name_devanagari} (${sarga.index}-${kANDa.index}) | श्रीमद्रामायणम्`;
+      description =
+        `श्रीमद्रामायणस्य ${sarga.name_devanagari} - ${kANDa.name_devanagari} पठनम् | ` +
+        `Read ${sarga.name_normal} - ${kANDa.name_normal} of Shri Ramayanam. ${sarga.index} - ${kANDa.index}`;
+    } else if ($kANDa_selected !== 0 && $sarga_selected === 0) {
+      const kANDa = rAmAyaNam_map[$kANDa_selected - 1];
+      title = `${kANDa.name_devanagari} (${kANDa.index}) | श्रीमद्रामायणम्`;
+      description =
+        `श्रीमद्रामायणस्य ${kANDa.name_devanagari} पठनम् | ` +
+        `Read ${kANDa.name_normal} of Shri Ramayanam. ${kANDa.index}`;
+    }
+    return {
+      title,
+      description
+    };
+  };
+  let PAGE_INFO = get_page_info();
+  $: {
+    $kANDa_selected;
+    $sarga_selected;
+    PAGE_INFO = get_page_info();
+  }
 </script>
 
+<MetaTags title={PAGE_INFO.title} description={PAGE_INFO.description} />
 <div class="mt-4 space-y-4">
   <div class="flex justify-between">
     <label class="space-x-4">
