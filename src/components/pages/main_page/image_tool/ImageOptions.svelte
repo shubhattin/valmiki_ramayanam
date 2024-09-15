@@ -71,7 +71,7 @@
 
   $: sarga_loading = $image_sarga_data.isFetching || !$image_sarga_data.isSuccess;
 
-  const download_image = async () => {
+  const download_image_as_png = async () => {
     if ($shaded_background_image_status) await set_background_image_type(false);
     const URL = $canvas.toDataURL({
       format: 'png',
@@ -175,9 +175,9 @@
         {/each}
       </select>
     </label>
-    <button class="btn inline-flex rounded-lg px-2 py-1" on:click={download_image}>
-      <Icon src={BsDownload} class="-mt-1 mr-1 text-lg" />
-      Download Image
+    <button on:click={download_image_as_png} class="btn inline-flex rounded-lg p-1 text-sm">
+      <Icon src={BsDownload} class="-mt-1 mr-1 text-xl" />
+      PNG
     </button>
     <span class="inline-flex flex-col">
       <SlideToggle

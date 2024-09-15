@@ -13,7 +13,6 @@
     image_tool_opened
   } from '@state/main_page/main_state';
   import { createMutation } from '@tanstack/svelte-query';
-  import { download_file_in_browser } from '@tools/download_file_browser';
   import { BsThreeDots } from 'svelte-icons-pack/bs';
   import { popup } from '@skeletonlabs/skeleton';
   import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
@@ -23,6 +22,14 @@
   import Icon from '@tools/Icon.svelte';
   import Modal from '@components/Modal.svelte';
   import { BiImage } from 'svelte-icons-pack/bi';
+  import type { Workbook } from 'exceljs';
+  import { writable } from 'svelte/store';
+  import PreviewExcel from '@components/PreviewExcel.svelte';
+
+  let current_workbook: Workbook;
+  let current_file_name: string;
+  let current_dowbload_link: string;
+  let excel_preview_opened = writable(false);
 
   const download_excel_file = createMutation({
     mutationKey: ['sarga', 'download_excel_data'],
@@ -81,11 +88,10 @@
       const blob = new Blob([buffer], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       });
-      const downloadLink = URL.createObjectURL(blob);
-      download_file_in_browser(
-        downloadLink,
-        `${kANDa_selected}-${$sarga_selected}. ${sarga_name}.xlsx`
-      );
+      current_dowbload_link = URL.createObjectURL(blob);
+      current_file_name = `${$kANDa_selected}-${$sarga_selected}. ${sarga_name}.xlsx`;
+      current_workbook = workbook;
+      $excel_preview_opened = true;
     }
   });
 </script>
@@ -134,3 +140,9 @@
     {/await}
   </Modal>
 </div>
+<PreviewExcel
+  file_link={current_dowbload_link}
+  file_name={current_file_name}
+  file_preview_opened={excel_preview_opened}
+  workbook={current_workbook}
+/>

@@ -17,7 +17,7 @@
   import { transliterate_xlxs_file } from '@tools/excel/transliterate_xlsx_file';
   import { download_file_in_browser } from '@tools/download_file_browser';
   import { writable } from 'svelte/store';
-  import Preview from './Preview.svelte';
+  import PreviewExcel from '@components/PreviewExcel.svelte';
   import MetaTags from '@components/tags/MetaTags.svelte';
   import { createMutation } from '@tanstack/svelte-query';
   import { PAGE_TITLES } from '@state/page_titles';
@@ -250,7 +250,7 @@
       Start Transliteration
     </button>
     {#if $file_preview_opened}
-      <Preview
+      <PreviewExcel
         workbook={current_workbook}
         {file_preview_opened}
         file_name={current_file_name}
