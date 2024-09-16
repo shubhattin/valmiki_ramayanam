@@ -11,7 +11,10 @@
     image_sarga_data,
     image_trans_data,
     set_background_image_type,
-    shaded_background_image_status
+    shaded_background_image_status,
+    background_image,
+    IMAGE_DIMENSIONS,
+    get_units
   } from './state';
   import {
     sarga_selected,
@@ -30,7 +33,7 @@
   import { BsDownload } from 'svelte-icons-pack/bs';
   import { get, writable } from 'svelte/store';
   import { onMount } from 'svelte';
-  import { SlideToggle } from '@skeletonlabs/skeleton';
+  import { SlideToggle, popup } from '@skeletonlabs/skeleton';
 
   let mounted = writable(false);
   onMount(() => {
@@ -67,8 +70,14 @@
 
   $: sarga_loading = $image_sarga_data.isFetching || !$image_sarga_data.isSuccess;
 
-  const download_image_as_png = async () => {
-    if ($shaded_background_image_status) await set_background_image_type(false);
+  const remove_background_image = async () => {
+    await $background_image.setSrc('');
+    $canvas.requestRenderAll();
+  };
+  const download_image_as_png = async (remove_background: boolean) => {
+    if (remove_background) await remove_background_image();
+    else if ($shaded_background_image_status) await set_background_image_type(false);
+
     const URL = $canvas.toDataURL({
       format: 'png',
       multiplier: 1 / $scaling_factor
@@ -76,6 +85,26 @@
     download_file_in_browser(
       URL,
       `${$image_kANDa}-${$image_sarga} Shloka No. ${$image_shloka}.png`
+    );
+    await set_background_image_type($shaded_background_image_status);
+  };
+  const download_image_as_svg = async () => {
+    await remove_background_image();
+    const svg_text = $canvas.toSVG({
+      width: `${IMAGE_DIMENSIONS[0]}`,
+      height: `${IMAGE_DIMENSIONS[1]}`,
+      viewBox: {
+        x: 0,
+        y: 0,
+        width: get_units(IMAGE_DIMENSIONS[0]),
+        height: get_units(IMAGE_DIMENSIONS[1])
+      }
+    });
+    const blob = new Blob([svg_text], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    download_file_in_browser(
+      url,
+      `${$image_kANDa}-${$image_sarga} Shloka No. ${$image_shloka}.svg`
     );
     await set_background_image_type($shaded_background_image_status);
   };
@@ -171,10 +200,37 @@
         {/each}
       </select>
     </label>
-    <button on:click={download_image_as_png} class="btn inline-flex rounded-lg p-1 text-sm">
-      <Icon src={BsDownload} class="-mt-1 mr-1 text-xl" />
-      PNG
+    <button
+      use:popup={{
+        event: 'click',
+        target: 'image_download',
+        placement: 'bottom'
+      }}
+      on:dblclick={() => download_image_as_png(true)}
+      class="btn inline-flex rounded-lg p-1 text-sm"
+    >
+      <Icon src={BsDownload} class="-mt-1 mr-1 text-2xl" />
     </button>
+    <div class="card z-50 space-x-2 rounded-md p-1 shadow-xl" data-popup="image_download">
+      <button
+        on:click={() => download_image_as_svg()}
+        class="btn rounded-md p-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
+      >
+        SVG
+      </button>
+      <button
+        on:click={() => download_image_as_png(true)}
+        class="btn rounded-md p-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
+      >
+        PNG
+      </button>
+      <button
+        on:click={() => download_image_as_png(false)}
+        class="btn rounded-md p-1 text-xs hover:bg-gray-200 dark:hover:bg-gray-700"
+      >
+        PNG (with background)
+      </button>
+    </div>
     <span class="inline-flex flex-col">
       <SlideToggle
         name="from_text_type"

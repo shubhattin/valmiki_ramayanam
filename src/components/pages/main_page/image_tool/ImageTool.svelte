@@ -7,7 +7,8 @@
     scaling_factor,
     get_units,
     shaded_background_image_status,
-    set_background_image_type
+    set_background_image_type,
+    IMAGE_DIMENSIONS
   } from './state';
   import ImageOptions from './ImageOptions.svelte';
   import RenderText from './RenderText.svelte';
@@ -15,13 +16,11 @@
   let canvas_element: HTMLCanvasElement;
   let mounted = false;
 
-  const DIMENSIONS = [1920, 1080]; // Background image dimensions
-
   function update_scaling_factor() {
     // we can improve the method of calculating the scaling factor later on
     const availableWidth = window.innerWidth * 0.8;
     const availableHeight = window.innerHeight * 0.799;
-    const scale = [availableWidth / DIMENSIONS[0], availableHeight / DIMENSIONS[1]];
+    const scale = [availableWidth / IMAGE_DIMENSIONS[0], availableHeight / IMAGE_DIMENSIONS[1]];
     let min_value = Math.min(...scale);
     $scaling_factor = min_value;
   }
@@ -38,8 +37,9 @@
   });
   const paint_init_convas = async () => {
     $canvas = new fabric.Canvas(canvas_element, {
-      width: get_units(DIMENSIONS[0]),
-      height: get_units(DIMENSIONS[1])
+      width: get_units(IMAGE_DIMENSIONS[0]),
+      height: get_units(IMAGE_DIMENSIONS[1]),
+      backgroundColor: 'transparent'
     });
     const img = await fabric.util.loadImage('');
     $background_image = new fabric.Image(img, {
@@ -61,8 +61,8 @@
   const update_canvas_dimensions = () => {
     if (!$canvas || !mounted) return;
     // Update canvas dimensions
-    $canvas.setWidth(get_units(DIMENSIONS[0]));
-    $canvas.setHeight(get_units(DIMENSIONS[1]));
+    $canvas.setWidth(get_units(IMAGE_DIMENSIONS[0]));
+    $canvas.setHeight(get_units(IMAGE_DIMENSIONS[1]));
     const prev_scaling_factor = $background_image.scaleX;
     // Scale background image
     $background_image.scaleX = $scaling_factor;

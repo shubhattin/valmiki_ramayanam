@@ -15,10 +15,10 @@ export let scaling_factor = writable<number>(0); // Scale factor for the backgro
 export let shloka_texts = writable<fabric.FabricText[]>();
 export let trans_text = writable<fabric.Textbox>();
 
+export const IMAGE_DIMENSIONS = [1920, 1080];
 export const get_units = (value: number) => {
   return value * get(scaling_factor);
 };
-
 export async function set_background_image_type(shaded_image: boolean) {
   const $background_image = get(background_image);
   if (!$background_image) return;
