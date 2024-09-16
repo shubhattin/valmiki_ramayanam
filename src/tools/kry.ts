@@ -60,3 +60,16 @@ export const get_possibily_not_undefined = <T>(val: T | null, fallback_val: T | 
 export const copy_text_to_clipboard = (text: string) => {
   navigator.clipboard.writeText(text);
 };
+
+export function dataURLToBlob(dataURL: string) {
+  const byteString = atob(dataURL.split(',')[1]);
+  const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
+  const buffer = new ArrayBuffer(byteString.length);
+  const intArray = new Uint8Array(buffer);
+
+  for (let i = 0; i < byteString.length; i++) {
+    intArray[i] = byteString.charCodeAt(i);
+  }
+
+  return new Blob([buffer], { type: mimeString });
+}
