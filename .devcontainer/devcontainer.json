@@ -1,5 +1,5 @@
 {
   "name": "Sanskrit Transliteration",
   "initializeCommand": "echo 'Skipping default npm install'",
-  "postCreateCommand": "npm i -g pnpm tsx && pnpm install && cd data/ramayan && pip install -r requirements.txt && cd ../.. && git config --global pull.rebase false"
+  "postCreateCommand": "git config --global pull.rebase false && npm i -g pnpm tsx && pnpm install && cd data/ramayan && pip install -r requirements.txt && cd ../.."
 }
