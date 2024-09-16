@@ -14,7 +14,9 @@
     shaded_background_image_status,
     background_image,
     IMAGE_DIMENSIONS,
-    get_units
+    get_units,
+    shloka_texts,
+    trans_text
   } from './state';
   import {
     sarga_selected,
@@ -71,7 +73,14 @@
   $: sarga_loading = $image_sarga_data.isFetching || !$image_sarga_data.isSuccess;
 
   const remove_background_image = async () => {
-    await $background_image.setSrc('');
+    $canvas.getObjects().forEach((obj) => {
+      if (obj.type === 'image') $canvas.remove(obj);
+    });
+    $canvas.requestRenderAll();
+  };
+  const add_background_image = async () => {
+    $canvas.add($background_image);
+    $canvas.sendObjectToBack($background_image);
     $canvas.requestRenderAll();
   };
   const download_image_as_png = async (remove_background: boolean) => {
@@ -86,7 +95,9 @@
       URL,
       `${$image_kANDa}-${$image_sarga} Shloka No. ${$image_shloka}.png`
     );
-    await set_background_image_type($shaded_background_image_status);
+    if (remove_background) add_background_image();
+    else if ($shaded_background_image_status)
+      await set_background_image_type($shaded_background_image_status);
   };
   const download_image_as_svg = async () => {
     await remove_background_image();
@@ -106,7 +117,7 @@
       url,
       `${$image_kANDa}-${$image_sarga} Shloka No. ${$image_shloka}.svg`
     );
-    await set_background_image_type($shaded_background_image_status);
+    add_background_image();
   };
 </script>
 
