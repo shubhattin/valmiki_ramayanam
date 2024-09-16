@@ -30,6 +30,7 @@
   import JSZip from 'jszip';
   import * as fabric from 'fabric';
   import { lipi_parivartak_async } from '@tools/converter';
+  import { dataURLToBlob } from '@tools/kry';
 
   export let mounted: boolean;
 
@@ -135,23 +136,29 @@
     $canvas.sendObjectToBack($background_image);
     $canvas.requestRenderAll();
   };
-  const download_image_as_png = async (remove_background: boolean) => {
+  const download_image_as_png = async (
+    remove_background: boolean,
+    download = true,
+    shloka_num: number | null = null
+  ) => {
     if (remove_background) await remove_background_image();
     else if ($shaded_background_image_status) await set_background_image_type(false);
 
-    const image_url = $canvas.toDataURL({
+    const url = $canvas.toDataURL({
       format: 'png',
       multiplier: 1 / $scaling_factor
     });
-    download_file_in_browser(
-      image_url,
-      `${$image_kANDa}-${$image_sarga} Shloka No. ${$image_shloka}.png`
-    );
+    const name = `${$image_kANDa}-${$image_sarga} Shloka No. ${shloka_num ?? $image_shloka}.png`;
+    if (download) download_file_in_browser(url, name);
     if (remove_background) add_background_image();
     else if ($shaded_background_image_status)
       await set_background_image_type($shaded_background_image_status);
+    return {
+      url,
+      name
+    };
   };
-  const download_image_as_svg = async () => {
+  const download_image_as_svg = async (download = true, shloka_num: number | null = null) => {
     await remove_background_image();
     const svg_text = $canvas.toSVG({
       width: `${IMAGE_DIMENSIONS[0]}`,
@@ -164,12 +171,48 @@
       }
     });
     const blob = new Blob([svg_text], { type: 'image/svg+xml' });
-    const svg_url = URL.createObjectURL(blob);
-    download_file_in_browser(
-      svg_url,
-      `${$image_kANDa}-${$image_sarga} Shloka No. ${$image_shloka}.svg`
-    );
+    const name = `${$image_kANDa}-${$image_sarga} Shloka No. ${shloka_num ?? $image_shloka}.svg`;
+    if (download) {
+      const svg_url = URL.createObjectURL(blob);
+      download_file_in_browser(svg_url, name);
+    }
     add_background_image();
+    return {
+      blob,
+      name
+    };
+  };
+
+  const download_png_zip = async () => {
+    const zip = new JSZip();
+    for (let i = -1; i <= shloka_count; i++) {
+      await render_all_texts(i, $image_script);
+      const { url, name } = await download_image_as_png(true, false, i);
+      const blob = dataURLToBlob(url);
+      zip.file(name, blob);
+    }
+    await render_all_texts($image_shloka, $image_script);
+    const zip_blob = await zip.generateAsync({ type: 'blob' });
+    download_file_in_browser(
+      URL.createObjectURL(zip_blob),
+      `${$image_kANDa}-${$image_sarga} PNG files.zip`
+    );
+    // ^ restore the original state
+  };
+  const download_svg_zip = async () => {
+    const zip = new JSZip();
+    for (let i = -1; i <= shloka_count; i++) {
+      await render_all_texts(i, $image_script);
+      const { blob, name } = await download_image_as_svg(false, i);
+      zip.file(name, blob);
+    }
+    await render_all_texts($image_shloka, $image_script);
+    const zip_blob = await zip.generateAsync({ type: 'blob' });
+    download_file_in_browser(
+      URL.createObjectURL(zip_blob),
+      `${$image_kANDa}-${$image_sarga} SVG files.zip`
+    );
+    // ^ restore the original state
   };
 </script>
 
@@ -230,25 +273,41 @@
   >
     <Icon src={BsDownload} class="-mt-1 mr-1 text-2xl" />
   </button>
-  <div class="card z-50 space-x-2 rounded-md p-1 shadow-xl" data-popup="image_download">
-    <button
-      on:click={() => download_image_as_svg()}
-      class="btn rounded-md p-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
-    >
-      SVG
-    </button>
-    <button
-      on:click={() => download_image_as_png(true)}
-      class="btn rounded-md p-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
-    >
-      PNG
-    </button>
-    <button
-      on:click={() => download_image_as_png(false)}
-      class="btn rounded-md p-1 text-xs hover:bg-gray-200 dark:hover:bg-gray-700"
-    >
-      PNG (with background)
-    </button>
+  <div class="card z-50 space-y-0 rounded-md p-1 shadow-xl" data-popup="image_download">
+    <div class="flex items-center justify-center space-x-2">
+      <button
+        on:click={() => download_image_as_svg()}
+        class="btn rounded-md p-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
+      >
+        SVG
+      </button>
+      <button
+        on:click={() => download_image_as_png(true)}
+        class="btn rounded-md p-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
+      >
+        PNG
+      </button>
+      <button
+        on:click={() => download_image_as_png(false)}
+        class="btn rounded-md p-1 text-xs hover:bg-gray-200 dark:hover:bg-gray-700"
+      >
+        PNG (with background)
+      </button>
+    </div>
+    <div class="flex items-center justify-center space-x-2">
+      <button
+        on:click={() => download_png_zip()}
+        class="btn rounded-md p-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
+      >
+        PNG Zip
+      </button>
+      <button
+        on:click={() => download_svg_zip()}
+        class="btn rounded-md p-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
+      >
+        SVG Zip
+      </button>
+    </div>
   </div>
   <span class="inline-flex flex-col">
     <SlideToggle
