@@ -10,6 +10,7 @@ pyyaml
 jinja2
 pyquery
 black
+watchdog
 
 # Other
 shubhlipi

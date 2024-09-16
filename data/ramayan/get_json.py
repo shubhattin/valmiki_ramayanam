@@ -2,11 +2,15 @@
 
 import os
 import time
+import sys
 
 import typer
 from rich.console import Console
 from rich.prompt import Confirm
 import shubhlipi as sh
+from typing import Literal
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
 from run_tests import run_tests
 from common import (
@@ -161,47 +165,94 @@ def get_shloka_json(path: str):
     sh.write(out_folder, sh.dump_json(shloka_list, 2))
 
 
+class ChangeHandler(FileSystemEventHandler):
+    def __init__(self, execute_task, debounce_time=1):
+        self.execute_task = execute_task
+        self.debounce_time = debounce_time
+        self.last_modified = {}
+
+    def on_modified(self, event):
+        if event.is_directory:
+            return
+
+        pth = str(event.src_path)
+        if pth.endswith(".txt") and pth.startswith(TEXT_DATA_FOLDER):
+            # Check debounce to avoid multiple triggers for the same event
+            current_time = time.time()
+            last_time = self.last_modified.get(pth, 0)
+
+            if current_time - last_time >= self.debounce_time:
+                name = "/".join(pth.split("/")[1:])
+                console.log(f"[yellow]Change detected in: [blue]{name}[/][/]")
+                self.execute_task(pth)
+                self.last_modified[pth] = current_time
+
+
 @app.command()
 def main(
-    no_confirm: bool = typer.Option(True, "--no-confirm", "-y"), run_test: bool = True
+    no_confirm: bool = typer.Option(True, "--no-confirm", "-y"),
+    run_test: bool = True,
+    watch: bool = False,
+    log_time: bool = True,
 ):
     if not os.path.isdir(TEXT_DATA_FOLDER):
         console.print("[bold red]Text Data folder not found![/]")
-        exit(-1)
-    # Checking if raw data already exists
-    if os.path.isdir(OUTPUT_DATA_FOLDER):
-        if not no_confirm:
-            choice = Confirm.ask(
-                "[yellow]Raw Data already exists, do you want to recreate it ?[/]"
-            )
-            if not choice:
-                return
-        sh.delete_folder(OUTPUT_DATA_FOLDER)
-        sh.makedir(OUTPUT_DATA_FOLDER)
-    else:
-        sh.makedir(OUTPUT_DATA_FOLDER)
+        sys.exit(-1)
 
-    for kANDa_num in os.listdir(TEXT_DATA_FOLDER):
-        # Only taking the number to create json folder
-        sh.makedir(f"{OUTPUT_DATA_FOLDER}/{kANDa_num}")
+    def execute_task(paths: Literal["all"] | str = "all"):
+        # Checking if raw data already exists
+        if paths == "all":
+            if os.path.isdir(OUTPUT_DATA_FOLDER):
+                if not no_confirm:
+                    choice = Confirm.ask(
+                        "[yellow]Raw Data already exists, do you want to recreate it ?[/]"
+                    )
+                    if not choice:
+                        return
+                sh.delete_folder(OUTPUT_DATA_FOLDER)
+                sh.makedir(OUTPUT_DATA_FOLDER)
+            else:
+                sh.makedir(OUTPUT_DATA_FOLDER)
 
-    # Running get text
-    get_text.main(use_existing_text=True)
+            for kANDa_num in os.listdir(TEXT_DATA_FOLDER):
+                # Only taking the number to create json folder
+                sh.makedir(f"{OUTPUT_DATA_FOLDER}/{kANDa_num}")
 
-    start_time = time.time()
-    for root, _, files in os.walk(TEXT_DATA_FOLDER):
-        for file in files:
-            path = os.path.join(root, file)
-            get_shloka_json(path)
-    end_time = time.time()
+            # Running get text
+            get_text.main(use_existing_text=True)
 
-    # saving the DATA back into ramayan_map.json
-    sh.write(
-        "ramayan_map.json", sh.dump_json([kANDa.model_dump() for kANDa in DATA], 2)
-    )
+        start_time = time.time()
+        for root, _, files in os.walk(TEXT_DATA_FOLDER):
+            for file in files:
+                path = os.path.join(root, file)
+                if paths != "all" and path != paths:
+                    continue
+                # console.log(path, paths)
+                get_shloka_json(path)
+        end_time = time.time()
 
-    console.print(f"[white bold]Time: {round(end_time-start_time)}s[/]")
+        # saving the DATA back into ramayan_map.json
+        sh.write(
+            "ramayan_map.json", sh.dump_json([kANDa.model_dump() for kANDa in DATA], 2)
+        )
+        if log_time:
+            console.log(f"[white bold]Time: {round(end_time-start_time)}s[/]")
 
+    execute_task()
+    if watch:
+        event_handler = ChangeHandler(execute_task)
+        observer = Observer()
+        observer.schedule(event_handler, TEXT_DATA_FOLDER, recursive=True)
+        observer.start()
+
+        console.log("[bold green]Watching for changes in text_data folder...[/]")
+
+        try:
+            while True:
+                time.sleep(5)  # Keep the script running
+        except KeyboardInterrupt:
+            observer.stop()
+        observer.join()
     # running tests after each scraping
     # if run_test:
     #     run_tests()
