@@ -13,7 +13,7 @@ OPTIONS = [
         ],
     ],
     [
-        "Watch JSON Files",
+        "Watch TXT files for changes",
         [
             "cd data/ramayan/",
             "python3 get_json.py --watch --no-log-time",
