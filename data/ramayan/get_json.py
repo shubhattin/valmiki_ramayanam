@@ -249,10 +249,12 @@ def main(
 
         try:
             while True:
-                time.sleep(5)  # Keep the script running
+                time.sleep(3)  # Keep the script running
         except KeyboardInterrupt:
             observer.stop()
+            console.log("[white bold]Exiting...[/]")
         observer.join()
+    execute_task()
     # running tests after each scraping
     # if run_test:
     #     run_tests()

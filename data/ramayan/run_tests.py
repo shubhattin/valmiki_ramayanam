@@ -20,36 +20,49 @@ class TestInfo(BaseModel):
     test_info: str
     failed_cases: list[str] = []
     report_test_fail_if_found: bool = True
+    index: int
 
 
 TEST_INFO: list[TestInfo] = [
     TestInfo(
         test_title="Check for empty json files",
         test_info="These files are empty",
+        index=0,
     ),  # 0
     TestInfo(
         test_title=f"Check for {SINGLE_VIRAMA} or {DOUBLE_VIRAMA} before line break",
         test_info="virAma not present before new line in",
+        index=1,
     ),  # 1
     TestInfo(
         test_title=f"Single Line Shlokas",
         test_info="Single line shlokas found",
         report_test_fail_if_found=False,
+        index=2,
     ),  # 2
     TestInfo(
         test_title=f"Line Count more than 3",
         test_info="Shlokas with more than 3 lines",
         report_test_fail_if_found=False,
+        index=4,
     ),  # 3
     TestInfo(
         test_title="Variance in Shloka Count from Book Source",
         test_info="Sargas with Shloka count variance (`L → extracted|R → book|difference from book`)",
         report_test_fail_if_found=False,
+        index=5,
     ),  # 4
     TestInfo(
         test_title=f"Check for {DOUBLE_VIRAMA} at the end of shloka",
         test_info="Double virAma not present at the end in these shlokas",
+        index=6,
     ),  # 5
+    TestInfo(
+        test_title=f"3 Line Shlokas",
+        test_info="Shlokas with 3 lines",
+        report_test_fail_if_found=False,
+        index=3,
+    ),  # 6
 ]
 
 
@@ -76,6 +89,7 @@ def _run_tests(data: list[str], kANDa_num: str, sarga_num: str):
     VIRAMA_TEST = TEST_INFO[1]
     SINGLE_LINE_TEST = TEST_INFO[2]
     MORE_THAN_3_TEST = TEST_INFO[3]
+    THREE_LINE_TEST = TEST_INFO[6]
     DOUBLE_VIRAMA_TEST = TEST_INFO[5]
     for ln_ind, lines in enumerate(data):
         # ln_ind will act as shloka number as first line in start
@@ -95,6 +109,8 @@ def _run_tests(data: list[str], kANDa_num: str, sarga_num: str):
                 SINGLE_LINE_TEST.failed_cases.append(
                     f"{kANDa_num}-{sarga_num}-{ln_ind}"
                 )
+            elif lines.count(NEW_LINE) == 2:  # checking for 3 lined
+                THREE_LINE_TEST.failed_cases.append(f"{kANDa_num}-{sarga_num}-{ln_ind}")
             elif lines.count(NEW_LINE) >= 3:  # checking for 4 lined and more
                 MORE_THAN_3_TEST.failed_cases.append(
                     f"{kANDa_num}-{sarga_num}-{ln_ind} → {lines.count(NEW_LINE) + 1}"
@@ -137,9 +153,15 @@ def run_tests():
         )
         == 0
     )  # if no failed cases
+
+    def get_test_with_index(i: int):
+        # return next(filter(lambda x: x.index == i, TEST_INFO))
+        return list(filter(lambda x: x.index == i, TEST_INFO))[0]
+
     RENDER_DATA = {
         "all_tests_passed": all_tests_passed,
         "test_info": TEST_INFO,
+        "get_test_with_index": get_test_with_index,
         "filter_function": lambda lst, start_text: list(
             map(
                 lambda x: "-".join(x.split("-")[1:]),
