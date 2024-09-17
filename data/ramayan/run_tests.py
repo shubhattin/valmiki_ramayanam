@@ -21,6 +21,7 @@ class TestInfo(BaseModel):
     failed_cases: list[str] = []
     report_test_fail_if_found: bool = True
     index: int
+    variance: list[int] = []
 
 
 TEST_INFO: list[TestInfo] = []
@@ -124,14 +125,12 @@ def _run_tests(data: list[str], kANDa_num: str, sarga_num: str):
     SARGA_SHLOKA_COUNT_TEST = TEST_INFO[4]
     sarga_info = DATA[int(kANDa_num) - 1].sarga_data[int(sarga_num) - 1]
     if sarga_info.shloka_count != sarga_info.shloka_count_extracted:
+        diff = sarga_info.shloka_count_extracted - sarga_info.shloka_count
+        SARGA_SHLOKA_COUNT_TEST.variance.append(diff)
         SARGA_SHLOKA_COUNT_TEST.failed_cases.append(
             f"{kANDa_num}-{sarga_num} → {sarga_info.shloka_count_extracted}|{sarga_info.shloka_count}| "
-            + (
-                "+"
-                if sarga_info.shloka_count_extracted > sarga_info.shloka_count
-                else "-"
-            )
-            + f"{abs(sarga_info.shloka_count_extracted - sarga_info.shloka_count)}"
+            + ("+" if diff > 0 else "-")
+            + f"{abs(diff)}"
         )
     return TEST_INFO
 
@@ -165,10 +164,20 @@ def run_tests(log: bool = True):
         # return next(filter(lambda x: x.index == i, TEST_INFO))
         return list(filter(lambda x: x.index == i, TEST_INFO))[0]
 
+    def get_variance_sum_for_kANDa(kANDa: int, test: TestInfo):
+        sum = 0
+        if len(test.variance) == 0:
+            return None
+        for i, kanda in enumerate(test.failed_cases):
+            if kanda.startswith(f"{kANDa}-"):
+                sum += test.variance[i]
+        return sum
+
     RENDER_DATA = {
         "all_tests_passed": all_tests_passed,
         "test_info": TEST_INFO,
         "get_test_with_index": get_test_with_index,
+        "get_variance_sum_for_kANDa": get_variance_sum_for_kANDa,
         "filter_function": lambda lst, start_text: list(
             map(
                 lambda x: "-".join(x.split("-")[1:]),
