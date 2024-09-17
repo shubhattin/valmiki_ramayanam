@@ -23,47 +23,52 @@ class TestInfo(BaseModel):
     index: int
 
 
-TEST_INFO: list[TestInfo] = [
-    TestInfo(
-        test_title="Check for empty json files",
-        test_info="These files are empty",
-        index=0,
-    ),  # 0
-    TestInfo(
-        test_title=f"Check for {SINGLE_VIRAMA} or {DOUBLE_VIRAMA} before line break",
-        test_info="virAma not present before new line in",
-        index=1,
-    ),  # 1
-    TestInfo(
-        test_title=f"Single Line Shlokas",
-        test_info="Single line shlokas found",
-        report_test_fail_if_found=False,
-        index=2,
-    ),  # 2
-    TestInfo(
-        test_title=f"Line Count more than 3",
-        test_info="Shlokas with more than 3 lines",
-        report_test_fail_if_found=False,
-        index=4,
-    ),  # 3
-    TestInfo(
-        test_title="Variance in Shloka Count from Book Source",
-        test_info="Sargas with Shloka count variance (`L → extracted|R → book|difference from book`)",
-        report_test_fail_if_found=False,
-        index=5,
-    ),  # 4
-    TestInfo(
-        test_title=f"Check for {DOUBLE_VIRAMA} at the end of shloka",
-        test_info="Double virAma not present at the end in these shlokas",
-        index=6,
-    ),  # 5
-    TestInfo(
-        test_title=f"3 Line Shlokas",
-        test_info="Shlokas with 3 lines",
-        report_test_fail_if_found=False,
-        index=3,
-    ),  # 6
-]
+TEST_INFO: list[TestInfo] = []
+
+
+def init_test_info():
+    global TEST_INFO
+    TEST_INFO = [
+        TestInfo(
+            test_title="Check for empty json files",
+            test_info="These files are empty",
+            index=0,
+        ),  # 0
+        TestInfo(
+            test_title=f"Check for {SINGLE_VIRAMA} or {DOUBLE_VIRAMA} before line break",
+            test_info="virAma not present before new line in",
+            index=1,
+        ),  # 1
+        TestInfo(
+            test_title=f"Single Line Shlokas",
+            test_info="Single line shlokas found",
+            report_test_fail_if_found=False,
+            index=2,
+        ),  # 2
+        TestInfo(
+            test_title=f"Line Count more than 3",
+            test_info="Shlokas with more than 3 lines",
+            report_test_fail_if_found=False,
+            index=4,
+        ),  # 3
+        TestInfo(
+            test_title="Variance in Shloka Count from Book Source",
+            test_info="Sargas with Shloka count variance (`L → extracted|R → book|difference from book`)",
+            report_test_fail_if_found=False,
+            index=5,
+        ),  # 4
+        TestInfo(
+            test_title=f"Check for {DOUBLE_VIRAMA} at the end of shloka",
+            test_info="Double virAma not present at the end in these shlokas",
+            index=6,
+        ),  # 5
+        TestInfo(
+            test_title=f"3 Line Shlokas",
+            test_info="Shlokas with 3 lines",
+            report_test_fail_if_found=False,
+            index=3,
+        ),  # 6
+    ]
 
 
 def _run_tests(data: list[str], kANDa_num: str, sarga_num: str):
@@ -128,11 +133,13 @@ def _run_tests(data: list[str], kANDa_num: str, sarga_num: str):
             )
             + f"{abs(sarga_info.shloka_count_extracted - sarga_info.shloka_count)}"
         )
+    return TEST_INFO
 
 
 @app.command()
-def run_tests():
+def run_tests(log: bool = True):
     global TEST_INFO
+    init_test_info()
     if not os.path.isdir(DATA_FOLDER):
         console.print("[bold red]Raw Data folder not found![/]")
         exit(-1)
@@ -171,13 +178,13 @@ def run_tests():
     }
     RENDERRED_OUTPUT_MD = render_template("test_out_template.md.j2", **RENDER_DATA)
     sh.write("test_output.md", RENDERRED_OUTPUT_MD)
-
-    if all_tests_passed:
-        console.print("[bold green]✔ All Tests passed![/]")
-        exit(0)
-    else:
-        console.print("\n[bold red]❌ Some Tests failed![/]")
-        exit(-1)
+    if log:
+        if all_tests_passed:
+            console.print("[bold green]✔ All Tests passed![/]")
+            exit(0)
+        else:
+            console.print("\n[bold red]❌ Some Tests failed![/]")
+            exit(-1)
 
 
 if __name__ == "__main__":

@@ -26,7 +26,7 @@ Total: {{test_case.failed_cases|length}}
 {%- endif %}
 {%- endfor %}
 
-## ⚠️ Checks that need Manual Verification and Attention
+## ⚠️ Checks that need Manual Attention
 
 {%- for i in range(test_info|length) %}
 {%- set test_case = get_test_with_index(i) %}

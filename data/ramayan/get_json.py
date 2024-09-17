@@ -237,6 +237,8 @@ def main(
         )
         if log_time:
             console.log(f"[white bold]Time: {round(end_time-start_time)}s[/]")
+        if paths != "all":
+            run_tests(False)
 
     execute_task()
     if watch:
@@ -245,7 +247,9 @@ def main(
         observer.schedule(event_handler, TEXT_DATA_FOLDER, recursive=True)
         observer.start()
 
-        console.log("[bold green]Watching for changes in text_data folder...[/]")
+        console.log(
+            "[bold green]Watching for changes in text_data folder...[white], Check for live test output in [yellow]'data/ramayan/test_output.md'[/][/][/]"
+        )
 
         try:
             while True:
@@ -254,10 +258,10 @@ def main(
             observer.stop()
             console.log("[white bold]Exiting...[/]")
         observer.join()
-    execute_task()
-    # running tests after each scraping
-    # if run_test:
-    #     run_tests()
+        execute_task()
+    if run_test:
+        # running tests after each scraping
+        run_tests()
 
 
 if __name__ == "__main__":
