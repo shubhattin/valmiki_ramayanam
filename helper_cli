@@ -13,16 +13,11 @@ OPTIONS = [
         ],
     ],
     [
-        "Generate JSON Files + Excel zip",
+        "Watch TXT files for changes",
         [
-            "rm -f rAmAyaNam.zip",
             "cd data/ramayan/",
-            "python3 get_json.py",
-            "cd ../..",
-            "npx vite-node data/ramayan/make_excel_files.ts",
-            "cp ./data/ramayan/zipped/rAmAyaNam.zip .",
+            "python3 get_json.py --watch --no-log-time",
         ],
-        "[bold]The zip file has been generated as 'rAmAyaNam.zip'[/]",
     ],
     [
         "Run Checks on JSON Files",
@@ -42,6 +37,18 @@ OPTIONS = [
             "pnpm install",
         ],
     ],
+    # [
+    #     "Generate JSON Files + Excel zip",
+    #     [
+    #         "rm -f rAmAyaNam.zip",
+    #         "cd data/ramayan/",
+    #         "python3 get_json.py",
+    #         "cd ../..",
+    #         "npx vite-node data/ramayan/make_excel_files.ts",
+    #         "cp ./data/ramayan/zipped/rAmAyaNam.zip .",
+    #     ],
+    #     "[bold]The zip file has been generated as 'rAmAyaNam.zip'[/]",
+    # ],
 ]
 
 
