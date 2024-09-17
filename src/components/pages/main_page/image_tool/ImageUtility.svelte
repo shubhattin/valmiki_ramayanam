@@ -139,7 +139,8 @@
   const download_image_as_png = async (
     remove_background: boolean,
     download = true,
-    shloka_num: number | null = null
+    shloka_num: number | null = null,
+    restore = true
   ) => {
     if (remove_background) await remove_background_image();
     else if ($shaded_background_image_status) await set_background_image_type(false);
@@ -148,10 +149,10 @@
       format: 'png',
       multiplier: 1 / $scaling_factor
     });
-    const name = `${$image_kANDa}-${$image_sarga} Shloka No. ${shloka_num ?? $image_shloka}.png`;
+    const name = `${$image_kANDa}-${$image_sarga} Shloka No. ${shloka_num ?? $image_shloka}${remove_background ? '' : ' (with background)'}.png`;
     if (download) download_file_in_browser(url, name);
-    if (remove_background) add_background_image();
-    else if ($shaded_background_image_status)
+    if (remove_background) await add_background_image();
+    else if ($shaded_background_image_status && restore)
       await set_background_image_type($shaded_background_image_status);
     return {
       url,
@@ -183,11 +184,11 @@
     };
   };
 
-  const download_png_zip = async () => {
+  const download_png_zip = async (remove_back: boolean) => {
     const zip = new JSZip();
     for (let i = -1; i <= shloka_count; i++) {
       await render_all_texts(i, $image_script);
-      const { url, name } = await download_image_as_png(true, false, i);
+      const { url, name } = await download_image_as_png(remove_back, false, i, false);
       const blob = dataURLToBlob(url);
       zip.file(name, blob);
     }
@@ -195,7 +196,7 @@
     const zip_blob = await zip.generateAsync({ type: 'blob' });
     download_file_in_browser(
       URL.createObjectURL(zip_blob),
-      `${$image_kANDa}-${$image_sarga} PNG files.zip`
+      `${$image_kANDa}-${$image_sarga} PNG files${remove_back ? '' : ' (with background)'}.zip`
     );
     // ^ restore the original state
   };
@@ -296,16 +297,22 @@
     </div>
     <div class="flex items-center justify-center space-x-2">
       <button
-        on:click={() => download_png_zip()}
+        on:click={() => download_svg_zip()}
+        class="btn rounded-md p-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
+      >
+        SVG Zip
+      </button>
+      <button
+        on:click={() => download_png_zip(true)}
         class="btn rounded-md p-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
       >
         PNG Zip
       </button>
       <button
-        on:click={() => download_svg_zip()}
-        class="btn rounded-md p-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
+        on:click={() => download_png_zip(false)}
+        class=" btn rounded-md p-1 text-xs hover:bg-gray-200 dark:hover:bg-gray-700"
       >
-        SVG Zip
+        PNG Zip (with background)
       </button>
     </div>
   </div>

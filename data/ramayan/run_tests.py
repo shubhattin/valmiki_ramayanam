@@ -141,7 +141,10 @@ def run_tests():
         "all_tests_passed": all_tests_passed,
         "test_info": TEST_INFO,
         "filter_function": lambda lst, start_text: list(
-            filter(lambda x: x.startswith(f"{start_text}-"), lst)
+            map(
+                lambda x: "-".join(x.split("-")[1:]),
+                filter(lambda x: x.startswith(f"{start_text}-"), lst),
+            )
         ),
     }
     RENDERRED_OUTPUT_MD = render_template("test_out_template.md.j2", **RENDER_DATA)
