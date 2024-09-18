@@ -12,8 +12,6 @@ export let canvas = writable<fabric.Canvas>();
 export let background_image = writable<fabric.FabricImage>();
 export let shaded_background_image_status = writable(import.meta.env.DEV);
 export let scaling_factor = writable<number>(0); // Scale factor for the background image
-export let shloka_texts = writable<fabric.FabricText[]>();
-export let trans_text = writable<fabric.Textbox>();
 
 export const IMAGE_DIMENSIONS = [1920, 1080];
 export const get_units = (value: number) => {

@@ -9,11 +9,11 @@ type bounding_coords_type = {
 
 type shloka_type_config = {
   bounding_coords: bounding_coords_type;
-  space_between_lines: number;
   space_between_main_and_norm_text: number;
   main_text_font_size: number;
   norm_text_font_size: number;
   trans_text_font_size: number;
+  reference_lines_top: number[];
 };
 
 export const DEFAULT_SHLOKA_TYPE_2_CONFIG: shloka_type_config = {
@@ -26,9 +26,11 @@ export const DEFAULT_SHLOKA_TYPE_2_CONFIG: shloka_type_config = {
   main_text_font_size: 65,
   norm_text_font_size: 50,
   trans_text_font_size: 52,
-  space_between_lines: 0,
-  space_between_main_and_norm_text: 0
+  space_between_main_and_norm_text: 0,
+  reference_lines_top: [310, 510]
 };
+
+export const SPACE_ABOVE_REFERENCE_LINE = 10;
 
 export let shloka_configs = writable({
   2: DEFAULT_SHLOKA_TYPE_2_CONFIG,

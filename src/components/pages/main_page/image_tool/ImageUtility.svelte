@@ -10,11 +10,9 @@
     image_sarga_data,
     image_trans_data,
     shaded_background_image_status,
-    get_units,
-    shloka_texts,
-    trans_text
+    get_units
   } from './state';
-  import { shloka_configs } from './settings';
+  import { shloka_configs, SPACE_ABOVE_REFERENCE_LINE } from './settings';
   import { viewing_script, BASE_SCRIPT } from '@state/main_page/main_state';
   import { LANG_LIST } from '@tools/lang_list';
   import { FONT_NAMES, get_text_font, load_font } from '@tools/font_tools';
@@ -38,11 +36,12 @@
     const LINE_COLOR = 'black';
     const LINE_WIDTH = 1.5;
     for (let coords of [
-      [bounds.left, bounds.top, bounds.left, bounds.bottom],
-      [bounds.right, bounds.top, bounds.right, bounds.bottom],
-      [bounds.left, bounds.top, bounds.right, bounds.top],
-      [bounds.left, bounds.bottom, bounds.right, bounds.bottom]
-    ]) {
+      // x1 y1 x2 y2
+      [bounds.left, bounds.top, bounds.left, bounds.bottom], // left line
+      [bounds.right, bounds.top, bounds.right, bounds.bottom], // top line
+      [bounds.left, bounds.top, bounds.right, bounds.top], // right line
+      [bounds.left, bounds.bottom, bounds.right, bounds.bottom] // bottom line
+    ])
       $canvas.add(
         new fabric.Line(
           [get_units(coords[0]), get_units(coords[1]), get_units(coords[2]), get_units(coords[3])],
@@ -54,7 +53,19 @@
           }
         )
       );
-    }
+    // drawing shloka reference lines
+    for (let top of shloka_config.reference_lines_top)
+      $canvas.add(
+        new fabric.Line(
+          [get_units(bounds.left), get_units(top), get_units(bounds.right), get_units(top)],
+          {
+            stroke: 'brown',
+            strokeWidth: get_units(2),
+            selectable: false,
+            evented: false
+          }
+        )
+      );
 
     return shloka_config;
   };
@@ -63,14 +74,14 @@
     await load_font(FONT_NAMES.INDIC_FONT_NAME);
     await load_font(FONT_NAMES.ADOBE_DEVANGARI);
 
-    // remove all previous texts
+    // remove all previous texts, textboxes and lines
     $canvas.getObjects().forEach((obj) => {
       if (!obj || obj.type === 'image') return;
       $canvas.remove(obj);
     });
 
     // shloka
-    $shloka_texts = [];
+    const shloka_texts = [];
     const shloka_data =
       $image_sarga_data.data![
         $image_shloka !== -1 ? $image_shloka : $image_sarga_data.data!.length - 1
@@ -79,50 +90,63 @@
 
     const shloka_type = 2;
     const shloka_config = await draw_bounding_lines(shloka_type);
-
-    const START_LEFT_DEV = 600;
-    const START_TOP_DEV = 190;
-    const START_LEFT_NORMAL = 620;
-    const START_TOP_NORMAL = 270;
+    // using only 97% of the width
+    const WIDTH = get_units(
+      (shloka_config.bounding_coords.right - shloka_config.bounding_coords.left) * 0.97
+    );
 
     for (let i = 0; i < shloka_lines.length; i++) {
       const script_text = await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, $image_script);
       const text_main = new fabric.Text(script_text, {
         textAlign: 'center',
-        left: get_units(START_LEFT_DEV),
-        top: get_units(START_TOP_DEV + i * 180),
         fill: '#4f3200',
         fontFamily: FONT_NAMES.INDIC_FONT_NAME,
         fontSize: get_units(shloka_config.main_text_font_size),
         lockRotation: true,
         fontWeight: 700
       });
-      $shloka_texts.push(text_main);
+      const height_main = text_main.height; // already scaled
+      const width_main = text_main.width; // already scaled
       const transliterated_text = await lipi_parivartak_async(
         shloka_lines[i],
         BASE_SCRIPT,
         'Normal'
       );
-      const text_eng = new fabric.Text(transliterated_text, {
+      const text_norm = new fabric.Text(transliterated_text, {
         textAlign: 'center',
-        left: get_units(START_LEFT_NORMAL),
-        top: get_units(START_TOP_NORMAL + i * 180),
         fill: '#352700',
         fontFamily: FONT_NAMES.ADOBE_DEVANGARI,
         fontSize: get_units(shloka_config.norm_text_font_size),
         lockRotation: true
       });
-      $shloka_texts.push(text_eng);
+      const height_norm = text_norm.height; // already scaled
+      const width_norm = text_norm.width; // already scaled
+      text_norm.set({
+        top:
+          get_units(shloka_config.reference_lines_top[i]) -
+          (height_norm + get_units(SPACE_ABOVE_REFERENCE_LINE)),
+        left: get_units(shloka_config.bounding_coords.left) + (WIDTH - width_norm) / 2
+      });
+      text_main.set({
+        top:
+          get_units(shloka_config.reference_lines_top[i]) -
+          (height_main +
+            get_units(shloka_config.space_between_main_and_norm_text) +
+            (height_norm + get_units(SPACE_ABOVE_REFERENCE_LINE))),
+        left: get_units(shloka_config.bounding_coords.left) + (WIDTH - width_main) / 2
+      });
+      shloka_texts.push(text_main);
+      shloka_texts.push(text_norm);
       if (i === 1) break;
     }
-    $canvas.add(...$shloka_texts);
+    $canvas.add(...shloka_texts);
 
     // trans
     const trans_data = $image_trans_data.data!;
-    $trans_text = null!;
+    let trans_text: any = null!;
     if (trans_data.has($image_shloka)) {
-      const trans_text = trans_data.get($image_shloka)!;
-      $trans_text = new fabric.Textbox(trans_text, {
+      const trans_text_data = trans_data.get($image_shloka)!;
+      trans_text = new fabric.Textbox(trans_text_data, {
         textAlign: 'right',
         left: get_units(610),
         top: get_units(650),
@@ -133,7 +157,7 @@
         width: get_units(1200)
       });
     }
-    if ($trans_text) $canvas.add($trans_text);
+    if (trans_text) $canvas.add(trans_text);
     $canvas.requestRenderAll();
   };
 
