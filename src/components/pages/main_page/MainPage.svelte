@@ -58,7 +58,7 @@
       // $trans_lang_mut.mutateAsync('Hindi').then(() => {
       //   editing_status_on.set(true);
       // });
-      // $image_tool_opened = true;
+      $image_tool_opened = true;
     }
     if (browser && import.meta.env.PROD) {
       window.addEventListener('beforeunload', function (e) {

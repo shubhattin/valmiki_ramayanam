@@ -14,6 +14,7 @@
     shloka_texts,
     trans_text
   } from './state';
+  import { shloka_configs } from './settings';
   import { viewing_script, BASE_SCRIPT } from '@state/main_page/main_state';
   import { LANG_LIST } from '@tools/lang_list';
   import { FONT_NAMES, get_text_font, load_font } from '@tools/font_tools';
@@ -30,6 +31,33 @@
   $: kANDa_info = rAmAyaNam_map[$image_kANDa - 1];
   $: shloka_count = kANDa_info.sarga_data[$image_sarga - 1].shloka_count_extracted;
 
+  const draw_bounding_lines = async (shloka_type: number) => {
+    const shloka_config = $shloka_configs[shloka_type as keyof typeof $shloka_configs];
+
+    const bounds = shloka_config.bounding_coords;
+    const LINE_COLOR = 'black';
+    const LINE_WIDTH = 1.5;
+    for (let coords of [
+      [bounds.left, bounds.top, bounds.left, bounds.bottom],
+      [bounds.right, bounds.top, bounds.right, bounds.bottom],
+      [bounds.left, bounds.top, bounds.right, bounds.top],
+      [bounds.left, bounds.bottom, bounds.right, bounds.bottom]
+    ]) {
+      $canvas.add(
+        new fabric.Line(
+          [get_units(coords[0]), get_units(coords[1]), get_units(coords[2]), get_units(coords[3])],
+          {
+            stroke: LINE_COLOR,
+            strokeWidth: get_units(LINE_WIDTH),
+            selectable: false,
+            evented: false
+          }
+        )
+      );
+    }
+
+    return shloka_config;
+  };
   const render_all_texts = async ($image_shloka: number, $image_script: string) => {
     // load necessary fonts
     await load_font(FONT_NAMES.INDIC_FONT_NAME);
@@ -49,6 +77,9 @@
       ];
     const shloka_lines = shloka_data.split('\n');
 
+    const shloka_type = 2;
+    const shloka_config = await draw_bounding_lines(shloka_type);
+
     const START_LEFT_DEV = 600;
     const START_TOP_DEV = 190;
     const START_LEFT_NORMAL = 620;
@@ -62,7 +93,7 @@
         top: get_units(START_TOP_DEV + i * 180),
         fill: '#4f3200',
         fontFamily: FONT_NAMES.INDIC_FONT_NAME,
-        fontSize: get_units(68),
+        fontSize: get_units(shloka_config.main_text_font_size),
         lockRotation: true,
         fontWeight: 700
       });
@@ -78,7 +109,7 @@
         top: get_units(START_TOP_NORMAL + i * 180),
         fill: '#352700',
         fontFamily: FONT_NAMES.ADOBE_DEVANGARI,
-        fontSize: get_units(50),
+        fontSize: get_units(shloka_config.norm_text_font_size),
         lockRotation: true
       });
       $shloka_texts.push(text_eng);
@@ -97,7 +128,7 @@
         top: get_units(650),
         fill: '#352700',
         fontFamily: FONT_NAMES.ADOBE_DEVANGARI,
-        fontSize: get_units(58),
+        fontSize: get_units(shloka_config.trans_text_font_size),
         lockRotation: true,
         width: get_units(1200)
       });
@@ -113,7 +144,7 @@
     $image_trans_data.isSuccess &&
     $image_sarga &&
     $image_kANDa &&
-    $image_lang &&
+    $shloka_configs &&
     (async () => {
       await render_all_texts($image_shloka, $image_script);
     })();

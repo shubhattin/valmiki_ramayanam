@@ -36,12 +36,25 @@
     $canvas.sendObjectToBack($background_image);
     $canvas.requestRenderAll();
   };
+  const hide_lines = async () => {
+    $canvas.getObjects().forEach((obj) => {
+      if (obj.type === 'line') obj.set('visible', false);
+    });
+    $canvas.requestRenderAll();
+  };
+  const show_lines = async () => {
+    $canvas.getObjects().forEach((obj) => {
+      if (obj.type === 'line') obj.set('visible', true);
+    });
+    $canvas.requestRenderAll();
+  };
   const download_image_as_png = async (
     remove_background: boolean,
     download = true,
     shloka_num: number | null = null,
     restore = true
   ) => {
+    await hide_lines();
     if (remove_background) await remove_background_image();
     else if ($shaded_background_image_status) await set_background_image_type(false);
 
@@ -54,6 +67,7 @@
     if (remove_background) await add_background_image();
     else if ($shaded_background_image_status && restore)
       await set_background_image_type($shaded_background_image_status);
+    await show_lines();
     return {
       url,
       name
@@ -61,6 +75,7 @@
   };
   const download_image_as_svg = async (download = true, shloka_num: number | null = null) => {
     await remove_background_image();
+    await hide_lines();
     const svg_text = $canvas.toSVG({
       width: `${IMAGE_DIMENSIONS[0]}`,
       height: `${IMAGE_DIMENSIONS[1]}`,
@@ -78,6 +93,7 @@
       download_file_in_browser(svg_url, name);
     }
     add_background_image();
+    await show_lines();
     return {
       blob,
       name
@@ -98,6 +114,7 @@
       URL.createObjectURL(zip_blob),
       `${$image_kANDa}-${$image_sarga} PNG files${remove_back ? '' : ' (with background)'}.zip`
     );
+    await set_background_image_type($shaded_background_image_status);
     // ^ restore the original state
   };
   const download_svg_zip = async () => {

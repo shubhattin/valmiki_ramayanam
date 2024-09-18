@@ -117,17 +117,33 @@
     $canvas.getObjects().forEach((obj) => {
       if (!obj || obj.type === 'image') return;
       // not yet working for Textbox
-      const base_top = obj.get('top') / prev_scaling_factor;
-      const base_left = obj.get('left') / prev_scaling_factor;
-      const base_font_size = obj.get('fontSize') / prev_scaling_factor;
-      const options: Record<string, any> = {
-        left: get_units(base_left),
-        top: get_units(base_top),
-        fontSize: get_units(base_font_size)
-      };
-      if (obj.type === 'textbox') {
-        const base_width = obj.get('width') / prev_scaling_factor;
-        options['width'] = get_units(base_width);
+      let options: Record<string, any> = {};
+      if (['text', 'textbox'].includes(obj.type)) {
+        const base_top = obj.get('top') / prev_scaling_factor;
+        const base_left = obj.get('left') / prev_scaling_factor;
+        const base_font_size = obj.get('fontSize') / prev_scaling_factor;
+        options = {
+          left: get_units(base_left),
+          top: get_units(base_top),
+          fontSize: get_units(base_font_size)
+        };
+        if (obj.type === 'textbox') {
+          const base_width = obj.get('width') / prev_scaling_factor;
+          options['width'] = get_units(base_width);
+        }
+      } else if (obj.type === 'line') {
+        const base_x1 = obj.get('x1') / prev_scaling_factor;
+        const base_y1 = obj.get('y1') / prev_scaling_factor;
+        const base_x2 = obj.get('x2') / prev_scaling_factor;
+        const base_y2 = obj.get('y2') / prev_scaling_factor;
+        const stroke_width = obj.get('strokeWidth') / prev_scaling_factor;
+        options = {
+          x1: get_units(base_x1),
+          y1: get_units(base_y1),
+          x2: get_units(base_x2),
+          y2: get_units(base_y2),
+          strokeWidth: get_units(stroke_width)
+        };
       }
       obj.set(options);
       obj.setCoords(); // Update object's corner positions
