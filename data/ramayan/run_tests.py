@@ -36,7 +36,7 @@ def init_test_info():
             index=0,
         ),  # 0
         TestInfo(
-            test_title=f"Check for {SINGLE_VIRAMA} or {DOUBLE_VIRAMA} before line break",
+            test_title=f"Check for {SINGLE_VIRAMA} before line break",
             test_info="virAma not present before new line in",
             index=1,
         ),  # 1
@@ -99,13 +99,11 @@ def _run_tests(data: list[str], kANDa_num: str, sarga_num: str):
     DOUBLE_VIRAMA_TEST = TEST_INFO[5]
     for ln_ind, lines in enumerate(data):
         # ln_ind will act as shloka number as first line in start
-        if lines.count(DOUBLE_VIRAMA) != 2:
+        if lines.count(DOUBLE_VIRAMA) != 2 and lines[-1] != DOUBLE_VIRAMA:
             DOUBLE_VIRAMA_TEST.failed_cases.append(f"{kANDa_num}-{sarga_num}-{ln_ind}")
-        for line in lines.splitlines():
-            if line[-1] not in (
-                SINGLE_VIRAMA,
-                DOUBLE_VIRAMA,
-            ):
+        line_split = lines.splitlines()
+        for line_no, line in enumerate(line_split):
+            if line_no != len(line_split) - 1 and line[-1] != SINGLE_VIRAMA:
                 VIRAMA_TEST.failed_cases.append(f"{kANDa_num}-{sarga_num}-{ln_ind}")
         # if check_kANDa_sarga(1, 1):
         #     VIRAMA_TEST.failed_cases.append(f"{kANDa_num}-{sarga_num}-{ln_ind+1}")
