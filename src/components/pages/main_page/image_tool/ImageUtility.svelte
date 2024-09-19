@@ -23,6 +23,7 @@
   import * as fabric from 'fabric';
   import { lipi_parivartak_async } from '@tools/converter';
   import ImageDownloader from './ImageDownloader.svelte';
+  import opentype from 'opentype.js';
 
   export let mounted: boolean;
 
@@ -73,8 +74,13 @@
     // load necessary fonts
     await load_font(FONT_NAMES.INDIC_FONT_NAME);
     await load_font(FONT_NAMES.ADOBE_DEVANGARI);
+    const font_link = new URL('/src/fonts/Nirmala.ttf', import.meta.url).href;
+    const font = new Uint8Array(await (await fetch(font_link)).arrayBuffer());
 
-    // remove all previous texts, textboxes and lines
+    // const hb = await HarfBuzz(); // remove all previous texts, textboxes and lines
+    const pack = await import('@tools/harfbuzz');
+    const h = await pack.get_text_svg_path('text', font);
+    console.log(h);
     $canvas.getObjects().forEach((obj) => {
       if (!obj || obj.type === 'image') return;
       $canvas.remove(obj);
