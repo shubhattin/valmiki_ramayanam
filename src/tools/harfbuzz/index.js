@@ -4,9 +4,8 @@ import { load_hbjs } from './load_hbjs';
  * Compute the SVG path of a text using a font blob
  * @param {*} text string
  * @param {*} fontBlob Unit8Array
- * @returns
  */
-export async function get_text_svg_path(text, fontBlob) {
+export async function get_text_svg_path(text, fontBlob, fontWeight = 'normal') {
   const hb = await load_hbjs();
   var blob = hb.createBlob(fontBlob);
   var face = hb.createFace(blob, 0);
@@ -84,22 +83,6 @@ export async function get_text_svg_path(text, fontBlob) {
 
   var bbox = xmin + ' ' + ymin + ' ' + width + ' ' + height;
 
-  // if (!text) {
-  //   svgResult.innerHTML =
-  //     '<svg xmlns="http://www.w3.org/2000/svg" height="128" viewBox="' +
-  //     bbox +
-  //     '">' +
-  //     '<path d="' +
-  //     path +
-  //     '" /></svg>';
-  //   svgResult.download = text.value + '.svg';
-  //   // revoke previous URL
-  //   if (svgResult.href) URL.revokeObjectURL(svgResult.href);
-  //   svgResult.href = URL.createObjectURL(
-  //     new Blob([svgResult.innerHTML.replace(' height="128"', '')], { type: 'text/plain' })
-  //   );
-  //   shapeResult.innerText = JSON.stringify(result);
-  // }
   return path;
 }
 

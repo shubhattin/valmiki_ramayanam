@@ -10,7 +10,8 @@
     image_sarga_data,
     image_trans_data,
     shaded_background_image_status,
-    get_units
+    get_units,
+    scaling_factor
   } from './state';
   import { shloka_configs, SPACE_ABOVE_REFERENCE_LINE } from './settings';
   import { viewing_script, BASE_SCRIPT } from '@state/main_page/main_state';
@@ -23,7 +24,7 @@
   import * as fabric from 'fabric';
   import { lipi_parivartak_async } from '@tools/converter';
   import ImageDownloader from './ImageDownloader.svelte';
-  import opentype from 'opentype.js';
+  import { scale } from 'svelte/transition';
 
   export let mounted: boolean;
 
@@ -74,18 +75,23 @@
     // load necessary fonts
     await load_font(FONT_NAMES.INDIC_FONT_NAME);
     await load_font(FONT_NAMES.ADOBE_DEVANGARI);
-    const font_link = new URL('/src/fonts/Nirmala.ttf', import.meta.url).href;
+    const font_link = new URL('/src/fonts/bold/NirmalaB.ttf', import.meta.url).href;
     const font = new Uint8Array(await (await fetch(font_link)).arrayBuffer());
 
     // const hb = await HarfBuzz(); // remove all previous texts, textboxes and lines
     const pack = await import('@tools/harfbuzz');
-    const h = await pack.get_text_svg_path('text', font);
-    console.log(h);
+    const pth = await pack.get_text_svg_path('शर्वयां', font, 'bold');
+    // console.log(h);
+
     $canvas.getObjects().forEach((obj) => {
       if (!obj || obj.type === 'image') return;
       $canvas.remove(obj);
     });
 
+    const path = new fabric.Path(pth);
+    const scale = $scaling_factor / 10;
+    path.set({ left: 120, top: 120, scaleX: scale, scaleY: scale });
+    $canvas.add(path);
     // shloka
     const shloka_texts = [];
     const shloka_data =
