@@ -10,7 +10,20 @@ export const load_font = async (font: string) => {
   await document.fonts.load(`1em ${font}`);
 };
 
-export const FONT_NAMES = {
-  INDIC_FONT_NAME: 'Nirmala UI',
-  ADOBE_DEVANGARI: 'AdobeDevanagari'
+type font_fype = {
+  fontFamily: string;
+  regular_font_url: string;
+  bold_font_url: string;
+};
+export const FONTS_INFO = {
+  NIRMALA_UI: {
+    fontFamily: 'Nirmala UI',
+    regular_font_url: new URL('/src/fonts/regular/Nirmala.ttf', import.meta.url).href,
+    bold_font_url: new URL('/src/fonts/bold/NirmalaB.ttf', import.meta.url).href
+  },
+  ADOBE_DEVANGARI: {
+    fontFamily: 'AdobeDevanagari',
+    regular_font_url: new URL('/src/fonts/regular/AdobeDevanagari.otf', import.meta.url).href,
+    bold_font_url: new URL('/src/fonts/bold/AdobeDevanagariB.otf', import.meta.url).href
+  }
 };

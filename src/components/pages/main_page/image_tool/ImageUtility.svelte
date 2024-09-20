@@ -16,7 +16,7 @@
   import { shloka_configs, SPACE_ABOVE_REFERENCE_LINE } from './settings';
   import { viewing_script, BASE_SCRIPT } from '@state/main_page/main_state';
   import { LANG_LIST } from '@tools/lang_list';
-  import { FONT_NAMES, get_text_font, load_font } from '@tools/font_tools';
+  import { FONTS_INFO, get_text_font, load_font } from '@tools/font_tools';
   import Icon from '@tools/Icon.svelte';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import { LanguageIcon } from '@components/icons';
@@ -24,7 +24,7 @@
   import * as fabric from 'fabric';
   import { lipi_parivartak_async } from '@tools/converter';
   import ImageDownloader from './ImageDownloader.svelte';
-  import { scale } from 'svelte/transition';
+  import { get_text_svg_path } from '@tools/harfbuzz';
 
   export let mounted: boolean;
 
@@ -73,25 +73,24 @@
   };
   const render_all_texts = async ($image_shloka: number, $image_script: string) => {
     // load necessary fonts
-    await load_font(FONT_NAMES.INDIC_FONT_NAME);
-    await load_font(FONT_NAMES.ADOBE_DEVANGARI);
-    const font_link = new URL('/src/fonts/bold/NirmalaB.ttf', import.meta.url).href;
-    const font = new Uint8Array(await (await fetch(font_link)).arrayBuffer());
+    await load_font(FONTS_INFO.ADOBE_DEVANGARI.fontFamily);
 
-    // const hb = await HarfBuzz(); // remove all previous texts, textboxes and lines
-    const pack = await import('@tools/harfbuzz');
-    const pth = await pack.get_text_svg_path('शर्वयां', font, 'bold');
-    // console.log(h);
-
+    // remove all previous texts, textboxes and lines
     $canvas.getObjects().forEach((obj) => {
       if (!obj || obj.type === 'image') return;
       $canvas.remove(obj);
     });
 
-    const path = new fabric.Path(pth);
-    const scale = $scaling_factor / 10;
-    path.set({ left: 120, top: 120, scaleX: scale, scaleY: scale });
-    $canvas.add(path);
+    const scale = 1 / 30;
+    $canvas.add(
+      new fabric.Path(await get_text_svg_path('शर्वर्यां', FONTS_INFO.NIRMALA_UI.bold_font_url), {
+        left: get_units(120),
+        top: get_units(120),
+        scaleX: scale,
+        scaleY: scale
+      })
+    );
+
     // shloka
     const shloka_texts = [];
     const shloka_data =
@@ -112,7 +111,7 @@
       const text_main = new fabric.Text(script_text, {
         textAlign: 'center',
         fill: '#4f3200',
-        fontFamily: FONT_NAMES.INDIC_FONT_NAME,
+        fontFamily: FONTS_INFO.NIRMALA_UI.fontFamily,
         fontSize: get_units(shloka_config.main_text_font_size),
         lockRotation: true,
         fontWeight: 700
@@ -127,7 +126,7 @@
       const text_norm = new fabric.Text(transliterated_text, {
         textAlign: 'center',
         fill: '#352700',
-        fontFamily: FONT_NAMES.ADOBE_DEVANGARI,
+        fontFamily: FONTS_INFO.ADOBE_DEVANGARI.fontFamily,
         fontSize: get_units(shloka_config.norm_text_font_size),
         lockRotation: true
       });
@@ -163,7 +162,7 @@
         left: get_units(610),
         top: get_units(650),
         fill: '#352700',
-        fontFamily: FONT_NAMES.ADOBE_DEVANGARI,
+        fontFamily: FONTS_INFO.ADOBE_DEVANGARI.fontFamily,
         fontSize: get_units(shloka_config.trans_text_font_size),
         lockRotation: true,
         width: get_units(1200)

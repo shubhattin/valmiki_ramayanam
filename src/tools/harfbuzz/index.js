@@ -1,12 +1,26 @@
 import { load_hbjs } from './load_hbjs';
 
 /**
+ * @type {Record<string, Uint8Array>}
+ */
+const FONT_CACHE = {};
+
+/**
  * Compute the SVG path of a text using a font blob
  * @param {*} text string
- * @param {*} fontBlob Unit8Array
+ * @param {*} font string | Unit8Array
  */
-export async function get_text_svg_path(text, fontBlob, fontWeight = 'normal') {
+export async function get_text_svg_path(text, font) {
   const hb = await load_hbjs();
+  let fontBlob =
+    font instanceof Uint8Array
+      ? font
+      : await (async () => {
+          if (FONT_CACHE[font]) return FONT_CACHE[font];
+          const blob = new Uint8Array(await fetch(font).then((res) => res.arrayBuffer()));
+          FONT_CACHE[font] = blob;
+          return blob;
+        })();
   var blob = hb.createBlob(fontBlob);
   var face = hb.createFace(blob, 0);
   var font = hb.createFont(face);
