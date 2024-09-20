@@ -133,7 +133,7 @@
     for (let i = 0; i < shloka_lines.length; i++) {
       const main_text_path = await get_text_svg_path(
         await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, $image_script),
-        get_font_url('NIRMALA_UI', 'bold')
+        get_font_url($image_script === 'Sanskrit' ? 'ADOBE_DEVANGARI' : 'NIRMALA_UI', 'bold')
       );
       let main_text_path_scale = get_font_size_for_path(shloka_config.main_text_font_size);
       const text_main = new fabric.Path(main_text_path, {
