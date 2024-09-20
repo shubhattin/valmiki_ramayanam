@@ -6,9 +6,11 @@ import { load_hbjs } from './load_hbjs';
 const FONT_CACHE = {};
 
 /**
- * Compute the SVG path of a text using a font blob
- * @param {*} text string
- * @param {*} font string | Unit8Array
+ * Generates an SVG path for the given text using the specified font.
+ *
+ * @param {string} text - The text to convert to an SVG path.
+ * @param {string|Uint8Array} font - The font to use, either as a URL string or a Uint8Array.
+ * @returns {Promise<string>} - A promise that resolves to the SVG path string.
  */
 export async function get_text_svg_path(text, font) {
   const hb = await load_hbjs();

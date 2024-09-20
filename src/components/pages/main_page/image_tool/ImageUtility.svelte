@@ -10,8 +10,7 @@
     image_sarga_data,
     image_trans_data,
     shaded_background_image_status,
-    get_units,
-    scaling_factor
+    get_units
   } from './state';
   import { shloka_configs, SPACE_ABOVE_REFERENCE_LINE } from './settings';
   import { viewing_script, BASE_SCRIPT } from '@state/main_page/main_state';
@@ -24,7 +23,6 @@
   import * as fabric from 'fabric';
   import { lipi_parivartak_async } from '@tools/converter';
   import ImageDownloader from './ImageDownloader.svelte';
-  import { get_text_svg_path } from '@tools/harfbuzz';
 
   export let mounted: boolean;
 
@@ -72,6 +70,9 @@
     return shloka_config;
   };
   const render_all_texts = async ($image_shloka: number, $image_script: string) => {
+    // load wasm based library
+    const { get_text_svg_path } = await import('@tools/harfbuzz');
+
     // load necessary fonts
     await load_font(FONTS_INFO.ADOBE_DEVANGARI.fontFamily);
 
