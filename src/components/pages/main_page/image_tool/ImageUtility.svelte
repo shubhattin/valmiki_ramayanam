@@ -15,7 +15,7 @@
   import { shloka_configs, SPACE_ABOVE_REFERENCE_LINE } from './settings';
   import { viewing_script, BASE_SCRIPT } from '@state/main_page/main_state';
   import { LANG_LIST } from '@tools/lang_list';
-  import { FONTS_INFO, get_text_font, load_font } from '@tools/font_tools';
+  import { FONT_FAMILY_NAME, get_text_font, load_font, FONT_URLS } from '@tools/font_tools';
   import Icon from '@tools/Icon.svelte';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import { LanguageIcon } from '@components/icons';
@@ -84,7 +84,7 @@
     const { get_text_svg_path } = await import('@tools/harfbuzz');
 
     // load necessary fonts
-    await load_font(FONTS_INFO.ADOBE_DEVANGARI.fontFamily);
+    await load_font(FONT_FAMILY_NAME.ADOBE_DEVANGARI);
 
     // remove all previous texts, textboxes and lines
     $canvas.getObjects().forEach((obj) => {
@@ -94,7 +94,7 @@
 
     const scale = get_units(1 / 15);
     $canvas.add(
-      new fabric.Path(await get_text_svg_path('शर्वर्यां', FONTS_INFO.NIRMALA_UI.bold_font_url), {
+      new fabric.Path(await get_text_svg_path('शर्वर्यां', FONT_URLS.NIRMALA_UI.bold), {
         left: get_units(690),
         top: get_units(90),
         scaleX: scale,
@@ -116,7 +116,7 @@
       const text_main = new fabric.Text(script_text, {
         textAlign: 'center',
         fill: '#4f3200',
-        fontFamily: FONTS_INFO.NIRMALA_UI.fontFamily,
+        fontFamily: FONT_FAMILY_NAME.NIRMALA_UI,
         fontSize: get_units(shloka_config.main_text_font_size),
         lockRotation: true,
         fontWeight: 700
@@ -131,7 +131,7 @@
       const text_norm = new fabric.Text(transliterated_text, {
         textAlign: 'center',
         fill: '#352700',
-        fontFamily: FONTS_INFO.ADOBE_DEVANGARI.fontFamily,
+        fontFamily: FONT_FAMILY_NAME.ADOBE_DEVANGARI,
         fontSize: get_units(shloka_config.norm_text_font_size),
         lockRotation: true
       });
@@ -167,7 +167,7 @@
         left: get_units(610),
         top: get_units(650),
         fill: '#352700',
-        fontFamily: FONTS_INFO.ADOBE_DEVANGARI.fontFamily,
+        fontFamily: FONT_FAMILY_NAME.ADOBE_DEVANGARI,
         fontSize: get_units(shloka_config.trans_text_font_size),
         lockRotation: true,
         width: get_units(1200)
