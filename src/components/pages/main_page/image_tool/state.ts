@@ -5,8 +5,8 @@ import { browser } from '$app/environment';
 import { get_sarga_data, get_translations, QUERY_KEYS } from '@state/main_page/data';
 import { createQuery } from '@tanstack/svelte-query';
 import { queryClient } from '@state/query';
-import background_image_url from './background_vr.png';
-import background_image_template_url from './background_vr_template.jpg';
+import background_image_url from './img/background_vr.png';
+import background_image_template_url from './img/background_vr_template.jpg';
 
 export let canvas = writable<fabric.Canvas>();
 export let background_image = writable<fabric.FabricImage>();

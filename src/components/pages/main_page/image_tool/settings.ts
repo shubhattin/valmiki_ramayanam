@@ -29,7 +29,7 @@ export const DEFAULT_SHLOKA_TYPE_2_CONFIG: shloka_type_config = {
 };
 
 export const SPACE_ABOVE_REFERENCE_LINE = 10;
-export const SPACE_BETWEEN_MAIN_AND_NORM = 0;
+export const SPACE_BETWEEN_MAIN_AND_NORM = 1;
 
 export let shloka_configs = writable({
   2: DEFAULT_SHLOKA_TYPE_2_CONFIG,
