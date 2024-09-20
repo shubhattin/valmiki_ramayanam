@@ -38,7 +38,7 @@
         new fabric.Line(
           [get_units(coords[0]), get_units(coords[1]), get_units(coords[2]), get_units(coords[3])],
           {
-            stroke: 'hsl(215, 100%, 34%)',
+            stroke: 'hsl(215, 40%, 60%)',
             strokeWidth: get_units(1.5),
             selectable: false,
             evented: false
@@ -46,7 +46,8 @@
         )
       );
     // drawing shloka reference lines
-    for (let top of shloka_config.reference_lines_top)
+    for (let top_i = 0; top_i < $current_shloka_type; top_i++) {
+      const top = shloka_config.reference_lines.top + top_i * shloka_config.reference_lines.spacing;
       $canvas.add(
         new fabric.Line(
           [get_units(bounds.left), get_units(top), get_units(bounds.right), get_units(top)],
@@ -58,7 +59,7 @@
           }
         )
       );
-
+    }
     return shloka_config;
   };
   const render_all_texts = async ($image_shloka: number, $image_script: string) => {
@@ -171,10 +172,12 @@
       });
       height_norm = text_norm.height * norm_text_path_scale;
       width_norm = text_norm.width * norm_text_path_scale;
+
+      const top_pos = get_units(
+        shloka_config.reference_lines.top + i * shloka_config.reference_lines.spacing
+      );
       text_norm.set({
-        top:
-          get_units(shloka_config.reference_lines_top[i]) -
-          (height_norm + get_units($SPACE_ABOVE_REFERENCE_LINE)),
+        top: top_pos - (height_norm + get_units($SPACE_ABOVE_REFERENCE_LINE)),
         left:
           get_units(shloka_config.bounding_coords.left) +
           (WIDTH_ACTUAL - WIDTH) / 2 +
@@ -182,7 +185,7 @@
       });
       text_main.set({
         top:
-          get_units(shloka_config.reference_lines_top[i]) -
+          top_pos -
           (height_main +
             $SPACE_BETWEEN_MAIN_AND_NORM +
             (height_norm + get_units($SPACE_ABOVE_REFERENCE_LINE))),

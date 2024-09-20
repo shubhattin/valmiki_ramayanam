@@ -128,31 +128,32 @@
           />
         </label>
       </div>
-      <div class="flex justify-center space-x-3">
-        <label class="inline-block">
-          <span class="text-sm">Space Above Reference Line</span>
-          <input
-            type="number"
-            class="input w-12 rounded-md px-1 py-0 text-sm"
-            bind:value={$SPACE_ABOVE_REFERENCE_LINE}
-            min={0}
-            max={40}
-          />
-        </label>
-        <label class="inline-block">
-          <span class="text-sm">Space Between Main and Normal</span>
-          <input
-            type="number"
-            class="input w-12 rounded-md px-1 py-0 text-sm"
-            bind:value={$SPACE_BETWEEN_MAIN_AND_NORM}
-            min={0}
-            max={20}
-          />
-        </label>
-      </div>
-      <div class="flex justify-center space-x-12">
+
+      <div class="flex justify-center space-x-16">
+        <div class="flex flex-col justify-center space-y-1">
+          <label>
+            <span class="text-sm">Space Above Reference Line</span>
+            <input
+              type="number"
+              class="input w-12 rounded-md px-1 py-0 text-sm"
+              bind:value={$SPACE_ABOVE_REFERENCE_LINE}
+              min={0}
+              max={40}
+            />
+          </label>
+          <label>
+            <span class="text-sm">Space Between Main and Normal</span>
+            <input
+              type="number"
+              class="input w-12 rounded-md px-1 py-0 text-sm"
+              bind:value={$SPACE_BETWEEN_MAIN_AND_NORM}
+              min={0}
+              max={20}
+            />
+          </label>
+        </div>
         <div class="flex flex-col items-center justify-center space-y-2">
-          <div class="text-sm underline">Boundaries</div>
+          <div class="text-sm font-semibold">Boundaries</div>
           <input
             type="number"
             class="input block w-14 rounded-sm px-1 py-0 text-sm"
@@ -184,19 +185,26 @@
             max={1080}
           />
         </div>
-        <div class="flex flex-col items-center justify-center">
+        <div class="flex flex-col items-center justify-center space-y-1">
           <div class="font-semibold">Reference Lines</div>
-          <div class="space-x-2">
-            {#each Array($current_shloka_type) as _, top_i (top_i)}
-              <input
-                type="number"
-                class="input w-16 rounded-sm px-1 py-0 text-sm"
-                bind:value={$shloka_configs[$current_shloka_type].reference_lines_top[top_i]}
-                min={0}
-                max={1080}
-              />
-            {/each}
-          </div>
+          <label class="inline-block space-x-1">
+            <span class="text-sm">Top Start</span>
+            <input
+              type="number"
+              class="input w-16 rounded-md px-1 py-0 text-sm"
+              bind:value={$shloka_configs[$current_shloka_type].reference_lines.top}
+              min={10}
+            />
+          </label>
+          <label class="inline-block space-x-1">
+            <span class="text-sm">Spacing</span>
+            <input
+              type="number"
+              class="input w-16 rounded-md px-1 py-0 text-sm"
+              bind:value={$shloka_configs[$current_shloka_type].reference_lines.spacing}
+              min={10}
+            />
+          </label>
         </div>
       </div>
     </div>

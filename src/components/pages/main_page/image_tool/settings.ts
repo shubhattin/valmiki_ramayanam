@@ -12,7 +12,10 @@ export type shloka_type_config = {
   main_text_font_size: number;
   norm_text_font_size: number;
   trans_text_font_size: number;
-  reference_lines_top: number[];
+  reference_lines: {
+    top: number;
+    spacing: number;
+  };
 };
 
 export const DEFAULT_SHLOKA_TYPE_1_CONFIG: shloka_type_config = {
@@ -25,7 +28,10 @@ export const DEFAULT_SHLOKA_TYPE_1_CONFIG: shloka_type_config = {
   main_text_font_size: 70,
   norm_text_font_size: 48,
   trans_text_font_size: 52,
-  reference_lines_top: [410]
+  reference_lines: {
+    top: 410,
+    spacing: 0
+  }
 };
 export const DEFAULT_SHLOKA_TYPE_2_CONFIG: shloka_type_config = {
   bounding_coords: {
@@ -37,7 +43,10 @@ export const DEFAULT_SHLOKA_TYPE_2_CONFIG: shloka_type_config = {
   main_text_font_size: 63,
   norm_text_font_size: 48,
   trans_text_font_size: 52,
-  reference_lines_top: [310, 510]
+  reference_lines: {
+    top: 310,
+    spacing: 200
+  }
 };
 export const DEFAULT_SHLOKA_TYPE_3_CONFIG: shloka_type_config = {
   bounding_coords: {
@@ -49,7 +58,10 @@ export const DEFAULT_SHLOKA_TYPE_3_CONFIG: shloka_type_config = {
   main_text_font_size: 55,
   norm_text_font_size: 43,
   trans_text_font_size: 52,
-  reference_lines_top: [230, 380, 530]
+  reference_lines: {
+    top: 230,
+    spacing: 150
+  }
 };
 export const DEFAULT_SHLOKA_TYPE_4_CONFIG: shloka_type_config = {
   bounding_coords: {
@@ -61,7 +73,10 @@ export const DEFAULT_SHLOKA_TYPE_4_CONFIG: shloka_type_config = {
   main_text_font_size: 45,
   norm_text_font_size: 40,
   trans_text_font_size: 52,
-  reference_lines_top: [200, 330, 460, 590]
+  reference_lines: {
+    top: 200,
+    spacing: 130
+  }
 };
 export const DEFAULT_SHLOKA_TYPE_5_CONFIG: shloka_type_config = {
   bounding_coords: {
@@ -73,7 +88,10 @@ export const DEFAULT_SHLOKA_TYPE_5_CONFIG: shloka_type_config = {
   main_text_font_size: 40,
   norm_text_font_size: 35,
   trans_text_font_size: 52,
-  reference_lines_top: [150, 260, 370, 480, 590]
+  reference_lines: {
+    top: 150,
+    spacing: 110
+  }
 };
 
 export const SPACE_ABOVE_REFERENCE_LINE = writable(10);
