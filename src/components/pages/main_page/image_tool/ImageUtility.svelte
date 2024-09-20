@@ -15,7 +15,7 @@
   import { shloka_configs, SPACE_ABOVE_REFERENCE_LINE } from './settings';
   import { viewing_script, BASE_SCRIPT } from '@state/main_page/main_state';
   import { LANG_LIST } from '@tools/lang_list';
-  import { FONT_FAMILY_NAME, get_text_font, load_font, FONT_URLS } from '@tools/font_tools';
+  import { FONT_FAMILY_NAME, get_text_font, load_font, get_font_url } from '@tools/font_tools';
   import Icon from '@tools/Icon.svelte';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import { LanguageIcon } from '@components/icons';
@@ -94,7 +94,7 @@
 
     const scale = get_units(1 / 15);
     $canvas.add(
-      new fabric.Path(await get_text_svg_path('शर्वर्यां', FONT_URLS.NIRMALA_UI.bold), {
+      new fabric.Path(await get_text_svg_path('शर्वर्यां', get_font_url('NIRMALA_UI', 'bold')), {
         left: get_units(690),
         top: get_units(90),
         scaleX: scale,
