@@ -17,11 +17,16 @@
   import { SlideToggle } from '@skeletonlabs/skeleton';
   import ImageDownloader from './ImageDownloader.svelte';
   import type { shloka_type_config } from './settings';
+  import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
+  import { IoOptions } from 'svelte-icons-pack/io';
+  import { current_shloka_type, shloka_configs } from './settings';
 
   export let render_all_texts: (shloka_num: number, script: string) => Promise<shloka_type_config>;
 
   $: kANDa_info = rAmAyaNam_map[$image_kANDa - 1];
   $: shloka_count = kANDa_info.sarga_data[$image_sarga - 1].shloka_count_extracted;
+
+  $: console.log($current_shloka_type);
 </script>
 
 <div class="flex space-x-2 text-sm">
@@ -81,3 +86,23 @@
     />
   </span>
 </div>
+<Accordion>
+  <AccordionItem open={false}>
+    <svelte:fragment slot="lead"><Icon src={IoOptions} class="text-2xl" /></svelte:fragment>
+    <svelte:fragment slot="summary"
+      ><span class="text-sm font-bold">Change Default Options</span>
+    </svelte:fragment>
+    <svelte:fragment slot="content">
+      <div class="space-y-2">
+        <label class="block space-x-2 text-sm">
+          <span>Shloka Type</span>
+          <select bind:value={$current_shloka_type} class="select w-20 px-1 py-0 text-sm">
+            {#each Object.keys($shloka_configs) as i}
+              <option value={parseInt(i)}>{i} Lines</option>
+            {/each}
+          </select>
+        </label>
+      </div>
+    </svelte:fragment>
+  </AccordionItem>
+</Accordion>

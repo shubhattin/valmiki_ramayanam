@@ -10,6 +10,7 @@
     get_units
   } from './state';
   import {
+    current_shloka_type,
     shloka_configs,
     SPACE_ABOVE_REFERENCE_LINE,
     SPACE_BETWEEN_MAIN_AND_NORM,
@@ -126,6 +127,7 @@
       return new_shloka_lines;
     })();
 
+    $current_shloka_type = shloka_lines.length;
     for (let i = 0; i < shloka_lines.length; i++) {
       const main_text_path = await get_text_svg_path(
         await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, $image_script),

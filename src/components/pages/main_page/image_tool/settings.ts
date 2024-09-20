@@ -28,6 +28,7 @@ export const DEFAULT_SHLOKA_TYPE_2_CONFIG: shloka_type_config = {
   reference_lines_top: [310, 510]
 };
 
+export let current_shloka_type = writable<number>();
 export const SPACE_ABOVE_REFERENCE_LINE = 10;
 export const SPACE_BETWEEN_MAIN_AND_NORM = 1;
 

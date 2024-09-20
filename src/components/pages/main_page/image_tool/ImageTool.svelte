@@ -77,7 +77,7 @@
   function update_scaling_factor() {
     // we can improve the method of calculating the scaling factor later on
     const availableWidth = window.innerWidth * 0.8;
-    const availableHeight = window.innerHeight * 0.799;
+    const availableHeight = window.innerHeight * 0.74;
     const scale = [availableWidth / IMAGE_DIMENSIONS[0], availableHeight / IMAGE_DIMENSIONS[1]];
     let min_value = Math.min(...scale);
     $scaling_factor = min_value;
@@ -214,6 +214,6 @@
   </div>
   <ImageUtility mounted={$mounted} />
 </div>
-<div class="mt-4 space-y-2">
+<div class="mt-1 space-y-2">
   <canvas bind:this={canvas_element}></canvas>
 </div>

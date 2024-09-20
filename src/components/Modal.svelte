@@ -64,7 +64,7 @@
     });
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && visibleModal) {
+      if (close_on_click_outside && e.key === 'Escape' && visibleModal) {
         closeModal();
       }
     });
