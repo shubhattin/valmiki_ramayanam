@@ -12,7 +12,7 @@
     shaded_background_image_status,
     get_units
   } from './state';
-  import { shloka_configs, SPACE_ABOVE_REFERENCE_LINE } from './settings';
+  import { shloka_configs, SPACE_ABOVE_REFERENCE_LINE, type shloka_type_config } from './settings';
   import { viewing_script, BASE_SCRIPT } from '@state/main_page/main_state';
   import { LANG_LIST } from '@tools/lang_list';
   import { FONT_FAMILY_NAME, get_text_font, load_font, get_font_url } from '@tools/font_tools';
@@ -30,9 +30,7 @@
   $: kANDa_info = rAmAyaNam_map[$image_kANDa - 1];
   $: shloka_count = kANDa_info.sarga_data[$image_sarga - 1].shloka_count_extracted;
 
-  const draw_bounding_and_reference_lines = async (shloka_type: number) => {
-    const shloka_config = $shloka_configs[shloka_type as keyof typeof $shloka_configs];
-
+  const draw_bounding_and_reference_lines = async (shloka_config: shloka_type_config) => {
     const bounds = shloka_config.bounding_coords;
     const LINE_COLOR = 'black';
     const LINE_WIDTH = 1.5;
@@ -72,17 +70,10 @@
   };
   const render_all_texts = async ($image_shloka: number, $image_script: string) => {
     const shloka_type = 2;
-    const shloka_config = await draw_bounding_and_reference_lines(shloka_type);
+    const shloka_config = $shloka_configs[shloka_type as keyof typeof $shloka_configs];
     if (!browser) return shloka_config;
-
-    // using only 98% of the width
-    const WIDTH = get_units(
-      (shloka_config.bounding_coords.right - shloka_config.bounding_coords.left) * 0.98
-    );
-
     // load wasm based library
     const { get_text_svg_path } = await import('@tools/harfbuzz');
-
     // load necessary fonts
     await load_font(FONT_FAMILY_NAME.ADOBE_DEVANGARI);
 
@@ -91,20 +82,17 @@
       if (!obj || obj.type === 'image') return;
       $canvas.remove(obj);
     });
-
-    const scale = get_units(1 / 15);
-    $canvas.add(
-      new fabric.Path(await get_text_svg_path('शर्वर्यां', get_font_url('NIRMALA_UI', 'bold')), {
-        left: get_units(690),
-        top: get_units(90),
-        scaleX: scale,
-        scaleY: scale,
-        fill: 'brown'
-      })
+    const get_font_size_for_path = (font_size: number) => {
+      const PATH_SCALING_FACTOR = 1 / 15.125;
+      return get_units((font_size / 65) * PATH_SCALING_FACTOR);
+    };
+    await draw_bounding_and_reference_lines(shloka_config);
+    // using only 98% of the width
+    const WIDTH = get_units(
+      (shloka_config.bounding_coords.right - shloka_config.bounding_coords.left) * 0.98
     );
 
     // shloka
-    const shloka_texts = [];
     const shloka_data =
       $image_sarga_data.data![
         $image_shloka !== -1 ? $image_shloka : $image_sarga_data.data!.length - 1
@@ -112,17 +100,18 @@
     const shloka_lines = shloka_data.split('\n');
 
     for (let i = 0; i < shloka_lines.length; i++) {
-      const script_text = await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, $image_script);
-      const text_main = new fabric.Text(script_text, {
-        textAlign: 'center',
+      const main_text_path = await get_text_svg_path(
+        await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, $image_script),
+        get_font_url('NIRMALA_UI', 'bold')
+      );
+      const main_text_path_scale = get_font_size_for_path(shloka_config.main_text_font_size);
+      const text_main = new fabric.Path(main_text_path, {
         fill: '#4f3200',
-        fontFamily: FONT_FAMILY_NAME.NIRMALA_UI,
-        fontSize: get_units(shloka_config.main_text_font_size),
-        lockRotation: true,
-        fontWeight: 700
+        scaleX: main_text_path_scale,
+        scaleY: main_text_path_scale
       });
-      const height_main = text_main.height; // already scaled
-      const width_main = text_main.width; // already scaled
+      const height_main = text_main.height * main_text_path_scale; // already scaled
+      const width_main = text_main.width * main_text_path_scale; // already scaled
       const transliterated_text = await lipi_parivartak_async(
         shloka_lines[i],
         BASE_SCRIPT,
@@ -151,11 +140,10 @@
             (height_norm + get_units(SPACE_ABOVE_REFERENCE_LINE))),
         left: get_units(shloka_config.bounding_coords.left) + (WIDTH - width_main) / 2
       });
-      shloka_texts.push(text_main);
-      shloka_texts.push(text_norm);
+      $canvas.add(text_main);
+      $canvas.add(text_norm);
       if (i === 1) break;
     }
-    $canvas.add(...shloka_texts);
 
     // trans
     const trans_data = $image_trans_data.data!;
