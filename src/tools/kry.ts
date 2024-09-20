@@ -73,3 +73,7 @@ export function dataURLToBlob(dataURL: string) {
 
   return new Blob([buffer], { type: mimeString });
 }
+
+export function copy_plain_object<T>(obj: T) {
+  return JSON.parse(JSON.stringify(obj)) as T;
+}

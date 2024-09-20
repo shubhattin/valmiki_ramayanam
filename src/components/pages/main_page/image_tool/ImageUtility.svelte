@@ -1,116 +1,221 @@
 <script lang="ts">
-  import { rAmAyaNam_map } from '@state/main_page/data';
   import {
     image_kANDa,
-    image_lang,
     image_sarga,
     image_script,
     image_shloka,
-    scaling_factor,
     canvas,
     image_sarga_data,
     image_trans_data,
-    set_background_image_type,
-    shaded_background_image_status,
-    background_image,
-    IMAGE_DIMENSIONS,
-    get_units,
-    shloka_texts,
-    trans_text
+    get_units
   } from './state';
-  import { viewing_script, BASE_SCRIPT } from '@state/main_page/main_state';
-  import { LANG_LIST, SCRIPT_LIST } from '@tools/lang_list';
-  import { FONT_NAMES, get_text_font, load_font } from '@tools/font_tools';
-  import Icon from '@tools/Icon.svelte';
-  import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
-  import { LanguageIcon } from '@components/icons';
-  import { download_file_in_browser } from '@tools/download_file_browser';
-  import { BsDownload } from 'svelte-icons-pack/bs';
-  import { SlideToggle, popup } from '@skeletonlabs/skeleton';
-  import JSZip from 'jszip';
+  import {
+    current_shloka_type,
+    shloka_configs,
+    SPACE_ABOVE_REFERENCE_LINE,
+    SPACE_BETWEEN_MAIN_AND_NORM,
+    type shloka_type_config
+  } from './settings';
+  import { BASE_SCRIPT } from '@state/main_page/main_state';
+  import { FONT_FAMILY_NAME, load_font, get_font_url } from '@tools/font_tools';
   import * as fabric from 'fabric';
   import { lipi_parivartak_async } from '@tools/converter';
-  import { dataURLToBlob } from '@tools/kry';
+  import { browser } from '$app/environment';
+  import ImageOptions from './ImageOptions.svelte';
 
   export let mounted: boolean;
 
-  $: kANDa_info = rAmAyaNam_map[$image_kANDa - 1];
-  $: shloka_count = kANDa_info.sarga_data[$image_sarga - 1].shloka_count_extracted;
-
+  const draw_bounding_and_reference_lines = async (shloka_config: shloka_type_config) => {
+    const bounds = shloka_config.bounding_coords;
+    for (let coords of [
+      // x1 y1 x2 y2
+      [bounds.left, bounds.top, bounds.left, bounds.bottom], // left line
+      [bounds.right, bounds.top, bounds.right, bounds.bottom], // top line
+      [bounds.left, bounds.top, bounds.right, bounds.top], // right line
+      [bounds.left, bounds.bottom, bounds.right, bounds.bottom] // bottom line
+    ])
+      $canvas.add(
+        new fabric.Line(
+          [get_units(coords[0]), get_units(coords[1]), get_units(coords[2]), get_units(coords[3])],
+          {
+            stroke: 'hsl(215, 40%, 60%)',
+            strokeWidth: get_units(1.5),
+            selectable: false,
+            evented: false
+          }
+        )
+      );
+    // drawing shloka reference lines
+    for (let top_i = 0; top_i < $current_shloka_type; top_i++) {
+      const top = shloka_config.reference_lines.top + top_i * shloka_config.reference_lines.spacing;
+      $canvas.add(
+        new fabric.Line(
+          [get_units(bounds.left), get_units(top), get_units(bounds.right), get_units(top)],
+          {
+            stroke: 'brown',
+            strokeWidth: get_units(2),
+            selectable: false,
+            evented: false
+          }
+        )
+      );
+    }
+    return shloka_config;
+  };
   const render_all_texts = async ($image_shloka: number, $image_script: string) => {
+    if (!browser) return $shloka_configs[2]; // just like has no meaning
+    // load wasm based library
+    const { get_text_svg_path } = await import('@tools/harfbuzz');
     // load necessary fonts
-    await load_font(FONT_NAMES.INDIC_FONT_NAME);
-    await load_font(FONT_NAMES.ADOBE_DEVANGARI);
+    await load_font(FONT_FAMILY_NAME.ADOBE_DEVANGARI);
 
-    // remove all previous texts
+    // remove all previous texts, textboxes and lines
     $canvas.getObjects().forEach((obj) => {
       if (!obj || obj.type === 'image') return;
       $canvas.remove(obj);
     });
 
-    // shloka
-    $shloka_texts = [];
+    // fetch shloka config
     const shloka_data =
       $image_sarga_data.data![
         $image_shloka !== -1 ? $image_shloka : $image_sarga_data.data!.length - 1
       ];
-    const shloka_lines = shloka_data.split('\n');
+    const CHAR_LIMIT = 45;
 
-    const START_LEFT_DEV = 600;
-    const START_TOP_DEV = 190;
-    const START_LEFT_NORMAL = 620;
-    const START_TOP_NORMAL = 270;
+    const shloka_lines = (() => {
+      if ($image_shloka === 0) {
+        const words = shloka_data.split(' ');
+        const break_point = 3;
+        return [words.slice(0, break_point).join(' '), words.slice(break_point).join(' ')];
+      } else if ($image_shloka === -1) {
+        const words = shloka_data.split(' ');
+        const break_point = 4;
+        return [words.slice(0, break_point).join(' '), words.slice(break_point).join(' ')];
+      }
+      const line_split = shloka_data.split('\n');
+      const new_shloka_lines: string[] = [];
+      for (let i = 0; i < line_split.length; i++) {
+        const line = line_split[i];
+        //   if (line.length > CHAR_LIMIT) {
+        //     const words = line.split(' ');
+        //     let new_line = '';
+        //     for (let j = 0; j < words.length; j++) {
+        //       if (new_line.length + words[j].length > CHAR_LIMIT) {
+        //         new_shloka_lines.push(new_line);
+        //         new_line = words[j];
+        //       } else {
+        //         new_line += ' ' + words[j];
+        //       }
+        //     }
+        //     new_shloka_lines.push(new_line);
+        //   } else
+        new_shloka_lines.push(line);
+      }
+      return new_shloka_lines;
+    })();
+    $current_shloka_type = shloka_lines.length as keyof typeof $shloka_configs;
+    const shloka_config = $shloka_configs[$current_shloka_type];
 
+    const get_font_size_for_path = (font_size: number) => {
+      const PATH_SCALING_FACTOR = 1 / 15.125;
+      return get_units((font_size / 65) * PATH_SCALING_FACTOR);
+    };
+    await draw_bounding_and_reference_lines(shloka_config);
+    const WIDTH_ACTUAL = get_units(
+      (shloka_config.bounding_coords.right - shloka_config.bounding_coords.left) * 1.0
+    );
+    const WIDTH = WIDTH_ACTUAL * 0.985;
+    const HEIGHT_ACTUAL = get_units(
+      (shloka_config.bounding_coords.bottom - shloka_config.bounding_coords.top) * 1.0
+    );
+
+    // shloka
     for (let i = 0; i < shloka_lines.length; i++) {
-      const script_text = await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, $image_script);
-      const text_main = new fabric.Text(script_text, {
-        textAlign: 'center',
-        left: get_units(START_LEFT_DEV),
-        top: get_units(START_TOP_DEV + i * 180),
-        fill: '#4f3200',
-        fontFamily: FONT_NAMES.INDIC_FONT_NAME,
-        fontSize: get_units(68),
-        lockRotation: true,
-        fontWeight: 700
-      });
-      $shloka_texts.push(text_main);
-      const transliterated_text = await lipi_parivartak_async(
-        shloka_lines[i],
-        BASE_SCRIPT,
-        'Normal'
+      const main_text_path = await get_text_svg_path(
+        await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, $image_script),
+        get_font_url('NIRMALA_UI', 'bold')
       );
-      const text_eng = new fabric.Text(transliterated_text, {
-        textAlign: 'center',
-        left: get_units(START_LEFT_NORMAL),
-        top: get_units(START_TOP_NORMAL + i * 180),
-        fill: '#352700',
-        fontFamily: FONT_NAMES.ADOBE_DEVANGARI,
-        fontSize: get_units(50),
-        lockRotation: true
+      let main_text_path_scale = get_font_size_for_path(shloka_config.main_text_font_size);
+      const text_main = new fabric.Path(main_text_path, {
+        fill: '#4f3200',
+        lockRotation: true,
+        lockMovementY: true
       });
-      $shloka_texts.push(text_eng);
-      if (i === 1) break;
+      let height_main = text_main.height * main_text_path_scale; // already scaled
+      let width_main = text_main.width * main_text_path_scale; // already scaled
+      if (WIDTH / width_main < 1)
+        main_text_path_scale = (main_text_path_scale / width_main) * WIDTH;
+      text_main.set({
+        scaleX: main_text_path_scale,
+        scaleY: main_text_path_scale
+      });
+      height_main = text_main.height * main_text_path_scale;
+      width_main = text_main.width * main_text_path_scale;
+
+      const transliterated_text = await get_text_svg_path(
+        await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, 'Normal'),
+        get_font_url('ADOBE_DEVANGARI', 'regular')
+      );
+      let norm_text_path_scale = get_font_size_for_path(shloka_config.norm_text_font_size);
+      const text_norm = new fabric.Path(transliterated_text, {
+        fill: '#352700',
+        lockRotation: true,
+        lockMovementY: true
+      });
+      let height_norm = text_norm.height * norm_text_path_scale; // already scale
+      let width_norm = text_norm.width * norm_text_path_scale; // already scaled
+      if (WIDTH / width_norm < 1)
+        norm_text_path_scale = (norm_text_path_scale / width_norm) * WIDTH;
+      text_norm.set({
+        scaleX: norm_text_path_scale,
+        scaleY: norm_text_path_scale
+      });
+      height_norm = text_norm.height * norm_text_path_scale;
+      width_norm = text_norm.width * norm_text_path_scale;
+
+      const top_pos = get_units(
+        shloka_config.reference_lines.top + i * shloka_config.reference_lines.spacing
+      );
+      text_norm.set({
+        top: top_pos - (height_norm + get_units($SPACE_ABOVE_REFERENCE_LINE)),
+        left:
+          get_units(shloka_config.bounding_coords.left) +
+          (WIDTH_ACTUAL - WIDTH) / 2 +
+          (WIDTH - width_norm) / 2
+      });
+      text_main.set({
+        top:
+          top_pos -
+          (height_main +
+            $SPACE_BETWEEN_MAIN_AND_NORM +
+            (height_norm + get_units($SPACE_ABOVE_REFERENCE_LINE))),
+        left:
+          get_units(shloka_config.bounding_coords.left) +
+          (WIDTH_ACTUAL - WIDTH) / 2 +
+          (WIDTH - width_main) / 2
+      });
+      $canvas.add(text_main);
+      $canvas.add(text_norm);
     }
-    $canvas.add(...$shloka_texts);
 
     // trans
     const trans_data = $image_trans_data.data!;
-    $trans_text = null!;
     if (trans_data.has($image_shloka)) {
-      const trans_text = trans_data.get($image_shloka)!;
-      $trans_text = new fabric.Textbox(trans_text, {
+      const trans_text_data = trans_data.get($image_shloka)!;
+      const trans_text = new fabric.Textbox(trans_text_data, {
         textAlign: 'right',
         left: get_units(610),
         top: get_units(650),
         fill: '#352700',
-        fontFamily: FONT_NAMES.ADOBE_DEVANGARI,
-        fontSize: get_units(58),
+        fontFamily: FONT_FAMILY_NAME.ADOBE_DEVANGARI,
+        fontSize: get_units(shloka_config.trans_text_font_size),
         lockRotation: true,
-        width: get_units(1200)
+        width: get_units(1250)
       });
+      $canvas.add(trans_text);
     }
-    if ($trans_text) $canvas.add($trans_text);
     $canvas.requestRenderAll();
+    return shloka_config;
   };
 
   $: mounted &&
@@ -118,213 +223,14 @@
     $image_sarga_data.isSuccess &&
     !$image_trans_data.isFetching &&
     $image_trans_data.isSuccess &&
+    $SPACE_ABOVE_REFERENCE_LINE &&
+    $SPACE_BETWEEN_MAIN_AND_NORM &&
     $image_sarga &&
     $image_kANDa &&
-    $image_lang &&
+    $shloka_configs &&
     (async () => {
       await render_all_texts($image_shloka, $image_script);
     })();
-
-  const remove_background_image = async () => {
-    $canvas.getObjects().forEach((obj) => {
-      if (obj.type === 'image') $canvas.remove(obj);
-    });
-    $canvas.requestRenderAll();
-  };
-  const add_background_image = async () => {
-    $canvas.add($background_image);
-    $canvas.sendObjectToBack($background_image);
-    $canvas.requestRenderAll();
-  };
-  const download_image_as_png = async (
-    remove_background: boolean,
-    download = true,
-    shloka_num: number | null = null,
-    restore = true
-  ) => {
-    if (remove_background) await remove_background_image();
-    else if ($shaded_background_image_status) await set_background_image_type(false);
-
-    const url = $canvas.toDataURL({
-      format: 'png',
-      multiplier: 1 / $scaling_factor
-    });
-    const name = `${$image_kANDa}-${$image_sarga} Shloka No. ${shloka_num ?? $image_shloka}${remove_background ? '' : ' (with background)'}.png`;
-    if (download) download_file_in_browser(url, name);
-    if (remove_background) await add_background_image();
-    else if ($shaded_background_image_status && restore)
-      await set_background_image_type($shaded_background_image_status);
-    return {
-      url,
-      name
-    };
-  };
-  const download_image_as_svg = async (download = true, shloka_num: number | null = null) => {
-    await remove_background_image();
-    const svg_text = $canvas.toSVG({
-      width: `${IMAGE_DIMENSIONS[0]}`,
-      height: `${IMAGE_DIMENSIONS[1]}`,
-      viewBox: {
-        x: 0,
-        y: 0,
-        width: get_units(IMAGE_DIMENSIONS[0]),
-        height: get_units(IMAGE_DIMENSIONS[1])
-      }
-    });
-    const blob = new Blob([svg_text], { type: 'image/svg+xml' });
-    const name = `${$image_kANDa}-${$image_sarga} Shloka No. ${shloka_num ?? $image_shloka}.svg`;
-    if (download) {
-      const svg_url = URL.createObjectURL(blob);
-      download_file_in_browser(svg_url, name);
-    }
-    add_background_image();
-    return {
-      blob,
-      name
-    };
-  };
-
-  const download_png_zip = async (remove_back: boolean) => {
-    const zip = new JSZip();
-    for (let i = -1; i <= shloka_count; i++) {
-      await render_all_texts(i, $image_script);
-      const { url, name } = await download_image_as_png(remove_back, false, i, false);
-      const blob = dataURLToBlob(url);
-      zip.file(name, blob);
-    }
-    await render_all_texts($image_shloka, $image_script);
-    const zip_blob = await zip.generateAsync({ type: 'blob' });
-    download_file_in_browser(
-      URL.createObjectURL(zip_blob),
-      `${$image_kANDa}-${$image_sarga} PNG files${remove_back ? '' : ' (with background)'}.zip`
-    );
-    // ^ restore the original state
-  };
-  const download_svg_zip = async () => {
-    const zip = new JSZip();
-    for (let i = -1; i <= shloka_count; i++) {
-      await render_all_texts(i, $image_script);
-      const { blob, name } = await download_image_as_svg(false, i);
-      zip.file(name, blob);
-    }
-    await render_all_texts($image_shloka, $image_script);
-    const zip_blob = await zip.generateAsync({ type: 'blob' });
-    download_file_in_browser(
-      URL.createObjectURL(zip_blob),
-      `${$image_kANDa}-${$image_sarga} SVG files.zip`
-    );
-    // ^ restore the original state
-  };
 </script>
 
-<div class="flex space-x-2 text-sm">
-  <div class="inline-block space-x-1">
-    <button
-      class="btn m-0 p-0"
-      disabled={$image_shloka === 0}
-      on:click={() => {
-        if ($image_shloka !== -1) $image_shloka -= 1;
-        else $image_shloka = shloka_count;
-      }}
-    >
-      <Icon src={TiArrowBackOutline} class="-mt-1 text-lg" />
-    </button>
-    <select
-      class={`${get_text_font($viewing_script)} select inline-block w-14 p-1 text-sm`}
-      bind:value={$image_shloka}
-    >
-      <option value={0}>0</option>
-      {#each Array(shloka_count) as _, index}
-        <option value={index + 1}>{index + 1}</option>
-      {/each}
-      <option value={-1}>-1</option>
-    </select>
-    <button
-      class="btn m-0 p-0"
-      on:click={() => {
-        if ($image_shloka !== shloka_count) $image_shloka += 1;
-        else $image_shloka = -1;
-      }}
-      disabled={$image_shloka === -1}
-    >
-      <Icon src={TiArrowForwardOutline} class="-mt-1 text-lg" />
-    </button>
-  </div>
-  <label class="inline-block space-x-1">
-    <Icon src={LanguageIcon} class="text-xl" />
-    <select
-      class="select inline-block w-24 p-1 text-sm"
-      bind:value={$image_lang}
-      disabled={$image_trans_data.isFetching || !$image_trans_data.isSuccess}
-    >
-      <option value="English">English</option>
-      {#each LANG_LIST as lang (lang)}
-        <option value={lang}>{lang}</option>
-      {/each}
-    </select>
-  </label>
-  <button
-    use:popup={{
-      event: 'click',
-      target: 'image_download',
-      placement: 'bottom'
-    }}
-    on:dblclick={() => download_image_as_png(true)}
-    class="btn inline-flex rounded-lg p-1 text-sm"
-  >
-    <Icon src={BsDownload} class="-mt-1 mr-1 text-2xl" />
-  </button>
-  <div class="card z-50 space-y-0 rounded-md p-1 shadow-xl" data-popup="image_download">
-    <div class="flex items-center justify-center space-x-2">
-      <button
-        on:click={() => download_image_as_svg()}
-        class="btn rounded-md p-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
-      >
-        SVG
-      </button>
-      <button
-        on:click={() => download_image_as_png(true)}
-        class="btn rounded-md p-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
-      >
-        PNG
-      </button>
-      <button
-        on:click={() => download_image_as_png(false)}
-        class="btn rounded-md p-1 text-xs hover:bg-gray-200 dark:hover:bg-gray-700"
-      >
-        PNG (with background)
-      </button>
-    </div>
-    <div class="flex items-center justify-center space-x-2">
-      <button
-        on:click={() => download_svg_zip()}
-        class="btn rounded-md p-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
-      >
-        SVG Zip
-      </button>
-      <button
-        on:click={() => download_png_zip(true)}
-        class="btn rounded-md p-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
-      >
-        PNG Zip
-      </button>
-      <button
-        on:click={() => download_png_zip(false)}
-        class=" btn rounded-md p-1 text-xs hover:bg-gray-200 dark:hover:bg-gray-700"
-      >
-        PNG Zip (with background)
-      </button>
-    </div>
-  </div>
-  <span class="inline-flex flex-col">
-    <SlideToggle
-      name="from_text_type"
-      active="bg-primary-500"
-      class="mt-1 hover:text-gray-500 dark:hover:text-gray-400"
-      bind:checked={$shaded_background_image_status}
-      size="sm"
-    >
-      <!-- <Icon src={BsKeyboard} class="text-4xl" /> -->
-    </SlideToggle>
-  </span>
-</div>
+<ImageOptions {render_all_texts} />

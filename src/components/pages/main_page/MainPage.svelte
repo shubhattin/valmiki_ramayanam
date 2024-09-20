@@ -29,7 +29,8 @@
     edit_language_typer_status,
     sanskrit_mode,
     typing_assistance_modal_opened,
-    image_tool_opened
+    image_tool_opened,
+    get_script_for_lang
   } from '@state/main_page/main_state';
   import { user_allowed_langs } from '@state/main_page/user';
   import { SlideToggle } from '@skeletonlabs/skeleton';
@@ -107,9 +108,7 @@
       if (!mounted || !browser || lang === '--') return lang;
       // loading trnaslation lang data for typing support
       await delay(300);
-      let script = lang;
-      if (lang === 'Hindi') script = 'Sanskrit';
-      else if (lang === 'Tamil') script = 'Tamil-Extended';
+      let script = get_script_for_lang(lang);
       await Promise.all([
         $viewing_script_mut.mutateAsync({ script, update_viewing_script_selection: true }),
         load_parivartak_lang_data(lang)

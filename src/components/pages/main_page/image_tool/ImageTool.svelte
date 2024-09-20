@@ -22,7 +22,8 @@
     sarga_selected,
     kANDa_selected,
     viewing_script,
-    trans_lang
+    trans_lang,
+    get_script_for_lang
   } from '@state/main_page/main_state';
   import { get_kANDa_names, get_sarga_names, rAmAyaNam_map } from '@state/main_page/data';
   import Select from '@components/Select.svelte';
@@ -62,6 +63,7 @@
     $image_sarga = 1;
     $image_shloka = 1;
   }
+  $: $image_script = get_script_for_lang($image_lang);
 
   $: if ($image_sarga) {
     $image_shloka = 1;
@@ -75,7 +77,7 @@
   function update_scaling_factor() {
     // we can improve the method of calculating the scaling factor later on
     const availableWidth = window.innerWidth * 0.8;
-    const availableHeight = window.innerHeight * 0.799;
+    const availableHeight = window.innerHeight * 0.74;
     const scale = [availableWidth / IMAGE_DIMENSIONS[0], availableHeight / IMAGE_DIMENSIONS[1]];
     let min_value = Math.min(...scale);
     $scaling_factor = min_value;
@@ -115,19 +117,47 @@
     $background_image.scaleY = $scaling_factor;
     // Update positions and scales of text objects
     $canvas.getObjects().forEach((obj) => {
-      if (!obj || obj.type === 'image') return;
+      const type = obj.type;
+      if (!obj || type === 'image') return;
       // not yet working for Textbox
-      const base_top = obj.get('top') / prev_scaling_factor;
-      const base_left = obj.get('left') / prev_scaling_factor;
-      const base_font_size = obj.get('fontSize') / prev_scaling_factor;
-      const options: Record<string, any> = {
-        left: get_units(base_left),
-        top: get_units(base_top),
-        fontSize: get_units(base_font_size)
-      };
-      if (obj.type === 'textbox') {
-        const base_width = obj.get('width') / prev_scaling_factor;
-        options['width'] = get_units(base_width);
+      let options: Record<string, any> = {};
+      if (['text', 'textbox'].includes(obj.type)) {
+        const base_top = obj.get('top') / prev_scaling_factor;
+        const base_left = obj.get('left') / prev_scaling_factor;
+        const base_font_size = obj.get('fontSize') / prev_scaling_factor;
+        options = {
+          left: get_units(base_left),
+          top: get_units(base_top),
+          fontSize: get_units(base_font_size)
+        };
+        if (type === 'textbox') {
+          const base_width = obj.get('width') / prev_scaling_factor;
+          options['width'] = get_units(base_width);
+        }
+      } else if (type === 'line') {
+        const base_x1 = obj.get('x1') / prev_scaling_factor;
+        const base_y1 = obj.get('y1') / prev_scaling_factor;
+        const base_x2 = obj.get('x2') / prev_scaling_factor;
+        const base_y2 = obj.get('y2') / prev_scaling_factor;
+        const stroke_width = obj.get('strokeWidth') / prev_scaling_factor;
+        options = {
+          x1: get_units(base_x1),
+          y1: get_units(base_y1),
+          x2: get_units(base_x2),
+          y2: get_units(base_y2),
+          strokeWidth: get_units(stroke_width)
+        };
+      } else if (type === 'path') {
+        const base_left = obj.get('left') / prev_scaling_factor;
+        const base_top = obj.get('top') / prev_scaling_factor;
+        const base_scaleX = obj.get('scaleX') / prev_scaling_factor;
+        const base_scaleY = obj.get('scaleY') / prev_scaling_factor;
+        options = {
+          left: get_units(base_left),
+          top: get_units(base_top),
+          scaleX: get_units(base_scaleX),
+          scaleY: get_units(base_scaleY)
+        };
       }
       obj.set(options);
       obj.setCoords(); // Update object's corner positions
@@ -184,6 +214,6 @@
   </div>
   <ImageUtility mounted={$mounted} />
 </div>
-<div class="mt-4 space-y-2">
+<div class="mt-1 space-y-2">
   <canvas bind:this={canvas_element}></canvas>
 </div>
