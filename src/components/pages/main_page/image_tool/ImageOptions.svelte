@@ -23,8 +23,10 @@
     current_shloka_type,
     shloka_configs,
     SPACE_ABOVE_REFERENCE_LINE,
-    SPACE_BETWEEN_MAIN_AND_NORM
+    SPACE_BETWEEN_MAIN_AND_NORM,
+    DEFAULT_SHLOKA_CONFIG
   } from './settings';
+  import { copy_plain_object } from '@tools/kry';
 
   export let render_all_texts: (shloka_num: number, script: string) => Promise<shloka_type_config>;
 
@@ -96,8 +98,18 @@
       ><span class="text-sm font-bold">Change Default Options</span>
     </svelte:fragment>
     <div slot="content" class="space-y-2">
-      <div class="flex justify-center space-x-2 text-sm">
-        Current Shloka Type : {$current_shloka_type}
+      <div class="flex items-center justify-center space-x-4 text-sm">
+        <span>
+          Current Shloka Type : {$current_shloka_type}
+        </span>
+        <button
+          on:click={() =>
+            ($shloka_configs[$current_shloka_type] = copy_plain_object(
+              DEFAULT_SHLOKA_CONFIG[$current_shloka_type]
+            ))}
+          class="btn rounded-md bg-primary-700 px-1.5 py-1 text-sm font-bold text-white dark:bg-primary-500"
+          >Reset</button
+        >
       </div>
       <div class="flex justify-center space-x-3">
         <label class="inline-block">

@@ -200,10 +200,9 @@
 
     // trans
     const trans_data = $image_trans_data.data!;
-    let trans_text: any = null!;
     if (trans_data.has($image_shloka)) {
       const trans_text_data = trans_data.get($image_shloka)!;
-      trans_text = new fabric.Textbox(trans_text_data, {
+      const trans_text = new fabric.Textbox(trans_text_data, {
         textAlign: 'right',
         left: get_units(610),
         top: get_units(650),
@@ -211,10 +210,10 @@
         fontFamily: FONT_FAMILY_NAME.ADOBE_DEVANGARI,
         fontSize: get_units(shloka_config.trans_text_font_size),
         lockRotation: true,
-        width: get_units(1200)
+        width: get_units(1250)
       });
+      $canvas.add(trans_text);
     }
-    if (trans_text) $canvas.add(trans_text);
     $canvas.requestRenderAll();
     return shloka_config;
   };
