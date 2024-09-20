@@ -62,9 +62,7 @@
     return shloka_config;
   };
   const render_all_texts = async ($image_shloka: number, $image_script: string) => {
-    const shloka_type = 2;
-    const shloka_config = $shloka_configs[shloka_type as keyof typeof $shloka_configs];
-    if (!browser) return shloka_config;
+    if (!browser) return $shloka_configs[2]; // just like has no meaning
     // load wasm based library
     const { get_text_svg_path } = await import('@tools/harfbuzz');
     // load necessary fonts
@@ -75,20 +73,8 @@
       if (!obj || obj.type === 'image') return;
       $canvas.remove(obj);
     });
-    const get_font_size_for_path = (font_size: number) => {
-      const PATH_SCALING_FACTOR = 1 / 15.125;
-      return get_units((font_size / 65) * PATH_SCALING_FACTOR);
-    };
-    await draw_bounding_and_reference_lines(shloka_config);
-    const WIDTH_ACTUAL = get_units(
-      (shloka_config.bounding_coords.right - shloka_config.bounding_coords.left) * 1.0
-    );
-    const WIDTH = WIDTH_ACTUAL * 0.985;
-    const HEIGHT_ACTUAL = get_units(
-      (shloka_config.bounding_coords.bottom - shloka_config.bounding_coords.top) * 1.0
-    );
 
-    // shloka
+    // fetch shloka config
     const shloka_data =
       $image_sarga_data.data![
         $image_shloka !== -1 ? $image_shloka : $image_sarga_data.data!.length - 1
@@ -126,8 +112,23 @@
       }
       return new_shloka_lines;
     })();
+    $current_shloka_type = shloka_lines.length as keyof typeof $shloka_configs;
+    const shloka_config = $shloka_configs[$current_shloka_type];
 
-    $current_shloka_type = shloka_lines.length;
+    const get_font_size_for_path = (font_size: number) => {
+      const PATH_SCALING_FACTOR = 1 / 15.125;
+      return get_units((font_size / 65) * PATH_SCALING_FACTOR);
+    };
+    await draw_bounding_and_reference_lines(shloka_config);
+    const WIDTH_ACTUAL = get_units(
+      (shloka_config.bounding_coords.right - shloka_config.bounding_coords.left) * 1.0
+    );
+    const WIDTH = WIDTH_ACTUAL * 0.985;
+    const HEIGHT_ACTUAL = get_units(
+      (shloka_config.bounding_coords.bottom - shloka_config.bounding_coords.top) * 1.0
+    );
+
+    // shloka
     for (let i = 0; i < shloka_lines.length; i++) {
       const main_text_path = await get_text_svg_path(
         await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, $image_script),
@@ -173,7 +174,7 @@
       text_norm.set({
         top:
           get_units(shloka_config.reference_lines_top[i]) -
-          (height_norm + get_units(SPACE_ABOVE_REFERENCE_LINE)),
+          (height_norm + get_units($SPACE_ABOVE_REFERENCE_LINE)),
         left:
           get_units(shloka_config.bounding_coords.left) +
           (WIDTH_ACTUAL - WIDTH) / 2 +
@@ -183,8 +184,8 @@
         top:
           get_units(shloka_config.reference_lines_top[i]) -
           (height_main +
-            SPACE_BETWEEN_MAIN_AND_NORM +
-            (height_norm + get_units(SPACE_ABOVE_REFERENCE_LINE))),
+            $SPACE_BETWEEN_MAIN_AND_NORM +
+            (height_norm + get_units($SPACE_ABOVE_REFERENCE_LINE))),
         left:
           get_units(shloka_config.bounding_coords.left) +
           (WIDTH_ACTUAL - WIDTH) / 2 +
@@ -192,7 +193,6 @@
       });
       $canvas.add(text_main);
       $canvas.add(text_norm);
-      if (i === 1) break;
     }
 
     // trans
@@ -221,6 +221,8 @@
     $image_sarga_data.isSuccess &&
     !$image_trans_data.isFetching &&
     $image_trans_data.isSuccess &&
+    $SPACE_ABOVE_REFERENCE_LINE &&
+    $SPACE_BETWEEN_MAIN_AND_NORM &&
     $image_sarga &&
     $image_kANDa &&
     $shloka_configs &&

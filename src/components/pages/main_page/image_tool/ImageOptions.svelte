@@ -19,14 +19,17 @@
   import type { shloka_type_config } from './settings';
   import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
   import { IoOptions } from 'svelte-icons-pack/io';
-  import { current_shloka_type, shloka_configs } from './settings';
+  import {
+    current_shloka_type,
+    shloka_configs,
+    SPACE_ABOVE_REFERENCE_LINE,
+    SPACE_BETWEEN_MAIN_AND_NORM
+  } from './settings';
 
   export let render_all_texts: (shloka_num: number, script: string) => Promise<shloka_type_config>;
 
   $: kANDa_info = rAmAyaNam_map[$image_kANDa - 1];
   $: shloka_count = kANDa_info.sarga_data[$image_sarga - 1].shloka_count_extracted;
-
-  $: console.log($current_shloka_type);
 </script>
 
 <div class="flex space-x-2 text-sm">
@@ -92,17 +95,110 @@
     <svelte:fragment slot="summary"
       ><span class="text-sm font-bold">Change Default Options</span>
     </svelte:fragment>
-    <svelte:fragment slot="content">
-      <div class="space-y-2">
-        <label class="block space-x-2 text-sm">
-          <span>Shloka Type</span>
-          <select bind:value={$current_shloka_type} class="select w-20 px-1 py-0 text-sm">
-            {#each Object.keys($shloka_configs) as i}
-              <option value={parseInt(i)}>{i} Lines</option>
-            {/each}
-          </select>
+    <div slot="content" class="space-y-2">
+      <div class="flex justify-center space-x-2 text-sm">
+        Current Shloka Type : {$current_shloka_type}
+      </div>
+      <div class="flex justify-center space-x-3">
+        <label class="inline-block">
+          <span class="text-sm">Main Text</span>
+          <input
+            type="number"
+            class="input w-16 rounded-md px-1 py-0 text-sm"
+            bind:value={$shloka_configs[$current_shloka_type].main_text_font_size}
+            min={10}
+          />
+        </label>
+        <label class="inline-block">
+          <span class="text-sm">Normal Text</span>
+          <input
+            type="number"
+            class="input w-16 rounded-md px-1 py-0 text-sm"
+            bind:value={$shloka_configs[$current_shloka_type].norm_text_font_size}
+            min={10}
+          />
+        </label>
+        <label class="inline-block">
+          <span class="text-sm">Translation Text</span>
+          <input
+            type="number"
+            class="input w-16 rounded-md px-1 py-0 text-sm"
+            bind:value={$shloka_configs[$current_shloka_type].trans_text_font_size}
+            min={10}
+          />
         </label>
       </div>
-    </svelte:fragment>
+      <div class="flex justify-center space-x-3">
+        <label class="inline-block">
+          <span class="text-sm">Space Above Reference Line</span>
+          <input
+            type="number"
+            class="input w-12 rounded-md px-1 py-0 text-sm"
+            bind:value={$SPACE_ABOVE_REFERENCE_LINE}
+            min={0}
+            max={40}
+          />
+        </label>
+        <label class="inline-block">
+          <span class="text-sm">Space Between Main and Normal</span>
+          <input
+            type="number"
+            class="input w-12 rounded-md px-1 py-0 text-sm"
+            bind:value={$SPACE_BETWEEN_MAIN_AND_NORM}
+            min={0}
+            max={20}
+          />
+        </label>
+      </div>
+      <div class="flex justify-center space-x-12">
+        <div class="flex flex-col items-center justify-center space-y-2">
+          <div class="text-sm underline">Boundaries</div>
+          <input
+            type="number"
+            class="input block w-14 rounded-sm px-1 py-0 text-sm"
+            bind:value={$shloka_configs[$current_shloka_type].bounding_coords.top}
+            min={0}
+            max={1080}
+          />
+          <div class="space-x-6">
+            <input
+              type="number"
+              class="input w-16 rounded-sm px-1 py-0 text-sm"
+              bind:value={$shloka_configs[$current_shloka_type].bounding_coords.left}
+              min={0}
+              max={1920}
+            />
+            <input
+              type="number"
+              class="input w-16 rounded-sm px-1 py-0 text-sm"
+              bind:value={$shloka_configs[$current_shloka_type].bounding_coords.right}
+              min={0}
+              max={1920}
+            />
+          </div>
+          <input
+            type="number"
+            class="input w-16 rounded-sm px-1 py-0 text-sm"
+            bind:value={$shloka_configs[$current_shloka_type].bounding_coords.bottom}
+            min={0}
+            max={1080}
+          />
+        </div>
+        <div class="flex flex-col items-center justify-center">
+          <div class="font-semibold">Reference Lines</div>
+          <div class="space-x-2">
+            {#each Array($current_shloka_type) as _, top_i (top_i)}
+              <input
+                type="number"
+                class="input w-16 rounded-sm px-1 py-0 text-sm"
+                bind:value={$shloka_configs[$current_shloka_type].reference_lines_top[top_i]}
+                min={0}
+                max={1080}
+              />
+            {/each}
+          </div>
+        </div>
+      </div>
+    </div>
   </AccordionItem>
 </Accordion>
