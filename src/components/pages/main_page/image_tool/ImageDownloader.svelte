@@ -19,8 +19,9 @@
   import { popup } from '@skeletonlabs/skeleton';
   import { BsDownload } from 'svelte-icons-pack/bs';
   import Icon from '@tools/Icon.svelte';
+  import type { shloka_type_config } from './settings';
 
-  export let render_all_texts: (shloka_num: number, script: string) => Promise<void>;
+  export let render_all_texts: (shloka_num: number, script: string) => Promise<shloka_type_config>;
 
   $: kANDa_info = rAmAyaNam_map[$image_kANDa - 1];
   $: shloka_count = kANDa_info.sarga_data[$image_sarga - 1].shloka_count_extracted;

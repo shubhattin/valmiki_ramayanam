@@ -7,7 +7,7 @@ type bounding_coords_type = {
   bottom: number;
 };
 
-type shloka_type_config = {
+export type shloka_type_config = {
   bounding_coords: bounding_coords_type;
   space_between_main_and_norm_text: number;
   main_text_font_size: number;

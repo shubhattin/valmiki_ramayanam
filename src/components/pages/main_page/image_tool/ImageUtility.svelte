@@ -23,13 +23,14 @@
   import * as fabric from 'fabric';
   import { lipi_parivartak_async } from '@tools/converter';
   import ImageDownloader from './ImageDownloader.svelte';
+  import { browser } from '$app/environment';
 
   export let mounted: boolean;
 
   $: kANDa_info = rAmAyaNam_map[$image_kANDa - 1];
   $: shloka_count = kANDa_info.sarga_data[$image_sarga - 1].shloka_count_extracted;
 
-  const draw_bounding_lines = async (shloka_type: number) => {
+  const draw_bounding_and_reference_lines = async (shloka_type: number) => {
     const shloka_config = $shloka_configs[shloka_type as keyof typeof $shloka_configs];
 
     const bounds = shloka_config.bounding_coords;
@@ -70,6 +71,15 @@
     return shloka_config;
   };
   const render_all_texts = async ($image_shloka: number, $image_script: string) => {
+    const shloka_type = 2;
+    const shloka_config = await draw_bounding_and_reference_lines(shloka_type);
+    if (!browser) return shloka_config;
+
+    // using only 98% of the width
+    const WIDTH = get_units(
+      (shloka_config.bounding_coords.right - shloka_config.bounding_coords.left) * 0.98
+    );
+
     // load wasm based library
     const { get_text_svg_path } = await import('@tools/harfbuzz');
 
@@ -82,13 +92,14 @@
       $canvas.remove(obj);
     });
 
-    const scale = 1 / 30;
+    const scale = get_units(1 / 15);
     $canvas.add(
       new fabric.Path(await get_text_svg_path('शर्वर्यां', FONTS_INFO.NIRMALA_UI.bold_font_url), {
-        left: get_units(120),
-        top: get_units(120),
+        left: get_units(690),
+        top: get_units(90),
         scaleX: scale,
-        scaleY: scale
+        scaleY: scale,
+        fill: 'brown'
       })
     );
 
@@ -99,13 +110,6 @@
         $image_shloka !== -1 ? $image_shloka : $image_sarga_data.data!.length - 1
       ];
     const shloka_lines = shloka_data.split('\n');
-
-    const shloka_type = 2;
-    const shloka_config = await draw_bounding_lines(shloka_type);
-    // using only 97% of the width
-    const WIDTH = get_units(
-      (shloka_config.bounding_coords.right - shloka_config.bounding_coords.left) * 0.97
-    );
 
     for (let i = 0; i < shloka_lines.length; i++) {
       const script_text = await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, $image_script);
@@ -171,6 +175,7 @@
     }
     if (trans_text) $canvas.add(trans_text);
     $canvas.requestRenderAll();
+    return shloka_config;
   };
 
   $: mounted &&

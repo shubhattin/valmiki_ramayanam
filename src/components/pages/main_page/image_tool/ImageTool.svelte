@@ -115,7 +115,8 @@
     $background_image.scaleY = $scaling_factor;
     // Update positions and scales of text objects
     $canvas.getObjects().forEach((obj) => {
-      if (!obj || obj.type === 'image') return;
+      const type = obj.type;
+      if (!obj || type === 'image') return;
       // not yet working for Textbox
       let options: Record<string, any> = {};
       if (['text', 'textbox'].includes(obj.type)) {
@@ -127,11 +128,11 @@
           top: get_units(base_top),
           fontSize: get_units(base_font_size)
         };
-        if (obj.type === 'textbox') {
+        if (type === 'textbox') {
           const base_width = obj.get('width') / prev_scaling_factor;
           options['width'] = get_units(base_width);
         }
-      } else if (obj.type === 'line') {
+      } else if (type === 'line') {
         const base_x1 = obj.get('x1') / prev_scaling_factor;
         const base_y1 = obj.get('y1') / prev_scaling_factor;
         const base_x2 = obj.get('x2') / prev_scaling_factor;
@@ -143,6 +144,17 @@
           x2: get_units(base_x2),
           y2: get_units(base_y2),
           strokeWidth: get_units(stroke_width)
+        };
+      } else if (type === 'path') {
+        const base_left = obj.get('left') / prev_scaling_factor;
+        const base_top = obj.get('top') / prev_scaling_factor;
+        const base_scaleX = obj.get('scaleX') / prev_scaling_factor;
+        const base_scaleY = obj.get('scaleY') / prev_scaling_factor;
+        options = {
+          left: get_units(base_left),
+          top: get_units(base_top),
+          scaleX: get_units(base_scaleX),
+          scaleY: get_units(base_scaleY)
         };
       }
       obj.set(options);
