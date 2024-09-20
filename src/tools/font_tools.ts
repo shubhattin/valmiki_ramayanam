@@ -14,7 +14,7 @@ export const load_font = async (font: string) => {
 
 export const FONT_FAMILY_NAME = {
   NIRMALA_UI: 'Nirmala UI',
-  ADOBE_DEVANGARI: 'AdobeDevanagari'
+  ADOBE_DEVANAGARI: 'AdobeDevanagari'
 };
 
 export const get_font_url = (font: keyof typeof FONT_FAMILY_NAME, type: 'regular' | 'bold') => {
@@ -30,7 +30,7 @@ export const get_font_url = (font: keyof typeof FONT_FAMILY_NAME, type: 'regular
       regular: new URL('/src/fonts/regular/Nirmala.ttf', import.meta.url).href,
       bold: new URL('/src/fonts/bold/NirmalaB.ttf', import.meta.url).href
     },
-    ADOBE_DEVANGARI: {
+    ADOBE_DEVANAGARI: {
       regular: new URL('/src/fonts/regular/AdobeDevanagari.otf', import.meta.url).href,
       bold: new URL('/src/fonts/bold/AdobeDevanagariB.otf', import.meta.url).href
     }

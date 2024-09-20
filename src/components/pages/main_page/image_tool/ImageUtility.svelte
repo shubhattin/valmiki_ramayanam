@@ -67,7 +67,7 @@
     // load wasm based library
     const { get_text_svg_path } = await import('@tools/harfbuzz');
     // load necessary fonts
-    await load_font(FONT_FAMILY_NAME.ADOBE_DEVANGARI);
+    await load_font(FONT_FAMILY_NAME.ADOBE_DEVANAGARI);
 
     // remove all previous texts, textboxes and lines
     $canvas.getObjects().forEach((obj) => {
@@ -133,7 +133,7 @@
     for (let i = 0; i < shloka_lines.length; i++) {
       const main_text_path = await get_text_svg_path(
         await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, $image_script),
-        get_font_url($image_script === 'Sanskrit' ? 'ADOBE_DEVANGARI' : 'NIRMALA_UI', 'bold')
+        get_font_url($image_script === 'Sanskrit' ? 'ADOBE_DEVANAGARI' : 'NIRMALA_UI', 'bold')
       );
       let main_text_path_scale = get_font_size_for_path(shloka_config.main_text_font_size);
       const text_main = new fabric.Path(main_text_path, {
@@ -154,7 +154,7 @@
 
       const transliterated_text = await get_text_svg_path(
         await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, 'Normal'),
-        get_font_url('ADOBE_DEVANGARI', 'regular')
+        get_font_url('ADOBE_DEVANAGARI', 'regular')
       );
       let norm_text_path_scale = get_font_size_for_path(shloka_config.norm_text_font_size);
       const text_norm = new fabric.Path(transliterated_text, {
@@ -207,7 +207,7 @@
         left: get_units(610),
         top: get_units(650),
         fill: '#352700',
-        fontFamily: FONT_FAMILY_NAME.ADOBE_DEVANGARI,
+        fontFamily: FONT_FAMILY_NAME.ADOBE_DEVANAGARI,
         fontSize: get_units(shloka_config.trans_text_font_size),
         lockRotation: true,
         width: get_units(1250)
