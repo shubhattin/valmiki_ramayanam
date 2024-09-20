@@ -19,3 +19,11 @@ export let edit_language_typer_status = writable<boolean>(true);
 export let typing_assistance_modal_opened = writable(false);
 
 export let image_tool_opened = writable(false);
+
+export function get_script_for_lang(lang: string) {
+  let script = lang;
+  if (lang === 'Hindi' || lang === 'English') script = 'Sanskrit';
+  // ^ Name for Sanskrit value in the dropdown is Devanagari
+  else if (lang === 'Tamil') script = 'Tamil-Extended';
+  return script;
+}

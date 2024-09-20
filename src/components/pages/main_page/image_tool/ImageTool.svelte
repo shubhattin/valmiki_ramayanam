@@ -22,7 +22,8 @@
     sarga_selected,
     kANDa_selected,
     viewing_script,
-    trans_lang
+    trans_lang,
+    get_script_for_lang
   } from '@state/main_page/main_state';
   import { get_kANDa_names, get_sarga_names, rAmAyaNam_map } from '@state/main_page/data';
   import Select from '@components/Select.svelte';
@@ -62,6 +63,7 @@
     $image_sarga = 1;
     $image_shloka = 1;
   }
+  $: $image_script = get_script_for_lang($image_lang);
 
   $: if ($image_sarga) {
     $image_shloka = 1;

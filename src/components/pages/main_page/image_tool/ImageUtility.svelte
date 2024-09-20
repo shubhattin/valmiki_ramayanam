@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { rAmAyaNam_map } from '@state/main_page/data';
   import {
     image_kANDa,
     image_sarga,
@@ -83,8 +82,8 @@
     const WIDTH_ACTUAL = get_units(
       (shloka_config.bounding_coords.right - shloka_config.bounding_coords.left) * 1.0
     );
-    const WIDTH = WIDTH_ACTUAL * 0.98;
-    const HEIGHT_ACUAL = get_units(
+    const WIDTH = WIDTH_ACTUAL * 0.985;
+    const HEIGHT_ACTUAL = get_units(
       (shloka_config.bounding_coords.bottom - shloka_config.bounding_coords.top) * 1.0
     );
 
@@ -93,7 +92,39 @@
       $image_sarga_data.data![
         $image_shloka !== -1 ? $image_shloka : $image_sarga_data.data!.length - 1
       ];
-    const shloka_lines = shloka_data.split('\n');
+    const CHAR_LIMIT = 45;
+
+    const shloka_lines = (() => {
+      if ($image_shloka === 0) {
+        const words = shloka_data.split(' ');
+        const break_point = 3;
+        return [words.slice(0, break_point).join(' '), words.slice(break_point).join(' ')];
+      } else if ($image_shloka === -1) {
+        const words = shloka_data.split(' ');
+        const break_point = 4;
+        return [words.slice(0, break_point).join(' '), words.slice(break_point).join(' ')];
+      }
+      const line_split = shloka_data.split('\n');
+      const new_shloka_lines: string[] = [];
+      for (let i = 0; i < line_split.length; i++) {
+        const line = line_split[i];
+        //   if (line.length > CHAR_LIMIT) {
+        //     const words = line.split(' ');
+        //     let new_line = '';
+        //     for (let j = 0; j < words.length; j++) {
+        //       if (new_line.length + words[j].length > CHAR_LIMIT) {
+        //         new_shloka_lines.push(new_line);
+        //         new_line = words[j];
+        //       } else {
+        //         new_line += ' ' + words[j];
+        //       }
+        //     }
+        //     new_shloka_lines.push(new_line);
+        //   } else
+        new_shloka_lines.push(line);
+      }
+      return new_shloka_lines;
+    })();
 
     for (let i = 0; i < shloka_lines.length; i++) {
       const main_text_path = await get_text_svg_path(
