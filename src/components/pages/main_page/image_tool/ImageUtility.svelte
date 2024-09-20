@@ -12,14 +12,19 @@
     shaded_background_image_status,
     get_units
   } from './state';
-  import { shloka_configs, SPACE_ABOVE_REFERENCE_LINE, type shloka_type_config } from './settings';
+  import {
+    shloka_configs,
+    SPACE_ABOVE_REFERENCE_LINE,
+    SPACE_BETWEEN_MAIN_AND_NORM,
+    type shloka_type_config
+  } from './settings';
   import { viewing_script, BASE_SCRIPT } from '@state/main_page/main_state';
   import { LANG_LIST } from '@tools/lang_list';
   import { FONT_FAMILY_NAME, get_text_font, load_font, get_font_url } from '@tools/font_tools';
   import Icon from '@tools/Icon.svelte';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import { LanguageIcon } from '@components/icons';
-  import { SlideToggle, popup } from '@skeletonlabs/skeleton';
+  import { SlideToggle } from '@skeletonlabs/skeleton';
   import * as fabric from 'fabric';
   import { lipi_parivartak_async } from '@tools/converter';
   import ImageDownloader from './ImageDownloader.svelte';
@@ -87,9 +92,12 @@
       return get_units((font_size / 65) * PATH_SCALING_FACTOR);
     };
     await draw_bounding_and_reference_lines(shloka_config);
-    // using only 98% of the width
-    const WIDTH = get_units(
-      (shloka_config.bounding_coords.right - shloka_config.bounding_coords.left) * 0.98
+    const WIDTH_ACTUAL = get_units(
+      (shloka_config.bounding_coords.right - shloka_config.bounding_coords.left) * 1.0
+    );
+    const WIDTH = WIDTH_ACTUAL * 0.98;
+    const HEIGHT_ACUAL = get_units(
+      (shloka_config.bounding_coords.bottom - shloka_config.bounding_coords.top) * 1.0
     );
 
     // shloka
@@ -104,41 +112,62 @@
         await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, $image_script),
         get_font_url('NIRMALA_UI', 'bold')
       );
-      const main_text_path_scale = get_font_size_for_path(shloka_config.main_text_font_size);
+      let main_text_path_scale = get_font_size_for_path(shloka_config.main_text_font_size);
       const text_main = new fabric.Path(main_text_path, {
         fill: '#4f3200',
+        lockRotation: true,
+        lockMovementY: true
+      });
+      let height_main = text_main.height * main_text_path_scale; // already scaled
+      let width_main = text_main.width * main_text_path_scale; // already scaled
+      if (WIDTH / width_main < 1)
+        main_text_path_scale = (main_text_path_scale / width_main) * WIDTH;
+      text_main.set({
         scaleX: main_text_path_scale,
         scaleY: main_text_path_scale
       });
-      const height_main = text_main.height * main_text_path_scale; // already scaled
-      const width_main = text_main.width * main_text_path_scale; // already scaled
-      const transliterated_text = await lipi_parivartak_async(
-        shloka_lines[i],
-        BASE_SCRIPT,
-        'Normal'
+      height_main = text_main.height * main_text_path_scale;
+      width_main = text_main.width * main_text_path_scale;
+
+      const transliterated_text = await get_text_svg_path(
+        await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, 'Normal'),
+        get_font_url('ADOBE_DEVANGARI', 'regular')
       );
-      const text_norm = new fabric.Text(transliterated_text, {
-        textAlign: 'center',
+      let norm_text_path_scale = get_font_size_for_path(shloka_config.norm_text_font_size);
+      const text_norm = new fabric.Path(transliterated_text, {
         fill: '#352700',
-        fontFamily: FONT_FAMILY_NAME.ADOBE_DEVANGARI,
-        fontSize: get_units(shloka_config.norm_text_font_size),
-        lockRotation: true
+        lockRotation: true,
+        lockMovementY: true
       });
-      const height_norm = text_norm.height; // already scaled
-      const width_norm = text_norm.width; // already scaled
+      let height_norm = text_norm.height * norm_text_path_scale; // already scale
+      let width_norm = text_norm.width * norm_text_path_scale; // already scaled
+      if (WIDTH / width_norm < 1)
+        norm_text_path_scale = (norm_text_path_scale / width_norm) * WIDTH;
+      text_norm.set({
+        scaleX: norm_text_path_scale,
+        scaleY: norm_text_path_scale
+      });
+      height_norm = text_norm.height * norm_text_path_scale;
+      width_norm = text_norm.width * norm_text_path_scale;
       text_norm.set({
         top:
           get_units(shloka_config.reference_lines_top[i]) -
           (height_norm + get_units(SPACE_ABOVE_REFERENCE_LINE)),
-        left: get_units(shloka_config.bounding_coords.left) + (WIDTH - width_norm) / 2
+        left:
+          get_units(shloka_config.bounding_coords.left) +
+          (WIDTH_ACTUAL - WIDTH) / 2 +
+          (WIDTH - width_norm) / 2
       });
       text_main.set({
         top:
           get_units(shloka_config.reference_lines_top[i]) -
           (height_main +
-            get_units(shloka_config.space_between_main_and_norm_text) +
+            SPACE_BETWEEN_MAIN_AND_NORM +
             (height_norm + get_units(SPACE_ABOVE_REFERENCE_LINE))),
-        left: get_units(shloka_config.bounding_coords.left) + (WIDTH - width_main) / 2
+        left:
+          get_units(shloka_config.bounding_coords.left) +
+          (WIDTH_ACTUAL - WIDTH) / 2 +
+          (WIDTH - width_main) / 2
       });
       $canvas.add(text_main);
       $canvas.add(text_norm);
