@@ -11,7 +11,7 @@
   import { OiCopy16 } from 'svelte-icons-pack/oi';
   import { BiHelpCircle } from 'svelte-icons-pack/bi';
   import TypingAssistance from '@components/TypingAssistance.svelte';
-  import { get_text_font_class } from '@tools/font_tools';
+  import { get_font_family_and_size, get_text_font_class } from '@tools/font_tools';
   import { PAGE_TITLES } from '@state/page_titles';
 
   let from_lang = writable('Sanskrit');
@@ -47,6 +47,9 @@
   };
 
   let typing_assistance_modal_opened = writable(false);
+
+  $: from_text_font_info = get_font_family_and_size($from_lang);
+  $: to_text_font_info = get_font_family_and_size($to_lang);
 </script>
 
 <MetaTags title={PAGE_INFO.title} description={PAGE_INFO.description} />
@@ -77,9 +80,11 @@
       </SlideToggle>
     </div>
     <textarea
-      class={`${get_text_font_class($from_lang)} textarea h-56`}
+      class="textarea h-56"
       placeholder={`Enter text in ${$from_lang}`}
       bind:value={$from_text}
+      style:font-size={`${from_text_font_info.size}rem`}
+      style:font-family={from_text_font_info.family}
       on:input={(e) => {
         if (from_text_type_enabled)
           // @ts-ignore
@@ -141,7 +146,9 @@
     </div>
     <textarea
       bind:value={$to_text}
-      class={`${get_text_font_class($to_lang)} textarea h-56`}
+      class="textarea h-56"
+      style:font-size={`${from_text_font_info.size}rem`}
+      style:font-family={from_text_font_info.family}
       placeholder={`Enter text in ${$to_lang}`}
       on:input={(e) => {
         if (to_text_type_enabled)
