@@ -74,6 +74,7 @@
       if (!obj || obj.type === 'image') return;
       $canvas.remove(obj);
     });
+    $canvas.discardActiveObject();
 
     // fetch shloka config
     const shloka_data =
@@ -130,69 +131,63 @@
     );
 
     // shloka
+    /**
+     * This function will also set the left coordinate of the text.
+     * left has to be set outside
+     */
+    const render_text = (path: string, font_size: number, color: string) => {
+      let text_path_scale = get_font_size_for_path(font_size);
+      const text = new fabric.Path(path, {
+        fill: color,
+        lockRotation: true,
+        lockMovementY: true
+      });
+      let height = text.height * text_path_scale; // already scaled
+      let width = text.width * text_path_scale; // already scaled
+      if (WIDTH / width < 1) text_path_scale = (text_path_scale / width) * WIDTH;
+      text.set({
+        scaleX: text_path_scale,
+        scaleY: text_path_scale
+      });
+      height = text.height * text_path_scale;
+      width = text.width * text_path_scale;
+      text.set({
+        left:
+          get_units(shloka_config.bounding_coords.left) +
+          (WIDTH_ACTUAL - WIDTH) / 2 +
+          (WIDTH - width) / 2
+      });
+      return [text, height, width] as [typeof text, number, number];
+    };
     for (let i = 0; i < shloka_lines.length; i++) {
-      const main_text_path = await get_text_svg_path(
-        await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, $image_script),
-        get_font_url($image_script === 'Sanskrit' ? 'ADOBE_DEVANAGARI' : 'NIRMALA_UI', 'bold')
+      const [text_main, height_main, width_main] = render_text(
+        await get_text_svg_path(
+          await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, $image_script),
+          get_font_url($image_script === 'Sanskrit' ? 'ADOBE_DEVANAGARI' : 'NIRMALA_UI', 'bold')
+        ),
+        shloka_config.main_text_font_size,
+        '#4f3200'
       );
-      let main_text_path_scale = get_font_size_for_path(shloka_config.main_text_font_size);
-      const text_main = new fabric.Path(main_text_path, {
-        fill: '#4f3200',
-        lockRotation: true,
-        lockMovementY: true
-      });
-      let height_main = text_main.height * main_text_path_scale; // already scaled
-      let width_main = text_main.width * main_text_path_scale; // already scaled
-      if (WIDTH / width_main < 1)
-        main_text_path_scale = (main_text_path_scale / width_main) * WIDTH;
-      text_main.set({
-        scaleX: main_text_path_scale,
-        scaleY: main_text_path_scale
-      });
-      height_main = text_main.height * main_text_path_scale;
-      width_main = text_main.width * main_text_path_scale;
-
-      const transliterated_text = await get_text_svg_path(
-        await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, 'Normal'),
-        get_font_url('ADOBE_DEVANAGARI', 'regular')
+      const [text_norm, height_norm, width_norm] = render_text(
+        await get_text_svg_path(
+          await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, 'Normal'),
+          get_font_url('ADOBE_DEVANAGARI', 'regular')
+        ),
+        shloka_config.norm_text_font_size,
+        '#352700'
       );
-      let norm_text_path_scale = get_font_size_for_path(shloka_config.norm_text_font_size);
-      const text_norm = new fabric.Path(transliterated_text, {
-        fill: '#352700',
-        lockRotation: true,
-        lockMovementY: true
-      });
-      let height_norm = text_norm.height * norm_text_path_scale; // already scale
-      let width_norm = text_norm.width * norm_text_path_scale; // already scaled
-      if (WIDTH / width_norm < 1)
-        norm_text_path_scale = (norm_text_path_scale / width_norm) * WIDTH;
-      text_norm.set({
-        scaleX: norm_text_path_scale,
-        scaleY: norm_text_path_scale
-      });
-      height_norm = text_norm.height * norm_text_path_scale;
-      width_norm = text_norm.width * norm_text_path_scale;
-
       const top_pos = get_units(
         shloka_config.reference_lines.top + i * shloka_config.reference_lines.spacing
       );
       text_norm.set({
-        top: top_pos - (height_norm + get_units($SPACE_ABOVE_REFERENCE_LINE)),
-        left:
-          get_units(shloka_config.bounding_coords.left) +
-          (WIDTH_ACTUAL - WIDTH) / 2 +
-          (WIDTH - width_norm) / 2
+        top: top_pos - (height_norm + get_units($SPACE_ABOVE_REFERENCE_LINE))
       });
       text_main.set({
         top:
           top_pos -
           (height_main +
             $SPACE_BETWEEN_MAIN_AND_NORM +
-            (height_norm + get_units($SPACE_ABOVE_REFERENCE_LINE))),
-        left:
-          get_units(shloka_config.bounding_coords.left) +
-          (WIDTH_ACTUAL - WIDTH) / 2 +
-          (WIDTH - width_main) / 2
+            (height_norm + get_units($SPACE_ABOVE_REFERENCE_LINE)))
       });
       $canvas.add(text_main);
       $canvas.add(text_norm);
