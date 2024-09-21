@@ -22,7 +22,6 @@
   import { lipi_parivartak_async } from '@tools/converter';
   import { browser } from '$app/environment';
   import ImageOptions from './ImageOptions.svelte';
-  import { scale } from 'svelte/transition';
 
   export let mounted: boolean;
 

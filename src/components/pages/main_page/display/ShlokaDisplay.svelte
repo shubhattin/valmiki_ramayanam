@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { get_text_font } from '@tools/font_tools';
+  import { get_text_font, get_font_family_and_size } from '@tools/font_tools';
   import { get_possibily_not_undefined } from '@tools/kry';
   import {
     viewing_script,
@@ -22,15 +22,25 @@
   export let update_trans_lang_data: (index: number, text: string) => Promise<void>;
   export let copy_text: (text: string) => void;
 
+  $: main_text_font_info = get_font_family_and_size($viewing_script);
+  $: trans_text_font_info = get_font_family_and_size($trans_lang);
+  const en_trans_text_font_info = get_font_family_and_size('English');
+
   $: line_split = shloka_lines.split('\n');
 </script>
 
 <div class="mt-0 w-full space-y-1">
   <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div on:dblclick={() => copy_text(shloka_lines)}>
+  <div
+    style:font-size={`${main_text_font_info.size}rem`}
+    style:font-family={main_text_font_info.family}
+    on:dblclick={() => copy_text(shloka_lines)}
+  >
     {#each line_split as line_shlk}
       <!-- if needed add 'whitespace-pre-wrap'2 -->
-      <div class={`${get_text_font($viewing_script)}`}>{line_shlk}</div>
+      <div>
+        {line_shlk}
+      </div>
     {/each}
   </div>
   {#if $view_translation_status && $trans_en_data.isSuccess && $trans_en_data.data.size !== 0}
@@ -39,6 +49,8 @@
       on:dblclick={() =>
         copy_text(get_possibily_not_undefined($trans_en_data.data.get(trans_index)))}
       class="text-stone-500 dark:text-slate-400"
+      style:font-size={`${en_trans_text_font_info.size}rem`}
+      style:font-family={en_trans_text_font_info.family}
     >
       {#if $trans_en_data.data.has(trans_index)}
         <!-- Usually translations are single but still... -->
@@ -86,6 +98,8 @@
           }}
           class={`${get_text_font($viewing_script)} textarea h-16 w-full`}
           value={$trans_lang_data.data?.get(trans_index)}
+          style:font-size={`${trans_text_font_info.size}rem`}
+          style:font-family={trans_text_font_info.family}
         ></textarea>
       {/if}
     </div>
@@ -95,11 +109,15 @@
       on:dblclick={() =>
         copy_text(get_possibily_not_undefined($trans_lang_data.data?.get(trans_index)))}
       class="text-yellow-700 dark:text-yellow-500"
+      style:font-size={`${trans_text_font_info.size}rem`}
+      style:font-family={trans_text_font_info.family}
     >
       {#if $trans_lang_data.data?.has(trans_index)}
         <!-- Usually translations are single but still... -->
         {#each get_possibily_not_undefined($trans_lang_data.data?.get(trans_index)).split('\n') as line_trans}
-          <div class={`${get_text_font($viewing_script)}`}>{line_trans}</div>
+          <div>
+            {line_trans}
+          </div>
         {/each}
       {/if}
     </div>
