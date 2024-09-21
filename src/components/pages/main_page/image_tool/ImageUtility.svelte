@@ -135,44 +135,63 @@
      * This function will also set the left coordinate of the text.
      * left has to be set outside
      */
-    const render_text = (path: string, font_size: number, color: string) => {
+    const render_text = async (
+      text: string,
+      font_url: string,
+      font_size: number,
+      color: string
+    ) => {
       let text_path_scale = get_font_size_for_path(font_size);
-      const text = new fabric.Path(path, {
-        fill: color,
+      const text_group = new fabric.Group([], {
         lockRotation: true,
-        lockMovementY: true
+        lockMovementY: true,
+        top: 0,
+        left: 0
       });
-      let height = text.height * text_path_scale; // already scaled
-      let width = text.width * text_path_scale; // already scaled
+      const words = text.split(' ');
+      let left_cord = 0;
+      const SPACE_WIDTH = 200;
+      for (let i = 0; i < words.length; i++) {
+        const word = words[i];
+        const path = await get_text_svg_path(word, font_url);
+        const text_path = new fabric.Path(path, {
+          fill: color,
+          lockRotation: true,
+          lockMovementY: true,
+          left: left_cord,
+          top: 0
+        });
+        const width = text_path.width;
+        left_cord += width + (i !== words.length - 1 ? 0 : SPACE_WIDTH);
+        text_group.add(text_path);
+      }
+      let height = text_group.height * text_path_scale; // already scaled
+      let width = text_group.width * text_path_scale; // already scaled
       if (WIDTH / width < 1) text_path_scale = (text_path_scale / width) * WIDTH;
-      text.set({
+      text_group.set({
         scaleX: text_path_scale,
         scaleY: text_path_scale
       });
-      height = text.height * text_path_scale;
-      width = text.width * text_path_scale;
-      text.set({
+      height = text_group.height * text_path_scale;
+      width = text_group.width * text_path_scale;
+      text_group.set({
         left:
           get_units(shloka_config.bounding_coords.left) +
           (WIDTH_ACTUAL - WIDTH) / 2 +
           (WIDTH - width) / 2
       });
-      return [text, height, width] as [typeof text, number, number];
+      return [text_group, height, width] as [typeof text_group, number, number];
     };
     for (let i = 0; i < shloka_lines.length; i++) {
-      const [text_main, height_main, width_main] = render_text(
-        await get_text_svg_path(
-          await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, $image_script),
-          get_font_url($image_script === 'Sanskrit' ? 'ADOBE_DEVANAGARI' : 'NIRMALA_UI', 'bold')
-        ),
+      const [text_main, height_main, width_main] = await render_text(
+        await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, $image_script),
+        get_font_url($image_script === 'Sanskrit' ? 'ADOBE_DEVANAGARI' : 'NIRMALA_UI', 'bold'),
         shloka_config.main_text_font_size,
         '#4f3200'
       );
-      const [text_norm, height_norm, width_norm] = render_text(
-        await get_text_svg_path(
-          await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, 'Normal'),
-          get_font_url('ADOBE_DEVANAGARI', 'regular')
-        ),
+      const [text_norm, height_norm, width_norm] = await render_text(
+        await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, 'Normal'),
+        get_font_url('ADOBE_DEVANAGARI', 'regular'),
         shloka_config.norm_text_font_size,
         '#352700'
       );
