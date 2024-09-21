@@ -147,7 +147,7 @@
           y2: get_units(base_y2),
           strokeWidth: get_units(stroke_width)
         };
-      } else if (type === 'path') {
+      } else if (['path', 'group'].includes(type)) {
         const base_left = obj.get('left') / prev_scaling_factor;
         const base_top = obj.get('top') / prev_scaling_factor;
         const base_scaleX = obj.get('scaleX') / prev_scaling_factor;
