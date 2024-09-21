@@ -99,8 +99,16 @@ export const DEFAULT_SHLOKA_CONFIG: Record<shloka_number_type, shloka_type_confi
   }
 };
 
-export const SPACE_ABOVE_REFERENCE_LINE = writable(10);
-export const SPACE_BETWEEN_MAIN_AND_NORM = writable(1);
+export const DEFAULT_SHLOKA_CONFIG_SHARED = {
+  SPACE_ABOVE_REFERENCE_LINE: 10,
+  SPACE_BETWEEN_MAIN_AND_NORM: 1
+};
+export const SPACE_ABOVE_REFERENCE_LINE = writable(
+  DEFAULT_SHLOKA_CONFIG_SHARED.SPACE_ABOVE_REFERENCE_LINE
+);
+export const SPACE_BETWEEN_MAIN_AND_NORM = writable(
+  DEFAULT_SHLOKA_CONFIG_SHARED.SPACE_BETWEEN_MAIN_AND_NORM
+);
 
 export let shloka_configs = writable(copy_plain_object(DEFAULT_SHLOKA_CONFIG));
 

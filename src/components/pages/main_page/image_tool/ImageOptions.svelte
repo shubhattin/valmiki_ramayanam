@@ -14,7 +14,7 @@
   import { LanguageIcon } from '@components/icons';
   import { SlideToggle } from '@skeletonlabs/skeleton';
   import ImageDownloader from './ImageDownloader.svelte';
-  import type { shloka_type_config } from './settings';
+  import { DEFAULT_SHLOKA_CONFIG_SHARED, type shloka_type_config } from './settings';
   import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
   import { IoOptions } from 'svelte-icons-pack/io';
   import {
@@ -98,10 +98,13 @@
           Current Shloka Type : {$current_shloka_type}
         </span>
         <button
-          on:click={() =>
-            ($shloka_configs[$current_shloka_type] = copy_plain_object(
+          on:click={() => {
+            $shloka_configs[$current_shloka_type] = copy_plain_object(
               DEFAULT_SHLOKA_CONFIG[$current_shloka_type]
-            ))}
+            );
+            $SPACE_ABOVE_REFERENCE_LINE = DEFAULT_SHLOKA_CONFIG_SHARED.SPACE_ABOVE_REFERENCE_LINE;
+            $SPACE_BETWEEN_MAIN_AND_NORM = DEFAULT_SHLOKA_CONFIG_SHARED.SPACE_BETWEEN_MAIN_AND_NORM;
+          }}
           class="btn rounded-md bg-primary-700 px-1.5 py-1 text-sm font-bold text-white dark:bg-primary-500"
           >Reset</button
         >
@@ -138,6 +141,7 @@
 
       <div class="flex justify-center space-x-16">
         <div class="flex flex-col justify-center space-y-1">
+          <div class="text-center text-sm font-semibold">Spaces</div>
           <label>
             <span class="text-sm">Space Above Reference Line</span>
             <input
