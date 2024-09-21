@@ -36,7 +36,7 @@
   import { SlideToggle } from '@skeletonlabs/skeleton';
   import { BsKeyboard } from 'svelte-icons-pack/bs';
   import User from './user/User.svelte';
-  import { get_text_font } from '@tools/font_tools';
+  import { get_text_font_class } from '@tools/font_tools';
   import {
     LOCALS_TRANS_LANGS,
     rAmAyaNam_map,
@@ -241,7 +241,7 @@
   <label class="space-x-4">
     <span class="font-bold">Select kANDa</span>
     <Select
-      class={`${get_text_font($viewing_script)} select w-52`}
+      class={`${get_text_font_class($viewing_script)} select w-52`}
       zodType={z.coerce.number().int()}
       bind:value={$kANDa_selected}
       options={[{ value: 0, text: 'Select' }].concat(
@@ -259,7 +259,7 @@
       <label class="inline-block space-x-4">
         <span class="font-bold">Select Sarga</span>
         <Select
-          class={`${get_text_font($viewing_script)} select w-52`}
+          class={`${get_text_font_class($viewing_script)} select w-52`}
           zodType={z.coerce.number().int()}
           bind:value={$sarga_selected}
           options={[{ value: 0, text: 'Select' }].concat(

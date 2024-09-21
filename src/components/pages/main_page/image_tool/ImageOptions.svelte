@@ -8,9 +8,7 @@
     image_trans_data,
     shaded_background_image_status
   } from './state';
-  import { viewing_script } from '@state/main_page/main_state';
   import { LANG_LIST } from '@tools/lang_list';
-  import { get_text_font } from '@tools/font_tools';
   import Icon from '@tools/Icon.svelte';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import { LanguageIcon } from '@components/icons';
@@ -46,10 +44,7 @@
     >
       <Icon src={TiArrowBackOutline} class="-mt-1 text-lg" />
     </button>
-    <select
-      class={`${get_text_font($viewing_script)} select inline-block w-14 p-1 text-sm`}
-      bind:value={$image_shloka}
-    >
+    <select class="select inline-block w-14 p-1 text-sm" bind:value={$image_shloka}>
       <option value={0}>0</option>
       {#each Array(shloka_count) as _, index}
         <option value={index + 1}>{index + 1}</option>

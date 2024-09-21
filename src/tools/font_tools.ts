@@ -1,9 +1,8 @@
 import { browser } from '$app/environment';
 
-export function get_text_font(lang: string) {
+export function get_text_font_class(lang: string) {
   // this will be udually used to display in select tags
-  if (['English', 'Normal'].includes(lang)) return '';
-  else if (lang === 'Romanized') return '';
+  if (['English', 'Normal', 'Romanized'].includes(lang)) return '';
   return 'indic-font';
 }
 

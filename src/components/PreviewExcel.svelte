@@ -6,7 +6,7 @@
   import type { Workbook, Worksheet } from 'exceljs';
   import Modal from '@components/Modal.svelte';
   import { normalize_lang_code } from '@tools/converter';
-  import { get_text_font } from '@tools/font_tools';
+  import { get_text_font_class } from '@tools/font_tools';
 
   export let file_link: string;
   export let workbook: Workbook;
@@ -74,7 +74,7 @@
                   {@const lang = get_lang_code_of_columnn(worksheet, column_i)}
                   <td>
                     <pre
-                      class={`${get_text_font(lang)} hide-scrollbar max-w-72 scroll-m-0 ${overflow_behavior === 'scroll' ? 'overflow-scroll' : 'overflow-hidden'} text-sm`}>{row_value}</pre>
+                      class={`${get_text_font_class(lang)} hide-scrollbar max-w-72 scroll-m-0 ${overflow_behavior === 'scroll' ? 'overflow-scroll' : 'overflow-hidden'} text-sm`}>{row_value}</pre>
                   </td>
                 {/each}
               </tr>

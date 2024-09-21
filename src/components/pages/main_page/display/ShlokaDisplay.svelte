@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { get_text_font, get_font_family_and_size } from '@tools/font_tools';
+  import { get_font_family_and_size } from '@tools/font_tools';
   import { get_possibily_not_undefined } from '@tools/kry';
   import {
     viewing_script,
@@ -96,7 +96,7 @@
               update_trans_lang_data(trans_index, e.currentTarget.value);
             }
           }}
-          class={`${get_text_font($viewing_script)} textarea h-16 w-full`}
+          class="textarea h-16 w-full"
           value={$trans_lang_data.data?.get(trans_index)}
           style:font-size={`${trans_text_font_info.size}rem`}
           style:font-family={trans_text_font_info.family}
