@@ -1,6 +1,8 @@
 <script lang="ts">
   import { rAmAyaNam_map } from '@state/main_page/data';
   import {
+    DEFAULT_MAIN_TEXT_FONT_CONFIGS,
+    DEFAULT_TRANS_TEXT_FONT_CONFIGS,
     image_kANDa,
     image_lang,
     image_sarga,
@@ -16,10 +18,9 @@
   import Icon from '@tools/Icon.svelte';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import { LanguageIcon } from '@components/icons';
-  import { SlideToggle } from '@skeletonlabs/skeleton';
+  import { SlideToggle, TabGroup, Tab, Accordion, AccordionItem } from '@skeletonlabs/skeleton';
   import ImageDownloader from './ImageDownloader.svelte';
   import { DEFAULT_SHLOKA_CONFIG_SHARED, type shloka_type_config } from './settings';
-  import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
   import { IoOptions } from 'svelte-icons-pack/io';
   import {
     current_shloka_type,
@@ -29,6 +30,7 @@
     DEFAULT_SHLOKA_CONFIG
   } from './settings';
   import { copy_plain_object } from '@tools/kry';
+  import { get_font_family_and_size } from '@tools/font_tools';
 
   export let render_all_texts: (
     shloka_num: number,
@@ -37,6 +39,19 @@
 
   $: kANDa_info = rAmAyaNam_map[$image_kANDa - 1];
   $: shloka_count = kANDa_info.sarga_data[$image_sarga - 1].shloka_count_extracted;
+
+  let settings_tab: 'depend' | 'non-depend' = 'non-depend';
+
+  const reset_func = () => {
+    $shloka_configs[$current_shloka_type] = copy_plain_object(
+      DEFAULT_SHLOKA_CONFIG[$current_shloka_type]
+    );
+    $SPACE_ABOVE_REFERENCE_LINE = DEFAULT_SHLOKA_CONFIG_SHARED.SPACE_ABOVE_REFERENCE_LINE;
+    $SPACE_BETWEEN_MAIN_AND_NORM = DEFAULT_SHLOKA_CONFIG_SHARED.SPACE_BETWEEN_MAIN_AND_NORM;
+    $normal_text_font_config = copy_plain_object(get_font_family_and_size('Normal', 'image'));
+    $main_text_font_configs = copy_plain_object(DEFAULT_MAIN_TEXT_FONT_CONFIGS);
+    $trans_text_font_configs = copy_plain_object(DEFAULT_TRANS_TEXT_FONT_CONFIGS);
+  };
 </script>
 
 <div class="flex space-x-2 text-sm">
@@ -94,13 +109,7 @@
   </span>
   <span class="flex flex-col items-center justify-center">
     <button
-      on:click={() => {
-        $shloka_configs[$current_shloka_type] = copy_plain_object(
-          DEFAULT_SHLOKA_CONFIG[$current_shloka_type]
-        );
-        $SPACE_ABOVE_REFERENCE_LINE = DEFAULT_SHLOKA_CONFIG_SHARED.SPACE_ABOVE_REFERENCE_LINE;
-        $SPACE_BETWEEN_MAIN_AND_NORM = DEFAULT_SHLOKA_CONFIG_SHARED.SPACE_BETWEEN_MAIN_AND_NORM;
-      }}
+      on:click={reset_func}
       class="btn m-0 rounded-md bg-surface-700 px-1 py-1 text-xs font-bold text-white dark:bg-surface-500"
       >Reset</button
     >
@@ -113,198 +122,208 @@
       ><span class="text-sm font-bold">Change Default Options</span>
     </svelte:fragment>
     <div slot="content" class="space-y-2">
-      <div class="flex justify-center space-x-16">
-        <div class="flex flex-col justify-center space-y-1">
-          <div class="text-center text-sm font-semibold">Spaces</div>
-          <label>
-            <span class="text-sm">Above Reference Line</span>
-            <input
-              type="number"
-              class="input w-12 rounded-md px-1 py-0 text-sm"
-              bind:value={$SPACE_ABOVE_REFERENCE_LINE}
-              min={0}
-              max={40}
-            />
-          </label>
-          <label>
-            <span class="text-sm">Between Main and Normal</span>
-            <input
-              type="number"
-              class="input w-12 rounded-md px-1 py-0 text-sm"
-              bind:value={$SPACE_BETWEEN_MAIN_AND_NORM}
-              min={0}
-              max={20}
-            />
-          </label>
-        </div>
-        <div class="flex flex-col justify-center space-y-1">
-          <div class="text-center text-sm font-semibold">Scaling factors</div>
-          <table class="w-full border-collapse text-center text-sm">
-            <thead>
-              <tr>
-                <th class=""></th>
-                <th class="p-1 font-semibold">Text</th>
-                <th class="p-1 font-semibold">Space</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="font-semibold">Main</td>
-                <td class="p-1">
+      <TabGroup>
+        <Tab bind:group={settings_tab} name="tab1" value={'non-depend'}>Shloka Type Independent</Tab
+        >
+        <Tab bind:group={settings_tab} name="tab2" value={'depend'}>Shloka Type Dependent</Tab>
+        <svelte:fragment slot="panel">
+          {#if settings_tab === 'non-depend'}
+            <div class="flex justify-center space-x-16">
+              <div class="flex flex-col justify-center space-y-1">
+                <div class="text-center text-sm font-semibold">Spaces</div>
+                <label>
+                  <span class="text-sm">Above Reference Line</span>
+                  <input
+                    type="number"
+                    class="input w-12 rounded-md px-1 py-0 text-sm"
+                    bind:value={$SPACE_ABOVE_REFERENCE_LINE}
+                    min={0}
+                    max={40}
+                  />
+                </label>
+                <label>
+                  <span class="text-sm">Between Main and Normal</span>
+                  <input
+                    type="number"
+                    class="input w-12 rounded-md px-1 py-0 text-sm"
+                    bind:value={$SPACE_BETWEEN_MAIN_AND_NORM}
+                    min={0}
+                    max={20}
+                  />
+                </label>
+              </div>
+              <div class="flex flex-col justify-center space-y-1">
+                <div class="text-center text-sm font-semibold">Scaling factors</div>
+                <table class="w-full border-collapse text-center text-sm">
+                  <thead>
+                    <tr>
+                      <th class=""></th>
+                      <th class="p-1 font-semibold">Text</th>
+                      <th class="p-1 font-semibold">Space</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="font-semibold">Main</td>
+                      <td class="p-1">
+                        <input
+                          type="number"
+                          class="input w-16 rounded-md px-1 py-0 text-sm"
+                          bind:value={$main_text_font_configs[$image_script].size}
+                          min={0}
+                          max={10}
+                        />
+                      </td>
+                      <td class="p-1">
+                        <input
+                          type="number"
+                          class="input w-16 rounded-md px-1 py-0 text-sm"
+                          bind:value={$main_text_font_configs[$image_script].space_width_scale}
+                          min={0}
+                          max={10}
+                        />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="font-semibold">Normal</td>
+                      <td class="p-1">
+                        <input
+                          type="number"
+                          class="input w-16 rounded-md px-1 py-0 text-sm"
+                          bind:value={$normal_text_font_config.size}
+                          min={0}
+                          max={10}
+                        />
+                      </td>
+                      <td class="p-1">
+                        <input
+                          type="number"
+                          class="input w-16 rounded-md px-1 py-0 text-sm"
+                          bind:value={$normal_text_font_config.space_width_scale}
+                          min={0}
+                          max={10}
+                        />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="font-semibold">Translation</td>
+                      <td class="p-1">
+                        <input
+                          type="number"
+                          class="input w-16 rounded-md px-1 py-0 text-sm"
+                          bind:value={$trans_text_font_configs[$image_lang].size}
+                          min={0}
+                          max={10}
+                        />
+                      </td>
+                      <td class="p-1">
+                        <input
+                          type="number"
+                          class="input w-16 rounded-md px-1 py-0 text-sm"
+                          bind:value={$trans_text_font_configs[$image_lang].space_width_scale}
+                          min={0}
+                          max={10}
+                        />
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          {:else if settings_tab === 'depend'}
+            <div class="flex items-center justify-center space-x-4 text-sm">
+              <span class="text-base font-bold">
+                Current Shloka Type : {$current_shloka_type}
+              </span>
+            </div>
+            <div class="flex justify-center space-x-16">
+              <div class="flex flex-col justify-center space-y-1">
+                <label class="space-x-1">
+                  <span class="text-sm">Main Text</span>
                   <input
                     type="number"
                     class="input w-16 rounded-md px-1 py-0 text-sm"
-                    bind:value={$main_text_font_configs[$image_script].size}
-                    min={0}
-                    max={10}
+                    bind:value={$shloka_configs[$current_shloka_type].main_text_font_size}
+                    min={10}
                   />
-                </td>
-                <td class="p-1">
+                </label>
+                <label class="space-x-1">
+                  <span class="text-sm">Normal Text</span>
                   <input
                     type="number"
                     class="input w-16 rounded-md px-1 py-0 text-sm"
-                    bind:value={$main_text_font_configs[$image_script].space_width_scale}
-                    min={0}
-                    max={10}
+                    bind:value={$shloka_configs[$current_shloka_type].norm_text_font_size}
+                    min={10}
                   />
-                </td>
-              </tr>
-              <tr>
-                <td class="font-semibold">Normal</td>
-                <td class="p-1">
+                </label>
+                <label class="space-x-1">
+                  <span class="text-sm">Translation Text</span>
                   <input
                     type="number"
                     class="input w-16 rounded-md px-1 py-0 text-sm"
-                    bind:value={$normal_text_font_config.size}
-                    min={0}
-                    max={10}
+                    bind:value={$shloka_configs[$current_shloka_type].trans_text_font_size}
+                    min={10}
                   />
-                </td>
-                <td class="p-1">
+                </label>
+              </div>
+              <div class="flex flex-col items-center justify-center space-y-2">
+                <div class="text-sm font-semibold">Boundaries</div>
+                <input
+                  type="number"
+                  class="input block w-14 rounded-sm px-1 py-0 text-sm"
+                  bind:value={$shloka_configs[$current_shloka_type].bounding_coords.top}
+                  min={0}
+                  max={1080}
+                />
+                <div class="space-x-6">
+                  <input
+                    type="number"
+                    class="input w-16 rounded-sm px-1 py-0 text-sm"
+                    bind:value={$shloka_configs[$current_shloka_type].bounding_coords.left}
+                    min={0}
+                    max={1920}
+                  />
+                  <input
+                    type="number"
+                    class="input w-16 rounded-sm px-1 py-0 text-sm"
+                    bind:value={$shloka_configs[$current_shloka_type].bounding_coords.right}
+                    min={0}
+                    max={1920}
+                  />
+                </div>
+                <input
+                  type="number"
+                  class="input w-16 rounded-sm px-1 py-0 text-sm"
+                  bind:value={$shloka_configs[$current_shloka_type].bounding_coords.bottom}
+                  min={0}
+                  max={1080}
+                />
+              </div>
+              <div class="flex flex-col items-center justify-center space-y-1">
+                <div class="font-semibold">Reference Lines</div>
+                <label class="inline-block space-x-1">
+                  <span class="text-sm">Top Start</span>
                   <input
                     type="number"
                     class="input w-16 rounded-md px-1 py-0 text-sm"
-                    bind:value={$normal_text_font_config.space_width_scale}
-                    min={0}
-                    max={10}
+                    bind:value={$shloka_configs[$current_shloka_type].reference_lines.top}
+                    min={10}
                   />
-                </td>
-              </tr>
-              <tr>
-                <td class="font-semibold">Translation</td>
-                <td class="p-1">
+                </label>
+                <label class="inline-block space-x-1">
+                  <span class="text-sm">Spacing</span>
                   <input
                     type="number"
                     class="input w-16 rounded-md px-1 py-0 text-sm"
-                    bind:value={$trans_text_font_configs[$image_lang].size}
-                    min={0}
-                    max={10}
+                    bind:value={$shloka_configs[$current_shloka_type].reference_lines.spacing}
+                    min={10}
                   />
-                </td>
-                <td class="p-1">
-                  <input
-                    type="number"
-                    class="input w-16 rounded-md px-1 py-0 text-sm"
-                    bind:value={$trans_text_font_configs[$image_lang].space_width_scale}
-                    min={0}
-                    max={10}
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="flex items-center justify-center space-x-4 text-sm">
-        <span class="text-base font-bold">
-          Current Shloka Type : {$current_shloka_type}
-        </span>
-      </div>
-      <div class="flex justify-center space-x-16">
-        <div class="flex flex-col justify-center space-y-1">
-          <label class="space-x-1">
-            <span class="text-sm">Main Text</span>
-            <input
-              type="number"
-              class="input w-16 rounded-md px-1 py-0 text-sm"
-              bind:value={$shloka_configs[$current_shloka_type].main_text_font_size}
-              min={10}
-            />
-          </label>
-          <label class="space-x-1">
-            <span class="text-sm">Normal Text</span>
-            <input
-              type="number"
-              class="input w-16 rounded-md px-1 py-0 text-sm"
-              bind:value={$shloka_configs[$current_shloka_type].norm_text_font_size}
-              min={10}
-            />
-          </label>
-          <label class="space-x-1">
-            <span class="text-sm">Translation Text</span>
-            <input
-              type="number"
-              class="input w-16 rounded-md px-1 py-0 text-sm"
-              bind:value={$shloka_configs[$current_shloka_type].trans_text_font_size}
-              min={10}
-            />
-          </label>
-        </div>
-        <div class="flex flex-col items-center justify-center space-y-2">
-          <div class="text-sm font-semibold">Boundaries</div>
-          <input
-            type="number"
-            class="input block w-14 rounded-sm px-1 py-0 text-sm"
-            bind:value={$shloka_configs[$current_shloka_type].bounding_coords.top}
-            min={0}
-            max={1080}
-          />
-          <div class="space-x-6">
-            <input
-              type="number"
-              class="input w-16 rounded-sm px-1 py-0 text-sm"
-              bind:value={$shloka_configs[$current_shloka_type].bounding_coords.left}
-              min={0}
-              max={1920}
-            />
-            <input
-              type="number"
-              class="input w-16 rounded-sm px-1 py-0 text-sm"
-              bind:value={$shloka_configs[$current_shloka_type].bounding_coords.right}
-              min={0}
-              max={1920}
-            />
-          </div>
-          <input
-            type="number"
-            class="input w-16 rounded-sm px-1 py-0 text-sm"
-            bind:value={$shloka_configs[$current_shloka_type].bounding_coords.bottom}
-            min={0}
-            max={1080}
-          />
-        </div>
-        <div class="flex flex-col items-center justify-center space-y-1">
-          <div class="font-semibold">Reference Lines</div>
-          <label class="inline-block space-x-1">
-            <span class="text-sm">Top Start</span>
-            <input
-              type="number"
-              class="input w-16 rounded-md px-1 py-0 text-sm"
-              bind:value={$shloka_configs[$current_shloka_type].reference_lines.top}
-              min={10}
-            />
-          </label>
-          <label class="inline-block space-x-1">
-            <span class="text-sm">Spacing</span>
-            <input
-              type="number"
-              class="input w-16 rounded-md px-1 py-0 text-sm"
-              bind:value={$shloka_configs[$current_shloka_type].reference_lines.spacing}
-              min={10}
-            />
-          </label>
-        </div>
-      </div>
+                </label>
+              </div>
+            </div>
+          {/if}
+        </svelte:fragment>
+      </TabGroup>
     </div>
   </AccordionItem>
 </Accordion>

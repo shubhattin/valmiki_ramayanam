@@ -20,12 +20,11 @@
     SPACE_BETWEEN_MAIN_AND_NORM,
     type shloka_type_config
   } from './settings';
-  import { BASE_SCRIPT, trans_lang } from '@state/main_page/main_state';
+  import { BASE_SCRIPT } from '@state/main_page/main_state';
   import {
     FONT_FAMILY_NAME,
     load_font,
     get_font_url,
-    get_font_family_and_size,
     DEFAULT_SPACE_WIDTH
   } from '@tools/font_tools';
   import * as fabric from 'fabric';
