@@ -97,11 +97,8 @@ export let normal_text_font_config = writable(
 export const DEFAULT_TRANS_TEXT_FONT_CONFIGS = (() => {
   const res: any = {};
   LANG_LIST.forEach(
-    (script) =>
-      (res[script as script_list_type] = get_font_family_and_size(
-        script as lang_list_type,
-        'image'
-      ))
+    (lang) =>
+      (res[lang as script_list_type] = get_font_family_and_size(lang as lang_list_type, 'image'))
   );
   res['English'] = get_font_family_and_size('English', 'image');
   return res as image_font_config_type<lang_list_extended_type>;
