@@ -208,7 +208,7 @@
       const [text_norm_group, height_norm, width_norm] = await render_text(
         norm_text,
         get_font_url(norm_text_font_info.key, 'regular'),
-        shloka_config.norm_text_font_size,
+        shloka_config.norm_text_font_size * norm_text_font_info.size,
         'hsla(44, 100%, 10%, 1)',
         i,
         'normal',
@@ -309,6 +309,8 @@
     $image_kANDa &&
     $shloka_configs &&
     $normal_text_font_config &&
+    $trans_text_font_configs &&
+    $main_text_font_configs &&
     (async () => {
       await render_all_texts($image_shloka, $image_script);
     })();

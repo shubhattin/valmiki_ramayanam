@@ -103,6 +103,7 @@ export let trans_text_font_configs = writable(
           'image'
         ))
     );
+    res['English'] = get_font_family_and_size('English', 'image');
     return res as image_font_config_type<lang_list_extended_type>;
   })()
 );

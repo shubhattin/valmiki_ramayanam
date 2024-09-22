@@ -4,9 +4,13 @@
     image_kANDa,
     image_lang,
     image_sarga,
+    image_script,
     image_shloka,
     image_trans_data,
-    shaded_background_image_status
+    main_text_font_configs,
+    normal_text_font_config,
+    shaded_background_image_status,
+    trans_text_font_configs
   } from './state';
   import { LANG_LIST, type script_list_type } from '@tools/lang_list';
   import Icon from '@tools/Icon.svelte';
@@ -134,11 +138,81 @@
           </label>
         </div>
         <div class="flex flex-col justify-center space-y-1">
-          <label class="space-x-1">
-            <span class="text-sm">Font Scale</span>
-            <input type="number" class="input w-16 rounded-md px-1 py-0 text-sm" min={10} />
-            <!-- bind:value={$shloka_configs[$current_shloka_type].main_text_font_size} -->
-          </label>
+          <div class="text-center text-sm font-semibold">Scaling factors</div>
+          <table class="w-full border-collapse text-center text-sm">
+            <thead>
+              <tr>
+                <th class=""></th>
+                <th class="p-1 font-semibold">Text</th>
+                <th class="p-1 font-semibold">Space</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="font-semibold">Main</td>
+                <td class="p-1">
+                  <input
+                    type="number"
+                    class="input w-16 rounded-md px-1 py-0 text-sm"
+                    bind:value={$main_text_font_configs[$image_script].size}
+                    min={0}
+                    max={10}
+                  />
+                </td>
+                <td class="p-1">
+                  <input
+                    type="number"
+                    class="input w-16 rounded-md px-1 py-0 text-sm"
+                    bind:value={$main_text_font_configs[$image_script].space_width_scale}
+                    min={0}
+                    max={10}
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td class="font-semibold">Normal</td>
+                <td class="p-1">
+                  <input
+                    type="number"
+                    class="input w-16 rounded-md px-1 py-0 text-sm"
+                    bind:value={$normal_text_font_config.size}
+                    min={0}
+                    max={10}
+                  />
+                </td>
+                <td class="p-1">
+                  <input
+                    type="number"
+                    class="input w-16 rounded-md px-1 py-0 text-sm"
+                    bind:value={$normal_text_font_config.space_width_scale}
+                    min={0}
+                    max={10}
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td class="font-semibold">Translation</td>
+                <td class="p-1">
+                  <input
+                    type="number"
+                    class="input w-16 rounded-md px-1 py-0 text-sm"
+                    bind:value={$trans_text_font_configs[$image_lang].size}
+                    min={0}
+                    max={10}
+                  />
+                </td>
+                <td class="p-1">
+                  <input
+                    type="number"
+                    class="input w-16 rounded-md px-1 py-0 text-sm"
+                    bind:value={$trans_text_font_configs[$image_lang].space_width_scale}
+                    min={0}
+                    max={10}
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
       <div class="flex items-center justify-center space-x-4 text-sm">
