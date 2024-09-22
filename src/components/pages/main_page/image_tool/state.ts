@@ -7,7 +7,14 @@ import { createQuery } from '@tanstack/svelte-query';
 import { queryClient } from '@state/query';
 import background_image_url from './img/background_vr.png';
 import background_image_template_url from './img/background_vr_template.jpg';
-import type { lang_list_extended_type, script_list_type } from '@tools/lang_list';
+import {
+  LANG_LIST,
+  SCRIPT_LIST,
+  type lang_list_extended_type,
+  type lang_list_type,
+  type script_list_type
+} from '@tools/lang_list';
+import { get_font_family_and_size } from '@tools/font_tools';
 
 export let canvas = writable<fabric.Canvas>();
 export let background_image = writable<fabric.FabricImage>();
@@ -63,4 +70,39 @@ export const image_trans_data = get_derived_query(
       queryClient
     );
   }
+);
+
+// Language and Script Specific Settings
+
+type image_font_config_type<T extends string> = Record<
+  T,
+  ReturnType<typeof get_font_family_and_size>
+>;
+export let main_text_font_configs = writable(
+  (() => {
+    const res: any = {};
+    SCRIPT_LIST.filter((src) => !['Normal'].includes(src)).forEach(
+      (script) =>
+        (res[script as script_list_type] = get_font_family_and_size(
+          script as script_list_type,
+          'image'
+        ))
+    );
+    return res as image_font_config_type<script_list_type>;
+  })()
+);
+
+export let normal_text_font_config = writable(get_font_family_and_size('Normal', 'image'));
+export let trans_text_font_configs = writable(
+  (() => {
+    const res: any = {};
+    LANG_LIST.forEach(
+      (script) =>
+        (res[script as script_list_type] = get_font_family_and_size(
+          script as lang_list_type,
+          'image'
+        ))
+    );
+    return res as image_font_config_type<lang_list_extended_type>;
+  })()
 );

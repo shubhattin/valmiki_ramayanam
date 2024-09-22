@@ -103,7 +103,7 @@
   </span>
 </div>
 <Accordion>
-  <AccordionItem open={true}>
+  <AccordionItem open={false}>
     <svelte:fragment slot="lead"><Icon src={IoOptions} class="text-2xl" /></svelte:fragment>
     <svelte:fragment slot="summary"
       ><span class="text-sm font-bold">Change Default Options</span>

@@ -8,7 +8,10 @@
     image_sarga_data,
     image_trans_data,
     get_units,
-    image_lang
+    image_lang,
+    normal_text_font_config,
+    main_text_font_configs,
+    trans_text_font_configs
   } from './state';
   import {
     current_shloka_type,
@@ -22,7 +25,8 @@
     FONT_FAMILY_NAME,
     load_font,
     get_font_url,
-    get_font_family_and_size
+    get_font_family_and_size,
+    DEFAULT_SPACE_WIDTH
   } from '@tools/font_tools';
   import * as fabric from 'fabric';
   import { lipi_parivartak_async } from '@tools/converter';
@@ -71,6 +75,11 @@
   };
   const render_all_texts = async ($image_shloka: number, $image_script: script_list_type) => {
     if (!browser) return $shloka_configs[2]; // just like has no meaning
+
+    const main_text_font_info = $main_text_font_configs[$image_script];
+    const trans_text_font_info = $trans_text_font_configs[$image_lang];
+    const norm_text_font_info = $normal_text_font_config;
+
     // load wasm based library
     const { get_text_svg_path } = await import('@tools/harfbuzz');
     // load necessary fonts
@@ -136,7 +145,7 @@
       color: string,
       line_index: number,
       text_type: 'main' | 'normal',
-      font_scaling_factor: number
+      space_width_scale: number
     ) => {
       let text_path_scale = get_font_size_for_path(font_size);
       const text_group = new fabric.Group([], {
@@ -145,7 +154,7 @@
       });
       const words = text.split(' ');
       let left_cord = 0;
-      const SPACE_WIDTH = 310 / font_scaling_factor;
+      const space_width = DEFAULT_SPACE_WIDTH * space_width_scale;
       const render_word = async (word: string) => {
         if (word === '') return;
         const path = await get_text_svg_path(word, font_url);
@@ -157,7 +166,7 @@
           // do not add `top` in this
         });
         const width = text_path.width;
-        left_cord += width + SPACE_WIDTH;
+        left_cord += width + space_width;
         text_group.add(text_path);
       };
       for (let i = 0; i < words.length; i++) {
@@ -186,7 +195,6 @@
     };
     for (let i = 0; i < shloka_lines.length; i++) {
       const main_text = await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, $image_script);
-      const main_text_font_info = get_font_family_and_size($image_script, 'image');
       const [text_main_group, height_main, width_main] = await render_text(
         main_text,
         get_font_url(main_text_font_info.key, 'bold'),
@@ -194,10 +202,9 @@
         'hsla(38, 100%, 15%, 1)',
         i,
         'main',
-        main_text_font_info.size
+        main_text_font_info.space_width_scale
       );
       const norm_text = await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, 'Normal');
-      const norm_text_font_info = get_font_family_and_size('Normal', 'image');
       const [text_norm_group, height_norm, width_norm] = await render_text(
         norm_text,
         get_font_url(norm_text_font_info.key, 'regular'),
@@ -205,7 +212,7 @@
         'hsla(44, 100%, 10%, 1)',
         i,
         'normal',
-        norm_text_font_info.size
+        norm_text_font_info.space_width_scale
       );
       const top_pos = get_units(
         shloka_config.reference_lines.top + i * shloka_config.reference_lines.spacing
@@ -273,7 +280,6 @@
 
     // trans
     const trans_data = $image_trans_data.data!;
-    const trnas_lang_font_config = get_font_family_and_size($image_lang, 'image');
     if (trans_data.has($image_shloka)) {
       const trans_text_data = trans_data.get($image_shloka)!;
       const trans_text = new fabric.Textbox(trans_text_data, {
@@ -281,8 +287,8 @@
         left: get_units(610),
         top: get_units(650),
         fill: 'hsla(44, 100%, 10%, 1)',
-        fontFamily: trnas_lang_font_config.family,
-        fontSize: get_units(shloka_config.trans_text_font_size) * trnas_lang_font_config.size,
+        fontFamily: trans_text_font_info.family,
+        fontSize: get_units(shloka_config.trans_text_font_size) * trans_text_font_info.size,
         lockRotation: true,
         width: get_units(1250)
       });
@@ -302,6 +308,7 @@
     $image_sarga &&
     $image_kANDa &&
     $shloka_configs &&
+    $normal_text_font_config &&
     (async () => {
       await render_all_texts($image_shloka, $image_script);
     })();
