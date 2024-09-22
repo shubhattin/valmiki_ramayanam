@@ -3,7 +3,12 @@
   import { onDestroy, onMount } from 'svelte';
   import { delay } from '@tools/delay';
   import { get, writable, type Unsubscriber } from 'svelte/store';
-  import { LANG_LIST, SCRIPT_LIST } from '@tools/lang_list';
+  import {
+    LANG_LIST,
+    SCRIPT_LIST,
+    type lang_list_type,
+    type script_list_type
+  } from '@tools/lang_list';
   import LipiLekhikA, { load_parivartak_lang_data, lipi_parivartak_async } from '@tools/converter';
   import { LanguageIcon } from '@components/icons';
   import { ensure_auth_access_status, get_id_token_info } from '@tools/auth_tools';
@@ -29,14 +34,13 @@
     edit_language_typer_status,
     sanskrit_mode,
     typing_assistance_modal_opened,
-    image_tool_opened,
-    get_script_for_lang
+    image_tool_opened
   } from '@state/main_page/main_state';
   import { user_allowed_langs } from '@state/main_page/user';
   import { SlideToggle } from '@skeletonlabs/skeleton';
   import { BsKeyboard } from 'svelte-icons-pack/bs';
   import User from './user/User.svelte';
-  import { get_text_font_class } from '@tools/font_tools';
+  import { get_script_for_lang, get_text_font_class } from '@tools/font_tools';
   import {
     LOCALS_TRANS_LANGS,
     rAmAyaNam_map,
@@ -80,7 +84,8 @@
   let viewing_script_mut = createMutation({
     mutationKey: ['viewing_script'],
     mutationFn: async (params: z.infer<typeof params_viewing_script_mut_schema>) => {
-      const { script } = params_viewing_script_mut_schema.parse(params);
+      const args = params_viewing_script_mut_schema.parse(params);
+      const script = args.script as script_list_type;
       if (!mounted) return script;
       await delay(500);
       await load_parivartak_lang_data(script);
@@ -100,11 +105,11 @@
     })
   );
 
-  let trans_lang_selection = writable('--');
+  let trans_lang_selection = writable<typeof $trans_lang>('--');
   $trans_lang = $trans_lang_selection;
   const trans_lang_mut = createMutation({
     mutationKey: ['trans_lang'],
-    mutationFn: async (lang: string) => {
+    mutationFn: async (lang: typeof $trans_lang) => {
       if (!mounted || !browser || lang === '--') return lang;
       // loading trnaslation lang data for typing support
       await delay(300);

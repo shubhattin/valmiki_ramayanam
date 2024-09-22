@@ -22,14 +22,13 @@
     sarga_selected,
     kANDa_selected,
     viewing_script,
-    trans_lang,
-    get_script_for_lang
+    trans_lang
   } from '@state/main_page/main_state';
   import { get_kANDa_names, get_sarga_names, rAmAyaNam_map } from '@state/main_page/data';
   import Select from '@components/Select.svelte';
   import Icon from '@tools/Icon.svelte';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
-  import { get_text_font_class } from '@tools/font_tools';
+  import { get_script_for_lang, get_text_font_class } from '@tools/font_tools';
   import { z } from 'zod';
   import { SCRIPT_LIST } from '@tools/lang_list';
 

@@ -1,8 +1,11 @@
 import { browser } from '$app/environment';
+import type { script_and_lang_list_type, script_list_type } from './lang_list';
 
-export function get_text_font_class(lang: string) {
+export const LATIN_BASED_SCRIPTS = ['English', 'Romanized', 'Normal'];
+
+export function get_text_font_class(lang: script_and_lang_list_type | '') {
   // this will be udually used to display in select tags
-  if (['English', 'Normal', 'Romanized'].includes(lang)) return '';
+  if (LATIN_BASED_SCRIPTS.includes(lang)) return '';
   return 'indic-font';
 }
 
@@ -19,10 +22,12 @@ export const FONT_FAMILY_NAME = {
   ROBOTO: 'Roboto'
 };
 
-export const get_font_url = (font: keyof typeof FONT_FAMILY_NAME, type: 'regular' | 'bold') => {
+type fonts_type = keyof typeof FONT_FAMILY_NAME;
+
+export const get_font_url = (font: fonts_type, type: 'regular' | 'bold') => {
   if (!browser) return '';
   const FONT_URLS: Record<
-    keyof typeof FONT_FAMILY_NAME,
+    fonts_type,
     {
       regular: string;
       bold: string;
@@ -47,18 +52,27 @@ export const get_font_url = (font: keyof typeof FONT_FAMILY_NAME, type: 'regular
 /**
  * `size` is in rem
  */
-export const get_font_family_and_size = (script: string) => {
-  let family = 'Nirmala UI';
+export const get_font_family_and_size = (script: script_and_lang_list_type) => {
+  let key: fonts_type = 'NIRMALA_UI';
   let size = 1;
   if (script === 'Sanskrit') {
-    family = FONT_FAMILY_NAME.ADOBE_DEVANAGARI;
+    key = 'ADOBE_DEVANAGARI';
     size = 1.45;
-  } else if (['Normal', 'English', 'Romanized'].includes(script)) {
-    family = 'Roboto';
+  } else if (LATIN_BASED_SCRIPTS.includes(script)) {
+    key = 'ROBOTO';
   }
 
   return {
-    family,
-    size
+    family: FONT_FAMILY_NAME[key],
+    size,
+    key
   };
 };
+
+export function get_script_for_lang(lang: script_and_lang_list_type): script_list_type {
+  if (lang === 'Hindi' || lang === 'English') return 'Sanskrit';
+  // ^ Name for Sanskrit value in the dropdown is Devanagari
+  else if (lang === 'Tamil') return 'Tamil-Extended';
+  // Add a default return value to satisfy the return type
+  return lang;
+}

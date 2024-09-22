@@ -7,6 +7,7 @@ import { createQuery } from '@tanstack/svelte-query';
 import { queryClient } from '@state/query';
 import background_image_url from './img/background_vr.png';
 import background_image_template_url from './img/background_vr_template.jpg';
+import type { lang_list_extended_type, script_list_type } from '@tools/lang_list';
 
 export let canvas = writable<fabric.Canvas>();
 export let background_image = writable<fabric.FabricImage>();
@@ -29,8 +30,8 @@ export async function set_background_image_type(shaded_image: boolean) {
   canvas.set($canvas);
 }
 
-export let image_script = writable<string>('');
-export let image_lang = writable<string>('English');
+export let image_script = writable<script_list_type>();
+export let image_lang = writable<lang_list_extended_type>('English');
 export let image_kANDa = writable<number>(0);
 export let image_sarga = writable<number>(0);
 // ^ kanda and sarga will be inherited from the main during mount

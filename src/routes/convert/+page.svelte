@@ -1,7 +1,7 @@
 <script lang="ts">
   import Icon from '@tools/Icon.svelte';
   import { SlideToggle } from '@skeletonlabs/skeleton';
-  import { SCRIPT_LIST } from '@tools/lang_list';
+  import { SCRIPT_LIST, type script_list_type } from '@tools/lang_list';
   import LipiLekhikA, { load_parivartak_lang_data, lipi_parivartak_async } from '@tools/converter';
   import { FaCircleUp, FaCircleDown } from 'svelte-icons-pack/fa';
   import { writable } from 'svelte/store';
@@ -14,8 +14,8 @@
   import { get_font_family_and_size, get_text_font_class } from '@tools/font_tools';
   import { PAGE_TITLES } from '@state/page_titles';
 
-  let from_lang = writable('Sanskrit');
-  let to_lang = writable('Telugu');
+  let from_lang = writable<script_list_type>('Sanskrit');
+  let to_lang = writable<script_list_type>('Telugu');
 
   let from_text = writable('');
   let to_text = writable('');

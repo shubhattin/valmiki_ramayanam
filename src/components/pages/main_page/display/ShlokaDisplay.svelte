@@ -1,5 +1,6 @@
 <script lang="ts">
   import { get_font_family_and_size } from '@tools/font_tools';
+  import type { lang_list_type } from '@tools/lang_list';
   import { get_possibily_not_undefined } from '@tools/kry';
   import {
     viewing_script,
@@ -23,7 +24,7 @@
   export let copy_text: (text: string) => void;
 
   $: main_text_font_info = get_font_family_and_size($viewing_script);
-  $: trans_text_font_info = get_font_family_and_size($trans_lang);
+  $: trans_text_font_info = get_font_family_and_size($trans_lang as lang_list_type);
   const en_trans_text_font_info = get_font_family_and_size('English');
 
   $: line_split = shloka_lines.split('\n');
