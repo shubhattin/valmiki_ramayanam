@@ -1,7 +1,7 @@
 <script lang="ts">
   import { lipi_parivartak_async } from '@tools/converter';
   import { type Unsubscriber } from 'svelte/store';
-  import { fade } from 'svelte/transition';
+  import { fade, scale, slide } from 'svelte/transition';
   import { cl_join } from '@tools/cl_join';
   import { onDestroy } from 'svelte';
   import {
@@ -76,17 +76,17 @@
   </div>
 {/if}
 <div class="relative w-full">
-  <button
-    title="Copy Sarga Text"
-    on:click={copy_sarga}
-    class={cl_join(
-      'btn absolute right-5 top-2 z-20 hidden  select-none p-0 outline-none',
-      sarga_hovered && 'inline-block'
-    )}
-    on:mouseenter={() => (sarga_hovered = true)}
-  >
-    <Icon src={OiCopy16} class="text-lg" />
-  </button>
+  {#if sarga_hovered}
+    <button
+      transition:fade={{ duration: 150 }}
+      title="Copy Sarga Text"
+      on:click={copy_sarga}
+      class={cl_join('btn absolute right-5 top-2 z-20 select-none p-0 outline-none')}
+      on:mouseenter={() => (sarga_hovered = true)}
+    >
+      <Icon src={OiCopy16} class="text-lg" />
+    </button>
+  {/if}
 </div>
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div

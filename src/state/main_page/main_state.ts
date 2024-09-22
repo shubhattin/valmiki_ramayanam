@@ -1,12 +1,13 @@
+import type { lang_list_type, script_list_type } from '@tools/lang_list';
 import { writable } from 'svelte/store';
 
 export let kANDa_selected = writable(0);
 export let sarga_selected = writable(0);
 
-export const BASE_SCRIPT = 'Sanskrit';
+export const BASE_SCRIPT = 'Devanagari';
 
-export let viewing_script = writable(BASE_SCRIPT);
-export let trans_lang = writable<string>();
+export let viewing_script = writable<script_list_type>(BASE_SCRIPT);
+export let trans_lang = writable<lang_list_type | '--'>();
 export let view_translation_status = writable(false);
 
 // Edit
@@ -19,11 +20,3 @@ export let edit_language_typer_status = writable<boolean>(true);
 export let typing_assistance_modal_opened = writable(false);
 
 export let image_tool_opened = writable(false);
-
-export function get_script_for_lang(lang: string) {
-  let script = lang;
-  if (lang === 'Hindi' || lang === 'English') script = 'Sanskrit';
-  // ^ Name for Sanskrit value in the dropdown is Devanagari
-  else if (lang === 'Tamil') script = 'Tamil-Extended';
-  return script;
-}

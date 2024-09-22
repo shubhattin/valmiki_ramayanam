@@ -22,14 +22,13 @@
     sarga_selected,
     kANDa_selected,
     viewing_script,
-    trans_lang,
-    get_script_for_lang
+    trans_lang
   } from '@state/main_page/main_state';
   import { get_kANDa_names, get_sarga_names, rAmAyaNam_map } from '@state/main_page/data';
   import Select from '@components/Select.svelte';
   import Icon from '@tools/Icon.svelte';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
-  import { get_text_font } from '@tools/font_tools';
+  import { get_script_for_lang, get_text_font_class } from '@tools/font_tools';
   import { z } from 'zod';
   import { SCRIPT_LIST } from '@tools/lang_list';
 
@@ -147,7 +146,7 @@
           y2: get_units(base_y2),
           strokeWidth: get_units(stroke_width)
         };
-      } else if (type === 'path') {
+      } else if (['path', 'group'].includes(type)) {
         const base_left = obj.get('left') / prev_scaling_factor;
         const base_top = obj.get('top') / prev_scaling_factor;
         const base_scaleX = obj.get('scaleX') / prev_scaling_factor;
@@ -172,11 +171,13 @@
   <div class="space-x-2 text-sm">
     <select class="select inline-block w-36 p-1 text-sm" bind:value={$image_script}>
       {#each SCRIPT_LIST as lang (lang)}
-        <option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
+        {#if !['Normal'].includes(lang)}
+          <option value={lang}>{lang}</option>
+        {/if}
       {/each}
     </select>
     <Select
-      class={`${get_text_font($image_lang)} select inline-block w-36 p-1 text-sm`}
+      class={`${get_text_font_class($image_script)} select inline-block w-36 p-1 text-sm`}
       disabled={sarga_loading}
       zodType={z.coerce.number().int()}
       bind:value={$image_kANDa}
@@ -194,7 +195,7 @@
         <Icon src={TiArrowBackOutline} class="-mt-1 text-lg" />
       </button>
       <Select
-        class={`${get_text_font($viewing_script)} select inline-block w-40 p-1 text-sm`}
+        class={`${get_text_font_class($image_script)} select inline-block w-40 p-1 text-sm`}
         zodType={z.coerce.number().int()}
         disabled={sarga_loading}
         bind:value={$image_sarga}

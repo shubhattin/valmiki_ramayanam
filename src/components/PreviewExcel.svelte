@@ -6,7 +6,8 @@
   import type { Workbook, Worksheet } from 'exceljs';
   import Modal from '@components/Modal.svelte';
   import { normalize_lang_code } from '@tools/converter';
-  import { get_text_font } from '@tools/font_tools';
+  import { get_text_font_class } from '@tools/font_tools';
+  import type { script_and_lang_list_type } from '@tools/lang_list';
 
   export let file_link: string;
   export let workbook: Workbook;
@@ -18,7 +19,7 @@
   const get_lang_code_of_columnn = (worksheet: Worksheet, column_i: number) => {
     const lang = normalize_lang_code(
       (worksheet.getCell(1, column_i + 1).value?.toLocaleString() ?? '').split(' ')[0]
-    );
+    ) as script_and_lang_list_type;
     return lang || '';
   };
 
@@ -74,7 +75,7 @@
                   {@const lang = get_lang_code_of_columnn(worksheet, column_i)}
                   <td>
                     <pre
-                      class={`${get_text_font(lang)} hide-scrollbar max-w-72 scroll-m-0 ${overflow_behavior === 'scroll' ? 'overflow-scroll' : 'overflow-hidden'} text-sm`}>{row_value}</pre>
+                      class={`${get_text_font_class(lang)} hide-scrollbar max-w-72 scroll-m-0 ${overflow_behavior === 'scroll' ? 'overflow-scroll' : 'overflow-hidden'} text-sm`}>{row_value}</pre>
                   </td>
                 {/each}
               </tr>

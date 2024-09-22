@@ -1,7 +1,7 @@
 <script lang="ts">
   import Icon from '@tools/Icon.svelte';
   import { SlideToggle } from '@skeletonlabs/skeleton';
-  import { SCRIPT_LIST } from '@tools/lang_list';
+  import { SCRIPT_LIST, type script_list_type } from '@tools/lang_list';
   import LipiLekhikA, { load_parivartak_lang_data, lipi_parivartak_async } from '@tools/converter';
   import { FaCircleUp, FaCircleDown } from 'svelte-icons-pack/fa';
   import { writable } from 'svelte/store';
@@ -11,11 +11,11 @@
   import { OiCopy16 } from 'svelte-icons-pack/oi';
   import { BiHelpCircle } from 'svelte-icons-pack/bi';
   import TypingAssistance from '@components/TypingAssistance.svelte';
-  import { get_text_font } from '@tools/font_tools';
+  import { get_font_family_and_size } from '@tools/font_tools';
   import { PAGE_TITLES } from '@state/page_titles';
 
-  let from_lang = writable('Sanskrit');
-  let to_lang = writable('Telugu');
+  let from_lang = writable<script_list_type>('Devanagari');
+  let to_lang = writable<script_list_type>('Telugu');
 
   let from_text = writable('');
   let to_text = writable('');
@@ -47,6 +47,9 @@
   };
 
   let typing_assistance_modal_opened = writable(false);
+
+  $: from_text_font_info = get_font_family_and_size($from_lang);
+  $: to_text_font_info = get_font_family_and_size($to_lang);
 </script>
 
 <MetaTags title={PAGE_INFO.title} description={PAGE_INFO.description} />
@@ -56,7 +59,7 @@
     <div class="flex space-x-4">
       <select class="select w-40" bind:value={$from_lang}>
         {#each SCRIPT_LIST as lang (lang)}
-          <option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
+          <option value={lang}>{lang}</option>
         {/each}
       </select>
       <button
@@ -77,9 +80,11 @@
       </SlideToggle>
     </div>
     <textarea
-      class={`${get_text_font($from_lang)} textarea h-56`}
+      class="textarea h-56"
       placeholder={`Enter text in ${$from_lang}`}
       bind:value={$from_text}
+      style:font-size={`${from_text_font_info.size}rem`}
+      style:font-family={from_text_font_info.family}
       on:input={(e) => {
         if (from_text_type_enabled)
           // @ts-ignore
@@ -119,7 +124,7 @@
     <div class="flex space-x-4">
       <select class="select w-40" bind:value={$to_lang}>
         {#each SCRIPT_LIST as lang (lang)}
-          <option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
+          <option value={lang}>{lang}</option>
         {/each}
       </select>
       <button
@@ -141,7 +146,9 @@
     </div>
     <textarea
       bind:value={$to_text}
-      class={`${get_text_font($to_lang)} textarea h-56`}
+      class="textarea h-56"
+      style:font-size={`${from_text_font_info.size}rem`}
+      style:font-family={from_text_font_info.family}
       placeholder={`Enter text in ${$to_lang}`}
       on:input={(e) => {
         if (to_text_type_enabled)
