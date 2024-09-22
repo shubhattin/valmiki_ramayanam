@@ -11,10 +11,10 @@
   import { OiCopy16 } from 'svelte-icons-pack/oi';
   import { BiHelpCircle } from 'svelte-icons-pack/bi';
   import TypingAssistance from '@components/TypingAssistance.svelte';
-  import { get_font_family_and_size, get_text_font_class } from '@tools/font_tools';
+  import { get_font_family_and_size } from '@tools/font_tools';
   import { PAGE_TITLES } from '@state/page_titles';
 
-  let from_lang = writable<script_list_type>('Sanskrit');
+  let from_lang = writable<script_list_type>('Devanagari');
   let to_lang = writable<script_list_type>('Telugu');
 
   let from_text = writable('');
@@ -59,7 +59,7 @@
     <div class="flex space-x-4">
       <select class="select w-40" bind:value={$from_lang}>
         {#each SCRIPT_LIST as lang (lang)}
-          <option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
+          <option value={lang}>{lang}</option>
         {/each}
       </select>
       <button
@@ -124,7 +124,7 @@
     <div class="flex space-x-4">
       <select class="select w-40" bind:value={$to_lang}>
         {#each SCRIPT_LIST as lang (lang)}
-          <option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
+          <option value={lang}>{lang}</option>
         {/each}
       </select>
       <button

@@ -4,7 +4,7 @@ import { writable } from 'svelte/store';
 export let kANDa_selected = writable(0);
 export let sarga_selected = writable(0);
 
-export const BASE_SCRIPT = 'Sanskrit';
+export const BASE_SCRIPT = 'Devanagari';
 
 export let viewing_script = writable<script_list_type>(BASE_SCRIPT);
 export let trans_lang = writable<lang_list_type | '--'>();

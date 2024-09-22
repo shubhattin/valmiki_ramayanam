@@ -22,6 +22,7 @@
   import { lipi_parivartak_async } from '@tools/converter';
   import { browser } from '$app/environment';
   import ImageOptions from './ImageOptions.svelte';
+  import type { script_list_type } from '@tools/lang_list';
 
   export let mounted: boolean;
 
@@ -62,7 +63,7 @@
     }
     return shloka_config;
   };
-  const render_all_texts = async ($image_shloka: number, $image_script: string) => {
+  const render_all_texts = async ($image_shloka: number, $image_script: script_list_type) => {
     if (!browser) return $shloka_configs[2]; // just like has no meaning
     // load wasm based library
     const { get_text_svg_path } = await import('@tools/harfbuzz');
@@ -172,8 +173,8 @@
           if (text_type === 'main') await render_word(word[0]); // only the pUrNa virAma
         } else await render_word(word);
       }
-      let height = text_group.height * text_path_scale; // already scaled
-      let width = text_group.width * text_path_scale; // already scaled
+      let height = text_group.height * text_path_scale;
+      let width = text_group.width * text_path_scale;
       if (WIDTH / width < 1) text_path_scale = (text_path_scale / width) * WIDTH;
       text_group.set({
         scaleX: text_path_scale,
@@ -193,7 +194,7 @@
       const main_text = await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, $image_script);
       const [text_main_group, height_main, width_main] = await render_text(
         main_text,
-        get_font_url($image_script === 'Sanskrit' ? 'ADOBE_DEVANAGARI' : 'NIRMALA_UI', 'bold'),
+        get_font_url($image_script === 'Devanagari' ? 'ADOBE_DEVANAGARI' : 'NIRMALA_UI', 'bold'),
         shloka_config.main_text_font_size,
         '#4f3200',
         i,
@@ -248,8 +249,8 @@
         };
         const [text_number_main, height_main, width_main] = await render_number_text(
           main_text.split(' ').at(-1)!,
-          get_font_url('ADOBE_DEVANAGARI', 'bold'),
-          40,
+          get_font_url($image_script === 'Devanagari' ? 'ADOBE_DEVANAGARI' : 'NIRMALA_UI', 'bold'),
+          42,
           'hsla(37, 80%, 25%, 0.8)',
           'main'
         );
@@ -260,8 +261,8 @@
 
         const [text_number_normal] = await render_number_text(
           norm_text.split(' ').at(-1)!,
-          get_font_url('ADOBE_DEVANAGARI', 'bold'),
-          35,
+          get_font_url('ROBOTO', 'bold'),
+          29,
           'hsla(37, 90%, 30%, 0.9)',
           'normal'
         );

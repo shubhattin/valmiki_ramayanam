@@ -172,7 +172,7 @@
     <select class="select inline-block w-36 p-1 text-sm" bind:value={$image_script}>
       {#each SCRIPT_LIST as lang (lang)}
         {#if !['Normal'].includes(lang)}
-          <option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
+          <option value={lang}>{lang}</option>
         {/if}
       {/each}
     </select>

@@ -55,7 +55,7 @@ export const get_font_url = (font: fonts_type, type: 'regular' | 'bold') => {
 export const get_font_family_and_size = (script: script_and_lang_list_type) => {
   let key: fonts_type = 'NIRMALA_UI';
   let size = 1;
-  if (script === 'Sanskrit') {
+  if (script === 'Devanagari') {
     key = 'ADOBE_DEVANAGARI';
     size = 1.45;
   } else if (LATIN_BASED_SCRIPTS.includes(script)) {
@@ -70,7 +70,7 @@ export const get_font_family_and_size = (script: script_and_lang_list_type) => {
 };
 
 export function get_script_for_lang(lang: script_and_lang_list_type): script_list_type {
-  if (lang === 'Hindi' || lang === 'English') return 'Sanskrit';
+  if (lang === 'Hindi' || lang === 'English') return 'Devanagari';
   // ^ Name for Sanskrit value in the dropdown is Devanagari
   else if (lang === 'Tamil') return 'Tamil-Extended';
   // Add a default return value to satisfy the return type

@@ -8,7 +8,7 @@
     image_trans_data,
     shaded_background_image_status
   } from './state';
-  import { LANG_LIST } from '@tools/lang_list';
+  import { LANG_LIST, type script_list_type } from '@tools/lang_list';
   import Icon from '@tools/Icon.svelte';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import { LanguageIcon } from '@components/icons';
@@ -26,7 +26,10 @@
   } from './settings';
   import { copy_plain_object } from '@tools/kry';
 
-  export let render_all_texts: (shloka_num: number, script: string) => Promise<shloka_type_config>;
+  export let render_all_texts: (
+    shloka_num: number,
+    script: script_list_type
+  ) => Promise<shloka_type_config>;
 
   $: kANDa_info = rAmAyaNam_map[$image_kANDa - 1];
   $: shloka_count = kANDa_info.sarga_data[$image_sarga - 1].shloka_count_extracted;

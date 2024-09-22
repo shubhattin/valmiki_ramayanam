@@ -20,8 +20,12 @@
   import { BsDownload } from 'svelte-icons-pack/bs';
   import Icon from '@tools/Icon.svelte';
   import type { shloka_type_config } from './settings';
+  import type { script_list_type } from '@tools/lang_list';
 
-  export let render_all_texts: (shloka_num: number, script: string) => Promise<shloka_type_config>;
+  export let render_all_texts: (
+    shloka_num: number,
+    script: script_list_type
+  ) => Promise<shloka_type_config>;
 
   $: kANDa_info = rAmAyaNam_map[$image_kANDa - 1];
   $: shloka_count = kANDa_info.sarga_data[$image_sarga - 1].shloka_count_extracted;

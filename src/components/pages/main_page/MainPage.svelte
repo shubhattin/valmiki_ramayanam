@@ -236,7 +236,7 @@
         bind:value={$viewing_script_selection}
       >
         {#each SCRIPT_LIST as lang (lang)}
-          <option value={lang}>{lang === 'Sanskrit' ? 'Devanagari' : lang}</option>
+          <option value={lang}>{lang}</option>
         {/each}
       </select>
     </label>
