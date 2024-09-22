@@ -88,65 +88,32 @@
       size="sm"
     />
   </span>
+  <span class="flex flex-col items-center justify-center">
+    <button
+      on:click={() => {
+        $shloka_configs[$current_shloka_type] = copy_plain_object(
+          DEFAULT_SHLOKA_CONFIG[$current_shloka_type]
+        );
+        $SPACE_ABOVE_REFERENCE_LINE = DEFAULT_SHLOKA_CONFIG_SHARED.SPACE_ABOVE_REFERENCE_LINE;
+        $SPACE_BETWEEN_MAIN_AND_NORM = DEFAULT_SHLOKA_CONFIG_SHARED.SPACE_BETWEEN_MAIN_AND_NORM;
+      }}
+      class="btn m-0 rounded-md bg-surface-700 px-1 py-1 text-xs font-bold text-white dark:bg-surface-500"
+      >Reset</button
+    >
+  </span>
 </div>
 <Accordion>
-  <AccordionItem open={false}>
+  <AccordionItem open={true}>
     <svelte:fragment slot="lead"><Icon src={IoOptions} class="text-2xl" /></svelte:fragment>
     <svelte:fragment slot="summary"
       ><span class="text-sm font-bold">Change Default Options</span>
     </svelte:fragment>
     <div slot="content" class="space-y-2">
-      <div class="flex items-center justify-center space-x-4 text-sm">
-        <span>
-          Current Shloka Type : {$current_shloka_type}
-        </span>
-        <button
-          on:click={() => {
-            $shloka_configs[$current_shloka_type] = copy_plain_object(
-              DEFAULT_SHLOKA_CONFIG[$current_shloka_type]
-            );
-            $SPACE_ABOVE_REFERENCE_LINE = DEFAULT_SHLOKA_CONFIG_SHARED.SPACE_ABOVE_REFERENCE_LINE;
-            $SPACE_BETWEEN_MAIN_AND_NORM = DEFAULT_SHLOKA_CONFIG_SHARED.SPACE_BETWEEN_MAIN_AND_NORM;
-          }}
-          class="btn rounded-md bg-primary-700 px-1.5 py-1 text-sm font-bold text-white dark:bg-primary-500"
-          >Reset</button
-        >
-      </div>
-      <div class="flex justify-center space-x-3">
-        <label class="inline-block">
-          <span class="text-sm">Main Text</span>
-          <input
-            type="number"
-            class="input w-16 rounded-md px-1 py-0 text-sm"
-            bind:value={$shloka_configs[$current_shloka_type].main_text_font_size}
-            min={10}
-          />
-        </label>
-        <label class="inline-block">
-          <span class="text-sm">Normal Text</span>
-          <input
-            type="number"
-            class="input w-16 rounded-md px-1 py-0 text-sm"
-            bind:value={$shloka_configs[$current_shloka_type].norm_text_font_size}
-            min={10}
-          />
-        </label>
-        <label class="inline-block">
-          <span class="text-sm">Translation Text</span>
-          <input
-            type="number"
-            class="input w-16 rounded-md px-1 py-0 text-sm"
-            bind:value={$shloka_configs[$current_shloka_type].trans_text_font_size}
-            min={10}
-          />
-        </label>
-      </div>
-
       <div class="flex justify-center space-x-16">
         <div class="flex flex-col justify-center space-y-1">
           <div class="text-center text-sm font-semibold">Spaces</div>
           <label>
-            <span class="text-sm">Space Above Reference Line</span>
+            <span class="text-sm">Above Reference Line</span>
             <input
               type="number"
               class="input w-12 rounded-md px-1 py-0 text-sm"
@@ -156,13 +123,56 @@
             />
           </label>
           <label>
-            <span class="text-sm">Space Between Main and Normal</span>
+            <span class="text-sm">Between Main and Normal</span>
             <input
               type="number"
               class="input w-12 rounded-md px-1 py-0 text-sm"
               bind:value={$SPACE_BETWEEN_MAIN_AND_NORM}
               min={0}
               max={20}
+            />
+          </label>
+        </div>
+        <div class="flex flex-col justify-center space-y-1">
+          <label class="space-x-1">
+            <span class="text-sm">Font Scale</span>
+            <input type="number" class="input w-16 rounded-md px-1 py-0 text-sm" min={10} />
+            <!-- bind:value={$shloka_configs[$current_shloka_type].main_text_font_size} -->
+          </label>
+        </div>
+      </div>
+      <div class="flex items-center justify-center space-x-4 text-sm">
+        <span class="text-base font-bold">
+          Current Shloka Type : {$current_shloka_type}
+        </span>
+      </div>
+      <div class="flex justify-center space-x-16">
+        <div class="flex flex-col justify-center space-y-1">
+          <label class="space-x-1">
+            <span class="text-sm">Main Text</span>
+            <input
+              type="number"
+              class="input w-16 rounded-md px-1 py-0 text-sm"
+              bind:value={$shloka_configs[$current_shloka_type].main_text_font_size}
+              min={10}
+            />
+          </label>
+          <label class="space-x-1">
+            <span class="text-sm">Normal Text</span>
+            <input
+              type="number"
+              class="input w-16 rounded-md px-1 py-0 text-sm"
+              bind:value={$shloka_configs[$current_shloka_type].norm_text_font_size}
+              min={10}
+            />
+          </label>
+          <label class="space-x-1">
+            <span class="text-sm">Translation Text</span>
+            <input
+              type="number"
+              class="input w-16 rounded-md px-1 py-0 text-sm"
+              bind:value={$shloka_configs[$current_shloka_type].trans_text_font_size}
+              min={10}
             />
           </label>
         </div>

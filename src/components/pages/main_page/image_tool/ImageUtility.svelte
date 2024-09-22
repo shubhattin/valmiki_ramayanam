@@ -7,7 +7,8 @@
     canvas,
     image_sarga_data,
     image_trans_data,
-    get_units
+    get_units,
+    image_lang
   } from './state';
   import {
     current_shloka_type,
@@ -16,8 +17,13 @@
     SPACE_BETWEEN_MAIN_AND_NORM,
     type shloka_type_config
   } from './settings';
-  import { BASE_SCRIPT } from '@state/main_page/main_state';
-  import { FONT_FAMILY_NAME, load_font, get_font_url } from '@tools/font_tools';
+  import { BASE_SCRIPT, trans_lang } from '@state/main_page/main_state';
+  import {
+    FONT_FAMILY_NAME,
+    load_font,
+    get_font_url,
+    get_font_family_and_size
+  } from '@tools/font_tools';
   import * as fabric from 'fabric';
   import { lipi_parivartak_async } from '@tools/converter';
   import { browser } from '$app/environment';
@@ -39,7 +45,7 @@
         new fabric.Line(
           [get_units(coords[0]), get_units(coords[1]), get_units(coords[2]), get_units(coords[3])],
           {
-            stroke: 'hsl(215, 40%, 60%)',
+            stroke: 'hsla(215, 40%, 60%, 1)',
             strokeWidth: get_units(1.5),
             selectable: false,
             evented: false
@@ -53,7 +59,7 @@
         new fabric.Line(
           [get_units(bounds.left), get_units(top), get_units(bounds.right), get_units(top)],
           {
-            stroke: 'brown',
+            stroke: 'hsla(0, 59%, 41%, 1)',
             strokeWidth: get_units(2),
             selectable: false,
             evented: false
@@ -82,7 +88,6 @@
       $image_sarga_data.data![
         $image_shloka !== -1 ? $image_shloka : $image_sarga_data.data!.length - 1
       ];
-    const CHAR_LIMIT = 45;
 
     const shloka_lines = (() => {
       if ($image_shloka === 0) {
@@ -98,19 +103,7 @@
       const new_shloka_lines: string[] = [];
       for (let i = 0; i < line_split.length; i++) {
         const line = line_split[i];
-        //   if (line.length > CHAR_LIMIT) {
-        //     const words = line.split(' ');
-        //     let new_line = '';
-        //     for (let j = 0; j < words.length; j++) {
-        //       if (new_line.length + words[j].length > CHAR_LIMIT) {
-        //         new_shloka_lines.push(new_line);
-        //         new_line = words[j];
-        //       } else {
-        //         new_line += ' ' + words[j];
-        //       }
-        //     }
-        //     new_shloka_lines.push(new_line);
-        //   } else
+        // We are not splitiing words as it leading to inconsistent unexpected results
         new_shloka_lines.push(line);
       }
       return new_shloka_lines;
@@ -142,7 +135,8 @@
       font_size: number,
       color: string,
       line_index: number,
-      text_type: 'main' | 'normal'
+      text_type: 'main' | 'normal',
+      font_scaling_factor: number
     ) => {
       let text_path_scale = get_font_size_for_path(font_size);
       const text_group = new fabric.Group([], {
@@ -151,7 +145,7 @@
       });
       const words = text.split(' ');
       let left_cord = 0;
-      const SPACE_WIDTH = 200;
+      const SPACE_WIDTH = 310 / font_scaling_factor;
       const render_word = async (word: string) => {
         if (word === '') return;
         const path = await get_text_svg_path(word, font_url);
@@ -192,22 +186,26 @@
     };
     for (let i = 0; i < shloka_lines.length; i++) {
       const main_text = await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, $image_script);
+      const main_text_font_info = get_font_family_and_size($image_script, 'image');
       const [text_main_group, height_main, width_main] = await render_text(
         main_text,
-        get_font_url($image_script === 'Devanagari' ? 'ADOBE_DEVANAGARI' : 'NIRMALA_UI', 'bold'),
-        shloka_config.main_text_font_size,
-        '#4f3200',
+        get_font_url(main_text_font_info.key, 'bold'),
+        shloka_config.main_text_font_size * main_text_font_info.size,
+        'hsla(38, 100%, 15%, 1)',
         i,
-        'main'
+        'main',
+        main_text_font_info.size
       );
       const norm_text = await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, 'Normal');
+      const norm_text_font_info = get_font_family_and_size('Normal', 'image');
       const [text_norm_group, height_norm, width_norm] = await render_text(
         norm_text,
-        get_font_url('ADOBE_DEVANAGARI', 'regular'),
+        get_font_url(norm_text_font_info.key, 'regular'),
         shloka_config.norm_text_font_size,
-        '#352700',
+        'hsla(44, 100%, 10%, 1)',
         i,
-        'normal'
+        'normal',
+        norm_text_font_info.size
       );
       const top_pos = get_units(
         shloka_config.reference_lines.top + i * shloka_config.reference_lines.spacing
@@ -249,8 +247,8 @@
         };
         const [text_number_main, height_main, width_main] = await render_number_text(
           main_text.split(' ').at(-1)!,
-          get_font_url($image_script === 'Devanagari' ? 'ADOBE_DEVANAGARI' : 'NIRMALA_UI', 'bold'),
-          42,
+          get_font_url(main_text_font_info.key, 'bold'),
+          42 * main_text_font_info.size * 0.8,
           'hsla(37, 80%, 25%, 0.8)',
           'main'
         );
@@ -262,7 +260,7 @@
         const [text_number_normal] = await render_number_text(
           norm_text.split(' ').at(-1)!,
           get_font_url('ROBOTO', 'bold'),
-          29,
+          28 * norm_text_font_info.size * 0.98,
           'hsla(37, 90%, 30%, 0.9)',
           'normal'
         );
@@ -275,15 +273,16 @@
 
     // trans
     const trans_data = $image_trans_data.data!;
+    const trnas_lang_font_config = get_font_family_and_size($image_lang, 'image');
     if (trans_data.has($image_shloka)) {
       const trans_text_data = trans_data.get($image_shloka)!;
       const trans_text = new fabric.Textbox(trans_text_data, {
         textAlign: 'right',
         left: get_units(610),
         top: get_units(650),
-        fill: '#352700',
-        fontFamily: FONT_FAMILY_NAME.ADOBE_DEVANAGARI,
-        fontSize: get_units(shloka_config.trans_text_font_size),
+        fill: 'hsla(44, 100%, 10%, 1)',
+        fontFamily: trnas_lang_font_config.family,
+        fontSize: get_units(shloka_config.trans_text_font_size) * trnas_lang_font_config.size,
         lockRotation: true,
         width: get_units(1250)
       });

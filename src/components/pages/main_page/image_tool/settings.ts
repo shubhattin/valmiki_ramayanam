@@ -29,7 +29,7 @@ export const DEFAULT_SHLOKA_CONFIG: Record<shloka_number_type, shloka_type_confi
       right: 1850,
       bottom: 600
     },
-    main_text_font_size: 83,
+    main_text_font_size: 70,
     norm_text_font_size: 48,
     trans_text_font_size: 52,
     reference_lines: {
@@ -44,7 +44,7 @@ export const DEFAULT_SHLOKA_CONFIG: Record<shloka_number_type, shloka_type_confi
       right: 1850,
       bottom: 600
     },
-    main_text_font_size: 85,
+    main_text_font_size: 63,
     norm_text_font_size: 48,
     trans_text_font_size: 52,
     reference_lines: {
@@ -59,7 +59,7 @@ export const DEFAULT_SHLOKA_CONFIG: Record<shloka_number_type, shloka_type_confi
       right: 1850,
       bottom: 600
     },
-    main_text_font_size: 77,
+    main_text_font_size: 55,
     norm_text_font_size: 43,
     trans_text_font_size: 52,
     reference_lines: {
@@ -74,7 +74,7 @@ export const DEFAULT_SHLOKA_CONFIG: Record<shloka_number_type, shloka_type_confi
       right: 1850,
       bottom: 600
     },
-    main_text_font_size: 63,
+    main_text_font_size: 45,
     norm_text_font_size: 38,
     trans_text_font_size: 52,
     reference_lines: {
@@ -89,7 +89,7 @@ export const DEFAULT_SHLOKA_CONFIG: Record<shloka_number_type, shloka_type_confi
       right: 1850,
       bottom: 600
     },
-    main_text_font_size: 57,
+    main_text_font_size: 40,
     norm_text_font_size: 35,
     trans_text_font_size: 52,
     reference_lines: {

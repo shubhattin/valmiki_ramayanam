@@ -9,6 +9,14 @@ export function get_text_font_class(lang: script_and_lang_list_type | '') {
   return 'indic-font';
 }
 
+export function get_script_for_lang(lang: script_and_lang_list_type): script_list_type {
+  if (lang === 'Hindi' || lang === 'English') return 'Devanagari';
+  // ^ Name for Sanskrit value in the dropdown is Devanagari
+  else if (lang === 'Tamil') return 'Tamil-Extended';
+  // Add a default return value to satisfy the return type
+  return lang;
+}
+
 /**
  * This loads the font family based on files defined in stylesheets
  */
@@ -23,6 +31,14 @@ export const FONT_FAMILY_NAME = {
 };
 
 type fonts_type = keyof typeof FONT_FAMILY_NAME;
+type image_font_config_type = Record<
+  script_and_lang_list_type,
+  {
+    font?: fonts_type;
+    size?: number;
+    space_width?: number;
+  }
+>;
 
 export const get_font_url = (font: fonts_type, type: 'regular' | 'bold') => {
   if (!browser) return '';
@@ -50,11 +66,32 @@ export const get_font_url = (font: fonts_type, type: 'regular' | 'bold') => {
 };
 
 /**
+ * Overrides the default font image config
+ */
+export const DEFAULT_FONT_IMAGE_CONFIG = {
+  Devanagari: {
+    size: 1.35,
+    space_width: 270
+  },
+  Normal: {
+    font: 'ADOBE_DEVANAGARI'
+  },
+  English: {
+    font: 'ADOBE_DEVANAGARI'
+  }
+} as image_font_config_type;
+
+/**
  * `size` is in rem
  */
-export const get_font_family_and_size = (script: script_and_lang_list_type) => {
+export const get_font_family_and_size = (
+  script: script_and_lang_list_type,
+  usage_context: 'image' | 'app' = 'app'
+) => {
+  const is_image_context = usage_context === 'image';
   let key: fonts_type = 'NIRMALA_UI';
   let size = 1;
+  let space_width = 310;
   if (script === 'Devanagari') {
     key = 'ADOBE_DEVANAGARI';
     size = 1.45;
@@ -62,17 +99,18 @@ export const get_font_family_and_size = (script: script_and_lang_list_type) => {
     key = 'ROBOTO';
   }
 
+  const override_image_conf = DEFAULT_FONT_IMAGE_CONFIG[script];
+  if (is_image_context && override_image_conf) {
+    // Override the default font size
+    if (override_image_conf.font) key = override_image_conf.font;
+    if (override_image_conf.size) size = override_image_conf.size;
+    if (override_image_conf.space_width) space_width = override_image_conf.space_width;
+  }
+
   return {
     family: FONT_FAMILY_NAME[key],
     size,
-    key
+    key,
+    space_width
   };
 };
-
-export function get_script_for_lang(lang: script_and_lang_list_type): script_list_type {
-  if (lang === 'Hindi' || lang === 'English') return 'Devanagari';
-  // ^ Name for Sanskrit value in the dropdown is Devanagari
-  else if (lang === 'Tamil') return 'Tamil-Extended';
-  // Add a default return value to satisfy the return type
-  return lang;
-}
