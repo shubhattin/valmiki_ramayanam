@@ -15,6 +15,7 @@ import {
   type script_list_type
 } from '@tools/lang_list';
 import { get_font_family_and_size } from '@tools/font_tools';
+import { copy_plain_object } from '@tools/kry';
 
 export let canvas = writable<fabric.Canvas>();
 export let background_image = writable<fabric.FabricImage>();
@@ -89,8 +90,10 @@ export const DEFAULT_MAIN_TEXT_FONT_CONFIGS = (() => {
   );
   return res as image_font_config_type<script_list_type>;
 })();
-export let main_text_font_configs = writable(DEFAULT_MAIN_TEXT_FONT_CONFIGS);
-export let normal_text_font_config = writable(get_font_family_and_size('Normal', 'image'));
+export let main_text_font_configs = writable(copy_plain_object(DEFAULT_MAIN_TEXT_FONT_CONFIGS));
+export let normal_text_font_config = writable(
+  copy_plain_object(get_font_family_and_size('Normal', 'image'))
+);
 export const DEFAULT_TRANS_TEXT_FONT_CONFIGS = (() => {
   const res: any = {};
   LANG_LIST.forEach(
@@ -103,4 +106,4 @@ export const DEFAULT_TRANS_TEXT_FONT_CONFIGS = (() => {
   res['English'] = get_font_family_and_size('English', 'image');
   return res as image_font_config_type<lang_list_extended_type>;
 })();
-export let trans_text_font_configs = writable(DEFAULT_TRANS_TEXT_FONT_CONFIGS);
+export let trans_text_font_configs = writable(copy_plain_object(DEFAULT_TRANS_TEXT_FONT_CONFIGS));
