@@ -11,10 +11,12 @@
 </script>
 
 <svelte:head>
-  <script>
-    partytown = {
-      forward: ['dataLayer.push']
-    };
-  </script>
-  <script bind:this={scriptEl}></script>
+  {#if import.meta.env.PROD}
+    <script>
+      partytown = {
+        forward: ['dataLayer.push']
+      };
+    </script>
+    <script bind:this={scriptEl}></script>
+  {/if}
 </svelte:head>

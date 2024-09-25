@@ -27,7 +27,7 @@
   import { browser } from '$app/environment';
   import ImageOptions from './ImageOptions.svelte';
   import type { script_list_type } from '@tools/lang_list';
-  import { z } from 'zod';
+  import { render_text } from './render_task';
 
   export let mounted: boolean;
 
@@ -75,8 +75,6 @@
     const trans_text_font_info = $trans_text_font_configs[$image_lang];
     const norm_text_font_info = $normal_text_font_config;
 
-    // load wasm based library
-    const { get_text_svg_path } = await import('@tools/harfbuzz');
     // load necessary fonts
     await load_font(FONT_FAMILY_NAME.ADOBE_DEVANAGARI);
 
@@ -115,100 +113,9 @@
     $current_shloka_type = shloka_lines.length as keyof typeof $shloka_configs;
     const shloka_config = $shloka_configs[$current_shloka_type];
 
-    const get_font_size_for_path = (font_size: number) => {
-      const PATH_SCALING_FACTOR = 1 / 15.125;
-      return get_units((font_size / 65) * PATH_SCALING_FACTOR);
-    };
     await draw_bounding_and_reference_lines(shloka_config);
 
     // shloka
-    const render_text_args_schema = z.object({
-      text: z.string(),
-      font_url: z.string(),
-      font_size: z.number(),
-      color: z.string(),
-      line_index: z.number().optional(),
-      text_type: z.union([z.literal('main'), z.literal('normal')]).optional(),
-      total_lines: z.number().optional(),
-      left: z.number(),
-      right: z.number(),
-      top: z.number().optional(),
-      width_usage_factor: z.number(),
-      align: z.union([z.literal('left'), z.literal('right'), z.literal('center')])
-    });
-    /**
-     * This function will also set the left coordinate of the text.
-     * left has to be set outside
-     *
-     * returns `[text_group, height, width]`
-     */
-    const render_text = async (opts: z.infer<typeof render_text_args_schema>) => {
-      const {
-        text,
-        font_url,
-        font_size,
-        color,
-        line_index,
-        text_type,
-        width_usage_factor,
-        align,
-        total_lines
-      } = render_text_args_schema.parse(opts);
-
-      const right = get_units(opts.right);
-      const left = get_units(opts.left);
-
-      const WIDTH_ACTUAL = right - left;
-      const WIDTH = WIDTH_ACTUAL * width_usage_factor;
-      const WIDTH_SPACING = (WIDTH_ACTUAL - WIDTH) / 2;
-
-      let text_used = '';
-      const words = text.split(' ');
-      for (let i = 0; i < words.length; i++) {
-        const word = words[i];
-        if (word === '') continue;
-        else if (
-          line_index &&
-          total_lines &&
-          text_type &&
-          i === words.length - 1 &&
-          line_index === total_lines - 1
-        ) {
-          if (text_type === 'main') text_used += word[0];
-          continue;
-        }
-        text_used += word + (i === words.length - 1 ? '' : ' ');
-      }
-      let text_path_scale = get_font_size_for_path(font_size);
-      const text_group = new fabric.Path(await get_text_svg_path(text_used, font_url), {
-        lockRotation: true,
-        lockMovementY: true,
-        fill: color
-      });
-      let height = text_group.height * text_path_scale;
-      let width = text_group.width * text_path_scale;
-      if (WIDTH / width < 1) text_path_scale = (text_path_scale / width) * WIDTH;
-      text_group.set({
-        scaleX: text_path_scale,
-        scaleY: text_path_scale
-      });
-      height = text_group.height * text_path_scale;
-      width = text_group.width * text_path_scale;
-      if (opts.top) text_group.set({ top: get_units(opts.top) });
-      if (align === 'center')
-        text_group.set({
-          left: left + WIDTH_SPACING + (WIDTH - width) / 2
-        });
-      else if (align === 'left')
-        text_group.set({
-          left: left + WIDTH_SPACING
-        });
-      else if (align === 'right')
-        text_group.set({
-          left: right - WIDTH_SPACING - width
-        });
-      return [text_group, height, width] as [typeof text_group, number, number];
-    };
 
     for (let i = 0; i < shloka_lines.length; i++) {
       const main_text = await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, $image_script);
