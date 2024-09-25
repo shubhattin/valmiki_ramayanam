@@ -129,105 +129,68 @@
         <svelte:fragment slot="panel">
           {#if settings_tab === 'non-depend'}
             <div class="flex justify-center space-x-16">
-              <div class="flex flex-col justify-center space-y-1">
+              <div class=" flex flex-col justify-center space-y-1">
                 <div class="text-center text-sm font-semibold">Spaces</div>
-                <label>
-                  <span class="text-sm">Above Reference Line</span>
-                  <input
-                    type="number"
-                    class="input w-12 rounded-md px-1 py-0 text-sm"
-                    bind:value={$SPACE_ABOVE_REFERENCE_LINE}
-                    min={0}
-                    max={40}
-                  />
-                </label>
-                <label>
-                  <span class="text-sm">Between Main and Normal</span>
-                  <input
-                    type="number"
-                    class="input w-12 rounded-md px-1 py-0 text-sm"
-                    bind:value={$SPACE_BETWEEN_MAIN_AND_NORM}
-                    min={0}
-                    max={20}
-                  />
-                </label>
+                <div class="space-y-1 text-center">
+                  <label>
+                    <span class="text-sm">Above Reference Line</span>
+                    <input
+                      type="number"
+                      class="input w-12 rounded-md px-1 py-0 text-sm"
+                      bind:value={$SPACE_ABOVE_REFERENCE_LINE}
+                      min={0}
+                      max={40}
+                    />
+                  </label>
+                  <label>
+                    <span class="text-sm">Between Main and Normal</span>
+                    <input
+                      type="number"
+                      class="input w-12 rounded-md px-1 py-0 text-sm"
+                      bind:value={$SPACE_BETWEEN_MAIN_AND_NORM}
+                      min={0}
+                      max={20}
+                    />
+                  </label>
+                </div>
               </div>
               <div class="flex flex-col justify-center space-y-1">
-                <div class="text-center text-sm font-semibold">Scaling factors</div>
-                <table class="w-full border-collapse text-center text-sm">
-                  <thead>
-                    <tr>
-                      <th class=""></th>
-                      <th class="p-1 font-semibold">Text</th>
-                      <th class="p-1 font-semibold">Space</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td class="font-semibold">Main</td>
-                      <td class="p-1">
-                        <input
-                          type="number"
-                          class="input w-16 rounded-md px-1 py-0 text-sm"
-                          bind:value={$main_text_font_configs[$image_script].size}
-                          min={0}
-                          max={10}
-                        />
-                      </td>
-                      <td class="p-1">
-                        <input
-                          type="number"
-                          class="input w-16 rounded-md px-1 py-0 text-sm"
-                          bind:value={$main_text_font_configs[$image_script].space_width_scale}
-                          min={0}
-                          max={10}
-                        />
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="font-semibold">Normal</td>
-                      <td class="p-1">
-                        <input
-                          type="number"
-                          class="input w-16 rounded-md px-1 py-0 text-sm"
-                          bind:value={$normal_text_font_config.size}
-                          min={0}
-                          max={10}
-                        />
-                      </td>
-                      <td class="p-1">
-                        <input
-                          type="number"
-                          class="input w-16 rounded-md px-1 py-0 text-sm"
-                          bind:value={$normal_text_font_config.space_width_scale}
-                          min={0}
-                          max={10}
-                        />
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="font-semibold">Translation</td>
-                      <td class="p-1">
-                        <input
-                          type="number"
-                          class="input w-16 rounded-md px-1 py-0 text-sm"
-                          bind:value={$trans_text_font_configs[$image_lang].size}
-                          min={0}
-                          max={10}
-                        />
-                      </td>
-                      <td class="p-1">
-                        <input
-                          type="number"
-                          class="input w-16 rounded-md px-1 py-0 text-sm"
-                          bind:value={$trans_text_font_configs[$image_lang].space_width_scale}
-                          min={0}
-                          max={10}
-                        />
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                <div class="text-center text-sm font-semibold">Text Scaling factors</div>
+                <div class="space-y-1 text-center">
+                  <label class="space-x-1">
+                    <span class="text-sm">Main</span>
+                    <input
+                      type="number"
+                      class="input w-16 rounded-md px-1 py-0 text-sm"
+                      bind:value={$main_text_font_configs[$image_script].size}
+                      min={0}
+                      max={10}
+                      step={0.1}
+                    />
+                  </label>
+                  <label class="space-x-1">
+                    <span class="text-sm">Normal</span>
+                    <input
+                      type="number"
+                      class="input w-16 rounded-md px-1 py-0 text-sm"
+                      bind:value={$normal_text_font_config.size}
+                      min={0}
+                      max={10}
+                      step={0.1}
+                    />
+                  </label>
+                  <label class="space-x-1">
+                    <span class="text-sm">Translation</span>
+                    <input
+                      type="number"
+                      class="input w-16 rounded-md px-1 py-0 text-sm"
+                      bind:value={$trans_text_font_configs[$image_lang].size}
+                      min={0}
+                      max={10}
+                      step={0.1}
+                    />
+                  </label>
+                </div>
               </div>
             </div>
           {:else if settings_tab === 'depend'}

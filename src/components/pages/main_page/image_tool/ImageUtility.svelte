@@ -21,12 +21,7 @@
     type shloka_type_config
   } from './settings';
   import { BASE_SCRIPT } from '@state/main_page/main_state';
-  import {
-    FONT_FAMILY_NAME,
-    load_font,
-    get_font_url,
-    DEFAULT_SPACE_WIDTH
-  } from '@tools/font_tools';
+  import { FONT_FAMILY_NAME, load_font, get_font_url } from '@tools/font_tools';
   import * as fabric from 'fabric';
   import { lipi_parivartak_async } from '@tools/converter';
   import { browser } from '$app/environment';
