@@ -78,6 +78,9 @@ export const DEFAULT_FONT_IMAGE_CONFIG = {
   },
   English: {
     font: 'ADOBE_DEVANAGARI'
+  },
+  Romanized: {
+    font: 'ADOBE_DEVANAGARI'
   }
 } as image_font_config_type;
 
