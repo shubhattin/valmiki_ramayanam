@@ -131,46 +131,45 @@ export const render_text = async (opts: z.infer<typeof render_text_args_schema>)
     prev_height += height + NEW_LINE_SPACING;
   };
 
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    text_path_scale = get_font_size_for_path(font_size * font_scale);
-    if (!multi_line_text) await render_line(line);
-    else {
-      const words = line.split(' ');
-      const render_multiple_line = async () => {
-        let allowed_words: string[] = [];
-        for (let word_i = 0; word_i < words.length; word_i++) {
-          const word = words[word_i];
-          let current_word =
-            allowed_words.join(' ') + (allowed_words.length !== 0 ? ' ' : '') + word;
-          const text_path = new fabric.Path(await get_text_svg_path(current_word, font_url), {
-            fill: color
-          });
-          let height = text_path.height * text_path_scale;
-          let width = text_path.width * text_path_scale;
-          if (WIDTH > width) allowed_words.push(word);
-          else {
-            await render_line(allowed_words.join(' '));
-            // new line should be started as the current word is not fitting
-            allowed_words = [word];
+  for (let iter = 0; true; iter++) {
+    prev_height = 0;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      text_path_scale = get_font_size_for_path(font_size * (font_scale - iter * FONT_SCALE_STEP));
+      if (!multi_line_text) await render_line(line);
+      else {
+        const words = line.split(' ');
+        const render_multiple_line = async () => {
+          let allowed_words: string[] = [];
+          for (let word_i = 0; word_i < words.length; word_i++) {
+            const word = words[word_i];
+            let current_word =
+              allowed_words.join(' ') + (allowed_words.length !== 0 ? ' ' : '') + word;
+            const text_path = new fabric.Path(await get_text_svg_path(current_word, font_url), {
+              fill: color
+            });
+            let height = text_path.height * text_path_scale;
+            let width = text_path.width * text_path_scale;
+            if (WIDTH > width) allowed_words.push(word);
+            else {
+              await render_line(allowed_words.join(' '));
+              // new line should be started as the current word is not fitting
+              allowed_words = [word];
+            }
           }
-        }
-        // last group of allowed words will rendered after done here
-        if (allowed_words.length !== 0) await render_line(allowed_words.join(' '));
-      };
-      for (let iter = 0; true; iter++) {
+          // last group of allowed words will rendered after done here
+          if (allowed_words.length !== 0) await render_line(allowed_words.join(' '));
+        };
         await render_multiple_line();
-        if (HEIGHT / text_group.height >= 1) {
-          console.log('correct', text_path_scale, font_scale);
-          break;
-        } else {
-          console.log('height exceeded', HEIGHT / text_group.height, text_path_scale);
-          text_path_scale = get_font_size_for_path(
-            font_size * (font_scale - (iter + 1) * FONT_SCALE_STEP)
-          );
-          console.log('new scale', text_path_scale);
-          text_group.removeAll();
-        }
+      }
+    }
+    if (!multi_line_text) break;
+    else {
+      if (HEIGHT / text_group.height >= 1) {
+        break;
+      } else {
+        console.log('resized');
+        text_group.removeAll();
       }
     }
   }
