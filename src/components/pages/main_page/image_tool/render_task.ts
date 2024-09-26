@@ -168,7 +168,6 @@ export const render_text = async (opts: z.infer<typeof render_text_args_schema>)
       if (HEIGHT / text_group.height >= 1) {
         break;
       } else {
-        console.log('resized');
         text_group.removeAll();
       }
     }

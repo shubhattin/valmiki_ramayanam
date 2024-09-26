@@ -34,24 +34,60 @@
 
   const draw_bounding_and_reference_lines = async (shloka_config: shloka_type_config) => {
     const bounds = shloka_config.bounding_coords;
-    for (let coords of [
-      // x1 y1 x2 y2
-      [bounds.left, bounds.top, bounds.left, bounds.bottom], // left line
-      [bounds.right, bounds.top, bounds.right, bounds.bottom], // top line
-      [bounds.left, bounds.top, bounds.right, bounds.top], // right line
-      [bounds.left, bounds.bottom, bounds.right, bounds.bottom] // bottom line
+    for (let line_coord of [
+      [
+        // the main area bounding box
+        // x1 y1 x2 y2
+        [bounds.left, bounds.top, bounds.left, bounds.bottom], // left line
+        [bounds.right, bounds.top, bounds.right, bounds.bottom], // top line
+        [bounds.left, bounds.top, bounds.right, bounds.top], // right line
+        [bounds.left, bounds.bottom, bounds.right, bounds.bottom] // bottom line
+      ],
+      [
+        // translation area bounding box
+        [
+          TRANSLATION_BOUNDIND_COORDS.left,
+          TRANSLATION_BOUNDIND_COORDS.top,
+          TRANSLATION_BOUNDIND_COORDS.left,
+          TRANSLATION_BOUNDIND_COORDS.bottom
+        ], // left line
+        [
+          TRANSLATION_BOUNDIND_COORDS.right,
+          TRANSLATION_BOUNDIND_COORDS.top,
+          TRANSLATION_BOUNDIND_COORDS.right,
+          TRANSLATION_BOUNDIND_COORDS.bottom
+        ], // top line
+        [
+          TRANSLATION_BOUNDIND_COORDS.left,
+          TRANSLATION_BOUNDIND_COORDS.top,
+          TRANSLATION_BOUNDIND_COORDS.right,
+          TRANSLATION_BOUNDIND_COORDS.top
+        ], // right line
+        [
+          TRANSLATION_BOUNDIND_COORDS.left,
+          TRANSLATION_BOUNDIND_COORDS.bottom,
+          TRANSLATION_BOUNDIND_COORDS.right,
+          TRANSLATION_BOUNDIND_COORDS.bottom
+        ] // bottom line
+      ]
     ])
-      $canvas.add(
-        new fabric.Line(
-          [get_units(coords[0]), get_units(coords[1]), get_units(coords[2]), get_units(coords[3])],
-          {
-            stroke: 'hsla(215, 40%, 60%, 1)',
-            strokeWidth: get_units(1.5),
-            selectable: false,
-            evented: false
-          }
-        )
-      );
+      for (let line_pos of line_coord)
+        $canvas.add(
+          new fabric.Line(
+            [
+              get_units(line_pos[0]),
+              get_units(line_pos[1]),
+              get_units(line_pos[2]),
+              get_units(line_pos[3])
+            ],
+            {
+              stroke: 'hsla(215, 40%, 60%, 1)',
+              strokeWidth: get_units(1.5),
+              selectable: false,
+              evented: false
+            }
+          )
+        );
     // drawing shloka reference lines
     for (let top_i = 0; top_i < $current_shloka_type; top_i++) {
       const top = shloka_config.reference_lines.top + top_i * shloka_config.reference_lines.spacing;
@@ -200,7 +236,6 @@
       const trans_text_data = trans_data.get($image_shloka)!;
       const trans_text = await render_text({
         text: trans_text_data,
-        // text: 'अथ तत्त्वमसि श्लोकः\nयदि त्वं शोकमोहौ त्यक्त्वा देहं द्रुतं गतः।\nअथ तत्त्वमसि श्लोकः\nयदि त्वं शोकमोहौ त्यक्त्वा देहं द्रुतं गतः।',
         align: 'right',
         color: 'hsla(44, 100%, 10%, 1)',
         font_url: get_font_url(trans_text_font_info.key, 'regular'),
