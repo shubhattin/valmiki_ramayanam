@@ -119,7 +119,7 @@
 
     for (let i = 0; i < shloka_lines.length; i++) {
       const main_text = await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, $image_script);
-      const [text_main, height_main, width_main] = await render_text({
+      const text_main_group = await render_text({
         text: main_text,
         font_url: get_font_url(main_text_font_info.key, 'bold'),
         font_size: shloka_config.main_text_font_size * main_text_font_info.size,
@@ -133,7 +133,7 @@
         align: 'center'
       });
       const norm_text = await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, 'Normal');
-      const [text_norm, height_norm, width_norm] = await render_text({
+      const text_norm_group = await render_text({
         text: norm_text,
         font_url: get_font_url(norm_text_font_info.key, 'regular'),
         font_size: shloka_config.norm_text_font_size * norm_text_font_info.size,
@@ -149,21 +149,21 @@
       const top_pos = get_units(
         shloka_config.reference_lines.top + i * shloka_config.reference_lines.spacing
       );
-      text_norm.set({
-        top: top_pos - (height_norm + get_units($SPACE_ABOVE_REFERENCE_LINE))
+      text_norm_group.set({
+        top: top_pos - (text_norm_group.height + get_units($SPACE_ABOVE_REFERENCE_LINE))
       });
-      text_main.set({
+      text_main_group.set({
         top:
           top_pos -
-          (height_main +
+          (text_main_group.height +
             $SPACE_BETWEEN_MAIN_AND_NORM +
-            (height_norm + get_units($SPACE_ABOVE_REFERENCE_LINE)))
+            (text_norm_group.height + get_units($SPACE_ABOVE_REFERENCE_LINE)))
       });
-      $canvas.add(text_main);
-      $canvas.add(text_norm);
+      $canvas.add(text_main_group);
+      $canvas.add(text_norm_group);
       if (i === shloka_lines.length - 1) {
         const number_main_text = main_text.split(' ').at(-1)!;
-        const [number_indicator_main, height_indicator_main] = await render_text({
+        const number_indicator_main = await render_text({
           text: number_main_text.substring(1, number_main_text.length - 1),
           font_url: get_font_url(main_text_font_info.key, 'bold'),
           font_size: 42 * main_text_font_info.size * 0.8,
@@ -176,7 +176,7 @@
         });
         $canvas.add(number_indicator_main);
 
-        const [number_indicator_norm] = await render_text({
+        const number_indicator_norm = await render_text({
           text: norm_text.split(' ').at(-1)!,
           font_url: get_font_url('ROBOTO', 'bold'),
           font_size: 28 * norm_text_font_info.size * 0.98,
@@ -188,7 +188,7 @@
         });
         // top has to be set outiside as itss a mix of scaled and non scaled values
         number_indicator_norm.set({
-          top: number_indicator_main.top + get_units(5) + height_indicator_main
+          top: number_indicator_main.top + get_units(5) + number_indicator_main.height
         });
         $canvas.add(number_indicator_norm);
       }
@@ -198,15 +198,17 @@
     const trans_data = $image_trans_data.data!;
     if (trans_data.has($image_shloka)) {
       const trans_text_data = trans_data.get($image_shloka)!;
-      const trans_text = new fabric.Textbox(trans_text_data, {
-        textAlign: 'right',
-        left: get_units(610),
-        top: get_units(650),
-        fill: 'hsla(44, 100%, 10%, 1)',
-        fontFamily: trans_text_font_info.family,
-        fontSize: get_units(shloka_config.trans_text_font_size) * trans_text_font_info.size,
-        lockRotation: true,
-        width: get_units(1250)
+      const trans_text = await render_text({
+        // text: trans_text_data,
+        text: 'Valmiki Greatest of all Sages\nGood',
+        align: 'right',
+        color: 'hsla(44, 100%, 10%, 1)',
+        font_url: get_font_url(trans_text_font_info.key, 'regular'),
+        font_size: shloka_config.trans_text_font_size * trans_text_font_info.size,
+        left: 610,
+        top: 650,
+        width_usage_factor: 0.985,
+        right: 610 + 1250
       });
       $canvas.add(trans_text);
     }

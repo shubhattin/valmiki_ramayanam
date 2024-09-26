@@ -70,32 +70,43 @@ export const render_text = async (opts: z.infer<typeof render_text_args_schema>)
     text_used += word + (i === words.length - 1 ? '' : ' ');
   }
   let text_path_scale = get_font_size_for_path(font_size);
-  const text_path = new fabric.Path(await get_text_svg_path(text_used, font_url), {
+  const text_group = new fabric.Group([], {
     lockRotation: true,
     lockMovementY: true,
-    fill: color
+    lockMovementX: true,
+    lockScalingX: true,
+    lockScalingY: true
   });
-  let height = text_path.height * text_path_scale;
-  let width = text_path.width * text_path_scale;
-  if (WIDTH / width < 1) text_path_scale = (text_path_scale / width) * WIDTH;
-  text_path.set({
-    scaleX: text_path_scale,
-    scaleY: text_path_scale
-  });
-  height = text_path.height * text_path_scale;
-  width = text_path.width * text_path_scale;
-  if (opts.top) text_path.set({ top: get_units(opts.top) });
-  if (align === 'center')
-    text_path.set({
-      left: left + WIDTH_SPACING + (WIDTH - width) / 2
+  const lines = text_used.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const text_path = new fabric.Path(await get_text_svg_path(line, font_url), {
+      fill: color
     });
-  else if (align === 'left')
+    let height = text_path.height * text_path_scale;
+    let width = text_path.width * text_path_scale;
+    if (WIDTH / width < 1) text_path_scale = (text_path_scale / width) * WIDTH;
     text_path.set({
-      left: left + WIDTH_SPACING
+      scaleX: text_path_scale,
+      scaleY: text_path_scale
     });
-  else if (align === 'right')
-    text_path.set({
-      left: right - WIDTH_SPACING - width
-    });
-  return [text_path, height, width] as [typeof text_path, number, number];
+    height = text_path.height * text_path_scale;
+    width = text_path.width * text_path_scale;
+    if (opts.top) text_path.set({ top: get_units(opts.top) });
+    if (align === 'center')
+      text_path.set({
+        left: left + WIDTH_SPACING + (WIDTH - width) / 2
+      });
+    else if (align === 'left')
+      text_path.set({
+        left: left + WIDTH_SPACING
+      });
+    else if (align === 'right')
+      text_path.set({
+        left: right - WIDTH_SPACING - width
+      });
+    text_group.add(text_path);
+    if (!multi_line_text) break;
+  }
+  return text_group;
 };
