@@ -113,3 +113,10 @@ export const SPACE_BETWEEN_MAIN_AND_NORM = writable(
 export let shloka_configs = writable(copy_plain_object(DEFAULT_SHLOKA_CONFIG));
 
 export let current_shloka_type = writable<shloka_number_type>();
+
+export const TRANSLATION_BOUNDIND_COORDS = {
+  left: 610,
+  top: 650,
+  right: 1860,
+  bottom: 970
+};

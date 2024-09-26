@@ -36,7 +36,6 @@ type image_font_config_type = Record<
   {
     font?: fonts_type;
     size?: number;
-    space_width_scale?: number;
   }
 >;
 
@@ -70,18 +69,19 @@ export const get_font_url = (font: fonts_type, type: 'regular' | 'bold') => {
  */
 export const DEFAULT_FONT_IMAGE_CONFIG = {
   Devanagari: {
-    size: 1.35,
-    space_width_scale: 0.55
+    size: 1.35
   },
   Normal: {
     font: 'ADOBE_DEVANAGARI'
   },
   English: {
     font: 'ADOBE_DEVANAGARI'
+  },
+  Romanized: {
+    font: 'ADOBE_DEVANAGARI'
   }
 } as image_font_config_type;
 
-export const DEFAULT_SPACE_WIDTH = 310;
 /**
  * `size` is in rem
  */
@@ -105,8 +105,6 @@ export const get_font_family_and_size = (
     // Override the default font size
     if (override_image_conf.font) key = override_image_conf.font;
     if (override_image_conf.size) size = override_image_conf.size;
-    if (override_image_conf.space_width_scale)
-      space_width_scale = override_image_conf.space_width_scale;
   }
 
   return {

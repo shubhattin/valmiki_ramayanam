@@ -18,20 +18,17 @@
     shloka_configs,
     SPACE_ABOVE_REFERENCE_LINE,
     SPACE_BETWEEN_MAIN_AND_NORM,
+    TRANSLATION_BOUNDIND_COORDS,
     type shloka_type_config
   } from './settings';
   import { BASE_SCRIPT } from '@state/main_page/main_state';
-  import {
-    FONT_FAMILY_NAME,
-    load_font,
-    get_font_url,
-    DEFAULT_SPACE_WIDTH
-  } from '@tools/font_tools';
+  import { FONT_FAMILY_NAME, load_font, get_font_url } from '@tools/font_tools';
   import * as fabric from 'fabric';
   import { lipi_parivartak_async } from '@tools/converter';
   import { browser } from '$app/environment';
   import ImageOptions from './ImageOptions.svelte';
   import type { script_list_type } from '@tools/lang_list';
+  import { render_text } from './render_task';
 
   export let mounted: boolean;
 
@@ -79,11 +76,6 @@
     const trans_text_font_info = $trans_text_font_configs[$image_lang];
     const norm_text_font_info = $normal_text_font_config;
 
-    // load wasm based library
-    const { get_text_svg_path } = await import('@tools/harfbuzz');
-    // load necessary fonts
-    await load_font(FONT_FAMILY_NAME.ADOBE_DEVANAGARI);
-
     // remove all previous texts, textboxes and lines
     $canvas.getObjects().forEach((obj) => {
       if (!obj || obj.type === 'image') return;
@@ -119,161 +111,86 @@
     $current_shloka_type = shloka_lines.length as keyof typeof $shloka_configs;
     const shloka_config = $shloka_configs[$current_shloka_type];
 
-    const get_font_size_for_path = (font_size: number) => {
-      const PATH_SCALING_FACTOR = 1 / 15.125;
-      return get_units((font_size / 65) * PATH_SCALING_FACTOR);
-    };
     await draw_bounding_and_reference_lines(shloka_config);
-    const WIDTH_ACTUAL = get_units(
-      (shloka_config.bounding_coords.right - shloka_config.bounding_coords.left) * 1.0
-    );
-    const WIDTH = WIDTH_ACTUAL * 0.985;
-    const HEIGHT_ACTUAL = get_units(
-      (shloka_config.bounding_coords.bottom - shloka_config.bounding_coords.top) * 1.0
-    );
 
     // shloka
-    /**
-     * This function will also set the left coordinate of the text.
-     * left has to be set outside
-     */
-    const render_text = async (
-      text: string,
-      font_url: string,
-      font_size: number,
-      color: string,
-      line_index: number,
-      text_type: 'main' | 'normal',
-      space_width_scale: number
-    ) => {
-      let text_path_scale = get_font_size_for_path(font_size);
-      const text_group = new fabric.Group([], {
-        lockRotation: true,
-        lockMovementY: true
-      });
-      const words = text.split(' ');
-      let left_cord = 0;
-      const space_width = DEFAULT_SPACE_WIDTH * space_width_scale;
-      const render_word = async (word: string) => {
-        if (word === '') return;
-        const path = await get_text_svg_path(word, font_url);
-        const text_path = new fabric.Path(path, {
-          fill: color,
-          lockRotation: true,
-          lockMovementY: true,
-          left: left_cord
-          // do not add `top` in this
-        });
-        const width = text_path.width;
-        left_cord += width + space_width;
-        text_group.add(text_path);
-      };
-      for (let i = 0; i < words.length; i++) {
-        const word = words[i];
-        if (word === '') continue;
-        if (line_index === shloka_lines.length - 1 && i === words.length - 1) {
-          if (text_type === 'main') await render_word(word[0]); // only the pUrNa virAma
-        } else await render_word(word);
-      }
-      let height = text_group.height * text_path_scale;
-      let width = text_group.width * text_path_scale;
-      if (WIDTH / width < 1) text_path_scale = (text_path_scale / width) * WIDTH;
-      text_group.set({
-        scaleX: text_path_scale,
-        scaleY: text_path_scale
-      });
-      height = text_group.height * text_path_scale;
-      width = text_group.width * text_path_scale;
-      text_group.set({
-        left:
-          get_units(shloka_config.bounding_coords.left) +
-          (WIDTH_ACTUAL - WIDTH) / 2 +
-          (WIDTH - width) / 2
-      });
-      return [text_group, height, width] as [typeof text_group, number, number];
-    };
+
     for (let i = 0; i < shloka_lines.length; i++) {
       const main_text = await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, $image_script);
-      const [text_main_group, height_main, width_main] = await render_text(
-        main_text,
-        get_font_url(main_text_font_info.key, 'bold'),
-        shloka_config.main_text_font_size * main_text_font_info.size,
-        'hsla(38, 100%, 15%, 1)',
-        i,
-        'main',
-        main_text_font_info.space_width_scale
-      );
+      const text_main_group = await render_text({
+        text: main_text,
+        font_url: get_font_url(main_text_font_info.key, 'bold'),
+        font_size: shloka_config.main_text_font_size,
+        font_scale: main_text_font_info.size,
+        color: 'hsla(38, 100%, 15%, 1)',
+        line_index: i,
+        total_lines: shloka_lines.length,
+        text_type: 'main',
+        ...shloka_config.bounding_coords,
+        width_usage_factor: 0.985,
+        align: 'center'
+      });
       const norm_text = await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, 'Normal');
-      const [text_norm_group, height_norm, width_norm] = await render_text(
-        norm_text,
-        get_font_url(norm_text_font_info.key, 'regular'),
-        shloka_config.norm_text_font_size * norm_text_font_info.size,
-        'hsla(44, 100%, 10%, 1)',
-        i,
-        'normal',
-        norm_text_font_info.space_width_scale
-      );
+      const text_norm_group = await render_text({
+        text: norm_text,
+        font_url: get_font_url(norm_text_font_info.key, 'regular'),
+        font_size: shloka_config.norm_text_font_size,
+        font_scale: norm_text_font_info.size,
+        color: 'hsla(44, 100%, 10%, 1)',
+        line_index: i,
+        total_lines: shloka_lines.length,
+        text_type: 'normal',
+        ...shloka_config.bounding_coords,
+        width_usage_factor: 0.985,
+        align: 'center'
+      });
       const top_pos = get_units(
         shloka_config.reference_lines.top + i * shloka_config.reference_lines.spacing
       );
       text_norm_group.set({
-        top: top_pos - (height_norm + get_units($SPACE_ABOVE_REFERENCE_LINE))
+        top: top_pos - (text_norm_group.height + get_units($SPACE_ABOVE_REFERENCE_LINE))
       });
       text_main_group.set({
         top:
           top_pos -
-          (height_main +
+          (text_main_group.height +
             $SPACE_BETWEEN_MAIN_AND_NORM +
-            (height_norm + get_units($SPACE_ABOVE_REFERENCE_LINE)))
+            (text_norm_group.height + get_units($SPACE_ABOVE_REFERENCE_LINE)))
       });
       $canvas.add(text_main_group);
       $canvas.add(text_norm_group);
       if (i === shloka_lines.length - 1) {
-        const render_number_text = async (
-          text: string,
-          font_url: string,
-          font_size: number,
-          color: string,
-          text_type: 'main' | 'normal'
-        ) => {
-          const text_number_scale = get_font_size_for_path(font_size);
-          let final_text = text_type === 'normal' ? text : text.slice(1, text.length - 1);
-          const text_number = new fabric.Path(await get_text_svg_path(final_text, font_url), {
-            fill: color,
-            scaleX: text_number_scale,
-            scaleY: text_number_scale,
-            lockRotation: true
-          });
-          const width = text_number.width * text_number_scale;
-          const height = text_number.height * text_number_scale;
-          text_number.set({
-            left: get_units(shloka_config.bounding_coords.right - 8) - width
-          });
-          return [text_number, height, width] as [typeof text_number, number, number];
-        };
-        const [text_number_main, height_main, width_main] = await render_number_text(
-          main_text.split(' ').at(-1)!,
-          get_font_url(main_text_font_info.key, 'bold'),
-          42 * main_text_font_info.size * 0.8,
-          'hsla(37, 80%, 25%, 0.8)',
-          'main'
-        );
-        text_number_main.set({
-          top: get_units(shloka_config.bounding_coords.top + 8)
+        const number_main_text = main_text.split(' ').at(-1)!;
+        const number_indicator_main = await render_text({
+          text: number_main_text.substring(1, number_main_text.length - 1),
+          font_url: get_font_url(main_text_font_info.key, 'bold'),
+          font_size: 42,
+          font_scale: main_text_font_info.size * 0.8,
+          color: 'hsla(37, 80%, 25%, 0.8)',
+          right: shloka_config.bounding_coords.right,
+          left: shloka_config.bounding_coords.left,
+          width_usage_factor: 0.985,
+          align: 'right',
+          top: shloka_config.bounding_coords.top + 8
         });
-        $canvas.add(text_number_main);
+        $canvas.add(number_indicator_main);
 
-        const [text_number_normal] = await render_number_text(
-          norm_text.split(' ').at(-1)!,
-          get_font_url('ROBOTO', 'bold'),
-          28 * norm_text_font_info.size * 0.98,
-          'hsla(37, 90%, 30%, 0.9)',
-          'normal'
-        );
-        text_number_normal.set({
-          top: get_units(shloka_config.bounding_coords.top + 8 + 5) + height_main
+        const number_indicator_norm = await render_text({
+          text: norm_text.split(' ').at(-1)!,
+          font_url: get_font_url('ROBOTO', 'bold'),
+          font_size: 28,
+          font_scale: norm_text_font_info.size * 0.98,
+          color: 'hsla(37, 80%, 25%, 0.8)',
+          right: shloka_config.bounding_coords.right,
+          left: shloka_config.bounding_coords.left,
+          width_usage_factor: 0.985,
+          align: 'right'
         });
-        $canvas.add(text_number_normal);
+        // top has to be set outiside as itss a mix of scaled and non scaled values
+        number_indicator_norm.set({
+          top: number_indicator_main.top + get_units(5) + number_indicator_main.height
+        });
+        $canvas.add(number_indicator_norm);
       }
     }
 
@@ -281,15 +198,21 @@
     const trans_data = $image_trans_data.data!;
     if (trans_data.has($image_shloka)) {
       const trans_text_data = trans_data.get($image_shloka)!;
-      const trans_text = new fabric.Textbox(trans_text_data, {
-        textAlign: 'right',
-        left: get_units(610),
-        top: get_units(650),
-        fill: 'hsla(44, 100%, 10%, 1)',
-        fontFamily: trans_text_font_info.family,
-        fontSize: get_units(shloka_config.trans_text_font_size) * trans_text_font_info.size,
-        lockRotation: true,
-        width: get_units(1250)
+      const trans_text = await render_text({
+        text: trans_text_data,
+        // text: 'अथ तत्त्वमसि श्लोकः\nयदि त्वं शोकमोहौ त्यक्त्वा देहं द्रुतं गतः।\nअथ तत्त्वमसि श्लोकः\nयदि त्वं शोकमोहौ त्यक्त्वा देहं द्रुतं गतः।',
+        align: 'right',
+        color: 'hsla(44, 100%, 10%, 1)',
+        font_url: get_font_url(trans_text_font_info.key, 'regular'),
+        font_size: shloka_config.trans_text_font_size,
+        font_scale: trans_text_font_info.size,
+        ...TRANSLATION_BOUNDIND_COORDS,
+        width_usage_factor: 0.985,
+        multi_line_text: true,
+        lockScalingX: false,
+        lockScalingY: false,
+        lockMovementX: false,
+        lockMovementY: false
       });
       $canvas.add(trans_text);
     }
