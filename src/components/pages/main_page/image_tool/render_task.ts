@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { get_units } from './state';
 import * as fabric from 'fabric';
+import { get_text_svg_path } from '@tools/harfbuzz';
 
 const render_text_args_schema = z.object({
   text: z.string(),
@@ -46,9 +47,6 @@ export const render_text = async (opts: z.infer<typeof render_text_args_schema>)
     lockScalingX,
     lockScalingY
   } = render_text_args_schema.parse(opts);
-
-  // load wasm based library
-  const { get_text_svg_path } = await import('@tools/harfbuzz');
 
   const get_font_size_for_path = (font_size: number) => {
     const PATH_SCALING_FACTOR = 1 / 15.125;
@@ -136,8 +134,10 @@ export const render_text = async (opts: z.infer<typeof render_text_args_schema>)
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       text_path_scale = get_font_size_for_path(font_size * (font_scale - iter * FONT_SCALE_STEP));
-      if (!multi_line_text) await render_line(line);
-      else {
+      if (!multi_line_text) {
+        await render_line(line);
+        break;
+      } else {
         const words = line.split(' ');
         const render_multiple_line = async () => {
           let allowed_words: string[] = [];
