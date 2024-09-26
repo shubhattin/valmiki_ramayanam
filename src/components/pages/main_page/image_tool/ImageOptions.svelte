@@ -165,7 +165,7 @@
                       bind:value={$main_text_font_configs[$image_script].size}
                       min={0}
                       max={10}
-                      step={0.1}
+                      step={0.05}
                     />
                   </label>
                   <label class="space-x-1">
@@ -176,7 +176,7 @@
                       bind:value={$normal_text_font_config.size}
                       min={0}
                       max={10}
-                      step={0.1}
+                      step={0.05}
                     />
                   </label>
                   <label class="space-x-1">
@@ -187,7 +187,7 @@
                       bind:value={$trans_text_font_configs[$image_lang].size}
                       min={0}
                       max={10}
-                      step={0.1}
+                      step={0.05}
                     />
                   </label>
                 </div>

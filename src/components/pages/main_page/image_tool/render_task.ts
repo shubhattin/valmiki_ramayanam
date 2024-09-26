@@ -13,9 +13,14 @@ const render_text_args_schema = z.object({
   left: z.number(),
   right: z.number(),
   top: z.number().optional(),
+  bottom: z.number().optional(),
   width_usage_factor: z.number(),
   align: z.union([z.literal('left'), z.literal('right'), z.literal('center')]),
-  multi_line_text: z.boolean().optional()
+  multi_line_text: z.boolean().optional(),
+  lockMovementY: z.boolean().optional(),
+  lockMovementX: z.boolean().optional(),
+  lockScalingX: z.boolean().optional(),
+  lockScalingY: z.boolean().optional()
 });
 /**
  * This function will also set the left coordinate of the text.
@@ -34,7 +39,11 @@ export const render_text = async (opts: z.infer<typeof render_text_args_schema>)
     width_usage_factor,
     align,
     total_lines,
-    multi_line_text
+    multi_line_text,
+    lockMovementX,
+    lockMovementY,
+    lockScalingX,
+    lockScalingY
   } = render_text_args_schema.parse(opts);
 
   // load wasm based library
@@ -47,10 +56,14 @@ export const render_text = async (opts: z.infer<typeof render_text_args_schema>)
 
   const right = get_units(opts.right);
   const left = get_units(opts.left);
+  const top = get_units(opts.top ?? 0);
+  const bottom = get_units(opts.bottom ?? 0);
 
   const WIDTH_ACTUAL = right - left;
   const WIDTH = WIDTH_ACTUAL * width_usage_factor;
   const WIDTH_SPACING = (WIDTH_ACTUAL - WIDTH) / 2;
+  const HEIGHT_ACTUAL = bottom - top;
+  const HEIGHT = HEIGHT_ACTUAL;
 
   let text_used = '';
   const words = text.split(' ');
@@ -70,12 +83,12 @@ export const render_text = async (opts: z.infer<typeof render_text_args_schema>)
     text_used += word + (i === words.length - 1 ? '' : ' ');
   }
   let text_path_scale = get_font_size_for_path(font_size);
-  const text_group = new fabric.Group([], {
+  let text_group = new fabric.Group([], {
     lockRotation: true,
-    lockMovementY: true,
-    lockMovementX: true,
-    lockScalingX: true,
-    lockScalingY: true
+    lockMovementY: lockMovementY ?? true,
+    lockMovementX: lockMovementX ?? true,
+    lockScalingX: lockScalingX ?? true,
+    lockScalingY: lockScalingY ?? true
   });
   const lines = text_used.split('\n');
   let prev_height = 0;
@@ -136,6 +149,7 @@ export const render_text = async (opts: z.infer<typeof render_text_args_schema>)
       }
       // last group of allowed words will rendered after done here
       if (allowed_words.length !== 0) await render_line(allowed_words.join(' '));
+      console.log(HEIGHT / text_group.height);
     }
   }
   return text_group;

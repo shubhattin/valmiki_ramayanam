@@ -18,6 +18,7 @@
     shloka_configs,
     SPACE_ABOVE_REFERENCE_LINE,
     SPACE_BETWEEN_MAIN_AND_NORM,
+    TRANSLATION_BOUNDIND_COORDS,
     type shloka_type_config
   } from './settings';
   import { BASE_SCRIPT } from '@state/main_page/main_state';
@@ -124,8 +125,7 @@
         line_index: i,
         total_lines: shloka_lines.length,
         text_type: 'main',
-        right: shloka_config.bounding_coords.right,
-        left: shloka_config.bounding_coords.left,
+        ...shloka_config.bounding_coords,
         width_usage_factor: 0.985,
         align: 'center'
       });
@@ -138,8 +138,7 @@
         line_index: i,
         total_lines: shloka_lines.length,
         text_type: 'normal',
-        right: shloka_config.bounding_coords.right,
-        left: shloka_config.bounding_coords.left,
+        ...shloka_config.bounding_coords,
         width_usage_factor: 0.985,
         align: 'center'
       });
@@ -195,9 +194,6 @@
     const trans_data = $image_trans_data.data!;
     if (trans_data.has($image_shloka)) {
       const trans_text_data = trans_data.get($image_shloka)!;
-      const START_TOP = 650;
-      const START_LEFT = 610;
-      const WIDTH = 1250;
       const trans_text = await render_text({
         text: trans_text_data,
         // text: 'अथ तत्त्वमसि श्लोकः\nयदि त्वं शोकमोहौ त्यक्त्वा देहं द्रुतं गतः।\nअथ तत्त्वमसि श्लोकः\nयदि त्वं शोकमोहौ त्यक्त्वा देहं द्रुतं गतः।',
@@ -205,11 +201,13 @@
         color: 'hsla(44, 100%, 10%, 1)',
         font_url: get_font_url(trans_text_font_info.key, 'regular'),
         font_size: shloka_config.trans_text_font_size * trans_text_font_info.size,
-        top: START_TOP,
-        left: START_LEFT,
-        right: START_LEFT + WIDTH,
+        ...TRANSLATION_BOUNDIND_COORDS,
         width_usage_factor: 0.985,
-        multi_line_text: true
+        multi_line_text: true,
+        lockScalingX: false,
+        lockScalingY: false,
+        lockMovementX: false,
+        lockMovementY: false
       });
       $canvas.add(trans_text);
     }
