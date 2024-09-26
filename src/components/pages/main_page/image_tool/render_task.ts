@@ -78,8 +78,10 @@ export const render_text = async (opts: z.infer<typeof render_text_args_schema>)
     lockScalingY: true
   });
   const lines = text_used.split('\n');
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
+  let prev_height = 0;
+  const NEW_LINE_SPACING = font_size;
+
+  const render_line = async (line: string) => {
     const text_path = new fabric.Path(await get_text_svg_path(line, font_url), {
       fill: color
     });
@@ -92,7 +94,7 @@ export const render_text = async (opts: z.infer<typeof render_text_args_schema>)
     });
     height = text_path.height * text_path_scale;
     width = text_path.width * text_path_scale;
-    if (opts.top) text_path.set({ top: get_units(opts.top) });
+    if (opts.top) text_path.set({ top: get_units(opts.top + prev_height) });
     if (align === 'center')
       text_path.set({
         left: left + WIDTH_SPACING + (WIDTH - width) / 2
@@ -106,7 +108,35 @@ export const render_text = async (opts: z.infer<typeof render_text_args_schema>)
         left: right - WIDTH_SPACING - width
       });
     text_group.add(text_path);
-    if (!multi_line_text) break;
+    if (!multi_line_text) return;
+    // console.log(prev_height, height);
+    prev_height += height + NEW_LINE_SPACING;
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (!multi_line_text) await render_line(line);
+    else {
+      const words = line.split(' ');
+      let allowed_words: string[] = [];
+      for (let word_i = 0; word_i < words.length; word_i++) {
+        const word = words[word_i];
+        let current_word = allowed_words.join(' ') + (allowed_words.length !== 0 ? ' ' : '') + word;
+        const text_path = new fabric.Path(await get_text_svg_path(current_word, font_url), {
+          fill: color
+        });
+        let height = text_path.height * text_path_scale;
+        let width = text_path.width * text_path_scale;
+        if (WIDTH > width) allowed_words.push(word);
+        else {
+          await render_line(allowed_words.join(' '));
+          // new line should be started as the current word is not fitting
+          allowed_words = [word];
+        }
+      }
+      // last group of allowed words will rendered after done here
+      if (allowed_words.length !== 0) await render_line(allowed_words.join(' '));
+    }
   }
   return text_group;
 };

@@ -75,9 +75,6 @@
     const trans_text_font_info = $trans_text_font_configs[$image_lang];
     const norm_text_font_info = $normal_text_font_config;
 
-    // load necessary fonts
-    await load_font(FONT_FAMILY_NAME.ADOBE_DEVANAGARI);
-
     // remove all previous texts, textboxes and lines
     $canvas.getObjects().forEach((obj) => {
       if (!obj || obj.type === 'image') return;
@@ -198,17 +195,21 @@
     const trans_data = $image_trans_data.data!;
     if (trans_data.has($image_shloka)) {
       const trans_text_data = trans_data.get($image_shloka)!;
+      const START_TOP = 650;
+      const START_LEFT = 610;
+      const WIDTH = 1250;
       const trans_text = await render_text({
-        // text: trans_text_data,
-        text: 'Valmiki Greatest of all Sages\nGood',
+        text: trans_text_data,
+        // text: 'अथ तत्त्वमसि श्लोकः\nयदि त्वं शोकमोहौ त्यक्त्वा देहं द्रुतं गतः।\nअथ तत्त्वमसि श्लोकः\nयदि त्वं शोकमोहौ त्यक्त्वा देहं द्रुतं गतः।',
         align: 'right',
         color: 'hsla(44, 100%, 10%, 1)',
         font_url: get_font_url(trans_text_font_info.key, 'regular'),
         font_size: shloka_config.trans_text_font_size * trans_text_font_info.size,
-        left: 610,
-        top: 650,
+        top: START_TOP,
+        left: START_LEFT,
+        right: START_LEFT + WIDTH,
         width_usage_factor: 0.985,
-        right: 610 + 1250
+        multi_line_text: true
       });
       $canvas.add(trans_text);
     }
