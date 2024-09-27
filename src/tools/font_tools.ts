@@ -71,8 +71,10 @@ export const get_font_url = (font: fonts_type, type: 'regular' | 'bold') => {
       `/src/fonts/regular/${font_file_info.file_name}.${font_file_info.file_type}`,
       import.meta.url
     ).href,
-    bold: new URL(`/src/fonts/bold/${font_file_info.file_name}B.${font_file_info}`, import.meta.url)
-      .href
+    bold: new URL(
+      `/src/fonts/bold/${font_file_info.file_name}B.${font_file_info.file_type}`,
+      import.meta.url
+    ).href
   }[type];
   return font_url;
 };
