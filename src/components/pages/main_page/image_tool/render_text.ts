@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import {
   get_units,
-  image_lang,
   image_sarga_data,
   image_trans_data,
   main_text_font_configs,
@@ -430,8 +429,6 @@ export const render_all_texts = async (
       ...TRANSLATION_BOUNDIND_COORDS,
       width_usage_factor: 0.985,
       multi_line_text: true,
-      lockScalingX: false,
-      lockScalingY: false,
       lockMovementX: false,
       lockMovementY: false
     });

@@ -20,7 +20,7 @@
   import { popup } from '@skeletonlabs/skeleton';
   import { BsDownload } from 'svelte-icons-pack/bs';
   import Icon from '@tools/Icon.svelte';
-  import { render_all_texts } from './render_task';
+  import { render_all_texts } from './render_text';
 
   $: kANDa_info = rAmAyaNam_map[$image_kANDa - 1];
   $: shloka_count = kANDa_info.sarga_data[$image_sarga - 1].shloka_count_extracted;

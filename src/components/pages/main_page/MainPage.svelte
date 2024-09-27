@@ -48,6 +48,7 @@
     get_sarga_names
   } from '@state/main_page/data';
   import MetaTags from '@components/tags/MetaTags.svelte';
+  import { loadLocalConfig } from './load_local_config';
 
   const unsubscribers: Unsubscriber[] = [];
   const query_client = useQueryClient();
@@ -59,11 +60,16 @@
       $user_info = get_id_token_info().user;
     } catch {}
     if (import.meta.env.DEV) {
-      // $view_translation_status = true;
-      // $trans_lang_mut.mutateAsync('Hindi').then(() => {
-      //   editing_status_on.set(true);
-      // });
-      $image_tool_opened = true;
+      (async () => {
+        const conf = await loadLocalConfig();
+        if (conf.view_translation_status) $view_translation_status = true;
+        if (conf.trans_lang)
+          $trans_lang_mut.mutateAsync('Hindi').then(() => {
+            editing_status_on.set(true);
+          });
+        if (conf.editing_status_on) $editing_status_on = true;
+        if (conf.image_tool_opened) $image_tool_opened = true;
+      })();
     }
     if (browser && import.meta.env.PROD) {
       window.addEventListener('beforeunload', function (e) {

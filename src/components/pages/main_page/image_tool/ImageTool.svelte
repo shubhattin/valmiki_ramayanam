@@ -39,7 +39,7 @@
     SPACE_ABOVE_REFERENCE_LINE,
     SPACE_BETWEEN_MAIN_AND_NORM
   } from './settings';
-  import { render_all_texts } from './render_task';
+  import { render_all_texts } from './render_text';
   import ImageOptions from './ImageOptions.svelte';
 
   let mounted = writable(false);
