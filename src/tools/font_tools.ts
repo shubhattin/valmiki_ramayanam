@@ -31,6 +31,29 @@ export const FONT_FAMILY_NAME = {
 };
 
 type fonts_type = keyof typeof FONT_FAMILY_NAME;
+type supported_font_formats = 'ttf' | 'otf';
+
+const FONT_FILE_INFO: Record<
+  fonts_type,
+  {
+    file_name: string;
+    file_type: supported_font_formats;
+  }
+> = {
+  NIRMALA_UI: {
+    file_name: 'Nirmala',
+    file_type: 'ttf'
+  },
+  ADOBE_DEVANAGARI: {
+    file_name: 'AdobeDevanagari',
+    file_type: 'otf'
+  },
+  ROBOTO: {
+    file_name: 'Roboto',
+    file_type: 'ttf'
+  }
+};
+
 type image_font_config_type = Record<
   script_and_lang_list_type,
   {
@@ -41,31 +64,40 @@ type image_font_config_type = Record<
 
 export const get_font_url = (font: fonts_type, type: 'regular' | 'bold') => {
   if (!browser) return '';
-  const FONT_URLS: Record<
-    fonts_type,
-    {
-      regular: string;
-      bold: string;
-    }
-  > = {
-    NIRMALA_UI: {
-      regular: new URL('/src/fonts/regular/Nirmala.ttf', import.meta.url).href,
-      bold: new URL('/src/fonts/bold/NirmalaB.ttf', import.meta.url).href
-    },
-    ADOBE_DEVANAGARI: {
-      regular: new URL('/src/fonts/regular/AdobeDevanagari.otf', import.meta.url).href,
-      bold: new URL('/src/fonts/bold/AdobeDevanagariB.otf', import.meta.url).href
-    },
-    ROBOTO: {
-      regular: new URL('/src/fonts/regular/Roboto.ttf', import.meta.url).href,
-      bold: new URL('/src/fonts/bold/RobotoB.ttf', import.meta.url).href
-    }
-  };
-  return FONT_URLS[font][type];
+  const font_file_info = FONT_FILE_INFO[font];
+
+  const font_url = {
+    regular: new URL(
+      `/src/fonts/regular/${font_file_info.file_name}.${font_file_info.file_type}`,
+      import.meta.url
+    ).href,
+    bold: new URL(`/src/fonts/bold/${font_file_info.file_name}B.${font_file_info}`, import.meta.url)
+      .href
+  }[type];
+  return font_url;
 };
 
 /**
- * Overrides the default font image config
+ * Default font config for main web app
+ */
+const DEFAULT_FONT_MAIN_CONFIG = {
+  Devanagari: {
+    font: 'ADOBE_DEVANAGARI',
+    size: 1.45
+  },
+  English: {
+    font: 'ROBOTO'
+  },
+  Romanized: {
+    font: 'ROBOTO'
+  },
+  Normal: {
+    font: 'ROBOTO'
+  }
+} as image_font_config_type;
+
+/**
+ * Overrides the default font image config from `DEFAULT_FONT_MAIN_CONFIG`
  */
 export const DEFAULT_FONT_IMAGE_CONFIG = {
   Devanagari: {
@@ -90,28 +122,24 @@ export const get_font_family_and_size = (
   script: script_and_lang_list_type,
   usage_context: 'image' | 'app' = 'app'
 ) => {
-  const is_image_context = usage_context === 'image';
   let key: fonts_type = 'NIRMALA_UI';
   let size = 1;
-  let space_width_scale = 1;
-  if (script === 'Devanagari') {
-    key = 'ADOBE_DEVANAGARI';
-    size = 1.45;
-  } else if (LATIN_BASED_SCRIPTS.includes(script)) {
-    key = 'ROBOTO';
+  const main_app_conf = DEFAULT_FONT_MAIN_CONFIG[script];
+  if (main_app_conf) {
+    if (main_app_conf.font) key = main_app_conf.font;
+    if (main_app_conf.size) size = main_app_conf.size;
   }
 
-  const override_image_conf = DEFAULT_FONT_IMAGE_CONFIG[script];
-  if (is_image_context && override_image_conf) {
+  const image_conf = DEFAULT_FONT_IMAGE_CONFIG[script];
+  if (usage_context === 'image' && image_conf) {
     // Override the default font size
-    if (override_image_conf.font) key = override_image_conf.font;
-    if (override_image_conf.size) size = override_image_conf.size;
+    if (image_conf.font) key = image_conf.font;
+    if (image_conf.size) size = image_conf.size;
   }
 
   return {
     family: FONT_FAMILY_NAME[key],
     size,
-    key,
-    space_width_scale
+    key
   };
 };
