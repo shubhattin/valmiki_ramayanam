@@ -1,7 +1,5 @@
 <script lang="ts">
-  import { env } from '$env/dynamic/public';
-
-  const ID = env.PUBLIC_GA_ID;
+  const ID: string = import.meta.env.VITE_GA_ID;
 
   let html = `
         window.dataLayer = window.dataLayer || [];
