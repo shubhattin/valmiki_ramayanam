@@ -31,7 +31,7 @@ export const DEFAULT_SHLOKA_CONFIG: Record<shloka_number_type, shloka_type_confi
     },
     main_text_font_size: 70,
     norm_text_font_size: 48,
-    trans_text_font_size: 52,
+    trans_text_font_size: 43.5,
     reference_lines: {
       top: 410,
       spacing: 0
@@ -46,7 +46,7 @@ export const DEFAULT_SHLOKA_CONFIG: Record<shloka_number_type, shloka_type_confi
     },
     main_text_font_size: 63,
     norm_text_font_size: 48,
-    trans_text_font_size: 52,
+    trans_text_font_size: 43.5,
     reference_lines: {
       top: 310,
       spacing: 200
@@ -61,7 +61,7 @@ export const DEFAULT_SHLOKA_CONFIG: Record<shloka_number_type, shloka_type_confi
     },
     main_text_font_size: 55,
     norm_text_font_size: 43,
-    trans_text_font_size: 52,
+    trans_text_font_size: 43.5,
     reference_lines: {
       top: 230,
       spacing: 150
@@ -76,7 +76,7 @@ export const DEFAULT_SHLOKA_CONFIG: Record<shloka_number_type, shloka_type_confi
     },
     main_text_font_size: 45,
     norm_text_font_size: 38,
-    trans_text_font_size: 52,
+    trans_text_font_size: 43.5,
     reference_lines: {
       top: 200,
       spacing: 130
@@ -91,7 +91,7 @@ export const DEFAULT_SHLOKA_CONFIG: Record<shloka_number_type, shloka_type_confi
     },
     main_text_font_size: 40,
     norm_text_font_size: 35,
-    trans_text_font_size: 52,
+    trans_text_font_size: 43.5,
     reference_lines: {
       top: 150,
       spacing: 110
@@ -100,7 +100,7 @@ export const DEFAULT_SHLOKA_CONFIG: Record<shloka_number_type, shloka_type_confi
 };
 
 export const DEFAULT_SHLOKA_CONFIG_SHARED = {
-  SPACE_ABOVE_REFERENCE_LINE: 10,
+  SPACE_ABOVE_REFERENCE_LINE: 5,
   SPACE_BETWEEN_MAIN_AND_NORM: 1
 };
 export const SPACE_ABOVE_REFERENCE_LINE = writable(

@@ -116,8 +116,7 @@ const render_text = async (input: z.input<typeof render_text_args_schema>) => {
   });
   const lines = text_used.split('\n');
   let prev_height = 0;
-  const NEW_LINE_SPACING = font_size;
-  // ^ currenyly works fine for our case
+  let NEW_LINE_SPACING = 0;
 
   const render_line = async (line: string) => {
     const text_path = new fabric.Path(await get_text_svg_path(line, font_url), {
@@ -153,9 +152,12 @@ const render_text = async (input: z.input<typeof render_text_args_schema>) => {
 
   for (let iter = 0; true; iter++) {
     prev_height = 0;
+    const net_scale = font_scale - iter * FONT_SCALE_STEP;
+    NEW_LINE_SPACING = font_size * net_scale;
+    text_path_scale = get_font_size_for_path(font_size * net_scale);
+    // ^ currenyly works fine for our case
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      text_path_scale = get_font_size_for_path(font_size * (font_scale - iter * FONT_SCALE_STEP));
       if (!multi_line_text) {
         await render_line(line);
         break;
@@ -196,6 +198,7 @@ const render_text = async (input: z.input<typeof render_text_args_schema>) => {
   }
   return text_group;
 };
+
 const draw_bounding_and_reference_lines = async (shloka_config: shloka_type_config) => {
   const bounds = shloka_config.bounding_coords;
   const $canvas = get(canvas);
