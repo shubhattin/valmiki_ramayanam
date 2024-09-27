@@ -14,13 +14,13 @@
     shaded_background_image_status,
     trans_text_font_configs
   } from './state';
-  import { LANG_LIST, type script_list_type } from '@tools/lang_list';
+  import { LANG_LIST } from '@tools/lang_list';
   import Icon from '@tools/Icon.svelte';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import { LanguageIcon } from '@components/icons';
   import { SlideToggle, TabGroup, Tab, Accordion, AccordionItem } from '@skeletonlabs/skeleton';
   import ImageDownloader from './ImageDownloader.svelte';
-  import { DEFAULT_SHLOKA_CONFIG_SHARED, type shloka_type_config } from './settings';
+  import { DEFAULT_SHLOKA_CONFIG_SHARED } from './settings';
   import { IoOptions } from 'svelte-icons-pack/io';
   import {
     current_shloka_type,
@@ -31,11 +31,6 @@
   } from './settings';
   import { copy_plain_object } from '@tools/kry';
   import { get_font_family_and_size } from '@tools/font_tools';
-
-  export let render_all_texts: (
-    shloka_num: number,
-    script: script_list_type
-  ) => Promise<shloka_type_config>;
 
   $: kANDa_info = rAmAyaNam_map[$image_kANDa - 1];
   $: shloka_count = kANDa_info.sarga_data[$image_sarga - 1].shloka_count_extracted;
@@ -97,7 +92,7 @@
       {/each}
     </select>
   </label>
-  <ImageDownloader {render_all_texts} />
+  <ImageDownloader />
   <span class="inline-flex flex-col">
     <SlideToggle
       name="from_text_type"

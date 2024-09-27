@@ -11,7 +11,8 @@
     shaded_background_image_status,
     background_image,
     IMAGE_DIMENSIONS,
-    get_units
+    get_units,
+    image_lang
   } from './state';
   import { download_file_in_browser } from '@tools/download_file_browser';
   import JSZip from 'jszip';
@@ -19,13 +20,7 @@
   import { popup } from '@skeletonlabs/skeleton';
   import { BsDownload } from 'svelte-icons-pack/bs';
   import Icon from '@tools/Icon.svelte';
-  import type { shloka_type_config } from './settings';
-  import type { script_list_type } from '@tools/lang_list';
-
-  export let render_all_texts: (
-    shloka_num: number,
-    script: script_list_type
-  ) => Promise<shloka_type_config>;
+  import { render_all_texts } from './render_task';
 
   $: kANDa_info = rAmAyaNam_map[$image_kANDa - 1];
   $: shloka_count = kANDa_info.sarga_data[$image_sarga - 1].shloka_count_extracted;
@@ -108,12 +103,12 @@
   const download_png_zip = async (remove_back: boolean) => {
     const zip = new JSZip();
     for (let i = -1; i <= shloka_count; i++) {
-      await render_all_texts(i, $image_script);
+      await render_all_texts(i, $image_script, $image_lang);
       const { url, name } = await download_image_as_png(remove_back, false, i, false);
       const blob = dataURLToBlob(url);
       zip.file(name, blob);
     }
-    await render_all_texts($image_shloka, $image_script);
+    await render_all_texts($image_shloka, $image_script, $image_lang);
     const zip_blob = await zip.generateAsync({ type: 'blob' });
     download_file_in_browser(
       URL.createObjectURL(zip_blob),
@@ -125,11 +120,11 @@
   const download_svg_zip = async () => {
     const zip = new JSZip();
     for (let i = -1; i <= shloka_count; i++) {
-      await render_all_texts(i, $image_script);
+      await render_all_texts(i, $image_script, $image_lang);
       const { blob, name } = await download_image_as_svg(false, i);
       zip.file(name, blob);
     }
-    await render_all_texts($image_shloka, $image_script);
+    await render_all_texts($image_shloka, $image_script, $image_lang);
     const zip_blob = await zip.generateAsync({ type: 'blob' });
     download_file_in_browser(
       URL.createObjectURL(zip_blob),

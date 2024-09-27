@@ -14,9 +14,12 @@
     image_script,
     image_lang,
     image_shloka,
-    image_sarga_data
+    image_sarga_data,
+    image_trans_data,
+    trans_text_font_configs,
+    main_text_font_configs,
+    normal_text_font_config
   } from './state';
-  import ImageUtility from './ImageUtility.svelte';
   import { get, writable } from 'svelte/store';
   import {
     sarga_selected,
@@ -31,6 +34,13 @@
   import { get_script_for_lang, get_text_font_class } from '@tools/font_tools';
   import { z } from 'zod';
   import { SCRIPT_LIST } from '@tools/lang_list';
+  import {
+    shloka_configs,
+    SPACE_ABOVE_REFERENCE_LINE,
+    SPACE_BETWEEN_MAIN_AND_NORM
+  } from './settings';
+  import { render_all_texts } from './render_task';
+  import ImageOptions from './ImageOptions.svelte';
 
   let mounted = writable(false);
 
@@ -165,6 +175,23 @@
   };
   $: $mounted && $scaling_factor && update_canvas_dimensions();
   $: $mounted && set_background_image_type($shaded_background_image_status);
+
+  $: mounted &&
+    !$image_sarga_data.isFetching &&
+    $image_sarga_data.isSuccess &&
+    !$image_trans_data.isFetching &&
+    $image_trans_data.isSuccess &&
+    $SPACE_ABOVE_REFERENCE_LINE &&
+    $SPACE_BETWEEN_MAIN_AND_NORM &&
+    $image_sarga &&
+    $image_kANDa &&
+    $shloka_configs &&
+    $normal_text_font_config &&
+    $trans_text_font_configs &&
+    $main_text_font_configs &&
+    (async () => {
+      await render_all_texts($image_shloka, $image_script, $image_lang);
+    })();
 </script>
 
 <div class="space-y-2">
@@ -213,7 +240,7 @@
       </button>
     </div>
   </div>
-  <ImageUtility mounted={$mounted} />
+  <ImageOptions />
 </div>
 <div class="mt-1 space-y-2">
   <canvas bind:this={canvas_element}></canvas>
