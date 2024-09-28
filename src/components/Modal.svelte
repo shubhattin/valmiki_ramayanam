@@ -8,6 +8,7 @@
 
   let className: string | null = null!;
   export { className as class };
+  export let outterClass: string | null = null!;
   export let modal_open: Writable<boolean>;
   export let cancel_btn_txt: string | null = null!;
   export let confirm_btn_txt: string | null = null!;
@@ -84,7 +85,8 @@
   bind:this={modalElement}
   class={cl_join(
     'duration-400 fixed inset-0  z-50 flex max-h-full max-w-full items-center justify-center bg-black bg-opacity-50 transition-all',
-    !opened && 'hidden bg-opacity-0'
+    !opened && 'hidden bg-opacity-0',
+    outterClass ?? ''
   )}
 >
   {#if opened && !is_closing}

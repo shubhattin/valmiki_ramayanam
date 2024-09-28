@@ -53,38 +53,40 @@
   });
 </script>
 
-<Modal modal_open={modal_opended}>
-  <select class="select w-40" bind:value={typing_assistance_lang}>
-    {#each ALL_LANG_SCRIPT_LIST as lang_script}
-      <option value={lang_script}>{lang_script}</option>
-    {/each}
-  </select>
-  <div
-    class={cl_join(
-      'mt-4 max-w-full',
-      !$usage_table.isFetching ? 'min-h-[580px] min-w-[560px]' : 'h-[580px] w-[560px]'
-    )}
-    style="
-     min-height: {!$usage_table.isFetching ? `${HEIGHT}px` : 'auto'};
-     min-width: {!$usage_table.isFetching ? `${WIDTH}px` : 'auto'};
-     height: {$usage_table.isFetching ? `${HEIGHT}px` : 'auto'};
-     width: {$usage_table.isFetching ? `${WIDTH}px` : 'auto'};
-   "
-  >
-    {#if $usage_table.isFetching}
-      <div class="h-full w-full space-y-2">
-        <div class="placeholder animate-pulse rounded-md"></div>
-        <!-- <div class="placeholder animate-pulse"></div> -->
-        <div class="placeholder h-full w-full animate-pulse rounded-lg"></div>
-      </div>
-    {:else if $usage_table.isSuccess}
-      {@const { url, height, width } = $usage_table.data}
-      <img
-        style:height={`${height}px`}
-        style:width={`${width}px`}
-        alt={typing_assistance_lang}
-        src={url}
-      />
-    {/if}
-  </div>
-</Modal>
+<div>
+  <Modal modal_open={modal_opended} outterClass="mt-0">
+    <select class="select w-40" bind:value={typing_assistance_lang}>
+      {#each ALL_LANG_SCRIPT_LIST as lang_script}
+        <option value={lang_script}>{lang_script}</option>
+      {/each}
+    </select>
+    <div
+      class={cl_join(
+        'mt-4 max-w-full',
+        !$usage_table.isFetching ? 'min-h-[580px] min-w-[560px]' : 'h-[580px] w-[560px]'
+      )}
+      style="
+    min-height: {!$usage_table.isFetching ? `${HEIGHT}px` : 'auto'};
+    min-width: {!$usage_table.isFetching ? `${WIDTH}px` : 'auto'};
+    height: {$usage_table.isFetching ? `${HEIGHT}px` : 'auto'};
+    width: {$usage_table.isFetching ? `${WIDTH}px` : 'auto'};
+    "
+    >
+      {#if $usage_table.isFetching}
+        <div class="h-full w-full space-y-2">
+          <div class="placeholder animate-pulse rounded-md"></div>
+          <!-- <div class="placeholder animate-pulse"></div> -->
+          <div class="placeholder h-full w-full animate-pulse rounded-lg"></div>
+        </div>
+      {:else if $usage_table.isSuccess}
+        {@const { url, height, width } = $usage_table.data}
+        <img
+          style:height={`${height}px`}
+          style:width={`${width}px`}
+          alt={typing_assistance_lang}
+          src={url}
+        />
+      {/if}
+    </div>
+  </Modal>
+</div>
