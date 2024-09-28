@@ -1,4 +1,5 @@
 {
   "workbench.localHistory.enabled": false,
-  "pylint.args": ["--disable=C,W"]
+  "pylint.args": ["--disable=C,W"],
+  "scss.lint.unknownAtRules": "ignore"
 }

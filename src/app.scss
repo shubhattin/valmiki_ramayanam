@@ -1,0 +1,49 @@
+/* Write your global styles here, in PostCSS syntax */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@base {
+  /* body {
+     font-family: 'Roboto', 'Nirmala UI', sans-serif;
+  } */
+  /* the above approach dos'nt work as Skeleton UI overrides these behaviours */
+}
+
+:root [data-theme='wintry'] {
+  --theme-font-family-base: 'Roboto', 'Nirmala UI', sans-serif;
+  --theme-font-family-heading: 'Roboto', 'Nirmala UI', sans-serif;
+}
+
+$NIRAMALA_UI: 'Niramala UI';
+$ADOBE_DEVANAGARI: 'Adobe Devanagari';
+
+@font-face {
+  font-family: $NIRAMALA_UI;
+  src: url('./fonts/regular/woff2/Nirmala.woff2') format('woff2');
+  // url('./fonts/regular/Nirmala.ttf') format('truetype');
+  font-weight: normal;
+}
+@font-face {
+  font-family: $NIRAMALA_UI;
+  src: url('./fonts/bold/woff2/NirmalaB.woff2') format('woff2');
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: $ADOBE_DEVANAGARI;
+  src: url('./fonts/regular/woff2/AdobeDevanagari.woff2') format('woff2');
+  font-weight: normal;
+}
+@font-face {
+  font-family: $ADOBE_DEVANAGARI;
+  src: url('./fonts/bold/woff2/AdobeDevanagariB.woff2') format('woff2');
+  font-weight: bold;
+}
+
+.indic-font {
+  font-family: $NIRAMALA_UI;
+}
+.normal-font {
+  font-family: $ADOBE_DEVANAGARI;
+}

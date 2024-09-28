@@ -1,7 +1,7 @@
 <script lang="ts">
   import { ModeWatcher } from 'mode-watcher';
   import '@fontsource/roboto/latin.css';
-  import '../app.pcss';
+  import '../app.scss';
   import TopAppBar from '@components/TopAppBar.svelte';
   import { initializeStores, Modal, storePopup } from '@skeletonlabs/skeleton';
   import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';

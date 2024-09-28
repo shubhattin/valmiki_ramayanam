@@ -26,7 +26,7 @@ export const load_font = async (font: string) => {
 
 export const FONT_FAMILY_NAME = {
   NIRMALA_UI: 'Nirmala UI',
-  ADOBE_DEVANAGARI: 'AdobeDevanagari',
+  ADOBE_DEVANAGARI: 'Adobe Devanagari',
   ROBOTO: 'Roboto'
 };
 

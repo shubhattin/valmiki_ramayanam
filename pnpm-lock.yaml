@@ -80,9 +80,6 @@ importers:
       prettier-plugin-tailwindcss:
         specifier: ^0.6.6
         version: 0.6.6(prettier-plugin-svelte@3.2.6(prettier@3.3.3)(svelte@4.2.19))(prettier@3.3.3)
-      sass:
-        specifier: ^1.78.0
-        version: 1.78.0
       superjson:
         specifier: ^2.2.1
         version: 2.2.1
@@ -162,6 +159,9 @@ importers:
       prettier-plugin-svelte:
         specifier: ^3.2.6
         version: 3.2.6(prettier@3.3.3)(svelte@4.2.19)
+      sass:
+        specifier: ^1.78.0
+        version: 1.78.0
       svelte:
         specifier: ^4.2.19
         version: 4.2.19
