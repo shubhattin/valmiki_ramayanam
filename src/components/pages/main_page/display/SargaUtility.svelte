@@ -25,7 +25,6 @@
   import { BiImage } from 'svelte-icons-pack/bi';
   import type { Workbook } from 'exceljs';
   import { writable } from 'svelte/store';
-  import PreviewExcel from '@components/PreviewExcel.svelte';
   import { TrOutlineFileTypeTxt } from 'svelte-icons-pack/tr';
   import { download_file_in_browser } from '@tools/download_file_browser';
   import { lipi_parivartak_async } from '@tools/converter';
@@ -177,9 +176,13 @@
     {/await}
   </Modal>
 </div>
-<PreviewExcel
-  file_link={current_dowbload_link}
-  file_name={current_file_name}
-  file_preview_opened={excel_preview_opened}
-  workbook={current_workbook}
-/>
+{#if $excel_preview_opened}
+  {#await import('@components/PreviewExcel.svelte') then PreviewExcel}
+    <PreviewExcel.default
+      file_link={current_dowbload_link}
+      file_name={current_file_name}
+      file_preview_opened={excel_preview_opened}
+      workbook={current_workbook}
+    />
+  {/await}
+{/if}

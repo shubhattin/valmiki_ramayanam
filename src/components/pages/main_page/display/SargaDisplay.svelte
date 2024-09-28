@@ -18,7 +18,6 @@
     trans_lang_data_query_key
   } from '@state/main_page/data';
   import SaveEdit from './SaveEdit.svelte';
-  import TypingAssistance from '../../../TypingAssistance.svelte';
   import { useQueryClient } from '@tanstack/svelte-query';
   import Icon from '@tools/Icon.svelte';
   import { BsClipboard2Check } from 'svelte-icons-pack/bs';
@@ -121,4 +120,11 @@
   {/if}
 </div>
 
-<TypingAssistance sync_lang_script={trans_lang} modal_opended={typing_assistance_modal_opened} />
+{#if $typing_assistance_modal_opened}
+  {#await import('@components/TypingAssistance.svelte') then TypingAssistance}
+    <TypingAssistance.default
+      sync_lang_script={trans_lang}
+      modal_opended={typing_assistance_modal_opened}
+    />
+  {/await}
+{/if}

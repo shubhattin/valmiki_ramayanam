@@ -19,6 +19,7 @@
 
   $: usage_table = createQuery({
     queryKey: ['usage_table', typing_assistance_lang],
+    enabled: $modal_opended,
     queryFn: async () => {
       await delay(700);
       await load_parivartak_lang_data(typing_assistance_lang);
