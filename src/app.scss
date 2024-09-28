@@ -15,35 +15,26 @@
   --theme-font-family-heading: 'Roboto', 'Nirmala UI', sans-serif;
 }
 
-$NIRAMALA_UI: 'Niramala UI';
-$ADOBE_DEVANAGARI: 'Adobe Devanagari';
+$fonts: (
+  'Nirmala': 'Nirmala UI',
+  'AdobeDevanagari': 'Adobe Devanagari'
+);
 
-@font-face {
-  font-family: $NIRAMALA_UI;
-  src: url('./fonts/regular/woff2/Nirmala.woff2') format('woff2');
-  // url('./fonts/regular/Nirmala.ttf') format('truetype');
-  font-weight: normal;
+@each $font, $name in $fonts {
+  @font-face {
+    font-family: $name;
+    src: url('./fonts/regular/woff2/#{$font}.woff2') format('woff2');
+    font-weight: normal;
+  }
+  @font-face {
+    font-family: $name;
+    src: url('./fonts/bold/woff2/#{$font}B.woff2') format('woff2');
+    font-weight: bold;
+  }
 }
-@font-face {
-  font-family: $NIRAMALA_UI;
-  src: url('./fonts/bold/woff2/NirmalaB.woff2') format('woff2');
-  font-weight: bold;
-}
-
-@font-face {
-  font-family: $ADOBE_DEVANAGARI;
-  src: url('./fonts/regular/woff2/AdobeDevanagari.woff2') format('woff2');
-  font-weight: normal;
-}
-@font-face {
-  font-family: $ADOBE_DEVANAGARI;
-  src: url('./fonts/bold/woff2/AdobeDevanagariB.woff2') format('woff2');
-  font-weight: bold;
-}
-
 .indic-font {
-  font-family: $NIRAMALA_UI;
+  font-family: map-get($fonts, 'Nirmala');
 }
 .normal-font {
-  font-family: $ADOBE_DEVANAGARI;
+  font-family: map-get($fonts, 'AdobeDevanagari');
 }
