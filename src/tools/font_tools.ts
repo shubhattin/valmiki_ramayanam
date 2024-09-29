@@ -108,6 +108,9 @@ export const DEFAULT_FONT_IMAGE_MAIN_CONFIG = {
   },
   Normal: {
     font: 'ADOBE_DEVANAGARI'
+  },
+  Telugu: {
+    size: 0.85
   }
 } as image_font_config_type;
 
@@ -123,6 +126,9 @@ export const DEFAULT_FONT_IMAGE_TRANS_CONFIG = {
   English: {
     font: 'ADOBE_DEVANAGARI',
     size: 1.2
+  },
+  Telugu: {
+    size: 0.9
   }
 } as image_font_config_type;
 
