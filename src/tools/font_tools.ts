@@ -105,6 +105,10 @@ export const DEFAULT_FONT_IMAGE_CONFIG = {
   Devanagari: {
     size: 1.35
   },
+  Hindi: {
+    font: 'ADOBE_DEVANAGARI',
+    size: 1.4
+  },
   Normal: {
     font: 'ADOBE_DEVANAGARI'
   },

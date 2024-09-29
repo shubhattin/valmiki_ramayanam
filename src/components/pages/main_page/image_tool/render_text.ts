@@ -153,7 +153,7 @@ const render_text = async (input: z.input<typeof render_text_args_schema>) => {
   for (let iter = 0; true; iter++) {
     prev_height = 0;
     const net_scale = font_scale - iter * FONT_SCALE_STEP;
-    NEW_LINE_SPACING = font_size * net_scale;
+    NEW_LINE_SPACING = get_units(font_size * net_scale * 3);
     text_path_scale = get_font_size_for_path(font_size * net_scale);
     // ^ currenyly works fine for our case
     for (let i = 0; i < lines.length; i++) {
@@ -338,7 +338,6 @@ export const render_all_texts = async (
   await draw_bounding_and_reference_lines(shloka_config);
 
   // shloka
-
   for (let i = 0; i < shloka_lines.length; i++) {
     const main_text = await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, $image_script);
     const text_main_group = await render_text({
@@ -378,7 +377,7 @@ export const render_all_texts = async (
       top:
         top_pos -
         (text_main_group.height +
-          $SPACE_BETWEEN_MAIN_AND_NORM +
+          get_units($SPACE_BETWEEN_MAIN_AND_NORM) +
           (text_norm_group.height + get_units($SPACE_ABOVE_REFERENCE_LINE)))
     });
     $canvas.add(text_main_group);
