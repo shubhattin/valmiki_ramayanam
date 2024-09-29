@@ -85,22 +85,27 @@ export const DEFAULT_MAIN_TEXT_FONT_CONFIGS = (() => {
     (script) =>
       (res[script as script_list_type] = get_font_family_and_size(
         script as script_list_type,
-        'image'
+        'image',
+        'shloka'
       ))
   );
   return res as image_font_config_type<script_list_type>;
 })();
 export let main_text_font_configs = writable(copy_plain_object(DEFAULT_MAIN_TEXT_FONT_CONFIGS));
 export let normal_text_font_config = writable(
-  copy_plain_object(get_font_family_and_size('Normal', 'image'))
+  copy_plain_object(get_font_family_and_size('Normal', 'image', 'shloka'))
 );
 export const DEFAULT_TRANS_TEXT_FONT_CONFIGS = (() => {
   const res: any = {};
   LANG_LIST.forEach(
     (lang) =>
-      (res[lang as script_list_type] = get_font_family_and_size(lang as lang_list_type, 'image'))
+      (res[lang as script_list_type] = get_font_family_and_size(
+        lang as lang_list_type,
+        'image',
+        'trans'
+      ))
   );
-  res['English'] = get_font_family_and_size('English', 'image');
+  res['English'] = get_font_family_and_size('English', 'image', 'trans');
   return res as image_font_config_type<lang_list_extended_type>;
 })();
 export let trans_text_font_configs = writable(copy_plain_object(DEFAULT_TRANS_TEXT_FONT_CONFIGS));

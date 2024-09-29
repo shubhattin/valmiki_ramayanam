@@ -138,7 +138,7 @@ export const TEXT_CONFIGS = {
     color: 'hsla(37, 80%, 25%, 0.8)'
   },
   norm_numb_text: {
-    color: 'hsla(37, 80%, 25`%, 0.8)`'
+    color: 'hsla(37, 80%, 25%, 0.8)'
   },
   trans_text: {
     color: 'hsla(44, 100%, 10%, 1)'
