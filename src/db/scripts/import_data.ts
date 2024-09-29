@@ -7,13 +7,23 @@ const main = async () => {
 
   console.log(`Fetching Data from ${dbMode} Database...`);
 
-  await make_dir('./out');
+  const translations = await db.query.translations.findMany();
+  const user_verification_requests = await db.query.user_verification_requests.findMany();
+  const users = await db.query.users.findMany();
+
+  const json_data = {
+    translations,
+    user_verification_requests,
+    users
+  };
+
+  make_dir('./out');
   const out_file_name = {
     PROD: 'db_data_prod.json',
     PREVIEW: 'db_data_preview.json',
     LOCAL: 'db_data.json'
   }[dbMode];
-  // await writeFile(`./out/${out_file_name}`, JSON.stringify(json_data, null, 2));
+  await writeFile(`./out/${out_file_name}`, JSON.stringify(json_data, null, 2));
 };
 main().then(() => {
   queryClient.end();

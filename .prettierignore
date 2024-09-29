@@ -15,3 +15,5 @@ data/ramayan/out
 data/ramayan/text_data
 data/ramayan/zipped
 data/ramayan/ramayan_map.json
+
+src/db/scripts/out/

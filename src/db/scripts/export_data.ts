@@ -1,10 +1,13 @@
 import { dbClient_ext as db, queryClient } from './client';
 import { readFile } from 'fs/promises';
 import { dbMode, take_input } from '@tools/kry_server';
-import {} from '@db/schema';
-import {} from '@db/schema_zod';
+import { translations, user_verification_requests, users } from '@db/schema';
+import {
+  UsersSchemaZod,
+  TranslationsSchemaZod,
+  UserVerificationRequestsSchemaZod
+} from '@db/schema_zod';
 import { z } from 'zod';
-import { sql } from 'drizzle-orm';
 
 const main = async () => {
   /*
@@ -21,6 +24,36 @@ const main = async () => {
     PREVIEW: 'db_data_preview.json',
     LOCAL: 'db_data.json'
   }[dbMode];
+
+  const data = z
+    .object({
+      users: UsersSchemaZod.array(),
+      translations: TranslationsSchemaZod.array(),
+      user_verification_requests: UserVerificationRequestsSchemaZod.array()
+    })
+    .parse(JSON.parse((await readFile(`./out/${in_file_name}`)).toString()));
+
+  // insertig users
+  try {
+    await db.delete(users);
+    // @ts-ignore
+    await db.insert(users).values(data.users);
+    console.log('Successfully added values into table `users`');
+  } catch {}
+
+  // insertig user_verification_requests
+  try {
+    await db.delete(user_verification_requests);
+    await db.insert(user_verification_requests).values(data.user_verification_requests);
+    console.log('Successfully added values into table `user_verification_requests`');
+  } catch {}
+
+  // insertig translations
+  try {
+    await db.delete(translations);
+    await db.insert(translations).values(data.translations);
+    console.log('Successfully added values into table `translations`');
+  } catch {}
 };
 main().then(() => {
   queryClient.end();

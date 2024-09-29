@@ -132,7 +132,7 @@ export const DEFAULT_FONT_IMAGE_TRANS_CONFIG = {
     size: 1.2
   },
   Telugu: {
-    size: 0.9
+    size: 1
   }
 } as image_font_config_type;
 
