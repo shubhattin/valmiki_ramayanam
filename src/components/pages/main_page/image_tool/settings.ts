@@ -101,13 +101,17 @@ export const DEFAULT_SHLOKA_CONFIG: Record<shloka_number_type, shloka_type_confi
 
 export const DEFAULT_SHLOKA_CONFIG_SHARED = {
   SPACE_ABOVE_REFERENCE_LINE: 5,
-  SPACE_BETWEEN_MAIN_AND_NORM: 1
+  SPACE_BETWEEN_MAIN_AND_NORM: 1,
+  NEW_LINE_SPACING_FACTOR: 0.5 // this value can be overridden by scripts and langs
 };
 export const SPACE_ABOVE_REFERENCE_LINE = writable(
   DEFAULT_SHLOKA_CONFIG_SHARED.SPACE_ABOVE_REFERENCE_LINE
 );
 export const SPACE_BETWEEN_MAIN_AND_NORM = writable(
   DEFAULT_SHLOKA_CONFIG_SHARED.SPACE_BETWEEN_MAIN_AND_NORM
+);
+export const NEW_LINE_SPACING_FACTOR = writable(
+  DEFAULT_SHLOKA_CONFIG_SHARED.NEW_LINE_SPACING_FACTOR
 );
 
 export let shloka_configs = writable(copy_plain_object(DEFAULT_SHLOKA_CONFIG));
@@ -119,4 +123,24 @@ export const TRANSLATION_BOUNDIND_COORDS = {
   top: 650,
   right: 1860,
   bottom: 970
+};
+
+// Other configs
+
+export const TEXT_CONFIGS = {
+  main_text: {
+    color: 'hsla(38, 100%, 15%, 1)'
+  },
+  norm_text: {
+    color: 'hsla(44, 100%, 10%, 1)'
+  },
+  main_numb_text: {
+    color: 'hsla(37, 80%, 25%, 0.8)'
+  },
+  norm_numb_text: {
+    color: 'hsla(37, 80%, 25`%, 0.8)`'
+  },
+  trans_text: {
+    color: 'hsla(44, 100%, 10%, 1)'
+  }
 };
