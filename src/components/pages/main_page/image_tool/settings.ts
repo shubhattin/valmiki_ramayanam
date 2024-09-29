@@ -120,3 +120,23 @@ export const TRANSLATION_BOUNDIND_COORDS = {
   right: 1860,
   bottom: 970
 };
+
+// Other configs
+
+export const TEXT_CONFIGS = {
+  main_text: {
+    color: 'hsla(38, 100%, 15%, 1)'
+  },
+  norm_text: {
+    color: 'hsla(44, 100%, 10%, 1)'
+  },
+  main_numb_text: {
+    color: 'hsla(37, 80%, 25%, 0.8)'
+  },
+  norm_numb_text: {
+    color: 'hsla(37, 80%, 25%, 0.8)'
+  },
+  trans_text: {
+    color: 'hsla(44, 100%, 10%, 1)'
+  }
+};

@@ -104,7 +104,6 @@
       originY: 'top',
       scaleX: $scaling_factor,
       scaleY: $scaling_factor,
-      // (canvas.height / img.height) -> basically provides us with scaling factor
       selectable: false,
       evented: false,
       selection: false
@@ -124,11 +123,10 @@
     // Scale background image
     $background_image.scaleX = $scaling_factor;
     $background_image.scaleY = $scaling_factor;
-    // Update positions and scales of text objects
-    $canvas.getObjects().forEach((obj) => {
+
+    const scale_object = (obj: fabric.FabricObject) => {
       const type = obj.type;
       if (!obj || type === 'image') return;
-      // not yet working for Textbox
       let options: Record<string, any> = {};
       if (['text', 'textbox'].includes(obj.type)) {
         const base_top = obj.get('top') / prev_scaling_factor;
@@ -157,20 +155,33 @@
           strokeWidth: get_units(stroke_width)
         };
       } else if (['path', 'group'].includes(type)) {
-        const base_left = obj.get('left') / prev_scaling_factor;
-        const base_top = obj.get('top') / prev_scaling_factor;
-        const base_scaleX = obj.get('scaleX') / prev_scaling_factor;
-        const base_scaleY = obj.get('scaleY') / prev_scaling_factor;
-        options = {
-          left: get_units(base_left),
-          top: get_units(base_top),
-          scaleX: get_units(base_scaleX),
-          scaleY: get_units(base_scaleY)
+        const resize_path = (path_obj: fabric.Path) => {
+          const base_left = path_obj.get('left') / prev_scaling_factor;
+          const base_top = path_obj.get('top') / prev_scaling_factor;
+          const base_scaleX = path_obj.get('scaleX') / prev_scaling_factor;
+          const base_scaleY = path_obj.get('scaleY') / prev_scaling_factor;
+          options = {
+            left: get_units(base_left),
+            top: get_units(base_top),
+            scaleX: get_units(base_scaleX),
+            scaleY: get_units(base_scaleY)
+          };
         };
-      }
+        if (type === 'group' && obj instanceof fabric.Group) {
+          obj.forEachObject((e) => {
+            obj.remove(e);
+            scale_object(e);
+            obj.add(e);
+          });
+        } else {
+          resize_path(obj as fabric.Path);
+        }
+      } // Update object's corner positions
       obj.set(options);
-      obj.setCoords(); // Update object's corner positions
-    });
+      obj.setCoords();
+    };
+    // Update positions and scales of text objects
+    $canvas.getObjects().forEach(scale_object);
     $canvas.requestRenderAll();
   };
   $: $mounted && $scaling_factor && update_canvas_dimensions();

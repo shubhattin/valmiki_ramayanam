@@ -151,40 +151,55 @@
               </div>
               <div class="flex flex-col justify-center space-y-1">
                 <div class="text-center text-sm font-semibold">Text Scaling factors</div>
-                <div class="space-y-1 text-center">
-                  <label class="space-x-1">
-                    <span class="text-sm">Main</span>
-                    <input
-                      type="number"
-                      class="input w-16 rounded-md px-1 py-0 text-sm"
-                      bind:value={$main_text_font_configs[$image_script].size}
-                      min={0}
-                      max={10}
-                      step={0.05}
-                    />
-                  </label>
-                  <label class="space-x-1">
-                    <span class="text-sm">Normal</span>
-                    <input
-                      type="number"
-                      class="input w-16 rounded-md px-1 py-0 text-sm"
-                      bind:value={$normal_text_font_config.size}
-                      min={0}
-                      max={10}
-                      step={0.05}
-                    />
-                  </label>
-                  <label class="space-x-1">
-                    <span class="text-sm">Translation</span>
-                    <input
-                      type="number"
-                      class="input w-16 rounded-md px-1 py-0 text-sm"
-                      bind:value={$trans_text_font_configs[$image_lang].size}
-                      min={0}
-                      max={10}
-                      step={0.05}
-                    />
-                  </label>
+                <div class="flex justify-center space-x-3 text-center">
+                  <div class="flex flex-col justify-center space-y-1">
+                    <label class="space-x-1">
+                      <span class="text-sm">Main</span>
+                      <input
+                        type="number"
+                        class="input w-16 rounded-md px-1 py-0 text-sm"
+                        bind:value={$main_text_font_configs[$image_script].size}
+                        min={0}
+                        max={10}
+                        step={0.05}
+                      />
+                    </label>
+                    <label class="space-x-1">
+                      <span class="text-sm">Normal</span>
+                      <input
+                        type="number"
+                        class="input w-16 rounded-md px-1 py-0 text-sm"
+                        bind:value={$normal_text_font_config.size}
+                        min={0}
+                        max={10}
+                        step={0.05}
+                      />
+                    </label>
+                  </div>
+                  <div class="flex flex-col justify-center space-y-1">
+                    <label class="space-x-1">
+                      <span class="text-sm">Translation</span>
+                      <input
+                        type="number"
+                        class="input w-16 rounded-md px-1 py-0 text-sm"
+                        bind:value={$trans_text_font_configs[$image_lang].size}
+                        min={0}
+                        max={10}
+                        step={0.05}
+                      />
+                    </label>
+                    <label class="space-x-1">
+                      <span class="text-sm">New Line</span>
+                      <input
+                        type="number"
+                        class="input w-16 rounded-md px-1 py-0 text-sm"
+                        bind:value={$trans_text_font_configs[$image_lang].new_line_spacing}
+                        min={0}
+                        max={10}
+                        step={0.05}
+                      />
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>

@@ -14,6 +14,7 @@ import {
   shloka_configs,
   SPACE_ABOVE_REFERENCE_LINE,
   SPACE_BETWEEN_MAIN_AND_NORM,
+  TEXT_CONFIGS,
   TRANSLATION_BOUNDIND_COORDS,
   type shloka_type_config
 } from './settings';
@@ -44,7 +45,8 @@ const render_text_args_schema = z.object({
   lockMovementY: z.boolean().optional().default(true),
   lockMovementX: z.boolean().optional().default(true),
   lockScalingX: z.boolean().optional().default(true),
-  lockScalingY: z.boolean().optional().default(true)
+  lockScalingY: z.boolean().optional().default(true),
+  new_line_spacing_factor: z.number().optional().default(1)
 });
 
 /**
@@ -67,7 +69,8 @@ const render_text = async (input: z.input<typeof render_text_args_schema>) => {
     lockMovementX,
     lockMovementY,
     lockScalingX,
-    lockScalingY
+    lockScalingY,
+    new_line_spacing_factor
   } = opts;
 
   const get_font_size_for_path = (font_size: number) => {
@@ -131,7 +134,7 @@ const render_text = async (input: z.input<typeof render_text_args_schema>) => {
     });
     height = text_path.height * text_path_scale;
     width = text_path.width * text_path_scale;
-    if (opts.top) text_path.set({ top: get_units(opts.top + prev_height) });
+    if (opts.top) text_path.set({ top: get_units(opts.top) + prev_height });
     if (align === 'center')
       text_path.set({
         left: left + WIDTH_SPACING + (WIDTH - width) / 2
@@ -153,9 +156,8 @@ const render_text = async (input: z.input<typeof render_text_args_schema>) => {
   for (let iter = 0; true; iter++) {
     prev_height = 0;
     const net_scale = font_scale - iter * FONT_SCALE_STEP;
-    NEW_LINE_SPACING = font_size * net_scale;
+    NEW_LINE_SPACING = get_units(font_size * net_scale) * new_line_spacing_factor;
     text_path_scale = get_font_size_for_path(font_size * net_scale);
-    // ^ currenyly works fine for our case
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       if (!multi_line_text) {
@@ -338,7 +340,6 @@ export const render_all_texts = async (
   await draw_bounding_and_reference_lines(shloka_config);
 
   // shloka
-
   for (let i = 0; i < shloka_lines.length; i++) {
     const main_text = await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, $image_script);
     const text_main_group = await render_text({
@@ -346,7 +347,7 @@ export const render_all_texts = async (
       font_url: get_font_url(main_text_font_info.key, 'bold'),
       font_size: shloka_config.main_text_font_size,
       font_scale: main_text_font_info.size,
-      color: 'hsla(38, 100%, 15%, 1)',
+      ...TEXT_CONFIGS.main_text,
       line_index: i,
       total_lines: shloka_lines.length,
       text_type: 'main',
@@ -360,7 +361,7 @@ export const render_all_texts = async (
       font_url: get_font_url(norm_text_font_info.key, 'regular'),
       font_size: shloka_config.norm_text_font_size,
       font_scale: norm_text_font_info.size,
-      color: 'hsla(44, 100%, 10%, 1)',
+      ...TEXT_CONFIGS.norm_text,
       line_index: i,
       total_lines: shloka_lines.length,
       text_type: 'normal',
@@ -378,7 +379,7 @@ export const render_all_texts = async (
       top:
         top_pos -
         (text_main_group.height +
-          $SPACE_BETWEEN_MAIN_AND_NORM +
+          get_units($SPACE_BETWEEN_MAIN_AND_NORM) +
           (text_norm_group.height + get_units($SPACE_ABOVE_REFERENCE_LINE)))
     });
     $canvas.add(text_main_group);
@@ -390,7 +391,7 @@ export const render_all_texts = async (
         font_url: get_font_url(main_text_font_info.key, 'bold'),
         font_size: 42,
         font_scale: main_text_font_info.size * 0.8,
-        color: 'hsla(37, 80%, 25%, 0.8)',
+        ...TEXT_CONFIGS.main_numb_text,
         right: shloka_config.bounding_coords.right,
         left: shloka_config.bounding_coords.left,
         width_usage_factor: 0.985,
@@ -404,7 +405,7 @@ export const render_all_texts = async (
         font_url: get_font_url('ROBOTO', 'bold'),
         font_size: 28,
         font_scale: norm_text_font_info.size * 0.98,
-        color: 'hsla(37, 80%, 25%, 0.8)',
+        ...TEXT_CONFIGS.norm_numb_text,
         right: shloka_config.bounding_coords.right,
         left: shloka_config.bounding_coords.left,
         width_usage_factor: 0.985,
@@ -425,7 +426,7 @@ export const render_all_texts = async (
     const trans_text = await render_text({
       text: trans_text_data,
       align: 'right',
-      color: 'hsla(44, 100%, 10%, 1)',
+      ...TEXT_CONFIGS.trans_text,
       font_url: get_font_url(trans_text_font_info.key, 'regular'),
       font_size: shloka_config.trans_text_font_size,
       font_scale: trans_text_font_info.size,
@@ -433,7 +434,10 @@ export const render_all_texts = async (
       width_usage_factor: 0.985,
       multi_line_text: true,
       lockMovementX: false,
-      lockMovementY: false
+      lockMovementY: false,
+      lockScalingX: false,
+      lockScalingY: false,
+      new_line_spacing_factor: trans_text_font_info.new_line_spacing
     });
     $canvas.add(trans_text);
   }

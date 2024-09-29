@@ -59,6 +59,7 @@ type image_font_config_type = Record<
   {
     font?: fonts_type;
     size?: number;
+    new_line_spacing?: number;
   }
 >;
 
@@ -100,20 +101,36 @@ const DEFAULT_FONT_MAIN_CONFIG = {
 
 /**
  * Overrides the default font image config from `DEFAULT_FONT_MAIN_CONFIG`
+ * this is for shloka, this will be inherited for translations as well you have override it
  */
-export const DEFAULT_FONT_IMAGE_CONFIG = {
+export const DEFAULT_FONT_IMAGE_MAIN_CONFIG = {
   Devanagari: {
     size: 1.35
   },
   Normal: {
     font: 'ADOBE_DEVANAGARI'
   },
+  Telugu: {
+    size: 0.85
+  }
+} as image_font_config_type;
+
+/**
+ * Default font config for image translation
+ * You might need to override values from `DEFAULT_FONT_MAIN_CONFIG`
+ */
+export const DEFAULT_FONT_IMAGE_TRANS_CONFIG = {
+  Hindi: {
+    font: 'ADOBE_DEVANAGARI',
+    size: 1.4,
+    new_line_spacing: 0.3
+  },
   English: {
     font: 'ADOBE_DEVANAGARI',
     size: 1.2
   },
-  Romanized: {
-    font: 'ADOBE_DEVANAGARI'
+  Telugu: {
+    size: 0.9
   }
 } as image_font_config_type;
 
@@ -122,26 +139,36 @@ export const DEFAULT_FONT_IMAGE_CONFIG = {
  */
 export const get_font_family_and_size = (
   script: script_and_lang_list_type,
-  usage_context: 'image' | 'app' = 'app'
+  usage_context: 'image' | 'app' = 'app',
+  image_context: 'shloka' | 'trans' | null = null!
 ) => {
   let key: fonts_type = 'NIRMALA_UI';
   let size = 1;
+  let new_line_spacing = 0.5;
+
   const main_app_conf = DEFAULT_FONT_MAIN_CONFIG[script];
   if (main_app_conf) {
     if (main_app_conf.font) key = main_app_conf.font;
     if (main_app_conf.size) size = main_app_conf.size;
   }
 
-  const image_conf = DEFAULT_FONT_IMAGE_CONFIG[script];
+  let image_conf = DEFAULT_FONT_IMAGE_MAIN_CONFIG[script];
   if (usage_context === 'image' && image_conf) {
     // Override the default font size
     if (image_conf.font) key = image_conf.font;
     if (image_conf.size) size = image_conf.size;
   }
+  image_conf = DEFAULT_FONT_IMAGE_TRANS_CONFIG[script];
+  if (usage_context === 'image' && image_context === 'trans' && image_conf) {
+    if (image_conf.font) key = image_conf.font;
+    if (image_conf.size) size = image_conf.size;
+    if (image_conf.new_line_spacing) new_line_spacing = image_conf.new_line_spacing;
+  }
 
   return {
     family: FONT_FAMILY_NAME[key],
     size,
-    key
+    key,
+    new_line_spacing
   };
 };
