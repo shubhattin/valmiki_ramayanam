@@ -11,7 +11,6 @@ import * as fabric from 'fabric';
 import { get_text_svg_path } from '@tools/harfbuzz';
 import {
   current_shloka_type,
-  NEW_LINE_SPACING_FACTOR,
   shloka_configs,
   SPACE_ABOVE_REFERENCE_LINE,
   SPACE_BETWEEN_MAIN_AND_NORM,
@@ -46,7 +45,8 @@ const render_text_args_schema = z.object({
   lockMovementY: z.boolean().optional().default(true),
   lockMovementX: z.boolean().optional().default(true),
   lockScalingX: z.boolean().optional().default(true),
-  lockScalingY: z.boolean().optional().default(true)
+  lockScalingY: z.boolean().optional().default(true),
+  new_line_spacing_factor: z.number().optional().default(1)
 });
 
 /**
@@ -54,7 +54,6 @@ const render_text_args_schema = z.object({
  * left has to be set outside
  */
 const render_text = async (input: z.input<typeof render_text_args_schema>) => {
-  const $NEW_LINE_SPACING_FACTOR = get(NEW_LINE_SPACING_FACTOR);
   const opts = render_text_args_schema.parse(input);
   const {
     text,
@@ -70,7 +69,8 @@ const render_text = async (input: z.input<typeof render_text_args_schema>) => {
     lockMovementX,
     lockMovementY,
     lockScalingX,
-    lockScalingY
+    lockScalingY,
+    new_line_spacing_factor
   } = opts;
 
   const get_font_size_for_path = (font_size: number) => {
@@ -156,7 +156,7 @@ const render_text = async (input: z.input<typeof render_text_args_schema>) => {
   for (let iter = 0; true; iter++) {
     prev_height = 0;
     const net_scale = font_scale - iter * FONT_SCALE_STEP;
-    NEW_LINE_SPACING = get_units(font_size * net_scale) * $NEW_LINE_SPACING_FACTOR;
+    NEW_LINE_SPACING = get_units(font_size * net_scale) * new_line_spacing_factor;
     text_path_scale = get_font_size_for_path(font_size * net_scale);
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
@@ -436,7 +436,8 @@ export const render_all_texts = async (
       lockMovementX: false,
       lockMovementY: false,
       lockScalingX: false,
-      lockScalingY: false
+      lockScalingY: false,
+      new_line_spacing_factor: trans_text_font_info.new_line_spacing
     });
     $canvas.add(trans_text);
   }
