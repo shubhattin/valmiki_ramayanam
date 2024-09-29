@@ -60,6 +60,7 @@ type image_font_config_type = Record<
     font?: fonts_type;
     size?: number;
     new_line_spacing?: number;
+    space_between_main_and_normal?: number;
   }
 >;
 
@@ -111,7 +112,8 @@ export const DEFAULT_FONT_IMAGE_MAIN_CONFIG = {
     font: 'ADOBE_DEVANAGARI'
   },
   Telugu: {
-    size: 0.85
+    size: 0.85,
+    space_between_main_and_normal: 3
   }
 } as image_font_config_type;
 
@@ -137,7 +139,8 @@ export const DEFAULT_FONT_IMAGE_TRANS_CONFIG = {
 const DEFAULTS = {
   font: 'NIRMALA_UI',
   size: 1,
-  new_line_spacing: 0.5
+  new_line_spacing: 0.5,
+  space_between_main_and_normal: 1
 };
 /**
  * `size` is in rem
@@ -148,8 +151,7 @@ export const get_font_family_and_size = (
   image_context: 'shloka' | 'trans' | null = null!
 ) => {
   let key: fonts_type = DEFAULTS.font as fonts_type;
-  let size = DEFAULTS.size;
-  let new_line_spacing = DEFAULTS.new_line_spacing;
+  let { size, new_line_spacing, space_between_main_and_normal } = DEFAULTS;
 
   const main_app_conf = DEFAULT_FONT_MAIN_CONFIG[script];
   if (main_app_conf) {
@@ -157,11 +159,14 @@ export const get_font_family_and_size = (
     if (main_app_conf.size) size = main_app_conf.size;
   }
 
+  // Image based options
   let image_conf = DEFAULT_FONT_IMAGE_MAIN_CONFIG[script];
   if (usage_context === 'image' && image_conf) {
     // Override the default font size
     if (image_conf.font) key = image_conf.font;
     if (image_conf.size) size = image_conf.size;
+    if (image_conf.space_between_main_and_normal)
+      space_between_main_and_normal = image_conf.space_between_main_and_normal;
   }
   image_conf = DEFAULT_FONT_IMAGE_TRANS_CONFIG[script];
   if (usage_context === 'image' && image_context === 'trans' && image_conf) {
@@ -174,6 +179,7 @@ export const get_font_family_and_size = (
     family: FONT_FAMILY_NAME[key],
     size,
     key,
-    new_line_spacing
+    new_line_spacing,
+    space_between_main_and_normal
   };
 };

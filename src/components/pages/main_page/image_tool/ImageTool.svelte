@@ -34,11 +34,7 @@
   import { get_script_for_lang, get_text_font_class } from '@tools/font_tools';
   import { z } from 'zod';
   import { SCRIPT_LIST } from '@tools/lang_list';
-  import {
-    shloka_configs,
-    SPACE_ABOVE_REFERENCE_LINE,
-    SPACE_BETWEEN_MAIN_AND_NORM
-  } from './settings';
+  import { shloka_configs, SPACE_ABOVE_REFERENCE_LINE } from './settings';
   import { render_all_texts } from './render_text';
   import ImageOptions from './ImageOptions.svelte';
 
@@ -193,7 +189,6 @@
     !$image_trans_data.isFetching &&
     $image_trans_data.isSuccess &&
     $SPACE_ABOVE_REFERENCE_LINE &&
-    $SPACE_BETWEEN_MAIN_AND_NORM &&
     $image_sarga &&
     $image_kANDa &&
     $shloka_configs &&

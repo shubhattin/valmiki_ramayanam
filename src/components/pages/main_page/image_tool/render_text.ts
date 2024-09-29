@@ -13,7 +13,6 @@ import {
   current_shloka_type,
   shloka_configs,
   SPACE_ABOVE_REFERENCE_LINE,
-  SPACE_BETWEEN_MAIN_AND_NORM,
   TEXT_CONFIGS,
   TRANSLATION_BOUNDIND_COORDS,
   type shloka_type_config
@@ -293,7 +292,6 @@ export const render_all_texts = async (
   const $trans_text_font_configs = get(trans_text_font_configs);
   const $normal_text_font_config = get(normal_text_font_config);
   const $SPACE_ABOVE_REFERENCE_LINE = get(SPACE_ABOVE_REFERENCE_LINE);
-  const $SPACE_BETWEEN_MAIN_AND_NORM = get(SPACE_BETWEEN_MAIN_AND_NORM);
   const $image_trans_data = get(image_trans_data);
 
   if (!browser) return $shloka_configs[2]; // just like has no meaning
@@ -301,6 +299,7 @@ export const render_all_texts = async (
   const main_text_font_info = $main_text_font_configs[$image_script];
   const trans_text_font_info = $trans_text_font_configs[$image_lang];
   const norm_text_font_info = $normal_text_font_config;
+  const $SPACE_BETWEEN_MAIN_AND_NORM = main_text_font_info.space_between_main_and_normal;
 
   // remove all previous texts, textboxes and lines
   $canvas.getObjects().forEach((obj) => {

@@ -26,7 +26,6 @@
     current_shloka_type,
     shloka_configs,
     SPACE_ABOVE_REFERENCE_LINE,
-    SPACE_BETWEEN_MAIN_AND_NORM,
     DEFAULT_SHLOKA_CONFIG
   } from './settings';
   import { copy_plain_object } from '@tools/kry';
@@ -42,7 +41,6 @@
       DEFAULT_SHLOKA_CONFIG[$current_shloka_type]
     );
     $SPACE_ABOVE_REFERENCE_LINE = DEFAULT_SHLOKA_CONFIG_SHARED.SPACE_ABOVE_REFERENCE_LINE;
-    $SPACE_BETWEEN_MAIN_AND_NORM = DEFAULT_SHLOKA_CONFIG_SHARED.SPACE_BETWEEN_MAIN_AND_NORM;
     $normal_text_font_config = copy_plain_object(get_font_family_and_size('Normal', 'image'));
     $main_text_font_configs = copy_plain_object(DEFAULT_MAIN_TEXT_FONT_CONFIGS);
     $trans_text_font_configs = copy_plain_object(DEFAULT_TRANS_TEXT_FONT_CONFIGS);
@@ -142,7 +140,8 @@
                     <input
                       type="number"
                       class="input w-12 rounded-md px-1 py-0 text-sm"
-                      bind:value={$SPACE_BETWEEN_MAIN_AND_NORM}
+                      bind:value={$main_text_font_configs[$image_script]
+                        .space_between_main_and_normal}
                       min={0}
                       max={20}
                     />
