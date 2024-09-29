@@ -189,7 +189,7 @@
                       />
                     </label>
                     <label class="space-x-1">
-                      <span class="text-sm">New Line</span>
+                      <span class="text-sm">Line Spacing</span>
                       <input
                         type="number"
                         class="input w-16 rounded-md px-1 py-0 text-sm"

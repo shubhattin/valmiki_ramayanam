@@ -134,6 +134,11 @@ export const DEFAULT_FONT_IMAGE_TRANS_CONFIG = {
   }
 } as image_font_config_type;
 
+const DEFAULTS = {
+  font: 'NIRMALA_UI',
+  size: 1,
+  new_line_spacing: 0.5
+};
 /**
  * `size` is in rem
  */
@@ -142,9 +147,9 @@ export const get_font_family_and_size = (
   usage_context: 'image' | 'app' = 'app',
   image_context: 'shloka' | 'trans' | null = null!
 ) => {
-  let key: fonts_type = 'NIRMALA_UI';
-  let size = 1;
-  let new_line_spacing = 0.5;
+  let key: fonts_type = DEFAULTS.font as fonts_type;
+  let size = DEFAULTS.size;
+  let new_line_spacing = DEFAULTS.new_line_spacing;
 
   const main_app_conf = DEFAULT_FONT_MAIN_CONFIG[script];
   if (main_app_conf) {
