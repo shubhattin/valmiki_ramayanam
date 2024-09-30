@@ -64,8 +64,11 @@ Maharishi Valmiki, the great ascetic, asked Narada, who is engaged in the Vedas,
   {/if}
   <div>
     {#if !$image_mut.isPending && $image_mut.isSuccess}
-      <!-- svelte-ignore a11y-img-redundant-alt -->
-      <img src={$image_mut.data[0].url} alt="Generated Image" />
+      <img
+        src={$image_mut.data[0].url}
+        alt={$image_mut.data[0].revised_prompt}
+        title={$image_mut.data[0].revised_prompt}
+      />
     {/if}
   </div>
 </div>
