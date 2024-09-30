@@ -16,8 +16,8 @@ const ACCRSS_TOKEN_INFO_SCHEMA = ID_TOKEN_INFO_SCHEMA.pick({
   user_type: true
 });
 
-export const AUTH_ID = 'drive_auth_id'; // id token
-export const ACCESS_ID = 'drive_access_id';
+export const AUTH_ID = 'auth_id'; // id token
+export const ACCESS_ID = 'access_id';
 export const COOKIE_LOC = '/';
 
 export interface authRes {
