@@ -61,14 +61,14 @@ Maharishi Valmiki, the great ascetic, asked Narada, who is engaged in the Vedas,
 <div>
   {#if !$prompt_mut.isPending && $prompt_mut.isSuccess}
     <textarea class="textarea h-48">{$prompt_mut.data?.image_prompt}</textarea>
+    <div>
+      {#if !$image_mut.isPending && $image_mut.isSuccess}
+        <img
+          src={$image_mut.data[0].url}
+          alt={$image_mut.data[0].revised_prompt}
+          title={$image_mut.data[0].revised_prompt}
+        />
+      {/if}
+    </div>
   {/if}
-  <div>
-    {#if !$image_mut.isPending && $image_mut.isSuccess}
-      <img
-        src={$image_mut.data[0].url}
-        alt={$image_mut.data[0].revised_prompt}
-        title={$image_mut.data[0].revised_prompt}
-      />
-    {/if}
-  </div>
 </div>
