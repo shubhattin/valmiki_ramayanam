@@ -73,6 +73,7 @@
     "jose": "^5.8.0",
     "jszip": "^3.10.1",
     "mode-watcher": "^0.4.1",
+    "openai": "^4.66.1",
     "openai-edge": "^1.2.2",
     "postcss": "^8.4.45",
     "postcss-load-config": "^6.0.1",

@@ -25,7 +25,9 @@
   const BASE_REPLY = `To create consistent image prompts that encapsulate the essence of the translations from Valmiki Ramayanam, I will aim to generate a detailed, descriptive prompt based on the meaning and context of each shloka. These prompts will focus on the visual elements of the scene described in the translation, while keeping the artistic and cultural essence intact.
 
 Feel free to provide the first shloka and translation when you're ready, and I'll start generating a suitable image prompt for it.`;
-  let input: string = '';
+  let input: string = `तपःस्वाध्यायनिरतं तपस्वी वाग्विदां वरम् ।
+नारदं परिपप्रच्छ वाल्मीकिर्मुनिपुङ्गवम् ॥१-१-१॥
+Maharishi Valmiki, the great ascetic, asked Narada, who is engaged in the Vedas, penance, and studies, who is the best of the eloquent orators, thus...`;
 
   const create_image = async () => {
     await $prompt_mut.mutateAsync({
@@ -63,7 +65,7 @@ Feel free to provide the first shloka and translation when you're ready, and I'l
   <div>
     {#if !$image_mut.isPending && $image_mut.isSuccess}
       <!-- svelte-ignore a11y-img-redundant-alt -->
-      <img src={$image_mut.data} alt="Generated Image" />
+      <img src={$image_mut.data[0].url} alt="Generated Image" />
     {/if}
   </div>
 </div>

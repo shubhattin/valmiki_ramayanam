@@ -2,8 +2,9 @@ import { protectedAdminProcedure, t } from '@api/trpc_init';
 import { createOpenAI } from '@ai-sdk/openai';
 import { generateObject } from 'ai';
 import { env } from '$env/dynamic/private';
-import { Configuration, OpenAIApi, type ResponseTypes } from 'openai-edge';
+import type OpenAI from 'openai';
 import { z } from 'zod';
+import { fetch_post } from '@tools/fetch';
 
 const openai_text_model = createOpenAI({ apiKey: env.OPENAI_API_KEY });
 
@@ -30,12 +31,6 @@ const get_image_prompt_router = protectedAdminProcedure
     return result.object;
   });
 
-const config = new Configuration({
-  apiKey: env.OPENAI_API_KEY
-});
-
-const openai = new OpenAIApi(config);
-
 const get_generated_image_router = protectedAdminProcedure
   .input(
     z.object({
@@ -43,16 +38,27 @@ const get_generated_image_router = protectedAdminProcedure
     })
   )
   .mutation(async ({ input: { image_prompt } }) => {
-    const response = await openai.createImage({
-      prompt: image_prompt,
-      size: '1024x1024',
-      response_format: 'url'
+    const req = await fetch_post('https://api.openai.com/v1/images/generations', {
+      json: {
+        model: 'dall-e-3',
+        prompt: image_prompt,
+        n: 1,
+        size: '1024x1024',
+        quality: 'standard'
+      },
+      headers: {
+        Authorization: `Bearer ${env.OPENAI_API_KEY}`
+      }
     });
+    const resp = (await req.json()) as {
+      created: number;
+      data: {
+        revised_prompt: string;
+        url: string;
+      }[];
+    };
 
-    const data = (await response.json()) as ResponseTypes['createImage'];
-
-    const url = data.data?.[0]?.url;
-    return url;
+    return resp.data;
   });
 
 export const ai_router = t.router({
