@@ -34,7 +34,8 @@
     edit_language_typer_status,
     sanskrit_mode,
     typing_assistance_modal_opened,
-    image_tool_opened
+    image_tool_opened,
+    ai_tool_opened
   } from '@state/main_page/main_state';
   import { user_allowed_langs } from '@state/main_page/user';
   import { SlideToggle } from '@skeletonlabs/skeleton';
@@ -69,6 +70,7 @@
           });
         if (conf.editing_status_on) $editing_status_on = true;
         if (conf.image_tool_opened) $image_tool_opened = true;
+        if (conf.ai_tool_opened) $ai_tool_opened = true;
       })();
     }
     if (browser && import.meta.env.PROD) {
@@ -316,44 +318,46 @@
           <Icon class="-mt-1 ml-1 text-xl" src={TiArrowForwardOutline} />
         </button>
       {/if}
-      {#if !$view_translation_status}
-        <button
-          on:click={() => {
-            $view_translation_status = true;
-          }}
-          class="btn bg-primary-800 px-2 py-1 font-bold text-white dark:bg-primary-700"
-          >View Translations</button
-        >
-      {:else}
-        <label class="mr-3 inline-block space-x-4">
-          Translation
-          <Icon src={LanguageIcon} class="text-2xl" />
-          <select
-            disabled={$editing_status_on ||
-              $trans_lang_mut.isPending ||
-              $viewing_script_mut.isPending}
-            class="select inline-block w-32 px-2 py-1"
-            bind:value={$trans_lang_selection}
-          >
-            <option value="--">-- Select --</option>
-            {#each LANG_LIST as lang (lang)}
-              <option value={lang}>{lang}</option>
-            {/each}
-          </select>
-        </label>
-        {#if !$editing_status_on && $trans_lang !== '--' && !LOCALS_TRANS_LANGS.includes($trans_lang) && $user_allowed_langs.isSuccess && $user_info && (get_possibily_not_undefined($user_info).user_type === 'admin' || $user_allowed_langs.data.indexOf($trans_lang) !== -1)}
+      {#if !($ai_tool_opened && $user_info && $user_info.user_type === 'admin')}
+        {#if !$view_translation_status}
           <button
-            on:click={() => ($editing_status_on = true)}
-            class="btn my-1 rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white dark:bg-tertiary-600"
+            on:click={() => {
+              $view_translation_status = true;
+            }}
+            class="btn bg-primary-800 px-2 py-1 font-bold text-white dark:bg-primary-700"
+            >View Translations</button
           >
-            <Icon src={BiEdit} class="mr-1 text-2xl" />
-            Edit
-          </button>
+        {:else}
+          <label class="mr-3 inline-block space-x-4">
+            Translation
+            <Icon src={LanguageIcon} class="text-2xl" />
+            <select
+              disabled={$editing_status_on ||
+                $trans_lang_mut.isPending ||
+                $viewing_script_mut.isPending}
+              class="select inline-block w-32 px-2 py-1"
+              bind:value={$trans_lang_selection}
+            >
+              <option value="--">-- Select --</option>
+              {#each LANG_LIST as lang (lang)}
+                <option value={lang}>{lang}</option>
+              {/each}
+            </select>
+          </label>
+          {#if !$editing_status_on && $trans_lang !== '--' && !LOCALS_TRANS_LANGS.includes($trans_lang) && $user_allowed_langs.isSuccess && $user_info && (get_possibily_not_undefined($user_info).user_type === 'admin' || $user_allowed_langs.data.indexOf($trans_lang) !== -1)}
+            <button
+              on:click={() => ($editing_status_on = true)}
+              class="btn my-1 rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white dark:bg-tertiary-600"
+            >
+              <Icon src={BiEdit} class="mr-1 text-2xl" />
+              Edit
+            </button>
+          {/if}
         {/if}
       {/if}
     </div>
-    <div class="flex space-x-4">
-      {#if $editing_status_on}
+    {#if $editing_status_on && !($ai_tool_opened && $user_info && $user_info.user_type === 'admin')}
+      <div class="flex space-x-4">
         <SlideToggle
           name="edit_lang"
           active="bg-primary-500"
@@ -380,8 +384,14 @@
         >
           <Icon src={BiHelpCircle} class="mt-1 text-3xl text-sky-500 dark:text-sky-400" />
         </button>
-      {/if}
-    </div>
-    <SargaDisplay />
+      </div>
+    {/if}
+    {#if !$ai_tool_opened}
+      <SargaDisplay />
+    {:else if $user_info && $user_info.user_type === 'admin'}
+      {#await import('./ai/AITools.svelte') then AITools}
+        <AITools.default />
+      {/await}
+    {/if}
   {/if}
 </div>
