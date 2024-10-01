@@ -182,30 +182,32 @@
       {#if $image_mut.isPending || !$image_mut.isSuccess}
         <div class="placeholder h-96 animate-pulse rounded-md"></div>
       {:else}
-        <section class="grid grid-cols-2 gap-4">
-          {#each get_possibily_not_undefined($image_mut.data) as image}
-            <div class="space-y-1">
-              <img
-                src={image.url}
-                alt={image.revised_prompt}
-                title={image.revised_prompt}
-                class="block rounded-md"
-              />
-              <div class="flex items-center justify-center space-x-3">
-                <button
-                  on:click={() =>
-                    download_file_in_browser(
-                      image.url,
-                      `${$sarga_selected}-${$kANDa_selected} Shloka No. ${$shloka_numb}.png`
-                    )}
-                  class="btn rounded-md bg-surface-600 px-1 py-1 outline-none dark:bg-surface-500"
-                >
-                  <Icon src={BsDownload} class="text-xl" />
-                </button>
+        <div>
+          <section class="mb-10 grid grid-cols-2 gap-4">
+            {#each get_possibily_not_undefined($image_mut.data) as image}
+              <div class="space-y-1">
+                <img
+                  src={image.url}
+                  alt={image.revised_prompt}
+                  title={image.revised_prompt}
+                  class="block rounded-md"
+                />
+                <div class="flex items-center justify-center space-x-3">
+                  <button
+                    on:click={() =>
+                      download_file_in_browser(
+                        image.url,
+                        `${$sarga_selected}-${$kANDa_selected} Shloka No. ${$shloka_numb}.png`
+                      )}
+                    class="btn rounded-md bg-surface-600 px-1 py-1 outline-none dark:bg-surface-500"
+                  >
+                    <Icon src={BsDownload} class="text-xl" />
+                  </button>
+                </div>
               </div>
-            </div>
-          {/each}
-        </section>
+            {/each}
+          </section>
+        </div>
       {/if}
     {/if}
   {/if}
