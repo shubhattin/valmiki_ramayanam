@@ -11,8 +11,6 @@
   import { get_possibily_not_undefined } from '@tools/kry';
   import { onMount } from 'svelte';
   import { loadLocalConfig } from '../load_local_config';
-  import { sample_data } from './sample_data';
-  import { delay } from '@tools/delay';
 
   $: kANDa_info = rAmAyaNam_map[$kANDa_selected - 1];
   $: sarga_info = kANDa_info.sarga_data[$sarga_selected - 1];
@@ -56,42 +54,28 @@
     })();
 
   const generate_image_prompt = async () => {
-    if (load_ai_sample_data) {
-      await delay(2500);
-      $image_prompt = sample_data.sample_text_prompt;
-      if ($auto_gen_image) generate_image();
-    } else
-      await $image_prompt_mut.mutateAsync({
-        messages: [
-          ...(base_prompts as {
-            role: 'user' | 'assistant';
-            content: string;
-          }[]),
-          {
-            role: 'user',
-            content: $shloka_text_prompt
-          }
-        ]
-      });
+    await $image_prompt_mut.mutateAsync({
+      messages: [
+        ...(base_prompts as {
+          role: 'user' | 'assistant';
+          content: string;
+        }[]),
+        {
+          role: 'user',
+          content: $shloka_text_prompt
+        }
+      ],
+      use_sample_data: load_ai_sample_data
+    });
   };
   const NUMBER_OF_IMAGES = 2;
+  // ^ Also update grid-cols-<num> in image rendering
   const generate_image = async () => {
-    // ^ Also update grid-cols-<num> in image rendering
-    if (load_ai_sample_data) {
-      await delay(5500);
-      const list: typeof $image_data = [];
-      for (let i = 0; i < NUMBER_OF_IMAGES; i++)
-        list.push({
-          url: sample_data.sample_images[i],
-          created: 0,
-          revised_prompt: `Sample Image ${i + 1}`
-        });
-      $image_data = list;
-    } else
-      await $image_mut.mutateAsync({
-        image_prompt: $image_prompt,
-        number_of_images: NUMBER_OF_IMAGES
-      });
+    await $image_mut.mutateAsync({
+      image_prompt: $image_prompt,
+      number_of_images: NUMBER_OF_IMAGES,
+      use_sample_data: load_ai_sample_data
+    });
   };
   const image_prompt_mut = client.ai.get_image_prompt.mutation({
     async onSuccess({ image_prompt }) {

@@ -5,6 +5,8 @@ import { env } from '$env/dynamic/private';
 import type OpenAI from 'openai';
 import { z } from 'zod';
 import { fetch_post } from '@tools/fetch';
+import { ai_sample_data } from './ai_sample_data/sample_data';
+import { delay } from '@tools/delay';
 
 const openai_text_model = createOpenAI({ apiKey: env.OPENAI_API_KEY });
 
@@ -16,10 +18,15 @@ const get_image_prompt_router = protectedAdminProcedure
           role: z.union([z.literal('user'), z.literal('assistant')]),
           content: z.string()
         })
-        .array()
+        .array(),
+      use_sample_data: z.boolean().optional().default(false)
     })
   )
-  .mutation(async ({ input: { messages } }) => {
+  .mutation(async ({ input: { messages, use_sample_data } }) => {
+    if (use_sample_data) {
+      await delay(1500);
+      return { image_prompt: ai_sample_data.sample_text_prompt };
+    }
     const result = await generateObject({
       model: openai_text_model('gpt-4o'),
       messages,
@@ -35,10 +42,11 @@ const get_generated_images_router = protectedAdminProcedure
   .input(
     z.object({
       image_prompt: z.string(),
-      number_of_images: z.number().int().min(1).max(4)
+      number_of_images: z.number().int().min(1).max(4),
+      use_sample_data: z.boolean().optional().default(false)
     })
   )
-  .mutation(async ({ input: { image_prompt, number_of_images } }) => {
+  .mutation(async ({ input: { image_prompt, number_of_images, use_sample_data } }) => {
     const get_single_image = async () => {
       const req = await fetch_post('https://api.openai.com/v1/images/generations', {
         json: {
@@ -71,6 +79,17 @@ const get_generated_images_router = protectedAdminProcedure
         ...resp.data[0]
       };
     };
+    if (use_sample_data) {
+      await delay(3500);
+      const list: Awaited<ReturnType<typeof get_single_image>>[] = [];
+      for (let i = 0; i < number_of_images; i++)
+        list.push({
+          url: ai_sample_data.sample_images[i],
+          created: 0,
+          revised_prompt: `Sample Image ${i + 1}`
+        });
+      return list;
+    }
     const requests = Array.from({ length: number_of_images }, () => get_single_image());
     const responses = await Promise.all(requests);
     return responses;
