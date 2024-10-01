@@ -31,7 +31,7 @@ const get_image_prompt_router = protectedAdminProcedure
     return result.object;
   });
 
-const get_generated_image_router = protectedAdminProcedure
+const get_generated_images_router = protectedAdminProcedure
   .input(
     z.object({
       image_prompt: z.string(),
@@ -64,5 +64,5 @@ const get_generated_image_router = protectedAdminProcedure
 
 export const ai_router = t.router({
   get_image_prompt: get_image_prompt_router,
-  get_generated_image: get_generated_image_router
+  get_generated_images: get_generated_images_router
 });

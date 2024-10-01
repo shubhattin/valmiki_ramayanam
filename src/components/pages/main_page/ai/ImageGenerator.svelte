@@ -8,6 +8,7 @@
   import { SlideToggle } from '@skeletonlabs/skeleton';
   import { client } from '@api/client';
   import { lipi_parivartak_async } from '@tools/converter';
+  import { get_possibily_not_undefined } from '@tools/kry';
 
   $: kANDa_info = rAmAyaNam_map[$kANDa_selected - 1];
   $: sarga_info = kANDa_info.sarga_data[$sarga_selected - 1];
@@ -42,7 +43,7 @@
       $shloka_text_prompt = prompt;
     })();
 
-  const gen_image_prompt = async () => {
+  const generate_image_prompt = async () => {
     await $image_prompt_mut.mutateAsync({
       messages: [
         ...(base_prompts as {
@@ -56,11 +57,20 @@
       ]
     });
   };
+  const generate_image = async () => {
+    const NUMBER_OF_IMAGES = 1;
+    await $image_mut.mutateAsync({
+      image_prompt: $image_prompt,
+      number_of_images: NUMBER_OF_IMAGES
+    });
+  };
   const image_prompt_mut = client.ai.get_image_prompt.mutation({
     async onSuccess({ image_prompt }) {
       $image_prompt = image_prompt;
+      if ($auto_gen_image) generate_image();
     }
   });
+  const image_mut = client.ai.get_generated_images.mutation();
 </script>
 
 <div>
@@ -114,7 +124,7 @@
     </button>
   </span>
   <button
-    on:click={gen_image_prompt}
+    on:click={generate_image_prompt}
     disabled={$image_prompt_mut.isPending}
     class="btn rounded-md bg-surface-700 px-2 py-1 font-bold text-white dark:bg-surface-600"
   >
@@ -132,13 +142,33 @@
   {#if $image_prompt_mut.isPending || !$image_prompt_mut.isSuccess}
     <div class="placeholder h-80 animate-pulse rounded-md"></div>
   {:else}
-    <label class="space-x-1">
+    <label class="space-y-2">
       <span class="font-bold">Image Prompt</span>
+      <button
+        disabled={$image_mut.isPending}
+        on:click={generate_image}
+        class="btn rounded-md bg-tertiary-800 px-1 py-0 font-bold text-white dark:bg-tertiary-700"
+        >Generate Image</button
+      >
       <textarea
         class="textarea h-36 px-1 py-0 text-sm"
         spellcheck="false"
         bind:value={$image_prompt}
       ></textarea>
     </label>
+    {#if !$image_mut.isIdle}
+      {#if $image_mut.isPending || !$image_mut.isSuccess}
+        <div class="placeholder h-96 animate-pulse rounded-md"></div>
+      {:else}
+        {#each get_possibily_not_undefined($image_mut.data) as image}
+          <img
+            src={image.url}
+            alt={image.revised_prompt}
+            title={image.revised_prompt}
+            class="rounded-md"
+          />
+        {/each}
+      {/if}
+    {/if}
   {/if}
 {/if}
