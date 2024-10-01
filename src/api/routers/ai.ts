@@ -24,7 +24,7 @@ const get_image_prompt_router = protectedAdminProcedure
   )
   .mutation(async ({ input: { messages, use_sample_data } }) => {
     if (use_sample_data) {
-      await delay(1500);
+      await delay(1000);
       return { image_prompt: ai_sample_data.sample_text_prompt };
     }
     const result = await generateObject({
@@ -80,7 +80,7 @@ const get_generated_images_router = protectedAdminProcedure
       };
     };
     if (use_sample_data) {
-      await delay(3500);
+      await delay(2000);
       const list: Awaited<ReturnType<typeof get_single_image>>[] = [];
       for (let i = 0; i < number_of_images; i++)
         list.push({

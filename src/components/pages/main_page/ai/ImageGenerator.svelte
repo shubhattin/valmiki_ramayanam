@@ -11,6 +11,8 @@
   import { get_possibily_not_undefined } from '@tools/kry';
   import { onMount } from 'svelte';
   import { loadLocalConfig } from '../load_local_config';
+  import { BsDownload } from 'svelte-icons-pack/bs';
+  import { download_file_in_browser } from '@tools/download_file_browser';
 
   $: kANDa_info = rAmAyaNam_map[$kANDa_selected - 1];
   $: sarga_info = kANDa_info.sarga_data[$sarga_selected - 1];
@@ -182,13 +184,25 @@
       {:else}
         <section class="grid grid-cols-2 gap-4">
           {#each get_possibily_not_undefined($image_mut.data) as image}
-            <div>
+            <div class="space-y-1">
               <img
                 src={image.url}
                 alt={image.revised_prompt}
                 title={image.revised_prompt}
-                class="rounded-md"
+                class="block rounded-md"
               />
+              <div class="flex items-center justify-center space-x-3">
+                <button
+                  on:click={() =>
+                    download_file_in_browser(
+                      image.url,
+                      `${$sarga_selected}-${$kANDa_selected} Shloka No. ${$shloka_numb}.png`
+                    )}
+                  class="btn rounded-md bg-surface-600 px-1 py-1 dark:bg-surface-500"
+                >
+                  <Icon src={BsDownload} class="text-xl" />
+                </button>
+              </div>
             </div>
           {/each}
         </section>
