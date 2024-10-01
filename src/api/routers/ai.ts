@@ -34,15 +34,16 @@ const get_image_prompt_router = protectedAdminProcedure
 const get_generated_image_router = protectedAdminProcedure
   .input(
     z.object({
-      image_prompt: z.string()
+      image_prompt: z.string(),
+      number_of_images: z.number().int().min(1).max(4)
     })
   )
-  .mutation(async ({ input: { image_prompt } }) => {
+  .mutation(async ({ input: { image_prompt, number_of_images } }) => {
     const req = await fetch_post('https://api.openai.com/v1/images/generations', {
       json: {
         model: 'dall-e-3',
         prompt: image_prompt,
-        n: 1,
+        n: number_of_images,
         size: '1024x1024',
         quality: 'standard'
       },

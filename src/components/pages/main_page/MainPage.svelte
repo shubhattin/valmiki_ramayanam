@@ -70,7 +70,10 @@
           });
         if (conf.editing_status_on) $editing_status_on = true;
         if (conf.image_tool_opened) $image_tool_opened = true;
-        if (conf.ai_tool_opened) $ai_tool_opened = true;
+        if (conf.ai_tool_opened) {
+          $ai_tool_opened = true;
+          $view_translation_status = true;
+        }
       })();
     }
     if (browser && import.meta.env.PROD) {
