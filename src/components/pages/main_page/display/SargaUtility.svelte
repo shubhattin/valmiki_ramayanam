@@ -11,7 +11,9 @@
     kANDa_selected,
     BASE_SCRIPT,
     image_tool_opened,
-    viewing_script
+    viewing_script,
+    ai_tool_opened,
+    view_translation_status
   } from '@state/main_page/main_state';
   import { createMutation } from '@tanstack/svelte-query';
   import { BsThreeDots } from 'svelte-icons-pack/bs';
@@ -28,6 +30,8 @@
   import { TrOutlineFileTypeTxt } from 'svelte-icons-pack/tr';
   import { download_file_in_browser } from '@tools/download_file_browser';
   import { lipi_parivartak_async } from '@tools/converter';
+  import { user_info } from '@state/main_page/user';
+  import { RiUserFacesRobot2Line } from 'svelte-icons-pack/ri';
 
   let current_workbook: Workbook;
   let current_file_name: string;
@@ -161,6 +165,21 @@
     <Icon src={BiImage} class="-mt-1 fill-sky-500 text-2xl dark:fill-sky-400" />
     Image Tool
   </button>
+  {#if $user_info && $user_info.user_type === 'admin'}
+    <button
+      on:click={() => {
+        $ai_tool_opened = true;
+        $view_translation_status = true;
+      }}
+      class="btn block w-full rounded-md px-2 py-1 text-start hover:bg-gray-200 dark:hover:bg-gray-700"
+    >
+      <Icon
+        src={RiUserFacesRobot2Line}
+        class="-mt-1 mr-1 fill-blue-500 text-2xl dark:fill-blue-400"
+      />
+      AI Tool
+    </button>
+  {/if}
   <button
     class="btn block w-full rounded-md px-2 py-1 text-start hover:bg-gray-200 dark:hover:bg-gray-700"
     on:click={() => $download_text_file.mutate()}

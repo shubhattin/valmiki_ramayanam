@@ -146,27 +146,12 @@ const load_english_translation = async (kANDa_num: number, sarga_number: number)
   const data_map = new Map<number, string>();
   if (!browser) return data_map;
   // ^ This is to prevent this to be bundled in edge functions as it a limit of 1mb(gzip)
-  if (import.meta.env.DEV) {
-    const yaml = (await import('js-yaml')).default;
-    const glob_yaml = import.meta.glob('/data/ramayan/trans_en/*/*.yaml', {
-      query: '?raw'
-    });
-    if (!(`/data/ramayan/trans_en/${kANDa_num}/${sarga_number}.yaml` in glob_yaml)) return data_map;
-    const text = (
-      (await glob_yaml[`/data/ramayan/trans_en/${kANDa_num}/${sarga_number}.yaml`]()) as any
-    ).default as string;
-    data = yaml.load(text) as Record<number, string>;
-  } else {
-    const glob_json = import.meta.glob('/data/ramayan/trans_en/json/*/*.json');
-    if (!(`/data/ramayan/trans_en/json/${kANDa_num}/${sarga_number}.json` in glob_json))
-      return data_map;
-    data = (
-      (await glob_json[`/data/ramayan/trans_en/json/${kANDa_num}/${sarga_number}.json`]()) as any
-    ).default as Record<number, string>;
-  }
 
-  for (const [key, value] of Object.entries(data)) {
+  const glob_yaml = import.meta.glob('/data/ramayan/trans_en/*/*.yaml');
+  const data_load_function = glob_yaml[`/data/ramayan/trans_en/${kANDa_num}/${sarga_number}.yaml`];
+  if (!data_load_function) return data_map;
+  data = ((await data_load_function()) as any).default as Record<number, string>;
+  for (const [key, value] of Object.entries(data))
     data_map.set(Number(key), value.replaceAll(/\n$/g, '')); // replace the ending newline
-  }
   return data_map;
 };
