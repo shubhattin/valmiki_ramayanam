@@ -39,27 +39,41 @@ const get_generated_images_router = protectedAdminProcedure
     })
   )
   .mutation(async ({ input: { image_prompt, number_of_images } }) => {
-    const req = await fetch_post('https://api.openai.com/v1/images/generations', {
-      json: {
-        model: 'dall-e-3',
-        prompt: image_prompt,
-        n: number_of_images,
-        size: '1024x1024',
-        quality: 'standard'
-      },
-      headers: {
-        Authorization: `Bearer ${env.OPENAI_API_KEY}`
-      }
-    });
-    const resp = (await req.json()) as {
-      created: number;
-      data: {
-        revised_prompt: string;
-        url: string;
-      }[];
-    };
+    const get_single_image = async () => {
+      const req = await fetch_post('https://api.openai.com/v1/images/generations', {
+        json: {
+          model: 'dall-e-3',
+          prompt: image_prompt,
+          n: 1,
+          size: '1024x1024',
+          quality: 'standard'
+        },
+        headers: {
+          Authorization: `Bearer ${env.OPENAI_API_KEY}`
+        }
+      });
+      const raw_resp = await req.json();
+      // console.log(raw_resp);
+      const resp = z
+        .object({
+          created: z.number().int(),
+          data: z
+            .object({
+              revised_prompt: z.string(),
+              url: z.string()
+            })
+            .array()
+        })
+        .parse(raw_resp);
 
-    return resp.data;
+      return {
+        created: resp.created,
+        ...resp.data[0]
+      };
+    };
+    const requests = Array.from({ length: number_of_images }, () => get_single_image());
+    const responses = await Promise.all(requests);
+    return responses;
   });
 
 export const ai_router = t.router({

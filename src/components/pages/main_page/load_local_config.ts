@@ -7,7 +7,8 @@ export async function loadLocalConfig() {
     view_translation_status: z.boolean().optional(),
     trans_lang: z.string().optional(),
     editing_status_on: z.boolean().optional(),
-    ai_tool_opened: z.boolean().optional()
+    ai_tool_opened: z.boolean().optional(),
+    use_ai_sample_data: z.boolean().optional()
   });
   let config: z.infer<typeof config_schema> = {};
   if (env.PUBLIC_LOCAL_CONFIG === 'true') {

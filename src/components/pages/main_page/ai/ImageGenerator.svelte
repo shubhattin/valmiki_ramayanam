@@ -6,13 +6,24 @@
   import { writable } from 'svelte/store';
   import base_prompts from './base_prompt.yaml';
   import { SlideToggle } from '@skeletonlabs/skeleton';
-  import { client } from '@api/client';
+  import { client, type client_raw } from '@api/client';
   import { lipi_parivartak_async } from '@tools/converter';
   import { get_possibily_not_undefined } from '@tools/kry';
+  import { onMount } from 'svelte';
+  import { loadLocalConfig } from '../load_local_config';
+  import { sample_data } from './sample_data';
+  import { delay } from '@tools/delay';
 
   $: kANDa_info = rAmAyaNam_map[$kANDa_selected - 1];
   $: sarga_info = kANDa_info.sarga_data[$sarga_selected - 1];
   $: shloka_count = sarga_info.shloka_count_extracted;
+
+  onMount(async () => {
+    if (import.meta.env.DEV) {
+      const conf = await loadLocalConfig();
+      if (conf.use_ai_sample_data) load_ai_sample_data = true;
+    }
+  });
 
   $: if ($sarga_selected) {
     $shloka_numb = 1;
@@ -23,6 +34,7 @@
   let additional_prompt_info = writable('');
   let shloka_text_prompt = writable('');
   let image_prompt = writable('');
+  let load_ai_sample_data = false;
 
   $: $additional_prompt_info =
     `The Shloka will be from Sarga ${sarga_info.index} named ${sarga_info.name_normal}, Kanda ${kANDa_info.index} ` +
@@ -44,25 +56,42 @@
     })();
 
   const generate_image_prompt = async () => {
-    await $image_prompt_mut.mutateAsync({
-      messages: [
-        ...(base_prompts as {
-          role: 'user' | 'assistant';
-          content: string;
-        }[]),
-        {
-          role: 'user',
-          content: $shloka_text_prompt
-        }
-      ]
-    });
+    if (load_ai_sample_data) {
+      await delay(2500);
+      $image_prompt = sample_data.sample_text_prompt;
+      if ($auto_gen_image) generate_image();
+    } else
+      await $image_prompt_mut.mutateAsync({
+        messages: [
+          ...(base_prompts as {
+            role: 'user' | 'assistant';
+            content: string;
+          }[]),
+          {
+            role: 'user',
+            content: $shloka_text_prompt
+          }
+        ]
+      });
   };
+  const NUMBER_OF_IMAGES = 2;
   const generate_image = async () => {
-    const NUMBER_OF_IMAGES = 1;
-    await $image_mut.mutateAsync({
-      image_prompt: $image_prompt,
-      number_of_images: NUMBER_OF_IMAGES
-    });
+    // ^ Also update grid-cols-<num> in image rendering
+    if (load_ai_sample_data) {
+      await delay(5500);
+      const list: typeof $image_data = [];
+      for (let i = 0; i < NUMBER_OF_IMAGES; i++)
+        list.push({
+          url: sample_data.sample_images[i],
+          created: 0,
+          revised_prompt: `Sample Image ${i + 1}`
+        });
+      $image_data = list;
+    } else
+      await $image_mut.mutateAsync({
+        image_prompt: $image_prompt,
+        number_of_images: NUMBER_OF_IMAGES
+      });
   };
   const image_prompt_mut = client.ai.get_image_prompt.mutation({
     async onSuccess({ image_prompt }) {
@@ -70,7 +99,14 @@
       if ($auto_gen_image) generate_image();
     }
   });
-  const image_mut = client.ai.get_generated_images.mutation();
+  const image_mut = client.ai.get_generated_images.mutation({
+    onSuccess(data) {
+      $image_data = data;
+    }
+  });
+  let image_data = writable<Awaited<ReturnType<typeof client_raw.ai.get_generated_images.mutate>>>(
+    []
+  );
 </script>
 
 <div>
@@ -160,14 +196,18 @@
       {#if $image_mut.isPending || !$image_mut.isSuccess}
         <div class="placeholder h-96 animate-pulse rounded-md"></div>
       {:else}
-        {#each get_possibily_not_undefined($image_mut.data) as image}
-          <img
-            src={image.url}
-            alt={image.revised_prompt}
-            title={image.revised_prompt}
-            class="rounded-md"
-          />
-        {/each}
+        <section class="grid grid-cols-2 gap-4">
+          {#each get_possibily_not_undefined($image_mut.data) as image}
+            <div>
+              <img
+                src={image.url}
+                alt={image.revised_prompt}
+                title={image.revised_prompt}
+                class="rounded-md"
+              />
+            </div>
+          {/each}
+        </section>
       {/if}
     {/if}
   {/if}
