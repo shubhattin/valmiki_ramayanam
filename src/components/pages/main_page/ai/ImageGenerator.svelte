@@ -135,7 +135,7 @@
     size="sm"
     class="mt-1 outline-none"
     active="bg-primary-500"
-    bind:checked={$auto_gen_image}>Auto Image Generate</SlideToggle
+    bind:checked={$auto_gen_image}>Auto Generate Image</SlideToggle
   >
 </div>
 {#if !$image_prompt_mut.isIdle}
