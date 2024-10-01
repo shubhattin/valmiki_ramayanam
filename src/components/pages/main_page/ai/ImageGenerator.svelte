@@ -198,7 +198,7 @@
                       image.url,
                       `${$sarga_selected}-${$kANDa_selected} Shloka No. ${$shloka_numb}.png`
                     )}
-                  class="btn rounded-md bg-surface-600 px-1 py-1 dark:bg-surface-500"
+                  class="btn rounded-md bg-surface-600 px-1 py-1 outline-none dark:bg-surface-500"
                 >
                   <Icon src={BsDownload} class="text-xl" />
                 </button>

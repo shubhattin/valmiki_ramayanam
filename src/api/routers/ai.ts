@@ -54,7 +54,8 @@ const get_generated_images_router = protectedAdminProcedure
           prompt: image_prompt,
           n: 1,
           size: '1024x1024',
-          quality: 'standard'
+          quality: 'standard',
+          response_format: 'b64_json'
         },
         headers: {
           Authorization: `Bearer ${env.OPENAI_API_KEY}`
@@ -68,7 +69,7 @@ const get_generated_images_router = protectedAdminProcedure
           data: z
             .object({
               revised_prompt: z.string(),
-              url: z.string()
+              b64_json: z.string()
             })
             .array()
         })
@@ -76,7 +77,8 @@ const get_generated_images_router = protectedAdminProcedure
 
       return {
         created: resp.created,
-        ...resp.data[0]
+        revised_prompt: resp.data[0].revised_prompt,
+        url: `data:image/png;base64,${resp.data[0].b64_json}`
       };
     };
     if (use_sample_data) {
