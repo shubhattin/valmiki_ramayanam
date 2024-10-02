@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { client } from '@api/client';
+  import { client_q } from '@api/client';
 
   export let on_done: () => void = null!;
 
@@ -8,7 +8,7 @@
 
   let pass_wrong_status = false;
 
-  const update_password = client.auth.update_password.mutation({
+  const update_password = client_q.auth.update_password.mutation({
     onSuccess(res) {
       if (!res.success) {
         pass_wrong_status = true;

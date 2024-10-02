@@ -4,7 +4,7 @@ import { delay } from '@tools/delay';
 import { get_derived_query } from '@tools/query';
 import { queryClient } from '@state/query';
 import { derived } from 'svelte/store';
-import { client_raw } from '@api/client';
+import { client } from '@api/client';
 import rAmAyaNam_map from '@data/ramayan/ramayan_map.json';
 import { lipi_parivartak_async } from '@tools/converter';
 
@@ -128,7 +128,7 @@ export async function get_translations(kanda: number, sarga: number, lang: strin
   if (LOCALS_TRANS_LANGS.includes(lang)) {
     if (lang === 'English') return await load_english_translation(kanda, sarga);
   }
-  const data = await client_raw.translations.get_translations_per_sarga.query({
+  const data = await client.translations.get_translations_per_sarga.query({
     lang: lang,
     kANDa_num: kanda,
     sarga_num: sarga

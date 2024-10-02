@@ -20,7 +20,7 @@
   import { popup } from '@skeletonlabs/skeleton';
   import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
   import { transliterate_xlxs_file } from '@tools/excel/transliterate_xlsx_file';
-  import { client_raw } from '@api/client';
+  import { client } from '@api/client';
   import { scale } from 'svelte/transition';
   import Icon from '@tools/Icon.svelte';
   import Modal from '@components/Modal.svelte';
@@ -62,7 +62,7 @@
         rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].shloka_count_extracted;
       // loading other online databased language translations
       const other_translations =
-        await client_raw.translations.get_all_langs_translations_per_sarga.query({
+        await client.translations.get_all_langs_translations_per_sarga.query({
           kANDa_num: $kANDa_selected,
           sarga_num: $sarga_selected
         });

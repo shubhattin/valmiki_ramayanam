@@ -6,7 +6,7 @@
   import { writable } from 'svelte/store';
   import base_prompts from './base_prompt.yaml';
   import { SlideToggle } from '@skeletonlabs/skeleton';
-  import { client, type client_raw } from '@api/client';
+  import { client_q, type client } from '@api/client';
   import { lipi_parivartak_async } from '@tools/converter';
   import { get_possibily_not_undefined } from '@tools/kry';
   import { onMount } from 'svelte';
@@ -81,7 +81,7 @@
       use_sample_data: load_ai_sample_data
     });
   };
-  const image_prompt_mut = client.ai.get_image_prompt.mutation({
+  const image_prompt_mut = client_q.ai.get_image_prompt.mutation({
     async onSuccess({ image_prompt }) {
       if (image_prompt) {
         $image_prompt = image_prompt;
@@ -92,14 +92,12 @@
       }
     }
   });
-  const image_mut = client.ai.get_generated_images.mutation({
+  const image_mut = client_q.ai.get_generated_images.mutation({
     onSuccess(data) {
       $image_data = data;
     }
   });
-  let image_data = writable<Awaited<ReturnType<typeof client_raw.ai.get_generated_images.mutate>>>(
-    []
-  );
+  let image_data = writable<Awaited<ReturnType<typeof client.ai.get_generated_images.mutate>>>([]);
 </script>
 
 <div>

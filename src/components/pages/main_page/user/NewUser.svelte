@@ -3,7 +3,7 @@
   import { cl_join } from '@tools/cl_join';
   import { LuUserPlus } from 'svelte-icons-pack/lu';
   import Icon from '@tools/Icon.svelte';
-  import { client } from '@api/client';
+  import { client_q } from '@api/client';
   import { z } from 'zod';
   export let on_verify: () => void = null!;
   export let name_input_element: Writable<HTMLInputElement>;
@@ -21,7 +21,7 @@
 
   let user_created_status = false;
 
-  const create_new_user = client.auth.add_new_user.mutation({
+  const create_new_user = client_q.auth.add_new_user.mutation({
     onSuccess(res) {
       user_already_exists = false;
       email_already_exists = false;

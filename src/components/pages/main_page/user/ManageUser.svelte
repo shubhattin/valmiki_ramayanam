@@ -1,6 +1,6 @@
 <script lang="ts">
   import Icon from '@tools/Icon.svelte';
-  import { client } from '@api/client';
+  import { client_q } from '@api/client';
   import { getModalStore, popup } from '@skeletonlabs/skeleton';
   import { RiSystemAddLargeFill, RiSystemCloseLargeLine } from 'svelte-icons-pack/ri';
   import { onDestroy, onMount } from 'svelte';
@@ -22,7 +22,7 @@
   let unverified_normal_users_index: number[] = [];
   let selected_langs_index: string[][] = [];
 
-  $: users_info = client.user_info.get_all_users_info.query(undefined, {
+  $: users_info = client_q.user_info.get_all_users_info.query(undefined, {
     enabled: browser && $user_info?.user_type === 'admin',
     placeholderData: [],
     refetchOnMount: 'always'
@@ -59,17 +59,17 @@
     );
   });
 
-  const add_allowed_lang = client.auth.add_user_allowed_langs.mutation({
+  const add_allowed_lang = client_q.auth.add_user_allowed_langs.mutation({
     onSuccess() {
       invaliadte_users_info();
     }
   });
-  const add_unverified_user = client.auth.verify_unverified_user.mutation({
+  const add_unverified_user = client_q.auth.verify_unverified_user.mutation({
     onSuccess() {
       invaliadte_users_info();
     }
   });
-  const remove_unverified_user = client.auth.delete_unverified_user.mutation({
+  const remove_unverified_user = client_q.auth.delete_unverified_user.mutation({
     onSuccess() {
       invaliadte_users_info();
     }

@@ -10,7 +10,7 @@
   } from '@state/main_page/main_state';
   import { trans_lang_data, trans_lang_data_query_key } from '@state/main_page/data';
   import { delay } from '@tools/delay';
-  import { client_raw } from '@api/client';
+  import { client } from '@api/client';
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
   import { scale, slide } from 'svelte/transition';
   import { FiSave } from 'svelte-icons-pack/fi';
@@ -33,7 +33,7 @@
       await delay(500);
       const added_texts = added_indexes.map((index) => $trans_lang_data.data?.get(index)!);
       const edited_texts = edited_indexes.map((index) => $trans_lang_data.data?.get(index)!);
-      const res = await client_raw.translations.edit_translation.mutate({
+      const res = await client.translations.edit_translation.mutate({
         data: {
           add_data: added_texts,
           edit_data: edited_texts,

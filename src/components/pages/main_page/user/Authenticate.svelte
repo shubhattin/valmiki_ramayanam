@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { client } from '@api/client';
+  import { client_q } from '@api/client';
   import { storeAuthInfo } from '@tools/auth_tools';
   import { writable } from 'svelte/store';
   import type { Writable } from 'svelte/store';
@@ -19,7 +19,7 @@
   let wrong_pass_status = false;
   let user_not_found_status = false;
 
-  const check_pass = client.auth.verify_pass.mutation({
+  const check_pass = client_q.auth.verify_pass.mutation({
     onSuccess(res) {
       user_not_found_status = false;
       wrong_pass_status = false;

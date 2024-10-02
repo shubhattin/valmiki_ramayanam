@@ -25,5 +25,5 @@ const client_options = {
   transformer
 };
 
-export const client_raw = createTRPCClient<Router>(client_options);
-export const client = createTRPCSvelte<Router>(client_options);
+export const client = createTRPCClient<Router>(client_options);
+export const client_q = createTRPCSvelte<Router>(client_options);
