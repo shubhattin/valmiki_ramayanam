@@ -11,9 +11,6 @@ importers:
       '@ai-sdk/openai':
         specifier: ^0.0.63
         version: 0.0.63(zod@3.23.8)
-      '@ai-sdk/svelte':
-        specifier: ^0.0.51
-        version: 0.0.51(svelte@4.2.19)(zod@3.23.8)
       '@builder.io/partytown':
         specifier: ^0.10.2
         version: 0.10.2
@@ -80,9 +77,6 @@ importers:
       openai:
         specifier: ^4.66.1
         version: 4.66.1(zod@3.23.8)
-      openai-edge:
-        specifier: ^1.2.2
-        version: 1.2.2
       postcss:
         specifier: ^8.4.45
         version: 8.4.45
@@ -2704,10 +2698,6 @@ packages:
   onetime@6.0.0:
     resolution: {integrity: sha512-1FlR+gjXK7X+AsAHso35MnyN5KqGwJRi/31ft6x0M194ht7S+rWAvd7PHss9xSKMzE0asv1pyIHaJYq+BbacAQ==}
     engines: {node: '>=12'}
-
-  openai-edge@1.2.2:
-    resolution: {integrity: sha512-C3/Ao9Hkx5uBPv9YFBpX/x59XMPgPUU4dyGg/0J2sOJ7O9D98kD+lfdOc7v/60oYo5xzMGct80uFkYLH+X2qgw==}
-    engines: {node: '>=18'}
 
   openai@4.66.1:
     resolution: {integrity: sha512-+sSyV6VtGHerPb6Kfi76hrEOVt+wayvuw7GX/ky7rAR11kN6JVs4dgbtoaxzDXvAxc5dcQLuXeco54mBfOMoQQ==}
@@ -5845,8 +5835,6 @@ snapshots:
   onetime@6.0.0:
     dependencies:
       mimic-fn: 4.0.0
-
-  openai-edge@1.2.2: {}
 
   openai@4.66.1(zod@3.23.8):
     dependencies:
