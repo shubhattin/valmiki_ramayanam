@@ -143,7 +143,7 @@
     target: 'sarga_options',
     placement: 'bottom'
   }}
-  class="btn m-0 rounded-full p-[0.05rem] ring-2 ring-zinc-400 dark:ring-zinc-300"
+  class="btn m-0 rounded-full p-[0.05rem] ring-2 ring-zinc-500 dark:ring-zinc-300"
 >
   <Icon class="text-2xl" src={BsThreeDots} />
 </button>

@@ -13,6 +13,7 @@
   import { loadLocalConfig } from '../load_local_config';
   import { BsDownload } from 'svelte-icons-pack/bs';
   import { download_file_in_browser } from '@tools/download_file_browser';
+  import { cl_join } from '@tools/cl_join';
 
   $: kANDa_info = rAmAyaNam_map[$kANDa_selected - 1];
   $: sarga_info = kANDa_info.sarga_data[$sarga_selected - 1];
@@ -35,6 +36,7 @@
   let shloka_text_prompt = writable('');
   let image_prompt = writable('');
   let load_ai_sample_data = false;
+  let image_prompt_request_error = false;
 
   $: $additional_prompt_info =
     `The Shloka will be from Sarga ${sarga_info.index} named ${sarga_info.name_normal}, Kanda ${kANDa_info.index} ` +
@@ -81,8 +83,13 @@
   };
   const image_prompt_mut = client.ai.get_image_prompt.mutation({
     async onSuccess({ image_prompt }) {
-      $image_prompt = image_prompt;
-      if ($auto_gen_image) generate_image();
+      if (image_prompt) {
+        $image_prompt = image_prompt;
+        if ($auto_gen_image) generate_image();
+        image_prompt_request_error = false;
+      } else {
+        image_prompt_request_error = true;
+      }
     }
   });
   const image_mut = client.ai.get_generated_images.mutation({
@@ -104,10 +111,10 @@
       bind:value={$base_user_prompt}
     ></textarea>
   </label>
-  <div class="break-words text-xs text-stone-400">
+  <div class="break-words text-xs text-stone-500 dark:text-stone-400">
     {$additional_prompt_info}
   </div>
-  <div class="text-xs text-slate-400">
+  <div class="text-xs text-slate-600 dark:text-slate-400">
     {#each $shloka_text_prompt.split('\n') as line}
       <div>
         {line === '' ? '\u200d' : line}
@@ -148,7 +155,7 @@
   <button
     on:click={generate_image_prompt}
     disabled={$image_prompt_mut.isPending}
-    class="btn rounded-md bg-surface-700 px-2 py-1 font-bold text-white dark:bg-surface-600"
+    class="btn rounded-md bg-surface-600 px-2 py-1 font-bold text-white dark:bg-surface-600"
   >
     Generate Image Prompt
   </button>
@@ -173,7 +180,10 @@
         >Generate Image</button
       >
       <textarea
-        class="textarea h-36 px-1 py-0 text-sm"
+        class={cl_join(
+          'textarea h-36 px-1 py-0 text-sm',
+          image_prompt_request_error && 'input-error'
+        )}
         spellcheck="false"
         bind:value={$image_prompt}
       ></textarea>
@@ -185,26 +195,30 @@
         <div>
           <section class="mb-10 grid grid-cols-2 gap-4">
             {#each get_possibily_not_undefined($image_mut.data) as image}
-              <div class="space-y-1">
-                <img
-                  src={image.url}
-                  alt={image.revised_prompt}
-                  title={image.revised_prompt}
-                  class="block rounded-md"
-                />
-                <div class="flex items-center justify-center space-x-3">
-                  <button
-                    on:click={() =>
-                      download_file_in_browser(
-                        image.url,
-                        `${$sarga_selected}-${$kANDa_selected} Shloka No. ${$shloka_numb}.png`
-                      )}
-                    class="btn rounded-md bg-surface-600 px-1 py-1 outline-none dark:bg-surface-500"
-                  >
-                    <Icon src={BsDownload} class="text-xl" />
-                  </button>
+              {#if image}
+                <div class="space-y-1">
+                  <img
+                    src={image.url}
+                    alt={image.revised_prompt}
+                    title={image.revised_prompt}
+                    class="block rounded-md"
+                  />
+                  <div class="flex items-center justify-center space-x-3">
+                    <button
+                      on:click={() =>
+                        download_file_in_browser(
+                          image.url,
+                          `${$sarga_selected}-${$kANDa_selected} Shloka No. ${$shloka_numb}.png`
+                        )}
+                      class="btn rounded-md bg-surface-600 px-1 py-1 outline-none dark:bg-surface-500"
+                    >
+                      <Icon src={BsDownload} class="text-xl" />
+                    </button>
+                  </div>
                 </div>
-              </div>
+              {:else}
+                error
+              {/if}
             {/each}
           </section>
         </div>
