@@ -208,7 +208,7 @@
                       on:click={() =>
                         download_file_in_browser(
                           image.url,
-                          `${$sarga_selected}-${$kANDa_selected} Shloka No. ${$shloka_numb}.png`
+                          `Image ${$sarga_selected}-${$kANDa_selected} Shloka No. ${$shloka_numb}.png`
                         )}
                       class="btn rounded-md bg-surface-600 px-1 py-1 outline-none dark:bg-surface-500"
                     >

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ImageGenerator from './ImageGenerator.svelte';
+  import ImageGenerator from './AIImageGenerator.svelte';
   // import { Tab, TabGroup } from '@skeletonlabs/skeleton';
 
   // let tab_set: 'image' = 'image';

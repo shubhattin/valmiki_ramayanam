@@ -1,6 +1,6 @@
 - role: user
   content: >
-    I will be giving you Sanskrit shloka along with its English translation for Valmiki Ramayanam. Generate a text prompt which can be used to generate consistent looking images that encapsulate the essence of the translations(meaning). Make the images look real along with the background. The scene should be set in the Treta Yuga(Ancient India in times of Valmiki Ramayanam). Keep People's faces in Indian Context.
+    I will be giving you Sanskrit shloka along with its English translation for Valmiki Ramayanam. Generate a text prompt which can be used to generate consistent looking images that encapsulate the essence of the translations(meaning). Make the images look real along with the background. The scene should be set in the Treta Yuga(Ancient India in times of Valmiki Ramayanam). Keep People's faces and clothes in Indian Context.
 - role: assistant
   content: >
     To create consistent image prompts that encapsulate the essence of the translations from Valmiki Ramayanam, I will aim to generate a detailed, descriptive prompt based on the meaning and context of each shloka. These prompts will focus on the visual elements of the scene described in the translation, while keeping the artistic and cultural essence intact.
