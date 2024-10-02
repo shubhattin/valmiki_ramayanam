@@ -72,7 +72,7 @@
       use_sample_data: load_ai_sample_data
     });
   };
-  const NUMBER_OF_IMAGES = 2;
+  const NUMBER_OF_IMAGES = 1;
   // ^ Also update grid-cols-<num> in image rendering
   const generate_image = async () => {
     await $image_mut.mutateAsync({
