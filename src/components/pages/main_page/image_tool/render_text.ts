@@ -89,6 +89,9 @@ const render_text = async (input: z.input<typeof render_text_args_schema>) => {
   const HEIGHT_ACTUAL = bottom - top;
   const HEIGHT = HEIGHT_ACTUAL;
 
+  let text_group_height = 0;
+  let text_group_width = 0;
+
   let text_used = '';
   const words = text.split(' ');
   for (let i = 0; i < words.length; i++) {
@@ -121,18 +124,27 @@ const render_text = async (input: z.input<typeof render_text_args_schema>) => {
   let NEW_LINE_SPACING = 0;
 
   const render_line = async (line: string) => {
-    const text_path = new fabric.Path(await get_text_svg_path(line, font_url), {
-      fill: color
-    });
-    let height = text_path.height * text_path_scale;
-    let width = text_path.width * text_path_scale;
-    if (WIDTH / width < 1) text_path_scale = (text_path_scale / width) * WIDTH;
-    text_path.set({
-      scaleX: text_path_scale,
-      scaleY: text_path_scale
-    });
-    height = text_path.height * text_path_scale;
-    width = text_path.width * text_path_scale;
+    const get_text_path_element = async (line_text: string) => {
+      const text_path = new fabric.Path(await get_text_svg_path(line_text, font_url), {
+        fill: color
+      });
+      let height = text_path.height * text_path_scale;
+      let width = text_path.width * text_path_scale;
+      if (WIDTH / width < 1) text_path_scale = (text_path_scale / width) * WIDTH;
+      text_path.set({
+        scaleX: text_path_scale,
+        scaleY: text_path_scale
+      });
+      height = text_path.height * text_path_scale;
+      width = text_path.width * text_path_scale;
+      return { text_path, height, width };
+    };
+    let { text_path, width, height } = await get_text_path_element(line);
+    if (text_type === 'normal') {
+      const CHARACTERS_WITH_MORE_LINE_HEIGHT = 'qypgj';
+      let { height } = await get_text_path_element(line + CHARACTERS_WITH_MORE_LINE_HEIGHT);
+      text_group_height = height;
+    }
     if (opts.top) text_path.set({ top: get_units(opts.top) + prev_height });
     if (align === 'center')
       text_path.set({
@@ -197,7 +209,12 @@ const render_text = async (input: z.input<typeof render_text_args_schema>) => {
       }
     }
   }
-  return text_group;
+  text_group_width = text_group.width;
+  if (text_type != 'normal') {
+    text_group_height = text_group.height;
+    // ^ for normal text height will not be calculated after adding letters like `y,p,g,q,j` etc
+  }
+  return { group: text_group, height: text_group_height, width: text_group_width };
 };
 
 const draw_bounding_and_reference_lines = async (shloka_config: shloka_type_config) => {
@@ -371,18 +388,18 @@ export const render_all_texts = async (
     const top_pos = get_units(
       shloka_config.reference_lines.top + i * shloka_config.reference_lines.spacing
     );
-    text_norm_group.set({
+    text_norm_group.group.set({
       top: top_pos - (text_norm_group.height + get_units($SPACE_ABOVE_REFERENCE_LINE))
     });
-    text_main_group.set({
+    text_main_group.group.set({
       top:
         top_pos -
         (text_main_group.height +
           get_units($SPACE_BETWEEN_MAIN_AND_NORM) +
           (text_norm_group.height + get_units($SPACE_ABOVE_REFERENCE_LINE)))
     });
-    $canvas.add(text_main_group);
-    $canvas.add(text_norm_group);
+    $canvas.add(text_main_group.group);
+    $canvas.add(text_norm_group.group);
     if (i === shloka_lines.length - 1) {
       const number_main_text = main_text.split(' ').at(-1)!;
       const number_indicator_main = await render_text({
@@ -397,7 +414,7 @@ export const render_all_texts = async (
         align: 'right',
         top: shloka_config.bounding_coords.top + 8
       });
-      $canvas.add(number_indicator_main);
+      $canvas.add(number_indicator_main.group);
 
       const number_indicator_norm = await render_text({
         text: norm_text.split(' ').at(-1)!,
@@ -411,10 +428,10 @@ export const render_all_texts = async (
         align: 'right'
       });
       // top has to be set outiside as itss a mix of scaled and non scaled values
-      number_indicator_norm.set({
-        top: number_indicator_main.top + get_units(5) + number_indicator_main.height
+      number_indicator_norm.group.set({
+        top: number_indicator_main.group.top + get_units(5) + number_indicator_main.height
       });
-      $canvas.add(number_indicator_norm);
+      $canvas.add(number_indicator_norm.group);
     }
   }
 
@@ -438,7 +455,7 @@ export const render_all_texts = async (
       lockScalingY: false,
       new_line_spacing_factor: trans_text_font_info.new_line_spacing
     });
-    $canvas.add(trans_text);
+    $canvas.add(trans_text.group);
   }
   $canvas.requestRenderAll();
   return shloka_config;
