@@ -14,8 +14,8 @@ import {
   type lang_list_type,
   type script_list_type
 } from '@tools/lang_list';
-import { get_font_family_and_size } from '@tools/font_tools';
 import { copy_plain_object } from '@tools/kry';
+import { get_image_font_info } from './settings';
 
 export let canvas = writable<fabric.Canvas>();
 export let background_image = writable<fabric.FabricImage>();
@@ -75,15 +75,12 @@ export const image_trans_data = get_derived_query(
 
 // Language and Script Specific Settings
 
-type image_font_config_type<T extends string> = Record<
-  T,
-  ReturnType<typeof get_font_family_and_size>
->;
+type image_font_config_type<T extends string> = Record<T, ReturnType<typeof get_image_font_info>>;
 export const DEFAULT_MAIN_TEXT_FONT_CONFIGS = (() => {
   const res: any = {};
   SCRIPT_LIST.filter((src) => !['Normal'].includes(src)).forEach(
     (script) =>
-      (res[script as script_list_type] = get_font_family_and_size(
+      (res[script as script_list_type] = get_image_font_info(
         script as script_list_type,
         'image',
         'shloka'
@@ -93,19 +90,19 @@ export const DEFAULT_MAIN_TEXT_FONT_CONFIGS = (() => {
 })();
 export let main_text_font_configs = writable(copy_plain_object(DEFAULT_MAIN_TEXT_FONT_CONFIGS));
 export let normal_text_font_config = writable(
-  copy_plain_object(get_font_family_and_size('Normal', 'image', 'shloka'))
+  copy_plain_object(get_image_font_info('Normal', 'image', 'shloka'))
 );
 export const DEFAULT_TRANS_TEXT_FONT_CONFIGS = (() => {
   const res: any = {};
   LANG_LIST.forEach(
     (lang) =>
-      (res[lang as script_list_type] = get_font_family_and_size(
+      (res[lang as script_list_type] = get_image_font_info(
         lang as lang_list_type,
         'image',
         'trans'
       ))
   );
-  res['English'] = get_font_family_and_size('English', 'image', 'trans');
+  res['English'] = get_image_font_info('English', 'image', 'trans');
   return res as image_font_config_type<lang_list_extended_type>;
 })();
 export let trans_text_font_configs = writable(copy_plain_object(DEFAULT_TRANS_TEXT_FONT_CONFIGS));

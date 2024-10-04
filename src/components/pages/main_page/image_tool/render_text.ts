@@ -369,7 +369,8 @@ export const render_all_texts = async (
       text_type: 'main',
       ...shloka_config.bounding_coords,
       width_usage_factor: 0.985,
-      align: 'center'
+      align: 'center',
+      lockMovementY: false
     });
     const norm_text = await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, 'Normal');
     const text_norm_group = await render_text({
@@ -383,7 +384,8 @@ export const render_all_texts = async (
       text_type: 'normal',
       ...shloka_config.bounding_coords,
       width_usage_factor: 0.985,
-      align: 'center'
+      align: 'center',
+      lockMovementY: false
     });
     const top_pos = get_units(
       shloka_config.reference_lines.top + i * shloka_config.reference_lines.spacing

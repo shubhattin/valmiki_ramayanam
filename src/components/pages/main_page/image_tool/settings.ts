@@ -1,5 +1,7 @@
 import { copy_plain_object } from '@tools/kry';
 import { writable } from 'svelte/store';
+import { get_font_family_and_size, type font_config_type } from '@tools/font_tools';
+import type { script_and_lang_list_type } from '@tools/lang_list';
 
 type bounding_coords_type = {
   left: number;
@@ -134,4 +136,82 @@ export const TEXT_CONFIGS = {
   trans_text: {
     color: 'hsla(44, 100%, 10%, 1)'
   }
+};
+
+type image_font_config_type = font_config_type & {
+  new_line_spacing?: number;
+  space_between_main_and_normal?: number;
+};
+
+/**
+ * Overrides the default font image config from `DEFAULT_FONT_MAIN_CONFIG`
+ * this is for shloka, this will be inherited for translations as well you have override it
+ */
+export const DEFAULT_FONT_IMAGE_MAIN_CONFIG = {
+  Devanagari: {
+    size: 1.35
+  },
+  Normal: {
+    font: 'ADOBE_DEVANAGARI'
+  },
+  Telugu: {
+    size: 0.8,
+    space_between_main_and_normal: 8
+  }
+} as image_font_config_type;
+
+/**
+ * Default font config for image translation
+ * You might need to override values from `DEFAULT_FONT_MAIN_CONFIG`
+ */
+export const DEFAULT_FONT_IMAGE_TRANS_CONFIG = {
+  Hindi: {
+    font: 'ADOBE_DEVANAGARI',
+    size: 1.4,
+    new_line_spacing: 0.35
+  },
+  English: {
+    font: 'ADOBE_DEVANAGARI',
+    size: 1.2
+  },
+  Telugu: {
+    size: 0.9
+  }
+} as image_font_config_type;
+
+const DEFAULT_IMAGE_CONF = {
+  new_line_spacing: 0.5,
+  space_between_main_and_normal: 1
+};
+
+export const get_image_font_info = (
+  script: script_and_lang_list_type,
+  usage_context: 'image' | 'app' = 'app',
+  image_context: 'shloka' | 'trans' | null = null!
+) => {
+  let { family, key, size } = get_font_family_and_size(script);
+  let { new_line_spacing, space_between_main_and_normal } = DEFAULT_IMAGE_CONF;
+
+  // Image based options
+  let image_conf = DEFAULT_FONT_IMAGE_MAIN_CONFIG[script];
+  if (usage_context === 'image' && image_conf) {
+    // Override the default font size
+    if (image_conf.font) key = image_conf.font;
+    if (image_conf.size) size = image_conf.size;
+    if (image_conf.space_between_main_and_normal)
+      space_between_main_and_normal = image_conf.space_between_main_and_normal;
+  }
+  image_conf = DEFAULT_FONT_IMAGE_TRANS_CONFIG[script];
+  if (usage_context === 'image' && image_context === 'trans' && image_conf) {
+    if (image_conf.font) key = image_conf.font;
+    if (image_conf.size) size = image_conf.size;
+    if (image_conf.new_line_spacing) new_line_spacing = image_conf.new_line_spacing;
+  }
+  return {
+    family,
+    key,
+    size,
+    new_line_spacing,
+    space_between_main_and_normal
+  };
 };

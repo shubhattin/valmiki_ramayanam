@@ -54,7 +54,7 @@ const FONT_FILE_INFO: Record<
   }
 };
 
-type image_font_config_type = Record<
+export type font_config_type = Record<
   script_and_lang_list_type,
   {
     font?: fonts_type;
@@ -98,60 +98,18 @@ const DEFAULT_FONT_MAIN_CONFIG = {
   Normal: {
     font: 'ROBOTO'
   }
-} as image_font_config_type;
-
-/**
- * Overrides the default font image config from `DEFAULT_FONT_MAIN_CONFIG`
- * this is for shloka, this will be inherited for translations as well you have override it
- */
-export const DEFAULT_FONT_IMAGE_MAIN_CONFIG = {
-  Devanagari: {
-    size: 1.35
-  },
-  Normal: {
-    font: 'ADOBE_DEVANAGARI'
-  },
-  Telugu: {
-    size: 0.8,
-    space_between_main_and_normal: 8
-  }
-} as image_font_config_type;
-
-/**
- * Default font config for image translation
- * You might need to override values from `DEFAULT_FONT_MAIN_CONFIG`
- */
-export const DEFAULT_FONT_IMAGE_TRANS_CONFIG = {
-  Hindi: {
-    font: 'ADOBE_DEVANAGARI',
-    size: 1.4,
-    new_line_spacing: 0.35
-  },
-  English: {
-    font: 'ADOBE_DEVANAGARI',
-    size: 1.2
-  },
-  Telugu: {
-    size: 0.9
-  }
-} as image_font_config_type;
+} as font_config_type;
 
 const DEFAULTS = {
   font: 'NIRMALA_UI',
-  size: 1,
-  new_line_spacing: 0.5,
-  space_between_main_and_normal: 1
+  size: 1
 };
 /**
  * `size` is in rem
  */
-export const get_font_family_and_size = (
-  script: script_and_lang_list_type,
-  usage_context: 'image' | 'app' = 'app',
-  image_context: 'shloka' | 'trans' | null = null!
-) => {
+export const get_font_family_and_size = (script: script_and_lang_list_type) => {
   let key: fonts_type = DEFAULTS.font as fonts_type;
-  let { size, new_line_spacing, space_between_main_and_normal } = DEFAULTS;
+  let { size } = DEFAULTS;
 
   const main_app_conf = DEFAULT_FONT_MAIN_CONFIG[script];
   if (main_app_conf) {
@@ -159,27 +117,9 @@ export const get_font_family_and_size = (
     if (main_app_conf.size) size = main_app_conf.size;
   }
 
-  // Image based options
-  let image_conf = DEFAULT_FONT_IMAGE_MAIN_CONFIG[script];
-  if (usage_context === 'image' && image_conf) {
-    // Override the default font size
-    if (image_conf.font) key = image_conf.font;
-    if (image_conf.size) size = image_conf.size;
-    if (image_conf.space_between_main_and_normal)
-      space_between_main_and_normal = image_conf.space_between_main_and_normal;
-  }
-  image_conf = DEFAULT_FONT_IMAGE_TRANS_CONFIG[script];
-  if (usage_context === 'image' && image_context === 'trans' && image_conf) {
-    if (image_conf.font) key = image_conf.font;
-    if (image_conf.size) size = image_conf.size;
-    if (image_conf.new_line_spacing) new_line_spacing = image_conf.new_line_spacing;
-  }
-
   return {
     family: FONT_FAMILY_NAME[key],
     size,
-    key,
-    new_line_spacing,
-    space_between_main_and_normal
+    key
   };
 };
