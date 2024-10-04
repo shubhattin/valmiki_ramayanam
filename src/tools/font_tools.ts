@@ -59,8 +59,6 @@ export type font_config_type = Record<
   {
     font?: fonts_type;
     size?: number;
-    new_line_spacing?: number;
-    space_between_main_and_normal?: number;
   }
 >;
 

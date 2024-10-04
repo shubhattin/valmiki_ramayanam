@@ -20,7 +20,7 @@
   import { LanguageIcon } from '@components/icons';
   import { SlideToggle, TabGroup, Tab, Accordion, AccordionItem } from '@skeletonlabs/skeleton';
   import ImageDownloader from './ImageDownloader.svelte';
-  import { DEFAULT_SHLOKA_CONFIG_SHARED } from './settings';
+  import { DEFAULT_SHLOKA_CONFIG_SHARED, get_image_font_info } from './settings';
   import { IoOptions } from 'svelte-icons-pack/io';
   import {
     current_shloka_type,
@@ -41,7 +41,7 @@
       DEFAULT_SHLOKA_CONFIG[$current_shloka_type]
     );
     $SPACE_ABOVE_REFERENCE_LINE = DEFAULT_SHLOKA_CONFIG_SHARED.SPACE_ABOVE_REFERENCE_LINE;
-    $normal_text_font_config = copy_plain_object(get_font_family_and_size('Normal', 'image'));
+    $normal_text_font_config = copy_plain_object(get_image_font_info('Normal'));
     $main_text_font_configs = copy_plain_object(DEFAULT_MAIN_TEXT_FONT_CONFIGS);
     $trans_text_font_configs = copy_plain_object(DEFAULT_TRANS_TEXT_FONT_CONFIGS);
   };

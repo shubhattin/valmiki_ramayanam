@@ -80,29 +80,20 @@ export const DEFAULT_MAIN_TEXT_FONT_CONFIGS = (() => {
   const res: any = {};
   SCRIPT_LIST.filter((src) => !['Normal'].includes(src)).forEach(
     (script) =>
-      (res[script as script_list_type] = get_image_font_info(
-        script as script_list_type,
-        'image',
-        'shloka'
-      ))
+      (res[script as script_list_type] = get_image_font_info(script as script_list_type, 'shloka'))
   );
   return res as image_font_config_type<script_list_type>;
 })();
 export let main_text_font_configs = writable(copy_plain_object(DEFAULT_MAIN_TEXT_FONT_CONFIGS));
 export let normal_text_font_config = writable(
-  copy_plain_object(get_image_font_info('Normal', 'image', 'shloka'))
+  copy_plain_object(get_image_font_info('Normal', 'shloka'))
 );
 export const DEFAULT_TRANS_TEXT_FONT_CONFIGS = (() => {
   const res: any = {};
   LANG_LIST.forEach(
-    (lang) =>
-      (res[lang as script_list_type] = get_image_font_info(
-        lang as lang_list_type,
-        'image',
-        'trans'
-      ))
+    (lang) => (res[lang as script_list_type] = get_image_font_info(lang as lang_list_type, 'trans'))
   );
-  res['English'] = get_image_font_info('English', 'image', 'trans');
+  res['English'] = get_image_font_info('English', 'trans');
   return res as image_font_config_type<lang_list_extended_type>;
 })();
 export let trans_text_font_configs = writable(copy_plain_object(DEFAULT_TRANS_TEXT_FONT_CONFIGS));

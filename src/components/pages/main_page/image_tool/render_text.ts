@@ -33,6 +33,7 @@ const render_text_args_schema = z.object({
   color: z.string(),
   line_index: z.number().optional(),
   text_type: z.union([z.literal('main'), z.literal('normal')]).optional(),
+  text_for_min_height: z.string().optional().nullable(),
   total_lines: z.number().optional(),
   left: z.number(),
   right: z.number(),
@@ -69,7 +70,8 @@ const render_text = async (input: z.input<typeof render_text_args_schema>) => {
     lockMovementY,
     lockScalingX,
     lockScalingY,
-    new_line_spacing_factor
+    new_line_spacing_factor,
+    text_for_min_height
   } = opts;
 
   const get_font_size_for_path = (font_size: number) => {
@@ -140,9 +142,8 @@ const render_text = async (input: z.input<typeof render_text_args_schema>) => {
       return { text_path, height, width };
     };
     let { text_path, width, height } = await get_text_path_element(line);
-    if (text_type === 'normal') {
-      const CHARACTERS_WITH_MORE_LINE_HEIGHT = 'qypgj';
-      let { height } = await get_text_path_element(line + CHARACTERS_WITH_MORE_LINE_HEIGHT);
+    if (text_for_min_height) {
+      let { height } = await get_text_path_element(line + text_for_min_height);
       text_group_height = height;
     }
     if (opts.top) text_path.set({ top: get_units(opts.top) + prev_height });
@@ -210,7 +211,7 @@ const render_text = async (input: z.input<typeof render_text_args_schema>) => {
     }
   }
   text_group_width = text_group.width;
-  if (text_type != 'normal') {
+  if (!text_for_min_height) {
     text_group_height = text_group.height;
     // ^ for normal text height will not be calculated after adding letters like `y,p,g,q,j` etc
   }
@@ -367,6 +368,7 @@ export const render_all_texts = async (
       line_index: i,
       total_lines: shloka_lines.length,
       text_type: 'main',
+      text_for_min_height: main_text_font_info.text_for_min_height,
       ...shloka_config.bounding_coords,
       width_usage_factor: 0.985,
       align: 'center',
@@ -382,6 +384,7 @@ export const render_all_texts = async (
       line_index: i,
       total_lines: shloka_lines.length,
       text_type: 'normal',
+      text_for_min_height: norm_text_font_info.text_for_min_height,
       ...shloka_config.bounding_coords,
       width_usage_factor: 0.985,
       align: 'center',
@@ -450,6 +453,7 @@ export const render_all_texts = async (
       font_scale: trans_text_font_info.size,
       ...TRANSLATION_BOUNDIND_COORDS,
       width_usage_factor: 0.985,
+      text_for_min_height: trans_text_font_info.text_for_min_height,
       multi_line_text: true,
       lockMovementX: false,
       lockMovementY: false,

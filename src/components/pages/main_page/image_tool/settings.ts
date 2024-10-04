@@ -138,10 +138,15 @@ export const TEXT_CONFIGS = {
   }
 };
 
-type image_font_config_type = font_config_type & {
-  new_line_spacing?: number;
-  space_between_main_and_normal?: number;
-};
+type image_font_config_type = font_config_type &
+  Record<
+    script_and_lang_list_type,
+    {
+      new_line_spacing?: number;
+      space_between_main_and_normal?: number;
+      text_for_min_line_height?: string;
+    }
+  >;
 
 /**
  * Overrides the default font image config from `DEFAULT_FONT_MAIN_CONFIG`
@@ -149,14 +154,17 @@ type image_font_config_type = font_config_type & {
  */
 export const DEFAULT_FONT_IMAGE_MAIN_CONFIG = {
   Devanagari: {
-    size: 1.35
+    size: 1.35,
+    text_for_min_line_height: 'तु'
   },
   Normal: {
-    font: 'ADOBE_DEVANAGARI'
+    font: 'ADOBE_DEVANAGARI',
+    text_for_min_line_height: 'qypgj'
   },
   Telugu: {
     size: 0.8,
-    space_between_main_and_normal: 8
+    space_between_main_and_normal: 8,
+    text_for_min_line_height: 'వై'
   }
 } as image_font_config_type;
 
@@ -168,14 +176,17 @@ export const DEFAULT_FONT_IMAGE_TRANS_CONFIG = {
   Hindi: {
     font: 'ADOBE_DEVANAGARI',
     size: 1.4,
-    new_line_spacing: 0.35
+    new_line_spacing: 0.35,
+    text_for_min_line_height: 'तु'
   },
   English: {
     font: 'ADOBE_DEVANAGARI',
-    size: 1.2
+    size: 1.2,
+    text_for_min_line_height: 'qypgj'
   },
   Telugu: {
-    size: 0.9
+    size: 0.9,
+    text_for_min_line_height: 'వై'
   }
 } as image_font_config_type;
 
@@ -186,32 +197,37 @@ const DEFAULT_IMAGE_CONF = {
 
 export const get_image_font_info = (
   script: script_and_lang_list_type,
-  usage_context: 'image' | 'app' = 'app',
   image_context: 'shloka' | 'trans' | null = null!
 ) => {
   let { family, key, size } = get_font_family_and_size(script);
   let { new_line_spacing, space_between_main_and_normal } = DEFAULT_IMAGE_CONF;
+  let text_for_min_height: string | null = null;
 
   // Image based options
-  let image_conf = DEFAULT_FONT_IMAGE_MAIN_CONFIG[script];
-  if (usage_context === 'image' && image_conf) {
+  let image_main_conf = DEFAULT_FONT_IMAGE_MAIN_CONFIG[script];
+  if (image_main_conf) {
     // Override the default font size
-    if (image_conf.font) key = image_conf.font;
-    if (image_conf.size) size = image_conf.size;
-    if (image_conf.space_between_main_and_normal)
-      space_between_main_and_normal = image_conf.space_between_main_and_normal;
+    if (image_main_conf.font) key = image_main_conf.font;
+    if (image_main_conf.size) size = image_main_conf.size;
+    if (image_main_conf.space_between_main_and_normal)
+      space_between_main_and_normal = image_main_conf.space_between_main_and_normal;
+    if (image_main_conf.text_for_min_line_height)
+      text_for_min_height = image_main_conf.text_for_min_line_height;
   }
-  image_conf = DEFAULT_FONT_IMAGE_TRANS_CONFIG[script];
-  if (usage_context === 'image' && image_context === 'trans' && image_conf) {
-    if (image_conf.font) key = image_conf.font;
-    if (image_conf.size) size = image_conf.size;
-    if (image_conf.new_line_spacing) new_line_spacing = image_conf.new_line_spacing;
+  image_main_conf = DEFAULT_FONT_IMAGE_TRANS_CONFIG[script];
+  if (image_context === 'trans' && image_main_conf) {
+    if (image_main_conf.font) key = image_main_conf.font;
+    if (image_main_conf.size) size = image_main_conf.size;
+    if (image_main_conf.new_line_spacing) new_line_spacing = image_main_conf.new_line_spacing;
+    if (image_main_conf.text_for_min_line_height)
+      text_for_min_height = image_main_conf.text_for_min_line_height;
   }
   return {
     family,
     key,
     size,
     new_line_spacing,
-    space_between_main_and_normal
+    space_between_main_and_normal,
+    text_for_min_height
   };
 };
