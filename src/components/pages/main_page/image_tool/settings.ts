@@ -152,7 +152,7 @@ type image_font_config_type = font_config_type &
  * Overrides the default font image config from `DEFAULT_FONT_MAIN_CONFIG`
  * this is for shloka, this will be inherited for translations as well you have override it
  */
-export const DEFAULT_FONT_IMAGE_MAIN_CONFIG = {
+export const SHLOKA_FONT_CONFIG = {
   Devanagari: {
     size: 1.35,
     text_for_min_line_height: 'तु'
@@ -172,7 +172,7 @@ export const DEFAULT_FONT_IMAGE_MAIN_CONFIG = {
  * Default font config for image translation
  * You might need to override values from `DEFAULT_FONT_MAIN_CONFIG`
  */
-export const DEFAULT_FONT_IMAGE_TRANS_CONFIG = {
+export const TRANS_FONT_CONFIG = {
   Hindi: {
     font: 'ADOBE_DEVANAGARI',
     size: 1.4,
@@ -190,7 +190,7 @@ export const DEFAULT_FONT_IMAGE_TRANS_CONFIG = {
   }
 } as image_font_config_type;
 
-const DEFAULT_IMAGE_CONF = {
+const DEFAULT_IMAGE_CONFIG = {
   new_line_spacing: 0.5,
   space_between_main_and_normal: 1
 };
@@ -200,11 +200,11 @@ export const get_image_font_info = (
   image_context: 'shloka' | 'trans' | null = null!
 ) => {
   let { family, key, size } = get_font_family_and_size(script);
-  let { new_line_spacing, space_between_main_and_normal } = DEFAULT_IMAGE_CONF;
+  let { new_line_spacing, space_between_main_and_normal } = DEFAULT_IMAGE_CONFIG;
   let text_for_min_height: string | null = null;
 
   // Image based options
-  let image_main_conf = DEFAULT_FONT_IMAGE_MAIN_CONFIG[script];
+  let image_main_conf = SHLOKA_FONT_CONFIG[script];
   if (image_main_conf) {
     // Override the default font size
     if (image_main_conf.font) key = image_main_conf.font;
@@ -214,7 +214,7 @@ export const get_image_font_info = (
     if (image_main_conf.text_for_min_line_height)
       text_for_min_height = image_main_conf.text_for_min_line_height;
   }
-  image_main_conf = DEFAULT_FONT_IMAGE_TRANS_CONFIG[script];
+  image_main_conf = TRANS_FONT_CONFIG[script];
   if (image_context === 'trans' && image_main_conf) {
     if (image_main_conf.font) key = image_main_conf.font;
     if (image_main_conf.size) size = image_main_conf.size;

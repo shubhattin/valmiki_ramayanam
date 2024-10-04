@@ -82,7 +82,7 @@ export const get_font_url = (font: fonts_type, type: 'regular' | 'bold') => {
 /**
  * Default font config for main web app
  */
-const DEFAULT_FONT_MAIN_CONFIG = {
+const MAIN_FONT_CONFIG = {
   Devanagari: {
     font: 'ADOBE_DEVANAGARI',
     size: 1.45
@@ -98,7 +98,7 @@ const DEFAULT_FONT_MAIN_CONFIG = {
   }
 } as font_config_type;
 
-const DEFAULTS = {
+const DEFAULT_FONT_CONFIG = {
   font: 'NIRMALA_UI',
   size: 1
 };
@@ -106,10 +106,10 @@ const DEFAULTS = {
  * `size` is in rem
  */
 export const get_font_family_and_size = (script: script_and_lang_list_type) => {
-  let key: fonts_type = DEFAULTS.font as fonts_type;
-  let { size } = DEFAULTS;
+  let key: fonts_type = DEFAULT_FONT_CONFIG.font as fonts_type;
+  let { size } = DEFAULT_FONT_CONFIG;
 
-  const main_app_conf = DEFAULT_FONT_MAIN_CONFIG[script];
+  const main_app_conf = MAIN_FONT_CONFIG[script];
   if (main_app_conf) {
     if (main_app_conf.font) key = main_app_conf.font;
     if (main_app_conf.size) size = main_app_conf.size;
