@@ -1,5 +1,7 @@
 import { copy_plain_object } from '@tools/kry';
 import { writable } from 'svelte/store';
+import { get_font_family_and_size, type font_config_type } from '@tools/font_tools';
+import type { script_and_lang_list_type } from '@tools/lang_list';
 
 type bounding_coords_type = {
   left: number;
@@ -134,4 +136,98 @@ export const TEXT_CONFIGS = {
   trans_text: {
     color: 'hsla(44, 100%, 10%, 1)'
   }
+};
+
+type image_font_config_type = font_config_type &
+  Record<
+    script_and_lang_list_type,
+    {
+      new_line_spacing?: number;
+      space_between_main_and_normal?: number;
+      text_for_min_line_height?: string;
+    }
+  >;
+
+/**
+ * Overrides the default font image config from `DEFAULT_FONT_MAIN_CONFIG`
+ * this is for shloka, this will be inherited for translations as well you have override it
+ */
+export const SHLOKA_FONT_CONFIG = {
+  Devanagari: {
+    size: 1.35,
+    text_for_min_line_height: 'तु'
+  },
+  Normal: {
+    font: 'ADOBE_DEVANAGARI',
+    text_for_min_line_height: 'qypgj'
+  },
+  Telugu: {
+    size: 0.8,
+    space_between_main_and_normal: 8,
+    text_for_min_line_height: 'వై'
+  }
+} as image_font_config_type;
+
+/**
+ * Default font config for image translation
+ * You might need to override values from `DEFAULT_FONT_MAIN_CONFIG`
+ */
+export const TRANS_FONT_CONFIG = {
+  Hindi: {
+    font: 'ADOBE_DEVANAGARI',
+    size: 1.4,
+    new_line_spacing: 0.35,
+    text_for_min_line_height: 'तु'
+  },
+  English: {
+    font: 'ADOBE_DEVANAGARI',
+    size: 1.2,
+    text_for_min_line_height: 'qypgj'
+  },
+  Telugu: {
+    size: 0.9,
+    text_for_min_line_height: 'వై'
+  }
+} as image_font_config_type;
+
+const DEFAULT_IMAGE_CONFIG = {
+  new_line_spacing: 0.5,
+  space_between_main_and_normal: 1
+};
+
+export const get_image_font_info = (
+  script: script_and_lang_list_type,
+  image_context: 'shloka' | 'trans' | null = null!
+) => {
+  let { family, key, size } = get_font_family_and_size(script);
+  let { new_line_spacing, space_between_main_and_normal } = DEFAULT_IMAGE_CONFIG;
+  let text_for_min_height: string | null = null;
+
+  // Image based options
+  let image_main_conf = SHLOKA_FONT_CONFIG[script];
+  if (image_main_conf) {
+    // Override the default font size
+    if (image_main_conf.font) key = image_main_conf.font;
+    if (image_main_conf.size) size = image_main_conf.size;
+    if (image_main_conf.space_between_main_and_normal)
+      space_between_main_and_normal = image_main_conf.space_between_main_and_normal;
+    if (image_main_conf.text_for_min_line_height)
+      text_for_min_height = image_main_conf.text_for_min_line_height;
+  }
+  image_main_conf = TRANS_FONT_CONFIG[script];
+  if (image_context === 'trans' && image_main_conf) {
+    if (image_main_conf.font) key = image_main_conf.font;
+    if (image_main_conf.size) size = image_main_conf.size;
+    if (image_main_conf.new_line_spacing) new_line_spacing = image_main_conf.new_line_spacing;
+    if (image_main_conf.text_for_min_line_height)
+      text_for_min_height = image_main_conf.text_for_min_line_height;
+  }
+  return {
+    family,
+    key,
+    size,
+    new_line_spacing,
+    space_between_main_and_normal,
+    text_for_min_height
+  };
 };
