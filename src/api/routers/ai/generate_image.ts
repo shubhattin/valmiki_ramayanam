@@ -91,7 +91,7 @@ const make_image_sdxl = async (image_prompt: string, number_of_images: number) =
   try {
     const engineId = 'stable-diffusion-v1-6';
     const apiHost = 'https://api.stability.ai';
-    const apiKey = env.STABILITYAI_API_KEY;
+    const apiKey = env.STABILITY_API_KEY;
     const response = await fetch_post(`${apiHost}/v1/generation/${engineId}/text-to-image`, {
       headers: {
         Accept: 'application/json',
