@@ -13,13 +13,13 @@ export const GET: RequestHandler = async ({ url, request }) => {
 
   const fileUrlParam = url.searchParams.get('file_url');
   if (!fileUrlParam) {
-    throw error(400, 'Missing "file_url" query parameter.');
+    throw error(400, 'Missing "file_url" query parameter');
   }
   let file_url: string;
   try {
     file_url = z.string().url().parse(fileUrlParam);
   } catch (e) {
-    throw error(400, 'Invalid "file_url" provided.');
+    throw error(400, 'Invalid "file_url" provided');
   }
 
   try {

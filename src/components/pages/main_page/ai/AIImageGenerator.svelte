@@ -12,7 +12,7 @@
   import { onMount } from 'svelte';
   import { loadLocalConfig } from '../load_local_config';
   import { BsDownload } from 'svelte-icons-pack/bs';
-  import { download_file_in_browser } from '@tools/download_file_browser';
+  import { download_external_file_in_browser } from '@tools/download_file_browser';
   import { cl_join } from '@tools/cl_join';
 
   $: kANDa_info = rAmAyaNam_map[$kANDa_selected - 1];
@@ -204,8 +204,8 @@
                   <div class="flex items-center justify-center space-x-3">
                     <button
                       on:click={() =>
-                        download_file_in_browser(
-                          image.url,
+                        download_external_file_in_browser(
+                          (load_ai_sample_data ? window.location.origin : '') + image.url,
                           `Image ${$sarga_selected}-${$kANDa_selected} Shloka No. ${$shloka_numb}.png`
                         )}
                       class="btn rounded-md bg-surface-600 px-1 py-1 outline-none dark:bg-surface-500"
