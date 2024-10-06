@@ -6,91 +6,164 @@ import { delay } from '@tools/delay';
 import { fetch_post } from '@tools/fetch';
 import type OpenAI from 'openai';
 
-type image_format_type = 'url' | 'b64_json';
-const IMADE_OUT_MODE = 'url' as image_format_type;
+const available_models_schema = z.enum(['dall-e-3', 'sdxl']);
+
+const create_image_output_schema = <
+  Model extends z.infer<typeof available_models_schema>,
+  ImageFormat extends 'url' | 'b64_json',
+  FileFormat extends 'png' | 'jpeg' | 'webp'
+>(
+  model: Model,
+  imageFormat: ImageFormat,
+  fileFormat: FileFormat
+) =>
+  z.object({
+    created: z.number().int(),
+    prompt: z.string(),
+    url: z.string(),
+    model: z.literal(model),
+    out_format: z.literal(imageFormat),
+    file_format: z.literal(fileFormat)
+  });
+
+const image_schema = z.union([
+  create_image_output_schema('dall-e-3', 'url', 'png'),
+  create_image_output_schema('sdxl', 'b64_json', 'png').extend({
+    seed: z.number().int(),
+    finish_reason: z.string()
+  })
+]);
+
+type image_output_type = z.infer<typeof image_schema>;
+
+const make_image_dall_e_3 = async (image_prompt: string, number_of_images: number) => {
+  // getting some unexpected errors while using the `openai` npm module so using HTTP API instead
+  const get_single_image = async () => {
+    try {
+      const req = await fetch_post('https://api.openai.com/v1/images/generations', {
+        json: {
+          model: 'dall-e-3',
+          prompt: image_prompt,
+          n: 1,
+          size: '1024x1024',
+          quality: 'standard',
+          response_format: 'url'
+        } as OpenAI.Images.ImageGenerateParams,
+        headers: {
+          Authorization: `Bearer ${env.OPENAI_API_KEY}`
+        }
+      });
+      if (!req.ok) throw new Error('Failed to fetch image');
+      const raw_resp = (await req.json()) as OpenAI.Images.ImagesResponse;
+      // when returned as plain URL
+      const resp = z
+        .object({
+          created: z.number().int(),
+          data: z
+            .object({
+              revised_prompt: z.string(),
+              url: z.string()
+            })
+            .array()
+        })
+        .parse(raw_resp);
+
+      return {
+        created: resp.created,
+        prompt: resp.data[0].revised_prompt!,
+        url: resp.data[0].url,
+        out_format: 'url',
+        model: 'dall-e-3',
+        file_format: 'png'
+      } satisfies image_output_type;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  };
+  const requests: ReturnType<typeof get_single_image>[] = [];
+  for (let i = 0; i < number_of_images; i++) requests.push(get_single_image());
+  const responses = await Promise.all(requests);
+  return responses;
+};
+
+const make_image_sdxl = async (image_prompt: string, number_of_images: number) => {
+  try {
+    const engineId = 'stable-diffusion-v1-6';
+    const apiHost = 'https://api.stability.ai';
+    const apiKey = env.STABILITYAI_API_KEY;
+    const response = await fetch_post(`${apiHost}/v1/generation/${engineId}/text-to-image`, {
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${apiKey}`
+      },
+      json: {
+        text_prompts: [
+          {
+            text: image_prompt
+          }
+        ],
+        cfg_scale: 7,
+        height: 768,
+        width: 768,
+        steps: 30,
+        samples: number_of_images
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Non-200 response: ${await response.text()}`);
+    }
+
+    type GenerationResponse = {
+      artifacts: Array<{
+        base64: string;
+        seed: number;
+        finishReason: string;
+      }>;
+    };
+
+    const responseJSON = (await response.json()) as GenerationResponse;
+    return responseJSON.artifacts.map((artifact) => ({
+      url: `data:image/png;base64,${artifact.base64}`,
+      created: new Date().getTime(),
+      prompt: image_prompt,
+      file_format: 'png',
+      model: 'sdxl',
+      out_format: 'b64_json',
+      finish_reason: artifact.finishReason,
+      seed: artifact.seed
+    })) satisfies image_output_type[];
+  } catch (e) {
+    return [null];
+  }
+};
+
 export const get_generated_images_router = protectedAdminProcedure
   .input(
     z.object({
       image_prompt: z.string(),
       number_of_images: z.number().int().min(1).max(4),
-      use_sample_data: z.boolean().optional().default(false)
+      use_sample_data: z.boolean().optional().default(false),
+      image_model: available_models_schema
     })
   )
-  .mutation(async ({ input: { image_prompt, number_of_images, use_sample_data } }) => {
-    const get_single_image = async () => {
-      try {
-        // getting some unexpected errors while using the `openai` npm module so using HTTP API instead
-        const req = await fetch_post('https://api.openai.com/v1/images/generations', {
-          json: {
-            model: 'dall-e-3',
-            prompt: image_prompt,
-            n: 1,
-            size: '1024x1024',
-            quality: 'standard',
-            response_format: IMADE_OUT_MODE
-          } as OpenAI.Images.ImageGenerateParams,
-          headers: {
-            Authorization: `Bearer ${env.OPENAI_API_KEY}`
-          }
-        });
-        if (!req.ok) throw new Error('Failed to fetch image');
-        const raw_resp = (await req.json()) as OpenAI.Images.ImagesResponse;
-        // console.log(raw_resp);
-        if (IMADE_OUT_MODE === 'b64_json') {
-          // when returned as base64 JSON
-          const resp = z
-            .object({
-              created: z.number().int(),
-              data: z
-                .object({
-                  revised_prompt: z.string(),
-                  b64_json: z.string()
-                })
-                .array()
-            })
-            .parse(raw_resp);
-
-          return {
-            created: resp.created,
-            revised_prompt: resp.data[0].revised_prompt!,
-            url: `data:image/png;base64,${resp.data[0].b64_json}`
-          };
-        }
-        // when returned as plain URL
-        const resp = z
-          .object({
-            created: z.number().int(),
-            data: z
-              .object({
-                revised_prompt: z.string(),
-                url: z.string()
-              })
-              .array()
-          })
-          .parse(raw_resp);
-
-        return {
-          created: resp.created,
-          revised_prompt: resp.data[0].revised_prompt!,
-          url: resp.data[0].url
-        };
-      } catch (e) {
-        return null;
-      }
-    };
+  .mutation(async ({ input: { image_prompt, number_of_images, use_sample_data, image_model } }) => {
     if (use_sample_data) {
       await delay(2000);
-      const list: Awaited<ReturnType<typeof get_single_image>>[] = [];
+      const list: image_output_type[] = [];
       for (let i = 0; i < number_of_images; i++)
         list.push({
           url: ai_sample_data.sample_images[i],
-          created: 0,
-          revised_prompt: `Sample Image ${i + 1}`
+          created: new Date().getTime(),
+          prompt: `Sample Image ${i + 1}`,
+          file_format: 'png', // although its webp
+          model: 'dall-e-3',
+          out_format: 'url'
         });
       return list;
     }
-    const requests: ReturnType<typeof get_single_image>[] = [];
-    for (let i = 0; i < number_of_images; i++) requests.push(get_single_image());
-    const responses = await Promise.all(requests);
-    return responses;
+    if (image_model === 'sdxl') return await make_image_sdxl(image_prompt, number_of_images);
+    // default dall-e-3
+    return await make_image_dall_e_3(image_prompt, number_of_images);
   });
