@@ -42,7 +42,7 @@ data/ramayan/test_output.md
 rAmAyaNam.zip
 
 static/~partytown
-src/components/pages/main_page/local_config.json
+src/components/pages/main_page/local_config.yaml
 
 
 temp
