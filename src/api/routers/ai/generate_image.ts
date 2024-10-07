@@ -5,6 +5,7 @@ import { ai_sample_data } from './sample_data/sample_data';
 import { delay } from '@tools/delay';
 import { fetch_post } from '@tools/fetch';
 import type OpenAI from 'openai';
+import { get_permutations } from '@tools/kry';
 
 const available_models_schema = z.enum(['dall-e-3', 'sd3-core']);
 
@@ -41,9 +42,9 @@ const _make_image_dall_e = async (
   number_of_images: number,
   dall_e_version: 2 | 3
 ) => {
-  // getting some unexpected errors while using the `openai` npm module so using HTTP API instead
   const get_single_image = async () => {
     try {
+      // getting some unexpected errors while using the `openai` npm module so using HTTP API instead
       const req = await fetch_post('https://api.openai.com/v1/images/generations', {
         json: {
           model: `dall-e-${dall_e_version}`,
@@ -85,10 +86,8 @@ const _make_image_dall_e = async (
       return null;
     }
   };
-  const requests: ReturnType<typeof get_single_image>[] = [];
-  for (let i = 0; i < number_of_images; i++) requests.push(get_single_image());
-  const responses = await Promise.all(requests);
-  return responses;
+  const responses = Array.from({ length: number_of_images }, () => get_single_image());
+  return await Promise.all(responses);
 };
 const make_image_dall_e_3 = (image_prompt: string, number_of_images: number) =>
   _make_image_dall_e(image_prompt, number_of_images, 3);
@@ -133,10 +132,8 @@ const make_image_sd3_core = async (image_prompt: string, number_of_images: numbe
       return null;
     }
   };
-  const requests: ReturnType<typeof get_single_image>[] = [];
-  for (let i = 0; i < number_of_images; i++) requests.push(get_single_image());
-  const responses = await Promise.all(requests);
-  return responses;
+  const responses = Array.from({ length: number_of_images }, () => get_single_image());
+  return await Promise.all(responses);
 };
 
 export const get_generated_images_router = protectedAdminProcedure
@@ -152,15 +149,18 @@ export const get_generated_images_router = protectedAdminProcedure
     if (use_sample_data) {
       await delay(2000);
       const list: image_output_type[] = [];
-      for (let i = 0; i < number_of_images; i++)
+      const permutation = get_permutations([1, 4], 1)[0];
+      for (let i = 0; i < number_of_images; i++) {
+        const image_index = permutation[i] - 1;
         list.push({
-          url: ai_sample_data.sample_images[i],
+          url: ai_sample_data.sample_images[image_index],
           created: new Date().getTime(),
-          prompt: `Sample Image ${i + 1}`,
+          prompt: `Sample Image ${image_index + 1}`,
           file_format: 'png', // although its webp
           model: 'dall-e-3',
           out_format: 'url'
         });
+      }
       return list;
     }
     if (image_model === 'sd3-core')
