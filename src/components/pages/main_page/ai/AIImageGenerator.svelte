@@ -40,10 +40,15 @@
   let image_prompt = writable('');
   let load_ai_sample_data = false;
   let image_prompt_request_error = false;
-  let image_model: 'dall-e-3' | 'sdxl' = 'sdxl';
-  const IMAGE_MODELS = {
-    'dall-e-3': ['DALL-E 3', '$0.04(₹3.36) / image'],
-    sdxl: ['SDXL', '$0.002(₹0.17) / image']
+
+  type image_models_type = Parameters<
+    typeof client.ai.get_generated_images.mutate
+  >[0]['image_model'];
+  let image_model: image_models_type = 'sdxl';
+  const IMAGE_MODELS: Record<image_models_type, [string, string]> = {
+    'dall-e-3': ['DALL-E 3', '$0.04 (₹3.36) / image'],
+    sdxl: ['SDXL', '$0.002 (₹0.17) / image'],
+    'dall-e-2': ['DALL-E 2', '$0.02 (₹1.68) / image']
   };
 
   $: $additional_prompt_info =

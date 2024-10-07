@@ -6,7 +6,7 @@ import { delay } from '@tools/delay';
 import { fetch_post } from '@tools/fetch';
 import type OpenAI from 'openai';
 
-const available_models_schema = z.enum(['dall-e-3', 'sdxl']);
+const available_models_schema = z.enum(['dall-e-3', 'dall-e-2', 'sdxl']);
 
 const create_image_output_schema = <
   Model extends z.infer<typeof available_models_schema>,
@@ -28,6 +28,7 @@ const create_image_output_schema = <
 
 const image_schema = z.union([
   create_image_output_schema('dall-e-3', 'url', 'png'),
+  create_image_output_schema('dall-e-2', 'url', 'png'),
   create_image_output_schema('sdxl', 'b64_json', 'png').extend({
     seed: z.number().int(),
     finish_reason: z.string()
@@ -36,13 +37,17 @@ const image_schema = z.union([
 
 type image_output_type = z.infer<typeof image_schema>;
 
-const make_image_dall_e_3 = async (image_prompt: string, number_of_images: number) => {
+const make_image_dall_e = async (
+  image_prompt: string,
+  number_of_images: number,
+  dall_e_version: 2 | 3
+) => {
   // getting some unexpected errors while using the `openai` npm module so using HTTP API instead
   const get_single_image = async () => {
     try {
       const req = await fetch_post('https://api.openai.com/v1/images/generations', {
         json: {
-          model: 'dall-e-3',
+          model: `dall-e-${dall_e_version}`,
           prompt: image_prompt,
           n: 1,
           size: '1024x1024',
@@ -61,7 +66,7 @@ const make_image_dall_e_3 = async (image_prompt: string, number_of_images: numbe
           created: z.number().int(),
           data: z
             .object({
-              revised_prompt: z.string(),
+              revised_prompt: z.string().optional(),
               url: z.string()
             })
             .array()
@@ -70,7 +75,7 @@ const make_image_dall_e_3 = async (image_prompt: string, number_of_images: numbe
 
       return {
         created: resp.created,
-        prompt: resp.data[0].revised_prompt!,
+        prompt: resp.data[0]?.revised_prompt ?? image_prompt,
         url: resp.data[0].url,
         out_format: 'url',
         model: 'dall-e-3',
@@ -86,6 +91,11 @@ const make_image_dall_e_3 = async (image_prompt: string, number_of_images: numbe
   const responses = await Promise.all(requests);
   return responses;
 };
+
+const make_image_dall_e_3 = (image_prompt: string, number_of_images: number) =>
+  make_image_dall_e(image_prompt, number_of_images, 3);
+const make_image_dall_e_2 = (image_prompt: string, number_of_images: number) =>
+  make_image_dall_e(image_prompt, number_of_images, 2);
 
 const make_image_sdxl = async (image_prompt: string, number_of_images: number) => {
   try {
@@ -164,6 +174,8 @@ export const get_generated_images_router = protectedAdminProcedure
       return list;
     }
     if (image_model === 'sdxl') return await make_image_sdxl(image_prompt, number_of_images);
-    // default dall-e-3
+    else if (image_model === 'dall-e-2')
+      return await make_image_dall_e_2(image_prompt, number_of_images);
+    // default` dall-e-3`
     return await make_image_dall_e_3(image_prompt, number_of_images);
   });
