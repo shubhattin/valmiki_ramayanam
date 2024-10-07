@@ -44,7 +44,7 @@
   type image_models_type = Parameters<
     typeof client.ai.get_generated_images.mutate
   >[0]['image_model'];
-  let image_model: image_models_type = 'sd3-core';
+  let image_model: image_models_type = 'dall-e-3';
   const IMAGE_MODELS: Record<image_models_type, [string, string]> = {
     'dall-e-3': ['DALL-E 3', '$0.04 (₹3.36) / image'],
     'sd3-core': ['SD3 Core', '$0.03 (₹2.51) / image'],
