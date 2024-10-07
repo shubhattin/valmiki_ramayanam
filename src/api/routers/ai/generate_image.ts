@@ -36,7 +36,7 @@ const image_schema = z.union([
 
 type image_output_type = z.infer<typeof image_schema>;
 
-const make_image_dall_e = async (
+const _make_image_dall_e = async (
   image_prompt: string,
   number_of_images: number,
   dall_e_version: 2 | 3
@@ -90,11 +90,8 @@ const make_image_dall_e = async (
   const responses = await Promise.all(requests);
   return responses;
 };
-
 const make_image_dall_e_3 = (image_prompt: string, number_of_images: number) =>
-  make_image_dall_e(image_prompt, number_of_images, 3);
-// const make_image_dall_e_2 = (image_prompt: string, number_of_images: number) =>
-//   make_image_dall_e(image_prompt, number_of_images, 2);
+  _make_image_dall_e(image_prompt, number_of_images, 3);
 
 const make_image_sd3_core = async (image_prompt: string, number_of_images: number) => {
   const get_single_image = async () => {
