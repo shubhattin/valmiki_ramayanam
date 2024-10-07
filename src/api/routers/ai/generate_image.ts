@@ -1,4 +1,4 @@
-import { protectedAdminProcedure, t } from '@api/trpc_init';
+import { protectedAdminProcedure } from '@api/trpc_init';
 import { env } from '$env/dynamic/private';
 import { z } from 'zod';
 import { ai_sample_data } from './sample_data/sample_data';
@@ -6,7 +6,7 @@ import { delay } from '@tools/delay';
 import { fetch_post } from '@tools/fetch';
 import type OpenAI from 'openai';
 
-const available_models_schema = z.enum(['dall-e-3', 'dall-e-2', 'sdxl']);
+const available_models_schema = z.enum(['dall-e-3', 'dall-e-2', 'sdxl', 'sd3-core']);
 
 const create_image_output_schema = <
   Model extends z.infer<typeof available_models_schema>,
@@ -30,6 +30,10 @@ const image_schema = z.union([
   create_image_output_schema('dall-e-3', 'url', 'png'),
   create_image_output_schema('dall-e-2', 'url', 'png'),
   create_image_output_schema('sdxl', 'b64_json', 'png').extend({
+    seed: z.number().int(),
+    finish_reason: z.string()
+  }),
+  create_image_output_schema('sd3-core', 'b64_json', 'png').extend({
     seed: z.number().int(),
     finish_reason: z.string()
   })
@@ -120,11 +124,9 @@ const make_image_sdxl = async (image_prompt: string, number_of_images: number) =
         samples: number_of_images
       }
     });
-
     if (!response.ok) {
       throw new Error(`Non-200 response: ${await response.text()}`);
     }
-
     type GenerationResponse = {
       artifacts: Array<{
         base64: string;
@@ -132,7 +134,6 @@ const make_image_sdxl = async (image_prompt: string, number_of_images: number) =
         finishReason: string;
       }>;
     };
-
     const responseJSON = (await response.json()) as GenerationResponse;
     return responseJSON.artifacts.map((artifact) => ({
       url: `data:image/png;base64,${artifact.base64}`,
@@ -147,6 +148,52 @@ const make_image_sdxl = async (image_prompt: string, number_of_images: number) =
   } catch (e) {
     return [null];
   }
+};
+
+const make_image_sd3_core = async (image_prompt: string, number_of_images: number) => {
+  const get_single_image = async () => {
+    try {
+      const response = await fetch_post(
+        'https://api.stability.ai/v2beta/stable-image/generate/core',
+        {
+          form: {
+            prompt: image_prompt,
+            output_format: 'png'
+          },
+          headers: {
+            Authorization: `Bearer ${env.STABILITY_API_KEY}`,
+            Accept: 'application/json; type=image/png'
+          }
+        }
+      );
+      if (!response.ok) {
+        throw new Error(`Non-200 response: ${await response.text()}`);
+      }
+      type GenerationResponse = {
+        image: string;
+        finish_reason: string;
+        seed: number;
+      };
+      const responseJSON = (await response.json()) as GenerationResponse;
+      return {
+        url: `data:image/png;base64,${responseJSON.image}`,
+        created: new Date().getTime(),
+        prompt: image_prompt,
+        file_format: 'png',
+        model: 'sd3-core',
+        out_format: 'b64_json',
+        finish_reason: responseJSON.finish_reason,
+        seed: responseJSON.seed
+      } satisfies image_output_type;
+    } catch (e) {
+      // console.error(e);
+      return null;
+    }
+  };
+  const requests: ReturnType<typeof get_single_image>[] = [];
+  for (let i = 0; i < number_of_images; i++) requests.push(get_single_image());
+  const responses = await Promise.all(requests);
+  return responses;
 };
 
 export const get_generated_images_router = protectedAdminProcedure
@@ -176,6 +223,8 @@ export const get_generated_images_router = protectedAdminProcedure
     if (image_model === 'sdxl') return await make_image_sdxl(image_prompt, number_of_images);
     else if (image_model === 'dall-e-2')
       return await make_image_dall_e_2(image_prompt, number_of_images);
+    else if (image_model === 'sd3-core')
+      return await make_image_sd3_core(image_prompt, number_of_images);
     // default` dall-e-3`
     return await make_image_dall_e_3(image_prompt, number_of_images);
   });
