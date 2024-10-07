@@ -34,7 +34,7 @@
   }
   let shloka_numb = writable(1);
   let base_user_prompt = writable<string>(base_prompts[0].content);
-  let auto_gen_image = writable(true);
+  let auto_gen_image = writable(false);
   let additional_prompt_info = writable('');
   let shloka_text_prompt = writable('');
   let image_prompt = writable('');
@@ -47,9 +47,9 @@
   let image_model: image_models_type = 'dall-e-3';
   const IMAGE_MODELS: Record<image_models_type, [string, string]> = {
     'dall-e-3': ['DALL-E 3', '$0.04 (₹3.36) / image'],
-    'sd3-core': ['SD3 Core', '$0.03 (₹2.51) / image'],
-    sdxl: ['SDXL', '$0.002 (₹0.17) / image'],
-    'dall-e-2': ['DALL-E 2', '$0.02 (₹1.68) / image']
+    'sd3-core': ['SD3 Core', '$0.03 (₹2.51) / image']
+    // sdxl: ['SDXL', '$0.002 (₹0.17) / image'],
+    // 'dall-e-2': ['DALL-E 2', '$0.02 (₹1.68) / image']
   };
 
   $: $additional_prompt_info =

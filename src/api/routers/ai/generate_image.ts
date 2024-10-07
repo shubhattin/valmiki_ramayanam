@@ -6,7 +6,7 @@ import { delay } from '@tools/delay';
 import { fetch_post } from '@tools/fetch';
 import type OpenAI from 'openai';
 
-const available_models_schema = z.enum(['dall-e-3', 'dall-e-2', 'sdxl', 'sd3-core']);
+const available_models_schema = z.enum(['dall-e-3', 'sd3-core']);
 
 const create_image_output_schema = <
   Model extends z.infer<typeof available_models_schema>,
@@ -28,11 +28,6 @@ const create_image_output_schema = <
 
 const image_schema = z.union([
   create_image_output_schema('dall-e-3', 'url', 'png'),
-  create_image_output_schema('dall-e-2', 'url', 'png'),
-  create_image_output_schema('sdxl', 'b64_json', 'png').extend({
-    seed: z.number().int(),
-    finish_reason: z.string()
-  }),
   create_image_output_schema('sd3-core', 'b64_json', 'png').extend({
     seed: z.number().int(),
     finish_reason: z.string()
@@ -98,57 +93,8 @@ const make_image_dall_e = async (
 
 const make_image_dall_e_3 = (image_prompt: string, number_of_images: number) =>
   make_image_dall_e(image_prompt, number_of_images, 3);
-const make_image_dall_e_2 = (image_prompt: string, number_of_images: number) =>
-  make_image_dall_e(image_prompt, number_of_images, 2);
-
-const make_image_sdxl = async (image_prompt: string, number_of_images: number) => {
-  try {
-    const engineId = 'stable-diffusion-v1-6';
-    const apiHost = 'https://api.stability.ai';
-    const apiKey = env.STABILITY_API_KEY;
-    const response = await fetch_post(`${apiHost}/v1/generation/${engineId}/text-to-image`, {
-      headers: {
-        Accept: 'application/json',
-        Authorization: `Bearer ${apiKey}`
-      },
-      json: {
-        text_prompts: [
-          {
-            text: image_prompt
-          }
-        ],
-        cfg_scale: 7,
-        height: 768,
-        width: 768,
-        steps: 30,
-        samples: number_of_images
-      }
-    });
-    if (!response.ok) {
-      throw new Error(`Non-200 response: ${await response.text()}`);
-    }
-    type GenerationResponse = {
-      artifacts: Array<{
-        base64: string;
-        seed: number;
-        finishReason: string;
-      }>;
-    };
-    const responseJSON = (await response.json()) as GenerationResponse;
-    return responseJSON.artifacts.map((artifact) => ({
-      url: `data:image/png;base64,${artifact.base64}`,
-      created: new Date().getTime(),
-      prompt: image_prompt,
-      file_format: 'png',
-      model: 'sdxl',
-      out_format: 'b64_json',
-      finish_reason: artifact.finishReason,
-      seed: artifact.seed
-    })) satisfies image_output_type[];
-  } catch (e) {
-    return [null];
-  }
-};
+// const make_image_dall_e_2 = (image_prompt: string, number_of_images: number) =>
+//   make_image_dall_e(image_prompt, number_of_images, 2);
 
 const make_image_sd3_core = async (image_prompt: string, number_of_images: number) => {
   const get_single_image = async () => {
@@ -220,11 +166,57 @@ export const get_generated_images_router = protectedAdminProcedure
         });
       return list;
     }
-    if (image_model === 'sdxl') return await make_image_sdxl(image_prompt, number_of_images);
-    else if (image_model === 'dall-e-2')
-      return await make_image_dall_e_2(image_prompt, number_of_images);
-    else if (image_model === 'sd3-core')
+    if (image_model === 'sd3-core')
       return await make_image_sd3_core(image_prompt, number_of_images);
     // default` dall-e-3`
     return await make_image_dall_e_3(image_prompt, number_of_images);
   });
+
+// const make_image_sdxl = async (image_prompt: string, number_of_images: number) => {
+//   try {
+//     const engineId = 'stable-diffusion-v1-6';
+//     const apiHost = 'https://api.stability.ai';
+//     const apiKey = env.STABILITY_API_KEY;
+//     const response = await fetch_post(`${apiHost}/v1/generation/${engineId}/text-to-image`, {
+//       headers: {
+//         Accept: 'application/json',
+//         Authorization: `Bearer ${apiKey}`
+//       },
+//       json: {
+//         text_prompts: [
+//           {
+//             text: image_prompt
+//           }
+//         ],
+//         cfg_scale: 7,
+//         height: 768,
+//         width: 768,
+//         steps: 30,
+//         samples: number_of_images
+//       }
+//     });
+//     if (!response.ok) {
+//       throw new Error(`Non-200 response: ${await response.text()}`);
+//     }
+//     type GenerationResponse = {
+//       artifacts: Array<{
+//         base64: string;
+//         seed: number;
+//         finishReason: string;
+//       }>;
+//     };
+//     const responseJSON = (await response.json()) as GenerationResponse;
+//     return responseJSON.artifacts.map((artifact) => ({
+//       url: `data:image/png;base64,${artifact.base64}`,
+//       created: new Date().getTime(),
+//       prompt: image_prompt,
+//       file_format: 'png',
+//       model: 'sdxl',
+//       out_format: 'b64_json',
+//       finish_reason: artifact.finishReason,
+//       seed: artifact.seed
+//     })) satisfies image_output_type[];
+//   } catch (e) {
+//     return [null];
+//   }
+// };
