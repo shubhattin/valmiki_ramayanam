@@ -226,7 +226,7 @@
         <div class="placeholder h-96 animate-pulse rounded-md"></div>
       {:else}
         <div>
-          <section class="mb-10 grid grid-cols-2 gap-4">
+          <section class="mb-10 grid grid-cols-2 gap-3">
             {#each get_possibily_not_undefined($image_mut.data) as image}
               {#if image}
                 <div class="space-y-1">
@@ -234,14 +234,16 @@
                     src={image.url}
                     alt={image.prompt}
                     title={image.prompt}
-                    class="block rounded-md"
+                    class="block rounded-md border-2 border-blue-600 dark:border-blue-800"
+                    height={1024}
+                    width={1024}
                   />
                   <div class="flex items-center justify-center space-x-3">
                     <button
                       on:click={() => download_image(image)}
                       class="btn rounded-md bg-surface-600 px-1 py-1 outline-none dark:bg-surface-500"
                     >
-                      <Icon src={BsDownload} class="text-xl" />
+                      <Icon src={BsDownload} class="text-xl text-white" />
                     </button>
                   </div>
                 </div>
