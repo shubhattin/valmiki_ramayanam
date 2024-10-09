@@ -1,9 +1,9 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { z } from 'zod';
-  import MainPage from '@components/pages/main_page/MainPage.svelte';
-  import { kANDa_selected, sarga_selected } from '@state/main_page/main_state';
-  import { main_app_bar_info } from '@state/app_bar';
+  import MainPage from '~/components/pages/main_page/MainPage.svelte';
+  import { kANDa_selected, sarga_selected } from '~/state/main_page/main_state';
+  import { main_app_bar_info } from '~/state/app_bar';
 
   const params_schema = z.object({
     kANDa: z.coerce.number().int().optional().default(0),

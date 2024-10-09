@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { client_q } from '@api/client';
+  import { client_q } from '~/api/client';
 
   export let on_done: () => void = null!;
 

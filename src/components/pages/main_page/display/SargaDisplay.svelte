@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { lipi_parivartak_async } from '@tools/converter';
+  import { lipi_parivartak_async } from '~/tools/converter';
   import { type Unsubscriber } from 'svelte/store';
   import { fade, scale, slide } from 'svelte/transition';
-  import { cl_join } from '@tools/cl_join';
+  import { cl_join } from '~/tools/cl_join';
   import { onDestroy } from 'svelte';
   import {
     editing_status_on,
@@ -10,19 +10,19 @@
     viewing_script,
     trans_lang,
     typing_assistance_modal_opened
-  } from '@state/main_page/main_state';
+  } from '~/state/main_page/main_state';
   import {
     sarga_data,
     trans_en_data,
     trans_lang_data,
     trans_lang_data_query_key
-  } from '@state/main_page/data';
+  } from '~/state/main_page/data';
   import SaveEdit from './SaveEdit.svelte';
   import { useQueryClient } from '@tanstack/svelte-query';
-  import Icon from '@tools/Icon.svelte';
+  import Icon from '~/tools/Icon.svelte';
   import { BsClipboard2Check } from 'svelte-icons-pack/bs';
   import ShlokaDisplay from './ShlokaDisplay.svelte';
-  import { copy_text_to_clipboard } from '@tools/kry';
+  import { copy_text_to_clipboard } from '~/tools/kry';
   import { OiCopy16 } from 'svelte-icons-pack/oi';
 
   const query_client = useQueryClient();
@@ -121,7 +121,7 @@
 </div>
 
 {#if $typing_assistance_modal_opened}
-  {#await import('@components/TypingAssistance.svelte') then TypingAssistance}
+  {#await import('~/components/TypingAssistance.svelte') then TypingAssistance}
     <TypingAssistance.default
       sync_lang_script={trans_lang}
       modal_opended={typing_assistance_modal_opened}

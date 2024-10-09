@@ -1,12 +1,12 @@
 import { browser } from '$app/environment';
 import { createQuery } from '@tanstack/svelte-query';
-import { delay } from '@tools/delay';
-import { get_derived_query } from '@tools/query';
-import { queryClient } from '@state/query';
+import { delay } from '~/tools/delay';
+import { get_derived_query } from '~/tools/query';
+import { queryClient } from '~/state/query';
 import { derived } from 'svelte/store';
-import { client } from '@api/client';
+import { client } from '~/api/client';
 import rAmAyaNam_map from '@data/ramayan/ramayan_map.json';
-import { lipi_parivartak_async } from '@tools/converter';
+import { lipi_parivartak_async } from '~/tools/converter';
 
 import {
   BASE_SCRIPT,

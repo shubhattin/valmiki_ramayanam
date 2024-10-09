@@ -1,7 +1,7 @@
-import { t, publicProcedure, protectedProcedure } from '@api/trpc_init';
-import { db } from '@db/db';
-import { translations } from '@db/schema';
-import type { lang_list_type } from '@tools/lang_list';
+import { t, publicProcedure, protectedProcedure } from '~/api/trpc_init';
+import { db } from '~/db/db';
+import { translations } from '~/db/schema';
+import type { lang_list_type } from '~/tools/lang_list';
 import { and, eq } from 'drizzle-orm';
 import { z } from 'zod';
 

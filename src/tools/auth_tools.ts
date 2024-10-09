@@ -1,7 +1,7 @@
-import { setCookie, getCookie, getTime, deleteCookie } from '@tools/cookies';
-import { from_base64 } from '@tools/kry';
+import { setCookie, getCookie, getTime, deleteCookie } from '~/tools/cookies';
+import { from_base64 } from '~/tools/kry';
 import { z } from 'zod';
-import { client, setAccessToken } from '@api/client';
+import { client, setAccessToken } from '~/api/client';
 
 export const ID_TOKEN_INFO_SCHEMA = z.object({
   id: z.number().int(),

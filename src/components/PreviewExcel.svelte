@@ -1,13 +1,13 @@
 <script lang="ts">
-  import Icon from '@tools/Icon.svelte';
+  import Icon from '~/tools/Icon.svelte';
   import { RiSystemDownloadLine } from 'svelte-icons-pack/ri';
   import { TabGroup, Tab } from '@skeletonlabs/skeleton';
   import type { Writable } from 'svelte/store';
   import type { Workbook, Worksheet } from 'exceljs';
-  import Modal from '@components/Modal.svelte';
-  import { normalize_lang_code } from '@tools/converter';
-  import { get_text_font_class } from '@tools/font_tools';
-  import type { script_and_lang_list_type } from '@tools/lang_list';
+  import Modal from '~/components/Modal.svelte';
+  import { normalize_lang_code } from '~/tools/converter';
+  import { get_text_font_class } from '~/tools/font_tools';
+  import type { script_and_lang_list_type } from '~/tools/lang_list';
 
   export let file_link: string;
   export let workbook: Workbook;

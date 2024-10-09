@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { get_user_from_header } from '@api/context';
+import { get_user_from_header } from '~/api/context';
 import { z } from 'zod';
 import ms from 'ms';
 

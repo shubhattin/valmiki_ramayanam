@@ -1,6 +1,6 @@
 import { dbClient_ext as db, queryClient } from './client';
 import { writeFile } from 'fs/promises';
-import { dbMode, make_dir, take_input } from '@tools/kry_server';
+import { dbMode, make_dir, take_input } from '~/tools/kry_server';
 
 const main = async () => {
   if (!(await confirm_environemnt())) return;

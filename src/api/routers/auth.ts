@@ -1,14 +1,14 @@
-import { protectedAdminProcedure, protectedProcedure, publicProcedure, t } from '@api/trpc_init';
+import { protectedAdminProcedure, protectedProcedure, publicProcedure, t } from '~/api/trpc_init';
 import { z } from 'zod';
-import { JWT_SECRET } from '@tools/jwt.server';
+import { JWT_SECRET } from '~/tools/jwt.server';
 import { jwtVerify, SignJWT } from 'jose';
-import { puShTi, gen_salt, hash_256 } from '@tools/hash';
-import { UsersSchemaZod } from '@db/schema_zod';
-import { db } from '@db/db';
-import { user_verification_requests, users } from '@db/schema';
+import { puShTi, gen_salt, hash_256 } from '~/tools/hash';
+import { UsersSchemaZod } from '~/db/schema_zod';
+import { db } from '~/db/db';
+import { user_verification_requests, users } from '~/db/schema';
 import { eq } from 'drizzle-orm';
-import type { lang_list_type } from '@tools/lang_list';
-import { delay } from '@tools/delay';
+import type { lang_list_type } from '~/tools/lang_list';
+import { delay } from '~/tools/delay';
 
 const user_info_schema = UsersSchemaZod.pick({
   user_id: true,

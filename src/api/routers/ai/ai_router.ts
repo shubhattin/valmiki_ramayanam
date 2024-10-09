@@ -1,4 +1,4 @@
-import { t } from '@api/trpc_init';
+import { t } from '~/api/trpc_init';
 import { get_generated_images_router } from './generate_image';
 import { get_image_prompt_router } from './get_image_prompt';
 

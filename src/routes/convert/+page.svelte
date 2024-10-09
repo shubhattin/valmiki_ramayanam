@@ -1,18 +1,18 @@
 <script lang="ts">
-  import Icon from '@tools/Icon.svelte';
+  import Icon from '~/tools/Icon.svelte';
   import { SlideToggle } from '@skeletonlabs/skeleton';
-  import { SCRIPT_LIST, type script_list_type } from '@tools/lang_list';
-  import LipiLekhikA, { load_parivartak_lang_data, lipi_parivartak_async } from '@tools/converter';
+  import { SCRIPT_LIST, type script_list_type } from '~/tools/lang_list';
+  import LipiLekhikA, { load_parivartak_lang_data, lipi_parivartak_async } from '~/tools/converter';
   import { FaCircleUp, FaCircleDown } from 'svelte-icons-pack/fa';
   import { writable } from 'svelte/store';
   import type { Writable } from 'svelte/store';
   import { BsKeyboard } from 'svelte-icons-pack/bs';
-  import MetaTags from '@components/tags/MetaTags.svelte';
+  import MetaTags from '~/components/tags/MetaTags.svelte';
   import { OiCopy16 } from 'svelte-icons-pack/oi';
   import { BiHelpCircle } from 'svelte-icons-pack/bi';
-  import TypingAssistance from '@components/TypingAssistance.svelte';
-  import { get_font_family_and_size } from '@tools/font_tools';
-  import { PAGE_TITLES } from '@state/page_titles';
+  import TypingAssistance from '~/components/TypingAssistance.svelte';
+  import { get_font_family_and_size } from '~/tools/font_tools';
+  import { PAGE_TITLES } from '~/state/page_titles';
 
   let from_lang = writable<script_list_type>('Devanagari');
   let to_lang = writable<script_list_type>('Telugu');

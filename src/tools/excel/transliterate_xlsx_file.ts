@@ -1,5 +1,5 @@
 import type ExcelJS from 'exceljs';
-import LipiLekhikA, { normalize_lang_code, lipi_parivartak_async } from '@tools/converter';
+import LipiLekhikA, { normalize_lang_code, lipi_parivartak_async } from '~/tools/converter';
 
 /**
  * To transliterate text in a given Excel file

@@ -1,6 +1,6 @@
-import { UsersSchemaZod } from '@db/schema_zod';
+import { UsersSchemaZod } from '~/db/schema_zod';
 import { jwtVerify } from 'jose';
-import { JWT_SECRET } from '@tools/jwt.server';
+import { JWT_SECRET } from '~/tools/jwt.server';
 import type { RequestEvent } from '@sveltejs/kit';
 import type { inferAsyncReturnType } from '@trpc/server';
 import { z } from 'zod';

@@ -1,11 +1,11 @@
 <script lang="ts">
   import { createQuery, useIsFetching } from '@tanstack/svelte-query';
-  import { load_parivartak_lang_data } from '@tools/converter';
-  import { delay } from '@tools/delay';
-  import { ALL_LANG_SCRIPT_LIST } from '@tools/lang_list';
-  import Modal from '@components/Modal.svelte';
+  import { load_parivartak_lang_data } from '~/tools/converter';
+  import { delay } from '~/tools/delay';
+  import { ALL_LANG_SCRIPT_LIST } from '~/tools/lang_list';
+  import Modal from '~/components/Modal.svelte';
   import type { Writable } from 'svelte/store';
-  import { cl_join } from '@tools/cl_join';
+  import { cl_join } from '~/tools/cl_join';
   import { onDestroy } from 'svelte';
 
   export let sync_lang_script: Writable<string>;

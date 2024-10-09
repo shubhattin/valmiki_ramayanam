@@ -1,6 +1,6 @@
-import { t, protectedAdminProcedure, protectedProcedure } from '@api/trpc_init';
-import { db } from '@db/db';
-import { delay } from '@tools/delay';
+import { t, protectedAdminProcedure, protectedProcedure } from '~/api/trpc_init';
+import { db } from '~/db/db';
+import { delay } from '~/tools/delay';
 
 const get_all_user_info_router = protectedAdminProcedure.query(async ({ ctx: { user } }) => {
   await delay(550);

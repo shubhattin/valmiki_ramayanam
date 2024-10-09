@@ -1,14 +1,14 @@
 <script lang="ts">
-  import Icon from '@tools/Icon.svelte';
-  import { client_q } from '@api/client';
+  import Icon from '~/tools/Icon.svelte';
+  import { client_q } from '~/api/client';
   import { getModalStore, popup } from '@skeletonlabs/skeleton';
   import { RiSystemAddLargeFill, RiSystemCloseLargeLine } from 'svelte-icons-pack/ri';
   import { onDestroy, onMount } from 'svelte';
   import { browser } from '$app/environment';
-  import { LanguageIcon } from '@components/icons';
+  import { LanguageIcon } from '~/components/icons';
   import { FiEdit3 } from 'svelte-icons-pack/fi';
-  import { LANG_LIST } from '@tools/lang_list';
-  import { user_info } from '@state/main_page/user';
+  import { LANG_LIST } from '~/tools/lang_list';
+  import { user_info } from '~/state/main_page/user';
   import type { Unsubscriber } from 'svelte/store';
   import { useQueryClient } from '@tanstack/svelte-query';
 

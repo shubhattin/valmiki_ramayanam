@@ -2,8 +2,8 @@
   import { FileButton, Accordion, AccordionItem } from '@skeletonlabs/skeleton';
   import type { ModalSettings } from '@skeletonlabs/skeleton';
   import { slide, scale, fly } from 'svelte/transition';
-  import { SCRIPT_LIST } from '@tools/lang_list';
-  import Icon from '@tools/Icon.svelte';
+  import { SCRIPT_LIST } from '~/tools/lang_list';
+  import Icon from '~/tools/Icon.svelte';
   import { IoOptions } from 'svelte-icons-pack/io';
   import { AiOutlineDelete } from 'svelte-icons-pack/ai';
   import { VscDebugStart, VscPreview } from 'svelte-icons-pack/vsc';
@@ -13,14 +13,14 @@
   import { BiSolidDownload } from 'svelte-icons-pack/bi';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import type { Workbook } from 'exceljs';
-  import { delay } from '@tools/delay';
-  import { transliterate_xlxs_file } from '@tools/excel/transliterate_xlsx_file';
-  import { download_file_in_browser } from '@tools/download_file_browser';
+  import { delay } from '~/tools/delay';
+  import { transliterate_xlxs_file } from '~/tools/excel/transliterate_xlsx_file';
+  import { download_file_in_browser } from '~/tools/download_file_browser';
   import { writable } from 'svelte/store';
-  import PreviewExcel from '@components/PreviewExcel.svelte';
-  import MetaTags from '@components/tags/MetaTags.svelte';
+  import PreviewExcel from '~/components/PreviewExcel.svelte';
+  import MetaTags from '~/components/tags/MetaTags.svelte';
   import { createMutation } from '@tanstack/svelte-query';
-  import { PAGE_TITLES } from '@state/page_titles';
+  import { PAGE_TITLES } from '~/state/page_titles';
 
   export const modalStore = getModalStore();
 

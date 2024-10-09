@@ -8,7 +8,7 @@ import {
   trans_text_font_configs
 } from './state';
 import * as fabric from 'fabric';
-import { get_text_svg_path } from '@tools/harfbuzz';
+import { get_text_svg_path } from '~/tools/harfbuzz';
 import {
   current_shloka_type,
   shloka_configs,
@@ -20,10 +20,10 @@ import {
 import { canvas } from './state';
 import { get } from 'svelte/store';
 import { browser } from '$app/environment';
-import type { lang_list_extended_type, script_list_type } from '@tools/lang_list';
-import { lipi_parivartak_async } from '@tools/converter';
-import { get_font_url } from '@tools/font_tools';
-import { BASE_SCRIPT } from '@state/main_page/main_state';
+import type { lang_list_extended_type, script_list_type } from '~/tools/lang_list';
+import { lipi_parivartak_async } from '~/tools/converter';
+import { get_font_url } from '~/tools/font_tools';
+import { BASE_SCRIPT } from '~/state/main_page/main_state';
 
 const render_text_args_schema = z.object({
   text: z.string(),

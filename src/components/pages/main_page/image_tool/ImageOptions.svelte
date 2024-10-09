@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { rAmAyaNam_map } from '@state/main_page/data';
+  import { rAmAyaNam_map } from '~/state/main_page/data';
   import {
     DEFAULT_MAIN_TEXT_FONT_CONFIGS,
     DEFAULT_TRANS_TEXT_FONT_CONFIGS,
@@ -14,10 +14,10 @@
     shaded_background_image_status,
     trans_text_font_configs
   } from './state';
-  import { LANG_LIST } from '@tools/lang_list';
-  import Icon from '@tools/Icon.svelte';
+  import { LANG_LIST } from '~/tools/lang_list';
+  import Icon from '~/tools/Icon.svelte';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
-  import { LanguageIcon } from '@components/icons';
+  import { LanguageIcon } from '~/components/icons';
   import { SlideToggle, TabGroup, Tab, Accordion, AccordionItem } from '@skeletonlabs/skeleton';
   import ImageDownloader from './ImageDownloader.svelte';
   import { DEFAULT_SHLOKA_CONFIG_SHARED, get_image_font_info } from './settings';
@@ -28,8 +28,8 @@
     SPACE_ABOVE_REFERENCE_LINE,
     DEFAULT_SHLOKA_CONFIG
   } from './settings';
-  import { copy_plain_object } from '@tools/kry';
-  import { get_font_family_and_size } from '@tools/font_tools';
+  import { copy_plain_object } from '~/tools/kry';
+  import { get_font_family_and_size } from '~/tools/font_tools';
 
   $: kANDa_info = rAmAyaNam_map[$image_kANDa - 1];
   $: shloka_count = kANDa_info.sarga_data[$image_sarga - 1].shloka_count_extracted;

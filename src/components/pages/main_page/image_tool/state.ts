@@ -1,10 +1,10 @@
 import { get, writable } from 'svelte/store';
 import type * as fabric from 'fabric';
-import { get_derived_query } from '@tools/query';
+import { get_derived_query } from '~/tools/query';
 import { browser } from '$app/environment';
-import { get_sarga_data, get_translations, QUERY_KEYS } from '@state/main_page/data';
+import { get_sarga_data, get_translations, QUERY_KEYS } from '~/state/main_page/data';
 import { createQuery } from '@tanstack/svelte-query';
-import { queryClient } from '@state/query';
+import { queryClient } from '~/state/query';
 import background_image_url from './img/background_vr.png';
 import background_image_template_url from './img/background_vr_template.jpg';
 import {
@@ -13,8 +13,8 @@ import {
   type lang_list_extended_type,
   type lang_list_type,
   type script_list_type
-} from '@tools/lang_list';
-import { copy_plain_object } from '@tools/kry';
+} from '~/tools/lang_list';
+import { copy_plain_object } from '~/tools/kry';
 import { get_image_font_info } from './settings';
 
 export let canvas = writable<fabric.Canvas>();

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { rAmAyaNam_map } from '@state/main_page/data';
+  import { rAmAyaNam_map } from '~/state/main_page/data';
   import {
     image_kANDa,
     image_sarga,
@@ -14,12 +14,12 @@
     get_units,
     image_lang
   } from './state';
-  import { download_file_in_browser } from '@tools/download_file_browser';
+  import { download_file_in_browser } from '~/tools/download_file_browser';
   import JSZip from 'jszip';
-  import { dataURLToBlob } from '@tools/kry';
+  import { dataURLToBlob } from '~/tools/kry';
   import { popup } from '@skeletonlabs/skeleton';
   import { BsDownload } from 'svelte-icons-pack/bs';
-  import Icon from '@tools/Icon.svelte';
+  import Icon from '~/tools/Icon.svelte';
   import { render_all_texts } from './render_text';
 
   $: kANDa_info = rAmAyaNam_map[$image_kANDa - 1];

@@ -1,8 +1,8 @@
-import { protectedAdminProcedure, t } from '@api/trpc_init';
+import { protectedAdminProcedure, t } from '~/api/trpc_init';
 import { generateObject } from 'ai';
 import { z } from 'zod';
 import { ai_sample_data } from './sample_data/sample_data';
-import { delay } from '@tools/delay';
+import { delay } from '~/tools/delay';
 import { createOpenAI } from '@ai-sdk/openai';
 import { env } from '$env/dynamic/private';
 

@@ -5,7 +5,7 @@
     sarga_data,
     LOCALS_TRANS_LANGS,
     rAmAyaNam_map
-  } from '@state/main_page/data';
+  } from '~/state/main_page/data';
   import {
     sarga_selected,
     kANDa_selected,
@@ -14,23 +14,23 @@
     viewing_script,
     ai_tool_opened,
     view_translation_status
-  } from '@state/main_page/main_state';
+  } from '~/state/main_page/main_state';
   import { createMutation } from '@tanstack/svelte-query';
   import { BsThreeDots } from 'svelte-icons-pack/bs';
   import { popup } from '@skeletonlabs/skeleton';
   import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
-  import { transliterate_xlxs_file } from '@tools/excel/transliterate_xlsx_file';
-  import { client } from '@api/client';
+  import { transliterate_xlxs_file } from '~/tools/excel/transliterate_xlsx_file';
+  import { client } from '~/api/client';
   import { scale } from 'svelte/transition';
-  import Icon from '@tools/Icon.svelte';
-  import Modal from '@components/Modal.svelte';
+  import Icon from '~/tools/Icon.svelte';
+  import Modal from '~/components/Modal.svelte';
   import { BiImage } from 'svelte-icons-pack/bi';
   import type { Workbook } from 'exceljs';
   import { writable } from 'svelte/store';
   import { TrOutlineFileTypeTxt } from 'svelte-icons-pack/tr';
-  import { download_file_in_browser } from '@tools/download_file_browser';
-  import { lipi_parivartak_async } from '@tools/converter';
-  import { user_info } from '@state/main_page/user';
+  import { download_file_in_browser } from '~/tools/download_file_browser';
+  import { lipi_parivartak_async } from '~/tools/converter';
+  import { user_info } from '~/state/main_page/user';
   import { RiUserFacesRobot2Line } from 'svelte-icons-pack/ri';
 
   let current_workbook: Workbook;
@@ -196,7 +196,7 @@
   </Modal>
 </div>
 {#if $excel_preview_opened}
-  {#await import('@components/PreviewExcel.svelte') then PreviewExcel}
+  {#await import('~/components/PreviewExcel.svelte') then PreviewExcel}
     <PreviewExcel.default
       file_link={current_dowbload_link}
       file_name={current_file_name}

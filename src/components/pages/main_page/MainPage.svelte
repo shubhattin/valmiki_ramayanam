@@ -1,26 +1,26 @@
 <script lang="ts">
-  import Icon from '@tools/Icon.svelte';
+  import Icon from '~/tools/Icon.svelte';
   import { onDestroy, onMount } from 'svelte';
-  import { delay } from '@tools/delay';
+  import { delay } from '~/tools/delay';
   import { get, writable, type Unsubscriber } from 'svelte/store';
   import {
     LANG_LIST,
     SCRIPT_LIST,
     type lang_list_type,
     type script_list_type
-  } from '@tools/lang_list';
-  import LipiLekhikA, { load_parivartak_lang_data, lipi_parivartak_async } from '@tools/converter';
-  import { LanguageIcon } from '@components/icons';
-  import { ensure_auth_access_status, get_id_token_info } from '@tools/auth_tools';
+  } from '~/tools/lang_list';
+  import LipiLekhikA, { load_parivartak_lang_data, lipi_parivartak_async } from '~/tools/converter';
+  import { LanguageIcon } from '~/components/icons';
+  import { ensure_auth_access_status, get_id_token_info } from '~/tools/auth_tools';
   import { browser } from '$app/environment';
   import SargaDisplay from './display/SargaDisplay.svelte';
-  import { get_possibily_not_undefined } from '@tools/kry';
+  import { get_possibily_not_undefined } from '~/tools/kry';
   import { BiEdit, BiHelpCircle } from 'svelte-icons-pack/bi';
   import { scale, slide } from 'svelte/transition';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
-  import { user_info } from '@state/main_page/user';
+  import { user_info } from '~/state/main_page/user';
   import { goto } from '$app/navigation';
-  import Select from '@components/Select.svelte';
+  import Select from '~/components/Select.svelte';
   import { z } from 'zod';
   import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
   import {
@@ -36,19 +36,19 @@
     typing_assistance_modal_opened,
     image_tool_opened,
     ai_tool_opened
-  } from '@state/main_page/main_state';
-  import { user_allowed_langs } from '@state/main_page/user';
+  } from '~/state/main_page/main_state';
+  import { user_allowed_langs } from '~/state/main_page/user';
   import { SlideToggle } from '@skeletonlabs/skeleton';
   import { BsKeyboard } from 'svelte-icons-pack/bs';
   import User from './user/User.svelte';
-  import { get_script_for_lang, get_text_font_class } from '@tools/font_tools';
+  import { get_script_for_lang, get_text_font_class } from '~/tools/font_tools';
   import {
     LOCALS_TRANS_LANGS,
     rAmAyaNam_map,
     get_kANDa_names,
     get_sarga_names
-  } from '@state/main_page/data';
-  import MetaTags from '@components/tags/MetaTags.svelte';
+  } from '~/state/main_page/data';
+  import MetaTags from '~/components/tags/MetaTags.svelte';
   import { loadLocalConfig } from './load_local_config';
 
   const unsubscribers: Unsubscriber[] = [];

@@ -1,11 +1,11 @@
-import { protectedAdminProcedure } from '@api/trpc_init';
+import { protectedAdminProcedure } from '~/api/trpc_init';
 import { env } from '$env/dynamic/private';
 import { z } from 'zod';
 import { ai_sample_data } from './sample_data/sample_data';
-import { delay } from '@tools/delay';
-import { fetch_post } from '@tools/fetch';
+import { delay } from '~/tools/delay';
+import { fetch_post } from '~/tools/fetch';
 import type OpenAI from 'openai';
-import { get_permutations } from '@tools/kry';
+import { get_permutations } from '~/tools/kry';
 
 const available_models_schema = z.enum(['dall-e-3', 'sd3-core']);
 

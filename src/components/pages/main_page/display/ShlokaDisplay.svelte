@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { get_font_family_and_size } from '@tools/font_tools';
-  import type { lang_list_type } from '@tools/lang_list';
-  import { get_possibily_not_undefined } from '@tools/kry';
+  import { get_font_family_and_size } from '~/tools/font_tools';
+  import type { lang_list_type } from '~/tools/lang_list';
+  import { get_possibily_not_undefined } from '~/tools/kry';
   import {
     viewing_script,
     editing_status_on,
@@ -11,12 +11,12 @@
     edit_language_typer_status,
     trans_lang,
     view_translation_status
-  } from '@state/main_page/main_state';
-  import { trans_en_data, trans_lang_data } from '@state/main_page/data';
+  } from '~/state/main_page/main_state';
+  import { trans_en_data, trans_lang_data } from '~/state/main_page/data';
   import { slide } from 'svelte/transition';
-  import Icon from '@tools/Icon.svelte';
+  import Icon from '~/tools/Icon.svelte';
   import { RiSystemAddLargeLine } from 'svelte-icons-pack/ri';
-  import LipiLekhikA from '@tools/converter';
+  import LipiLekhikA from '~/tools/converter';
 
   export let trans_index: number;
   export let shloka_lines: string;

@@ -1,22 +1,22 @@
 <script lang="ts">
-  import { rAmAyaNam_map, sarga_data, trans_en_data } from '@state/main_page/data';
-  import { BASE_SCRIPT, kANDa_selected, sarga_selected } from '@state/main_page/main_state';
-  import Icon from '@tools/Icon.svelte';
+  import { rAmAyaNam_map, sarga_data, trans_en_data } from '~/state/main_page/data';
+  import { BASE_SCRIPT, kANDa_selected, sarga_selected } from '~/state/main_page/main_state';
+  import Icon from '~/tools/Icon.svelte';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import { writable } from 'svelte/store';
   import base_prompts from './base_prompt.yaml';
   import { SlideToggle } from '@skeletonlabs/skeleton';
-  import { client_q, type client } from '@api/client';
-  import { lipi_parivartak_async } from '@tools/converter';
-  import { get_possibily_not_undefined } from '@tools/kry';
+  import { client_q, type client } from '~/api/client';
+  import { lipi_parivartak_async } from '~/tools/converter';
+  import { get_possibily_not_undefined } from '~/tools/kry';
   import { onMount } from 'svelte';
   import { loadLocalConfig } from '../load_local_config';
   import { BsDownload } from 'svelte-icons-pack/bs';
   import {
     download_external_file_in_browser,
     download_file_in_browser
-  } from '@tools/download_file_browser';
-  import { cl_join } from '@tools/cl_join';
+  } from '~/tools/download_file_browser';
+  import { cl_join } from '~/tools/cl_join';
 
   $: kANDa_info = rAmAyaNam_map[$kANDa_selected - 1];
   $: sarga_info = kANDa_info.sarga_data[$sarga_selected - 1];
