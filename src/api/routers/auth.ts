@@ -10,7 +10,7 @@ import { eq } from 'drizzle-orm';
 import type { lang_list_type } from '~/tools/lang_list';
 import { delay } from '~/tools/delay';
 
-const user_info_schema = UsersSchemaZod.pick({
+export const user_info_schema = UsersSchemaZod.pick({
   user_id: true,
   user_name: true,
   user_type: true,
