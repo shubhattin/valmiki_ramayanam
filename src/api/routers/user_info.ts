@@ -2,7 +2,7 @@ import { t, protectedAdminProcedure, protectedProcedure } from '~/api/trpc_init'
 import { db } from '~/db/db';
 import { delay } from '~/tools/delay';
 
-const get_all_user_info_router = protectedAdminProcedure.query(async ({ ctx: { user } }) => {
+const get_all_user_info_route = protectedAdminProcedure.query(async ({ ctx: { user } }) => {
   await delay(550);
   const other_users_data = await db.query.users.findMany({
     columns: {
@@ -23,7 +23,7 @@ const get_all_user_info_router = protectedAdminProcedure.query(async ({ ctx: { u
   return other_users_data;
 });
 
-const get_user_allowed_langs_router = protectedProcedure.query(async ({ ctx: { user } }) => {
+const get_user_allowed_langs_route = protectedProcedure.query(async ({ ctx: { user } }) => {
   await delay(300);
   const user_data = await db.query.users.findFirst({
     columns: {
@@ -35,6 +35,6 @@ const get_user_allowed_langs_router = protectedProcedure.query(async ({ ctx: { u
 });
 
 export const user_info_router = t.router({
-  get_all_users_info: get_all_user_info_router,
-  get_user_allowed_langs: get_user_allowed_langs_router
+  get_all_users_info: get_all_user_info_route,
+  get_user_allowed_langs: get_user_allowed_langs_route
 });

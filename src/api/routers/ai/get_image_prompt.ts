@@ -8,7 +8,7 @@ import { env } from '$env/dynamic/private';
 
 const openai_text_model = createOpenAI({ apiKey: env.OPENAI_API_KEY });
 
-export const get_image_prompt_router = protectedAdminProcedure
+export const get_image_prompt_route = protectedAdminProcedure
   .input(
     z.object({
       messages: z

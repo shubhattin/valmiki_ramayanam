@@ -49,7 +49,7 @@ const get_id_and_aceess_token = async (user_info: user_info_type) => {
   };
 };
 
-const verify_pass_router = publicProcedure
+const verify_pass_route = publicProcedure
   .input(
     z.object({
       username_or_email: z.string(),
@@ -99,7 +99,7 @@ const id_token_payload_schema = z.object({
   type: z.literal('login')
 });
 
-const renew_access_token = publicProcedure
+const renew_access_token_route = publicProcedure
   .input(
     z.object({
       id_token: z.string()
@@ -185,7 +185,7 @@ const add_new_user_route = publicProcedure
     return { success, status_code: 'success' };
   });
 
-const update_password_router = protectedProcedure
+const update_password_route = protectedProcedure
   .input(
     z.object({
       current_password: z.string(),
@@ -208,19 +208,19 @@ const update_password_router = protectedProcedure
     return { success: true };
   });
 
-const verify_user_router = protectedAdminProcedure
+const verify_user_route = protectedAdminProcedure
   .input(z.object({ id: z.number().int() }))
   .mutation(async ({ input: { id } }) => {
     await db.delete(user_verification_requests).where(eq(user_verification_requests.id, id));
   });
 
-const delete_unverified_user_router = protectedAdminProcedure
+const delete_unverified_user_route = protectedAdminProcedure
   .input(z.object({ id: z.number().int() }))
   .mutation(async ({ input: { id } }) => {
     await db.delete(users).where(eq(users.id, id));
   });
 
-const update_user_allowed_langs_router = protectedAdminProcedure
+const update_user_allowed_langs_route = protectedAdminProcedure
   .input(z.object({ id: z.number().int(), langs: z.string().array() }))
   .mutation(async ({ input: { id, langs } }) => {
     const langs_type = langs as lang_list_type[];
@@ -228,11 +228,11 @@ const update_user_allowed_langs_router = protectedAdminProcedure
   });
 
 export const auth_router = t.router({
-  verify_pass: verify_pass_router,
-  renew_access_token: renew_access_token,
+  verify_pass: verify_pass_route,
+  renew_access_token: renew_access_token_route,
   add_new_user: add_new_user_route,
-  update_password: update_password_router,
-  verify_unverified_user: verify_user_router,
-  delete_unverified_user: delete_unverified_user_router,
-  add_user_allowed_langs: update_user_allowed_langs_router
+  update_password: update_password_route,
+  verify_unverified_user: verify_user_route,
+  delete_unverified_user: delete_unverified_user_route,
+  add_user_allowed_langs: update_user_allowed_langs_route
 });

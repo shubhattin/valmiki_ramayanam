@@ -136,7 +136,7 @@ const make_image_sd3_core = async (image_prompt: string, number_of_images: numbe
   return await Promise.all(responses);
 };
 
-export const get_generated_images_router = protectedAdminProcedure
+export const get_generated_images_route = protectedAdminProcedure
   .input(
     z.object({
       image_prompt: z.string(),
