@@ -59,8 +59,6 @@ const main = async () => {
   try {
     await db.delete(translations);
     await db.insert(translations).values(data.translations);
-    // resetting the SERIAL
-    await db.execute(sql`SELECT setval('translations_id_seq', (select MAX(id) from translations))`);
     console.log('Successfully added values into table `translations`');
   } catch {}
 };
