@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { cl_join } from '@tools/cl_join';
+  import { cl_join } from '~/tools/cl_join';
   import { onDestroy, onMount } from 'svelte';
   import { type Writable } from 'svelte/store';
   import { scale, slide, fly } from 'svelte/transition';
   import { AiOutlineClose } from 'svelte-icons-pack/ai';
-  import Icon from '@tools/Icon.svelte';
+  import Icon from '~/tools/Icon.svelte';
 
   let className: string | null = null!;
   export { className as class };

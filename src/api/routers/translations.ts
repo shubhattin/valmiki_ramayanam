@@ -1,11 +1,11 @@
-import { t, publicProcedure, protectedProcedure } from '@api/trpc_init';
-import { db } from '@db/db';
-import { translations } from '@db/schema';
-import type { lang_list_type } from '@tools/lang_list';
+import { t, publicProcedure, protectedProcedure } from '~/api/trpc_init';
+import { db } from '~/db/db';
+import { translations } from '~/db/schema';
+import type { lang_list_type } from '~/tools/lang_list';
 import { and, eq } from 'drizzle-orm';
 import { z } from 'zod';
 
-export const get_translations_per_sarga_router = publicProcedure
+export const get_translations_per_sarga_route = publicProcedure
   .input(
     z.object({
       lang: z.string(),
@@ -30,7 +30,7 @@ export const get_translations_per_sarga_router = publicProcedure
     return data;
   });
 
-export const get_all_langs_translations_per_sarga_router = publicProcedure
+export const get_all_langs_translations_per_sarga_route = publicProcedure
   .input(
     z.object({
       kANDa_num: z.number().int(),
@@ -49,7 +49,7 @@ export const get_all_langs_translations_per_sarga_router = publicProcedure
     return data;
   });
 
-export const edit_translation_router = protectedProcedure
+export const edit_translation_route = protectedProcedure
   .input(
     z.object({
       lang: z.string(),
@@ -126,7 +126,7 @@ export const edit_translation_router = protectedProcedure
   );
 
 export const translations_router = t.router({
-  get_translations_per_sarga: get_translations_per_sarga_router,
-  edit_translation: edit_translation_router,
-  get_all_langs_translations_per_sarga: get_all_langs_translations_per_sarga_router
+  get_translations_per_sarga: get_translations_per_sarga_route,
+  edit_translation: edit_translation_route,
+  get_all_langs_translations_per_sarga: get_all_langs_translations_per_sarga_route
 });

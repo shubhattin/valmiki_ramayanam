@@ -1,23 +1,23 @@
 <script lang="ts">
-  import Icon from '@tools/Icon.svelte';
+  import Icon from '~/tools/Icon.svelte';
   import { getModalStore, popup } from '@skeletonlabs/skeleton';
   import type { ModalSettings } from '@skeletonlabs/skeleton';
   import { TrOutlineLogin2 } from 'svelte-icons-pack/tr';
   import { LuSettings, LuUserPlus } from 'svelte-icons-pack/lu';
-  import { get_id_token_info } from '@tools/auth_tools';
+  import { get_id_token_info } from '~/tools/auth_tools';
   import { RiUserFacesAdminLine } from 'svelte-icons-pack/ri';
   import { BiLock, BiLogOut } from 'svelte-icons-pack/bi';
-  import { deleteAuthCookies } from '@tools/auth_tools';
-  import Modal from '@components/Modal.svelte';
-  import Authenticate from '@components/pages/main_page/user/Authenticate.svelte';
+  import { deleteAuthCookies } from '~/tools/auth_tools';
+  import Modal from '~/components/Modal.svelte';
+  import Authenticate from '~/components/pages/main_page/user/Authenticate.svelte';
   import { writable } from 'svelte/store';
   import { AiOutlineUser } from 'svelte-icons-pack/ai';
   import NewUser from './NewUser.svelte';
   import ManageUser from './ManageUser.svelte';
   import UpdatePassword from './UpdatePassword.svelte';
-  import { LanguageIcon } from '@components/icons';
-  import { user_info, user_allowed_langs } from '@state/main_page/user';
-  import { editing_status_on } from '@state/main_page/main_state';
+  import { LanguageIcon } from '~/components/icons';
+  import { user_info, user_allowed_langs } from '~/state/main_page/user';
+  import { editing_status_on } from '~/state/main_page/main_state';
   import { VscAccount } from 'svelte-icons-pack/vsc';
 
   const modalStore = getModalStore();

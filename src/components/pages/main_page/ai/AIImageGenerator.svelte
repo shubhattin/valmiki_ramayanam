@@ -1,19 +1,22 @@
 <script lang="ts">
-  import { rAmAyaNam_map, sarga_data, trans_en_data } from '@state/main_page/data';
-  import { BASE_SCRIPT, kANDa_selected, sarga_selected } from '@state/main_page/main_state';
-  import Icon from '@tools/Icon.svelte';
+  import { rAmAyaNam_map, sarga_data, trans_en_data } from '~/state/main_page/data';
+  import { BASE_SCRIPT, kANDa_selected, sarga_selected } from '~/state/main_page/main_state';
+  import Icon from '~/tools/Icon.svelte';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import { writable } from 'svelte/store';
   import base_prompts from './base_prompt.yaml';
   import { SlideToggle } from '@skeletonlabs/skeleton';
-  import { client_q, type client } from '@api/client';
-  import { lipi_parivartak_async } from '@tools/converter';
-  import { get_possibily_not_undefined } from '@tools/kry';
+  import { client_q, type client } from '~/api/client';
+  import { lipi_parivartak_async } from '~/tools/converter';
+  import { get_possibily_not_undefined } from '~/tools/kry';
   import { onMount } from 'svelte';
   import { loadLocalConfig } from '../load_local_config';
   import { BsDownload } from 'svelte-icons-pack/bs';
-  import { download_file_in_browser } from '@tools/download_file_browser';
-  import { cl_join } from '@tools/cl_join';
+  import {
+    download_external_file_in_browser,
+    download_file_in_browser
+  } from '~/tools/download_file_browser';
+  import { cl_join } from '~/tools/cl_join';
 
   $: kANDa_info = rAmAyaNam_map[$kANDa_selected - 1];
   $: sarga_info = kANDa_info.sarga_data[$sarga_selected - 1];
@@ -31,12 +34,23 @@
   }
   let shloka_numb = writable(1);
   let base_user_prompt = writable<string>(base_prompts[0].content);
-  let auto_gen_image = writable(true);
+  let auto_gen_image = writable(false);
   let additional_prompt_info = writable('');
   let shloka_text_prompt = writable('');
   let image_prompt = writable('');
   let load_ai_sample_data = false;
   let image_prompt_request_error = false;
+
+  type image_models_type = Parameters<
+    typeof client.ai.get_generated_images.mutate
+  >[0]['image_model'];
+  let image_model: image_models_type = 'dall-e-3';
+  const IMAGE_MODELS: Record<image_models_type, [string, string]> = {
+    'dall-e-3': ['DALL-E 3', '$0.04 (₹3.36) / image'],
+    'sd3-core': ['SD3 Core', '$0.03 (₹2.51) / image']
+    // sdxl: ['SDXL', '$0.002 (₹0.17) / image'],
+    // 'dall-e-2': ['DALL-E 2', '$0.02 (₹1.68) / image']
+  };
 
   $: $additional_prompt_info =
     `The Shloka will be from Sarga ${sarga_info.index} named ${sarga_info.name_normal}, Kanda ${kANDa_info.index} ` +
@@ -78,7 +92,8 @@
     await $image_mut.mutateAsync({
       image_prompt: $image_prompt,
       number_of_images: NUMBER_OF_IMAGES,
-      use_sample_data: load_ai_sample_data
+      use_sample_data: load_ai_sample_data,
+      image_model
     });
   };
   const image_prompt_mut = client_q.ai.get_image_prompt.mutation({
@@ -97,7 +112,18 @@
       $image_data = data;
     }
   });
-  let image_data = writable<Awaited<ReturnType<typeof client.ai.get_generated_images.mutate>>>([]);
+  type image_data_type = Awaited<ReturnType<typeof client.ai.get_generated_images.mutate>>[0];
+  let image_data = writable<image_data_type[]>([]);
+
+  const download_image = (image: image_data_type) => {
+    if (!image) return;
+    const file_name = `Image ${$sarga_selected}-${$kANDa_selected} Shloka No. ${$shloka_numb}`;
+    if (load_ai_sample_data) download_file_in_browser(image.url, `${file_name}.webp`);
+    else if (image.out_format == 'url')
+      download_external_file_in_browser(image.url, `${file_name}.png`);
+    else if (image.out_format == 'b64_json')
+      download_file_in_browser(image.url, `${file_name}.png`);
+  };
 </script>
 
 <div>
@@ -157,6 +183,15 @@
   >
     Generate Image Prompt
   </button>
+  <select
+    class="select w-24 px-1 py-1 text-sm"
+    bind:value={image_model}
+    title={IMAGE_MODELS[image_model][1]}
+  >
+    {#each Object.entries(IMAGE_MODELS) as option}
+      <option class="text-sm" value={option[0]}>{option[1][0]}</option>
+    {/each}
+  </select>
   <SlideToggle
     name="auto_image"
     size="sm"
@@ -169,7 +204,7 @@
   {#if $image_prompt_mut.isPending || !$image_prompt_mut.isSuccess}
     <div class="placeholder h-80 animate-pulse rounded-md"></div>
   {:else}
-    <label class="space-y-2">
+    <div class="space-x-3">
       <span class="font-bold">Image Prompt</span>
       <button
         disabled={$image_mut.isPending}
@@ -177,40 +212,38 @@
         class="btn rounded-md bg-tertiary-800 px-1 py-0 font-bold text-white dark:bg-tertiary-700"
         >Generate Image</button
       >
-      <textarea
-        class={cl_join(
-          'textarea h-36 px-1 py-0 text-sm',
-          image_prompt_request_error && 'input-error'
-        )}
-        spellcheck="false"
-        bind:value={$image_prompt}
-      ></textarea>
-    </label>
+    </div>
+    <textarea
+      class={cl_join(
+        'textarea h-36 px-1 py-0 text-sm',
+        image_prompt_request_error && 'input-error'
+      )}
+      spellcheck="false"
+      bind:value={$image_prompt}
+    ></textarea>
     {#if !$image_mut.isIdle}
       {#if $image_mut.isPending || !$image_mut.isSuccess}
         <div class="placeholder h-96 animate-pulse rounded-md"></div>
       {:else}
         <div>
-          <section class="mb-10 grid grid-cols-2 gap-4">
+          <section class="mb-10 grid grid-cols-2 gap-3">
             {#each get_possibily_not_undefined($image_mut.data) as image}
               {#if image}
                 <div class="space-y-1">
                   <img
                     src={image.url}
-                    alt={image.revised_prompt}
-                    title={image.revised_prompt}
-                    class="block rounded-md"
+                    alt={image.prompt}
+                    title={image.prompt}
+                    class="block rounded-md border-2 border-blue-600 dark:border-blue-800"
+                    height={1024}
+                    width={1024}
                   />
                   <div class="flex items-center justify-center space-x-3">
                     <button
-                      on:click={() =>
-                        download_file_in_browser(
-                          image.url,
-                          `Image ${$sarga_selected}-${$kANDa_selected} Shloka No. ${$shloka_numb}.png`
-                        )}
+                      on:click={() => download_image(image)}
                       class="btn rounded-md bg-surface-600 px-1 py-1 outline-none dark:bg-surface-500"
                     >
-                      <Icon src={BsDownload} class="text-xl" />
+                      <Icon src={BsDownload} class="text-xl text-white" />
                     </button>
                   </div>
                 </div>

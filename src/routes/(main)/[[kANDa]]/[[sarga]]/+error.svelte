@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import MetaTags from '@components/tags/MetaTags.svelte';
+  import MetaTags from '~/components/tags/MetaTags.svelte';
 </script>
 
 <MetaTags title="Error" />

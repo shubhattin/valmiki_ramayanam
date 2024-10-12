@@ -1,12 +1,12 @@
 import { dbClient_ext as db, queryClient } from './client';
 import { readFile } from 'fs/promises';
-import { dbMode, take_input } from '@tools/kry_server';
-import { translations, user_verification_requests, users } from '@db/schema';
+import { dbMode, take_input } from '~/tools/kry_server';
+import { translations, user_verification_requests, users } from '~/db/schema';
 import {
   UsersSchemaZod,
   TranslationsSchemaZod,
   UserVerificationRequestsSchemaZod
-} from '@db/schema_zod';
+} from '~/db/schema_zod';
 import { z } from 'zod';
 
 const main = async () => {

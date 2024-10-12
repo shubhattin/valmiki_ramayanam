@@ -1,9 +1,9 @@
-import type { ID_TOKEN_INFO_SCHEMA } from '@tools/auth_tools';
+import type { ID_TOKEN_INFO_SCHEMA } from '~/tools/auth_tools';
 import { z } from 'zod';
 import { writable } from 'svelte/store';
-import { get_derived_query } from '@tools/query';
-import { queryClient } from '@state/query';
-import { client } from '@api/client';
+import { get_derived_query } from '~/tools/query';
+import { queryClient } from '~/state/query';
+import { client } from '~/api/client';
 import { browser } from '$app/environment';
 import { createQuery } from '@tanstack/svelte-query';
 

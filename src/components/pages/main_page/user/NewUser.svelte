@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { Writable } from 'svelte/store';
-  import { cl_join } from '@tools/cl_join';
+  import { cl_join } from '~/tools/cl_join';
   import { LuUserPlus } from 'svelte-icons-pack/lu';
-  import Icon from '@tools/Icon.svelte';
-  import { client_q } from '@api/client';
+  import Icon from '~/tools/Icon.svelte';
+  import { client_q } from '~/api/client';
   import { z } from 'zod';
   export let on_verify: () => void = null!;
   export let name_input_element: Writable<HTMLInputElement>;

@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { client_q } from '@api/client';
-  import { storeAuthInfo } from '@tools/auth_tools';
+  import { client_q } from '~/api/client';
+  import { storeAuthInfo } from '~/tools/auth_tools';
   import { writable } from 'svelte/store';
   import type { Writable } from 'svelte/store';
-  import { cl_join } from '@tools/cl_join';
-  import Icon from '@tools/Icon.svelte';
+  import { cl_join } from '~/tools/cl_join';
+  import Icon from '~/tools/Icon.svelte';
   import { BiLogIn } from 'svelte-icons-pack/bi';
 
   export let on_verify: (verified: boolean, id_token: string, access_token: string) => void = null!;

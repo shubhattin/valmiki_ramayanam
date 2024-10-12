@@ -7,14 +7,14 @@
     editing_status_on,
     added_translations_indexes,
     edited_translations_indexes
-  } from '@state/main_page/main_state';
-  import { trans_lang_data, trans_lang_data_query_key } from '@state/main_page/data';
-  import { delay } from '@tools/delay';
-  import { client } from '@api/client';
+  } from '~/state/main_page/main_state';
+  import { trans_lang_data, trans_lang_data_query_key } from '~/state/main_page/data';
+  import { delay } from '~/tools/delay';
+  import { client } from '~/api/client';
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
   import { scale, slide } from 'svelte/transition';
   import { FiSave } from 'svelte-icons-pack/fi';
-  import Icon from '@tools/Icon.svelte';
+  import Icon from '~/tools/Icon.svelte';
   import { AiOutlineClose } from 'svelte-icons-pack/ai';
 
   const query_client = useQueryClient();

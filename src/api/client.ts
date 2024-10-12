@@ -1,4 +1,4 @@
-import type { Router } from '@api/trpc_router';
+import type { Router } from '~/api/trpc_router';
 import { httpBatchLink } from '@trpc/client';
 import { createTRPCClient } from 'trpc-sveltekit';
 import transformer from './transformer';

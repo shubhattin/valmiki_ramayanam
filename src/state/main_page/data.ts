@@ -1,12 +1,12 @@
 import { browser } from '$app/environment';
 import { createQuery } from '@tanstack/svelte-query';
-import { delay } from '@tools/delay';
-import { get_derived_query } from '@tools/query';
-import { queryClient } from '@state/query';
+import { delay } from '~/tools/delay';
+import { get_derived_query } from '~/tools/query';
+import { queryClient } from '~/state/query';
 import { derived } from 'svelte/store';
-import { client } from '@api/client';
+import { client } from '~/api/client';
 import rAmAyaNam_map from '@data/ramayan/ramayan_map.json';
-import { lipi_parivartak_async } from '@tools/converter';
+import { lipi_parivartak_async } from '~/tools/converter';
 
 import {
   BASE_SCRIPT,
@@ -68,8 +68,9 @@ export const sarga_data = get_derived_query(
 export async function get_sarga_data(kANDa_num: number, sarga_num: number) {
   if (!browser) return [];
   // ^ This is to prevent this to be bundled in edge functions as it a limit of 1mb(gzip)
+  const glob_path = `/data/ramayan/data/*/*.json` as const;
   const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
-  const data = ((await all_sargas[`/data/ramayan/data/${kANDa_num}/${sarga_num}.json`]()) as any)
+  const data = ((await all_sargas[glob_path.replace('*/*', `${kANDa_num}/${sarga_num}`)]()) as any)
     .default as string[];
   await delay(350);
   return data;
@@ -147,8 +148,9 @@ const load_english_translation = async (kANDa_num: number, sarga_number: number)
   if (!browser) return data_map;
   // ^ This is to prevent this to be bundled in edge functions as it a limit of 1mb(gzip)
 
-  const glob_yaml = import.meta.glob('/data/ramayan/trans_en/*/*.yaml');
-  const data_load_function = glob_yaml[`/data/ramayan/trans_en/${kANDa_num}/${sarga_number}.yaml`];
+  const glob_path = `/data/ramayan/trans_en/*/*.yaml` as const;
+  const glob_yaml = import.meta.glob(`/data/ramayan/trans_en/*/*.yaml`);
+  const data_load_function = glob_yaml[glob_path.replace('*/*', `${kANDa_num}/${sarga_number}`)];
   if (!data_load_function) return data_map;
   data = ((await data_load_function()) as any).default as Record<number, string>;
   for (const [key, value] of Object.entries(data))

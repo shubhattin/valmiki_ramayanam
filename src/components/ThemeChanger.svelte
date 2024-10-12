@@ -1,7 +1,7 @@
 <script lang="ts">
   import { setMode } from 'mode-watcher';
   import { LuSun, LuMoon } from 'svelte-icons-pack/lu';
-  import Icon from '@tools/Icon.svelte';
+  import Icon from '~/tools/Icon.svelte';
   import { SlScreenDesktop } from 'svelte-icons-pack/sl';
 </script>
 

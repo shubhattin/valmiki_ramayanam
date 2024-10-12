@@ -2,15 +2,15 @@
   import { AppBar, popup } from '@skeletonlabs/skeleton';
   import type { PopupSettings } from '@skeletonlabs/skeleton';
   import ThemeChanger from './ThemeChanger.svelte';
-  import Icon from '@tools/Icon.svelte';
+  import Icon from '~/tools/Icon.svelte';
   import { SiGithub } from 'svelte-icons-pack/si';
   import { SiConvertio } from './icons';
   import { AiOutlineMenu } from 'svelte-icons-pack/ai';
   import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
-  import { YoutubeIcon } from '@components/icons';
+  import { YoutubeIcon } from '~/components/icons';
   import { page } from '$app/stores';
-  import { main_app_bar_info } from '@state/app_bar';
-  import { PAGE_TITLES } from '@state/page_titles';
+  import { main_app_bar_info } from '~/state/app_bar';
+  import { PAGE_TITLES } from '~/state/page_titles';
 
   $: page_url = $page.url.pathname;
 

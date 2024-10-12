@@ -77,3 +77,21 @@ export function dataURLToBlob(dataURL: string) {
 export function copy_plain_object<T>(obj: T) {
   return JSON.parse(JSON.stringify(obj)) as T;
 }
+
+export function get_permutations(range: [number, number], count: number = 1): number[][] {
+  const [start, end] = range;
+  const numbers: number[] = Array.from({ length: end - start + 1 }, (_, i) => i + start);
+  function shuffle(array: number[]): number[] {
+    const shuffled = array.slice();
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  }
+  const permutations: number[][] = [];
+  for (let i = 0; i < count; i++) {
+    permutations.push(shuffle(numbers));
+  }
+  return permutations;
+}

@@ -1,7 +1,7 @@
 // this file should be called root of project
 import { describe, it } from 'vitest';
 import ExcelJS from 'exceljs';
-import { normalize_lang_code, lipi_parivartak_async } from '@tools/converter';
+import { normalize_lang_code, lipi_parivartak_async } from '~/tools/converter';
 
 // Define file paths
 const inputFilePath = './src/tests/data/nAradavAkyam.xlsx';

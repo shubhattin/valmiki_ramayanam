@@ -1,7 +1,7 @@
-import { copy_plain_object } from '@tools/kry';
+import { copy_plain_object } from '~/tools/kry';
 import { writable } from 'svelte/store';
-import { get_font_family_and_size, type font_config_type } from '@tools/font_tools';
-import type { script_and_lang_list_type } from '@tools/lang_list';
+import { get_font_family_and_size, type font_config_type } from '~/tools/font_tools';
+import type { script_and_lang_list_type } from '~/tools/lang_list';
 
 type bounding_coords_type = {
   left: number;

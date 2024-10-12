@@ -8,7 +8,7 @@ import {
   trans_text_font_configs
 } from './state';
 import * as fabric from 'fabric';
-import { get_text_svg_path } from '@tools/harfbuzz';
+import { get_text_svg_path, preload_font_from_url, preload_harbuzzjs_wasm } from '~/tools/harfbuzz';
 import {
   current_shloka_type,
   shloka_configs,
@@ -20,10 +20,10 @@ import {
 import { canvas } from './state';
 import { get } from 'svelte/store';
 import { browser } from '$app/environment';
-import type { lang_list_extended_type, script_list_type } from '@tools/lang_list';
-import { lipi_parivartak_async } from '@tools/converter';
-import { get_font_url } from '@tools/font_tools';
-import { BASE_SCRIPT } from '@state/main_page/main_state';
+import type { lang_list_extended_type, script_list_type } from '~/tools/lang_list';
+import { lipi_parivartak_async } from '~/tools/converter';
+import { get_font_url } from '~/tools/font_tools';
+import { BASE_SCRIPT } from '~/state/main_page/main_state';
 
 const render_text_args_schema = z.object({
   text: z.string(),
@@ -318,6 +318,15 @@ export const render_all_texts = async (
   const trans_text_font_info = $trans_text_font_configs[$image_lang];
   const norm_text_font_info = $normal_text_font_config;
   const $SPACE_BETWEEN_MAIN_AND_NORM = main_text_font_info.space_between_main_and_normal;
+
+  // preloading fonts
+  await Promise.all([
+    preload_font_from_url(get_font_url(norm_text_font_info.key, 'regular')),
+    preload_font_from_url(get_font_url(main_text_font_info.key, 'bold')),
+    preload_font_from_url(get_font_url('ROBOTO', 'bold')),
+    preload_font_from_url(get_font_url(trans_text_font_info.key, 'regular')),
+    preload_harbuzzjs_wasm()
+  ]);
 
   // remove all previous texts, textboxes and lines
   $canvas.getObjects().forEach((obj) => {

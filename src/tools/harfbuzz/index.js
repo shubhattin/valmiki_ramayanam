@@ -5,6 +5,18 @@ import { load_hbjs } from './load_hbjs';
  */
 const FONT_CACHE = {};
 
+const load_font_from_url = async (font_url) => {
+  if (FONT_CACHE[font_url]) return FONT_CACHE[font_url];
+  const blob = new Uint8Array(await fetch(font_url).then((res) => res.arrayBuffer()));
+  FONT_CACHE[font_url] = blob;
+  return blob;
+};
+export const preload_font_from_url = load_font_from_url;
+
+export const preload_harbuzzjs_wasm = async () => {
+  await load_hbjs();
+};
+
 /**
  * Generates an SVG path for the given text using the specified font.
  *
@@ -14,15 +26,7 @@ const FONT_CACHE = {};
  */
 export async function get_text_svg_path(text, font) {
   const hb = await load_hbjs();
-  let fontBlob =
-    font instanceof Uint8Array
-      ? font
-      : await (async () => {
-          if (FONT_CACHE[font]) return FONT_CACHE[font];
-          const blob = new Uint8Array(await fetch(font).then((res) => res.arrayBuffer()));
-          FONT_CACHE[font] = blob;
-          return blob;
-        })();
+  let fontBlob = font instanceof Uint8Array ? font : await preload_font_from_url(font);
   var blob = hb.createBlob(fontBlob);
   var face = hb.createFace(blob, 0);
   var font = hb.createFont(face);
