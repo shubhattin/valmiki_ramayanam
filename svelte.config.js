@@ -8,7 +8,7 @@ const config = {
   kit: {
     adapter: adapter({
       runtime: 'edge',
-      regions: ['sin1']
+      regions: 'sin1'
     }),
     alias: {
       '~': 'src',
