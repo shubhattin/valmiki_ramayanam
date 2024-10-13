@@ -1,5 +1,5 @@
 {
-  "id": "b67cf89a-da53-42db-b4de-4f525efaeea9",
+  "id": "0f3e92dc-a128-48e4-87e8-c5547026b5cd",
   "prevId": "8fd721da-d8ee-4a70-b366-d8974b91bc9e",
   "version": "7",
   "dialect": "postgresql",
@@ -41,35 +41,7 @@
           "default": "''"
         }
       },
-      "indexes": {
-        "trans_lang_kanda_sarga_idx": {
-          "name": "trans_lang_kanda_sarga_idx",
-          "columns": [
-            {
-              "expression": "lang",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "kANDa_num",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "sarga_num",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
+      "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {
         "translations_lang_kANDa_num_sarga_num_shloka_num_pk": {

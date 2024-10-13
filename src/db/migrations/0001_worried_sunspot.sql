@@ -1,2 +1,0 @@
-ALTER TABLE "translations" ALTER COLUMN "text" SET NOT NULL;--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "trans_lang_kanda_sarga_idx" ON "translations" USING btree ("lang","kANDa_num","sarga_num");

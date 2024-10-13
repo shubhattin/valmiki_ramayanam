@@ -52,13 +52,7 @@ export const translations = pgTable(
     text: text('text').default('').notNull()
   },
   (table) => ({
-    pk: primaryKey({ columns: [table.lang, table.kANDa_num, table.sarga_num, table.shloka_num] }),
-    lang_kanda_sarga_idx: index('trans_lang_kanda_sarga_idx').on(
-      table.lang,
-      table.kANDa_num,
-      table.sarga_num
-    )
-    // we also want to define index on (lang, kANDa_num, sarga_num) for faster querying
+    pk: primaryKey({ columns: [table.lang, table.kANDa_num, table.sarga_num, table.shloka_num] })
   })
 );
 

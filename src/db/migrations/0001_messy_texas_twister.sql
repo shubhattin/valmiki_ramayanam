@@ -1,0 +1,1 @@
+ALTER TABLE "translations" ALTER COLUMN "text" SET NOT NULL;
