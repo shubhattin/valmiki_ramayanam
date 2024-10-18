@@ -8,15 +8,18 @@
   import { SlideToggle } from '@skeletonlabs/skeleton';
   import { client_q, type client } from '~/api/client';
   import { lipi_parivartak_async } from '~/tools/converter';
-  import { get_possibily_not_undefined } from '~/tools/kry';
+  import { copy_text_to_clipboard, get_possibily_not_undefined } from '~/tools/kry';
   import { onMount } from 'svelte';
   import { loadLocalConfig } from '../load_local_config';
-  import { BsDownload } from 'svelte-icons-pack/bs';
+  import { BsDownload, BsCopy } from 'svelte-icons-pack/bs';
   import {
     download_external_file_in_browser,
     download_file_in_browser
   } from '~/tools/download_file_browser';
   import { cl_join } from '~/tools/cl_join';
+  import { LuCopy } from 'svelte-icons-pack/lu';
+  import { OiCopy16 } from 'svelte-icons-pack/oi';
+  import { BsClipboard2Check } from 'svelte-icons-pack/bs';
 
   $: kANDa_info = rAmAyaNam_map[$kANDa_selected - 1];
   $: sarga_info = kANDa_info.sarga_data[$sarga_selected - 1];
@@ -46,8 +49,8 @@
   >[0]['image_model'];
   let image_model: image_models_type = 'dall-e-3';
   const IMAGE_MODELS: Record<image_models_type, [string, string]> = {
-    'dall-e-3': ['DALL-E 3', '$0.04 (₹3.36) / image'],
-    'sd3-core': ['SD3 Core', '$0.03 (₹2.51) / image']
+    'dall-e-3': ['DALL-E 3', '$0.04 (₹3.4) / image'],
+    'sd3-core': ['SD3 Core', '$0.03 (₹2.5) / image']
     // sdxl: ['SDXL', '$0.002 (₹0.17) / image'],
     // 'dall-e-2': ['DALL-E 2', '$0.02 (₹1.68) / image']
   };
@@ -124,21 +127,59 @@
     else if (image.out_format == 'b64_json')
       download_file_in_browser(image.url, `${file_name}.png`);
   };
+
+  let copied_text_status = false;
+  $: copied_text_status && setTimeout(() => (copied_text_status = false), 1400);
+  const copy_text_with_indicator = (text: string) => {
+    copy_text_to_clipboard(text);
+    copied_text_status = true;
+  };
 </script>
 
+{#if copied_text_status}
+  <div
+    class="fixed bottom-2 right-2 z-50 cursor-default select-none font-bold text-green-700 dark:text-green-300"
+  >
+    <Icon src={BsClipboard2Check} />
+    Copied to Clipboard
+  </div>
+{/if}
 <div>
-  <label class="block space-y-1">
-    <span class="font-bold">Base Prompt</span>
+  <div class="block space-y-1.5">
+    <div class="space-x-2">
+      <span class="font-bold">Base Prompt</span>
+      <button
+        class="btn m-0 p-0 outline-none"
+        on:click={() => copy_text_to_clipboard($base_user_prompt + $additional_prompt_info)}
+        title="Copy Base Prompt"
+      >
+        <Icon src={LuCopy} />
+      </button>
+      <button
+        class="btn m-0 p-0 outline-none"
+        title="Copy Full Prompt"
+        on:click={() =>
+          copy_text_to_clipboard(
+            $base_user_prompt + $additional_prompt_info + '\n\n\n' + $shloka_text_prompt
+          )}
+      >
+        <Icon src={OiCopy16} class="text-[1.2rem]" />
+      </button>
+    </div>
     <textarea
       class="textarea h-24 px-1 py-0 text-sm"
       spellcheck="false"
       bind:value={$base_user_prompt}
     ></textarea>
-  </label>
+  </div>
   <div class="break-words text-xs text-stone-500 dark:text-stone-400">
     {$additional_prompt_info}
   </div>
-  <div class="text-xs text-slate-600 dark:text-slate-400">
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <div
+    class="text-xs text-slate-600 dark:text-slate-400"
+    on:dblclick={() => copy_text_with_indicator($shloka_text_prompt)}
+  >
     {#each $shloka_text_prompt.split('\n') as line}
       <div>
         {line === '' ? '\u200d' : line}
@@ -212,6 +253,13 @@
         class="btn rounded-md bg-tertiary-800 px-1 py-0 font-bold text-white dark:bg-tertiary-700"
         >Generate Image</button
       >
+      <button
+        class="btn m-0 p-0 outline-none"
+        title="Copy Image Prompt"
+        on:click={() => copy_text_to_clipboard($image_prompt)}
+      >
+        <Icon src={BsCopy} class="text-lg" />
+      </button>
     </div>
     <textarea
       class={cl_join(

@@ -8,6 +8,7 @@ import {
   UserVerificationRequestsSchemaZod
 } from '~/db/schema_zod';
 import { z } from 'zod';
+import { sql } from 'drizzle-orm';
 
 const main = async () => {
   /*
@@ -38,6 +39,8 @@ const main = async () => {
     await db.delete(users);
     // @ts-ignore
     await db.insert(users).values(data.users);
+    // resetting the SERIAL
+    await db.execute(sql`SELECT setval('users_id_seq', (select MAX(id) from users))`);
     console.log('Successfully added values into table `users`');
   } catch {}
 
@@ -45,6 +48,10 @@ const main = async () => {
   try {
     await db.delete(user_verification_requests);
     await db.insert(user_verification_requests).values(data.user_verification_requests);
+    // resetting the SERIAL
+    await db.execute(
+      sql`SELECT setval('user_verification_requests_id_seq', (select MAX(id) from user_verification_requests))`
+    );
     console.log('Successfully added values into table `user_verification_requests`');
   } catch {}
 

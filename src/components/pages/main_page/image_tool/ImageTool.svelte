@@ -25,7 +25,8 @@
     sarga_selected,
     kANDa_selected,
     viewing_script,
-    trans_lang
+    trans_lang,
+    image_tool_opened
   } from '~/state/main_page/main_state';
   import { get_kANDa_names, get_sarga_names, rAmAyaNam_map } from '~/state/main_page/data';
   import Select from '~/components/Select.svelte';
@@ -182,6 +183,13 @@
   };
   $: $mounted && $scaling_factor && update_canvas_dimensions();
   $: $mounted && set_background_image_type($shaded_background_image_status);
+
+  $: mounted &&
+    $image_tool_opened &&
+    setTimeout(async () => {
+      await render_all_texts(get(image_shloka), get(image_script), get(image_lang));
+    }, 600);
+  // ^ This is to try to fix the issue of text not rendering after opening the image tool second time
 
   $: mounted &&
     !$image_sarga_data.isFetching &&

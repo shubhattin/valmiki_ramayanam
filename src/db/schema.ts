@@ -6,7 +6,8 @@ import {
   pgEnum,
   smallint,
   integer,
-  primaryKey
+  primaryKey,
+  index
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
@@ -33,6 +34,7 @@ export const users = pgTable('users', {
   user_type: userTypeEnum('user_type').default('non-admin').notNull(),
   allowed_langs: langEnum('allowed_langs').array()
 });
+// `unique indexes` are auto created for primary keys
 
 export const user_verification_requests = pgTable('user_verification_requests', {
   id: integer('id')
@@ -56,9 +58,6 @@ export const translations = pgTable(
 
 /* The relations defined below are only for the `query` API of drizzle */
 
-export const dataRelation = relations(users, ({ one }) => ({
-  user_verification_requests: one(user_verification_requests, {
-    fields: [users.id],
-    references: [user_verification_requests.id]
-  })
+export const userRelation = relations(users, ({ one }) => ({
+  user_verification_requests: one(user_verification_requests)
 }));
