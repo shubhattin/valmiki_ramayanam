@@ -6,8 +6,7 @@ import {
   pgEnum,
   smallint,
   integer,
-  primaryKey,
-  index
+  primaryKey
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
@@ -57,9 +56,13 @@ export const translations = pgTable(
 );
 
 /* The relations defined below are only for the `query` API of drizzle */
-export const dataRelation = relations(users, ({ one }) => ({
-  user_verification_requests: one(user_verification_requests, {
-    fields: [users.id],
-    references: [user_verification_requests.id]
+export const userRelation = relations(users, ({ one }) => ({
+  user_verification_requests: one(user_verification_requests)
+}));
+
+export const userVerificationRelation = relations(user_verification_requests, ({ one }) => ({
+  users: one(users, {
+    fields: [user_verification_requests.id],
+    references: [users.id]
   })
 }));
