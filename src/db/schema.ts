@@ -20,7 +20,8 @@ export const langEnum = pgEnum('lang', [
   'Gujarati',
   'Malayalam',
   'Odia',
-  'Sinhala'
+  'Sinhala',
+  'English'
 ]);
 
 export const users = pgTable('users', {
