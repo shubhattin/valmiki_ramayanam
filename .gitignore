@@ -33,6 +33,8 @@ a.json
 a.txt
 a.yaml
 
+src/db/scripts/backup/
+
 data/ramayan/raw_data
 data/ramayan/out
 data/ramayan/zipped

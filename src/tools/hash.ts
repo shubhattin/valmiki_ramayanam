@@ -1,10 +1,5 @@
 const str_to_array_buffer = (str: string) => {
-  const buf = new ArrayBuffer(str.length);
-  const bufView = new Uint8Array(buf);
-  for (let i = 0, strLen = str.length; i < strLen; i++) {
-    bufView[i] = str.charCodeAt(i);
-  }
-  return buf;
+  return new TextEncoder().encode(str).buffer;
 };
 const array_buffer_to_str = (buff: ArrayBuffer) => {
   return Array.from(new Uint8Array(buff))
