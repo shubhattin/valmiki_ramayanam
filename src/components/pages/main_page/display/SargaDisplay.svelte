@@ -1,7 +1,7 @@
 <script lang="ts">
   import { lipi_parivartak_async } from '~/tools/converter';
   import { type Unsubscriber } from 'svelte/store';
-  import { fade, scale, slide } from 'svelte/transition';
+  import { fade } from 'svelte/transition';
   import { cl_join } from '~/tools/cl_join';
   import { onDestroy } from 'svelte';
   import {
