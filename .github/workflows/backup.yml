@@ -2,8 +2,7 @@ name: Data Backup
 
 on:
   schedule:
-    # - cron: '30 4 */2 * *' # Run wvery days at 10:00 AM IST every 2 days
-    - cron: '* */6 * * *'
+    - cron: '30 4 */2 * *' # Run wvery days at 10:00 AM IST every 2 days
 
 jobs:
   backup_db_data:
