@@ -29,7 +29,6 @@
     DEFAULT_SHLOKA_CONFIG
   } from './settings';
   import { copy_plain_object } from '~/tools/kry';
-  import { get_font_family_and_size } from '~/tools/font_tools';
 
   $: kANDa_info = rAmAyaNam_map[$image_kANDa - 1];
   $: shloka_count = kANDa_info.sarga_data[$image_sarga - 1].shloka_count_extracted;
@@ -84,7 +83,6 @@
       bind:value={$image_lang}
       disabled={$image_trans_data.isFetching || !$image_trans_data.isSuccess}
     >
-      <option value="English">English</option>
       {#each LANG_LIST as lang (lang)}
         <option value={lang}>{lang}</option>
       {/each}

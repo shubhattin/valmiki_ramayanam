@@ -42,12 +42,7 @@
   import { BsKeyboard } from 'svelte-icons-pack/bs';
   import User from './user/User.svelte';
   import { get_script_for_lang, get_text_font_class } from '~/tools/font_tools';
-  import {
-    LOCALS_TRANS_LANGS,
-    rAmAyaNam_map,
-    get_kANDa_names,
-    get_sarga_names
-  } from '~/state/main_page/data';
+  import { rAmAyaNam_map, get_kANDa_names, get_sarga_names } from '~/state/main_page/data';
   import MetaTags from '~/components/tags/MetaTags.svelte';
   import { loadLocalConfig } from './load_local_config';
 
@@ -343,11 +338,13 @@
             >
               <option value="--">-- Select --</option>
               {#each LANG_LIST as lang (lang)}
-                <option value={lang}>{lang}</option>
+                {#if lang !== 'English'}
+                  <option value={lang}>{lang}</option>
+                {/if}
               {/each}
             </select>
           </label>
-          {#if !$editing_status_on && $trans_lang !== '--' && !LOCALS_TRANS_LANGS.includes($trans_lang) && $user_allowed_langs.isSuccess && $user_info && (get_possibily_not_undefined($user_info).user_type === 'admin' || $user_allowed_langs.data.indexOf($trans_lang) !== -1)}
+          {#if !$editing_status_on && $trans_lang !== '--' && $user_allowed_langs.isSuccess && $user_info && (get_possibily_not_undefined($user_info).user_type === 'admin' || $user_allowed_langs.data.indexOf($trans_lang) !== -1)}
             <button
               on:click={() => ($editing_status_on = true)}
               class="btn my-1 rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white dark:bg-tertiary-600"

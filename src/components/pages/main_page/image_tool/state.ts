@@ -10,7 +10,6 @@ import background_image_template_url from './img/background_vr_template.jpg';
 import {
   LANG_LIST,
   SCRIPT_LIST,
-  type lang_list_extended_type,
   type lang_list_type,
   type script_list_type
 } from '~/tools/lang_list';
@@ -39,7 +38,7 @@ export async function set_background_image_type(shaded_image: boolean) {
 }
 
 export let image_script = writable<script_list_type>();
-export let image_lang = writable<lang_list_extended_type>('English');
+export let image_lang = writable<lang_list_type>('English');
 export let image_kANDa = writable<number>(0);
 export let image_sarga = writable<number>(0);
 // ^ kanda and sarga will be inherited from the main during mount
@@ -93,7 +92,6 @@ export const DEFAULT_TRANS_TEXT_FONT_CONFIGS = (() => {
   LANG_LIST.forEach(
     (lang) => (res[lang as script_list_type] = get_image_font_info(lang as lang_list_type, 'trans'))
   );
-  res['English'] = get_image_font_info('English', 'trans');
-  return res as image_font_config_type<lang_list_extended_type>;
+  return res as image_font_config_type<lang_list_type>;
 })();
 export let trans_text_font_configs = writable(copy_plain_object(DEFAULT_TRANS_TEXT_FONT_CONFIGS));

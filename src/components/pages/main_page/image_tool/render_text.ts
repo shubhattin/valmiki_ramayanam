@@ -20,7 +20,7 @@ import {
 import { canvas } from './state';
 import { get } from 'svelte/store';
 import { browser } from '$app/environment';
-import type { lang_list_extended_type, script_list_type } from '~/tools/lang_list';
+import type { lang_list_type, script_list_type } from '~/tools/lang_list';
 import { lipi_parivartak_async } from '~/tools/converter';
 import { get_font_url } from '~/tools/font_tools';
 import { BASE_SCRIPT } from '~/state/main_page/main_state';
@@ -301,7 +301,7 @@ const draw_bounding_and_reference_lines = async (shloka_config: shloka_type_conf
 export const render_all_texts = async (
   $image_shloka: number,
   $image_script: script_list_type,
-  $image_lang: lang_list_extended_type
+  $image_lang: lang_list_type
 ) => {
   const $canvas = get(canvas);
   const $shloka_configs = get(shloka_configs);
