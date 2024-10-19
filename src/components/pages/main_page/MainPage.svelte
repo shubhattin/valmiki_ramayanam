@@ -2,13 +2,8 @@
   import Icon from '~/tools/Icon.svelte';
   import { onDestroy, onMount } from 'svelte';
   import { delay } from '~/tools/delay';
-  import { get, writable, type Unsubscriber } from 'svelte/store';
-  import {
-    LANG_LIST,
-    SCRIPT_LIST,
-    type lang_list_type,
-    type script_list_type
-  } from '~/tools/lang_list';
+  import { writable, type Unsubscriber } from 'svelte/store';
+  import { LANG_LIST, SCRIPT_LIST, type script_list_type } from '~/tools/lang_list';
   import LipiLekhikA, { load_parivartak_lang_data, lipi_parivartak_async } from '~/tools/converter';
   import { LanguageIcon } from '~/components/icons';
   import { ensure_auth_access_status, get_id_token_info } from '~/tools/auth_tools';
@@ -42,12 +37,7 @@
   import { BsKeyboard } from 'svelte-icons-pack/bs';
   import User from './user/User.svelte';
   import { get_script_for_lang, get_text_font_class } from '~/tools/font_tools';
-  import {
-    LOCALS_TRANS_LANGS,
-    rAmAyaNam_map,
-    get_kANDa_names,
-    get_sarga_names
-  } from '~/state/main_page/data';
+  import { rAmAyaNam_map, get_kANDa_names, get_sarga_names } from '~/state/main_page/data';
   import MetaTags from '~/components/tags/MetaTags.svelte';
   import { loadLocalConfig } from './load_local_config';
 
@@ -343,18 +333,30 @@
             >
               <option value="--">-- Select --</option>
               {#each LANG_LIST as lang (lang)}
-                <option value={lang}>{lang}</option>
+                {#if lang !== 'English'}
+                  <option value={lang}>{lang}</option>
+                {/if}
               {/each}
             </select>
           </label>
-          {#if !$editing_status_on && $trans_lang !== '--' && !LOCALS_TRANS_LANGS.includes($trans_lang) && $user_allowed_langs.isSuccess && $user_info && (get_possibily_not_undefined($user_info).user_type === 'admin' || $user_allowed_langs.data.indexOf($trans_lang) !== -1)}
-            <button
-              on:click={() => ($editing_status_on = true)}
-              class="btn my-1 rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white dark:bg-tertiary-600"
-            >
-              <Icon src={BiEdit} class="mr-1 text-2xl" />
-              Edit
-            </button>
+          {#if !$editing_status_on && $user_allowed_langs.isSuccess && $user_info}
+            {#if $trans_lang !== '--' && (get_possibily_not_undefined($user_info).user_type === 'admin' || $user_allowed_langs.data.indexOf($trans_lang) !== -1)}
+              <button
+                on:click={() => ($editing_status_on = true)}
+                class="btn my-1 rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white dark:bg-tertiary-600"
+              >
+                <Icon src={BiEdit} class="mr-1 text-2xl" />
+                Edit
+              </button>
+            {:else if $trans_lang === '--' && (get_possibily_not_undefined($user_info).user_type === 'admin' || $user_allowed_langs.data.indexOf('English') !== -1)}
+              <button
+                on:click={() => ($editing_status_on = true)}
+                class="btn my-1 rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white dark:bg-tertiary-600"
+              >
+                <Icon src={BiEdit} class="mr-1 text-2xl" />
+                Edit English
+              </button>
+            {/if}
           {/if}
         {/if}
       {/if}

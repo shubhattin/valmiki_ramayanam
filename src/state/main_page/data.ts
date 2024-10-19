@@ -16,6 +16,7 @@ import {
   trans_lang,
   view_translation_status
 } from './main_state';
+import { user_allowed_langs, user_info } from './user';
 
 export { rAmAyaNam_map };
 export const QUERY_KEYS = {
@@ -122,13 +123,9 @@ export const trans_lang_data = get_derived_query(
       queryClient
     )
 );
-export const LOCALS_TRANS_LANGS = ['English'];
-
 export async function get_translations(kanda: number, sarga: number, lang: string) {
   await delay(400);
-  if (LOCALS_TRANS_LANGS.includes(lang)) {
-    if (lang === 'English') return await load_english_translation(kanda, sarga);
-  }
+
   const data = await client.translations.get_translations_per_sarga.query({
     lang: lang,
     kANDa_num: kanda,
@@ -142,18 +139,10 @@ export async function get_translations(kanda: number, sarga: number, lang: strin
   return data_map;
 }
 
-const load_english_translation = async (kANDa_num: number, sarga_number: number) => {
-  let data: Record<number, string> = {};
-  const data_map = new Map<number, string>();
-  if (!browser) return data_map;
-  // ^ This is to prevent this to be bundled in edge functions as it a limit of 1mb(gzip)
-
-  const glob_path = `/data/ramayan/trans_en/*/*.yaml` as const;
-  const glob_yaml = import.meta.glob(`/data/ramayan/trans_en/*/*.yaml`);
-  const data_load_function = glob_yaml[glob_path.replace('*/*', `${kANDa_num}/${sarga_number}`)];
-  if (!data_load_function) return data_map;
-  data = ((await data_load_function()) as any).default as Record<number, string>;
-  for (const [key, value] of Object.entries(data))
-    data_map.set(Number(key), value.replaceAll(/\n$/g, '')); // replace the ending newline
-  return data_map;
-};
+export let english_edit_status = derived(
+  [trans_lang, user_info, user_allowed_langs],
+  ([$trans_lang, $user_info, $user_allowed_langs]) =>
+    $trans_lang === '--' &&
+    (($user_info && $user_info.user_type === 'admin') ||
+      ($user_allowed_langs.isSuccess && $user_allowed_langs.data.includes('English')))
+);
