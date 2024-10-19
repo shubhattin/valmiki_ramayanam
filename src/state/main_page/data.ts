@@ -16,6 +16,7 @@ import {
   trans_lang,
   view_translation_status
 } from './main_state';
+import { user_allowed_langs, user_info } from './user';
 
 export { rAmAyaNam_map };
 export const QUERY_KEYS = {
@@ -137,3 +138,11 @@ export async function get_translations(kanda: number, sarga: number, lang: strin
   }
   return data_map;
 }
+
+export let english_edit_status = derived(
+  [trans_lang, user_info, user_allowed_langs],
+  ([$trans_lang, $user_info, $user_allowed_langs]) =>
+    $trans_lang === '--' &&
+    (($user_info && $user_info.user_type === 'admin') ||
+      ($user_allowed_langs.isSuccess && $user_allowed_langs.data.includes('English')))
+);

@@ -12,7 +12,7 @@
     trans_lang,
     view_translation_status
   } from '~/state/main_page/main_state';
-  import { trans_en_data, trans_lang_data } from '~/state/main_page/data';
+  import { trans_en_data, trans_lang_data, english_edit_status } from '~/state/main_page/data';
   import { slide } from 'svelte/transition';
   import Icon from '~/tools/Icon.svelte';
   import { RiSystemAddLargeLine } from 'svelte-icons-pack/ri';
@@ -37,7 +37,7 @@
     if (!$added_translations_indexes.includes(trans_index))
       $edited_translations_indexes.add(trans_index);
     let callback_function_called_from_lipi_lekhika = false;
-    if ($edit_language_typer_status)
+    if ($edit_language_typer_status && !$english_edit_status)
       LipiLekhikA.mukhya(
         e.target,
         // @ts-ignore
@@ -71,25 +71,49 @@
       </div>
     {/each}
   </div>
-  {#if $view_translation_status && $trans_en_data.isSuccess && $trans_en_data.data.size !== 0}
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
-    <div
-      on:dblclick={() =>
-        copy_text(get_possibily_not_undefined($trans_en_data.data.get(trans_index)))}
-      class="text-stone-500 dark:text-slate-400"
-      style:font-size={`${en_trans_text_font_info.size}rem`}
-      style:font-family={en_trans_text_font_info.family}
-    >
-      {#if $trans_en_data.data.has(trans_index)}
-        <!-- Usually translations are single but still... -->
-        {#each get_possibily_not_undefined($trans_en_data.data.get(trans_index)).split('\n') as line_trans}
-          <div>{line_trans}</div>
-        {/each}
-      {/if}
-    </div>
+  {#if $view_translation_status && $trans_en_data.isSuccess}
+    {#if $editing_status_on && $english_edit_status}
+      <div transition:slide>
+        {#if !$trans_en_data.data?.has(trans_index)}
+          <button
+            on:click={async () => {
+              await update_trans_lang_data(trans_index, '');
+              $added_translations_indexes.push(trans_index);
+            }}
+            class="btn m-0 rounded-md bg-surface-500 px-1 py-0 font-bold text-white dark:bg-surface-500"
+          >
+            <Icon src={RiSystemAddLargeLine} />
+          </button>
+        {:else}
+          <textarea
+            on:input={input_func}
+            class="textarea h-16 w-full"
+            value={$trans_en_data.data?.get(trans_index)}
+            style:font-size={`${en_trans_text_font_info.size}rem`}
+            style:font-family={en_trans_text_font_info.family}
+          ></textarea>
+        {/if}
+      </div>
+    {:else if $trans_en_data.data.size !== 0}
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <div
+        on:dblclick={() =>
+          copy_text(get_possibily_not_undefined($trans_en_data.data.get(trans_index)))}
+        class="text-stone-500 dark:text-slate-400"
+        style:font-size={`${en_trans_text_font_info.size}rem`}
+        style:font-family={en_trans_text_font_info.family}
+      >
+        {#if $trans_en_data.data.has(trans_index)}
+          <!-- Usually translations are single but still... -->
+          {#each get_possibily_not_undefined($trans_en_data.data.get(trans_index)).split('\n') as line_trans}
+            <div>{line_trans}</div>
+          {/each}
+        {/if}
+      </div>
+    {/if}
   {/if}
   {#if $view_translation_status && $trans_lang_data.isSuccess}
-    {#if $editing_status_on}
+    {#if $editing_status_on && !$english_edit_status}
       <div transition:slide>
         {#if !$trans_lang_data.data?.has(trans_index)}
           <button
