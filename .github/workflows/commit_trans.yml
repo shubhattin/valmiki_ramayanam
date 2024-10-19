@@ -1,0 +1,32 @@
+name: Commit Translation to Main Repo
+
+on:
+  schedule:
+    - cron: '0 0 1,16 * *' # Run every 15days at midnight(UTC)
+  workflow_dispatch: # Allows manual triggering of the workflow
+
+permissions:
+  contents: write
+
+jobs:
+  commit_changes:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Update test.txt
+        run: |
+          echo "good"
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit and Push Changes
+        run: |
+          git add .
+          git commit -m "Updating Translation Files from Database" || echo "No changes to commit"
+          git push
+        continue-on-error: true
