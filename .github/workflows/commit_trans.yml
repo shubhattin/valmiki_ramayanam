@@ -12,12 +12,29 @@ jobs:
   commit_changes:
     runs-on: ubuntu-latest
 
+    env:
+      PG_DATABASE_URL: ${{ secrets.PG_DATABASE_URL }}
+      BACKUP_ENCRYPTION_KEY: ${{ secrets.BACKUP_ENCRYPTION_KEY }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Update test.txt
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 8
+          run_install: true
+      - name: Setup PostgreSQL
+        uses: tj-actions/install-postgresql@v3
+        with:
+          postgresql-version: 16
+      - name: Load Translations
         run: |
-          echo "good"
+          cd src/db/scripts/
+          npx tsx backup_db_data.ts --only-trans
 
       - name: Configure Git
         run: |
