@@ -24,26 +24,6 @@ const get_translation_data = async () => {
     }
   }
 
-  // load local english translations
-  for (let kANDa_info of ramAyaNa_map) {
-    for (let sarga_info of kANDa_info.sarga_data) {
-      const trans_file = `./data/ramayan/trans_en/${kANDa_info.index}/${sarga_info.index}.yaml`;
-      // create_if_not_exist(kANDa_info.index - 1, sarga_info.index - 1, 'English');
-      if (fs.existsSync(trans_file)) {
-        if (!data[kANDa_info.index - 1][sarga_info.index - 1].has('English'))
-          data[kANDa_info.index - 1][sarga_info.index - 1].set('English', new Map());
-        const trans_data = js_yaml.load(fs.readFileSync(trans_file, 'utf8')) as Record<
-          number,
-          string
-        >;
-        for (let shloka_num in trans_data) {
-          data[kANDa_info.index - 1][sarga_info.index - 1]
-            .get('English')!
-            .set(parseInt(shloka_num), trans_data[shloka_num]);
-        }
-      }
-    }
-  }
   // loading other translations  from backup file
   if (fs.existsSync('./src/db/scripts/backup/translations.json')) {
     const input: {

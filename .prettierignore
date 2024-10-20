@@ -14,6 +14,7 @@ data/ramayan/raw_data
 data/ramayan/out
 data/ramayan/text_data
 data/ramayan/zipped
+data/ramayan/translations/
 data/ramayan/ramayan_map.json
 
 src/db/scripts/out/
