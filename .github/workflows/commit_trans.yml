@@ -44,9 +44,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Commit and Push Changes
-        run: |
-          git add .
-          git commit -m "Updating Translation Files from Database" || echo "No changes to commit"
-          git push
-        continue-on-error: true
+      # - name: Commit and Push Changes
+      #   run: |
+      #     git add .
+      #     git commit -m "Updating Translation Files from Database" || echo "No changes to commit"
+      #     git push
+      #   continue-on-error: true
