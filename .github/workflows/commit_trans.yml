@@ -14,7 +14,6 @@ jobs:
 
     env:
       PG_DATABASE_URL: ${{ secrets.PG_DATABASE_URL }}
-      BACKUP_ENCRYPTION_KEY: ${{ secrets.BACKUP_ENCRYPTION_KEY }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
