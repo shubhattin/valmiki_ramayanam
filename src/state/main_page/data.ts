@@ -78,8 +78,8 @@ export async function get_sarga_data(kANDa_num: number, sarga_num: number) {
 }
 // Translations
 export const trans_en_data = get_derived_query(
-  [kANDa_selected, sarga_selected, view_translation_status],
-  ([$kANDa_selected, $sarga_selected, $view_translation_status]) =>
+  [kANDa_selected, sarga_selected, view_translation_status, editing_status_on],
+  ([$kANDa_selected, $sarga_selected, $view_translation_status, $editing_status_on]) =>
     createQuery(
       {
         queryKey: QUERY_KEYS.trans_lang_data('English', $kANDa_selected, $sarga_selected),
@@ -87,6 +87,12 @@ export const trans_en_data = get_derived_query(
         // so we dont have to manually invalidate it if were only sarga,trans,English
         enabled:
           browser && $view_translation_status && $kANDa_selected !== 0 && $sarga_selected !== 0,
+        ...($editing_status_on
+          ? {
+              staleTime: Infinity
+              // while editing the data should not go stale, else it would refetch lead to data loss
+            }
+          : {}),
         queryFn: () => get_translations($kANDa_selected, $sarga_selected, 'English')
       },
       queryClient

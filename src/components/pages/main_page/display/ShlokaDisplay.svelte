@@ -106,7 +106,7 @@
         {#if $trans_en_data.data.has(trans_index)}
           <!-- Usually translations are single but still... -->
           {#each get_possibily_not_undefined($trans_en_data.data.get(trans_index)).split('\n') as line_trans}
-            <div>{line_trans}</div>
+            <div>{line_trans !== '' ? line_trans : '\u200c'}</div>
           {/each}
         {/if}
       </div>
@@ -148,7 +148,7 @@
           <!-- Usually translations are single but still... -->
           {#each get_possibily_not_undefined($trans_lang_data.data?.get(trans_index)).split('\n') as line_trans}
             <div>
-              {line_trans}
+              {line_trans !== '' ? line_trans : '\u200c'}
             </div>
           {/each}
         {/if}
