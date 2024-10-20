@@ -93,7 +93,7 @@
   });
   const cancel_edit_func = () => {
     if ($edited_translations_indexes.size + $added_translations_indexes.length === 0) {
-      // $cancel_edit_data.mutate();
+      $cancel_edit_data.mutate();
       return;
     }
     const added_indexes = $added_translations_indexes.map((index) => index);
