@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import { z } from 'zod';
 import { dbClient_ext as db, queryClient } from '~/db/scripts/client';
 import { execSync } from 'child_process';
+import { json2csv } from 'json-2-csv';
 
 const OUT_FOLDER = './backup';
 
@@ -25,6 +26,8 @@ async function main() {
   };
   const JSON_TRANS_DATA_FILE = `${OUT_FOLDER}/translations.json`;
   fs.writeFileSync(JSON_TRANS_DATA_FILE, JSON.stringify(trans_data, null, 2));
+  const csv = json2csv(trans_data.translations);
+  fs.writeFileSync(`${OUT_FOLDER}/translations.csv`, csv);
 
   if (!process.argv.slice(2).includes('--only-trans')) {
     // Encrypting User Data
