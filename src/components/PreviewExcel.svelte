@@ -9,12 +9,16 @@
   import { get_text_font_class } from '~/tools/font_tools';
   import type { script_and_lang_list_type } from '~/tools/lang_list';
 
-  export let file_link: string;
-  export let workbook: Workbook;
-  export let file_name: string;
-  export let file_preview_opened: Writable<boolean>;
+  type Props = {
+    file_link: string;
+    workbook: Workbook;
+    file_name: string;
+    file_preview_opened: Writable<boolean>;
+  };
 
-  let sheet_number = 0;
+  let { file_link, workbook, file_name, file_preview_opened }: Props = $props();
+
+  let sheet_number = $state(0);
 
   const get_lang_code_of_columnn = (worksheet: Worksheet, column_i: number) => {
     const lang = normalize_lang_code(
@@ -23,7 +27,7 @@
     return lang || '';
   };
 
-  let overflow_behavior = 'hidden';
+  let overflow_behavior: 'hidden' | 'scroll' = $state('hidden');
 </script>
 
 <div>
@@ -55,7 +59,7 @@
           <span class="font-bold">{worksheet.name}</span>
         </Tab>
       {/each}
-      <div slot="panel" class="overflow-scroll">
+      <div class="overflow-scroll" slot="panel">
         {@const worksheet = workbook.worksheets[sheet_number]}
         <table class="table table-hover table-compact table-cell-fit">
           <thead>
