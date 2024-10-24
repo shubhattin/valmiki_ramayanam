@@ -1,37 +1,45 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { createEventDispatcher } from 'svelte';
   import { z } from 'zod';
 
-  export let zodType: any = z.string();
-  export let value: any;
-  let className: string = undefined!;
-  export let disabled = false;
-  export { className as class };
-  export let options: {
+  type Props = {
+    zodType?: any;
     value: any;
-    text: string;
-    className?: string | undefined;
-  }[];
-  export let resize = false;
-
-  const dispatch = createEventDispatcher<{
-    change: {
+    class?: string;
+    disabled?: boolean;
+    options: {
       value: any;
-      currentTarget: HTMLSelectElement;
-    };
-  }>();
+      text: string;
+      className?: string | undefined;
+    }[];
+    resize?: boolean;
+    onchange?: (
+      e: Event & {
+        currentTarget: EventTarget & HTMLSelectElement;
+      }
+    ) => void;
+  };
 
-  let width = 0;
-  let mounted = false;
+  let {
+    zodType = z.string(),
+    value = $bindable(),
+    class: className = undefined!,
+    disabled = false,
+    options,
+    resize = false,
+    onchange
+  }: Props = $props();
+
+  let width = $state(0);
+  let mounted = $state(false);
   onMount(() => {
-    if (resize) width = resize_select(elm);
+    if (resize && elm) width = resize_select(elm);
     mounted = true;
   });
 
-  let elm: HTMLSelectElement;
+  let elm = $state<HTMLSelectElement>();
 
-  const on_change = (
+  const on_change_func = (
     e: Event & {
       currentTarget: EventTarget & HTMLSelectElement;
     }
@@ -39,7 +47,7 @@
     const { currentTarget } = e;
     if (resize) width = resize_select(currentTarget);
     value = zodType.parse(currentTarget.value);
-    dispatch('change', { value, currentTarget });
+    onchange && onchange(e);
   };
 
   const replace_all = (str: string, replaceWhat: string, replaceTo: string) => {
@@ -66,7 +74,7 @@
 <select
   bind:this={elm}
   {disabled}
-  on:change={on_change}
+  onchange={on_change_func}
   class={className}
   style:width={resize && mounted ? `${width}px` : null}
 >
