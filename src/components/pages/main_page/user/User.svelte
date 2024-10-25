@@ -158,7 +158,7 @@
         onclick={() => {
           $user_create_modal_status = true;
           setTimeout(() => {
-            $user_input_elmnt_login.focus();
+            $name_input_elmnt_new_user.focus();
           }, 500);
         }}
         class="group flex w-full space-x-2 rounded-md px-2 py-1 font-bold hover:bg-gray-200 dark:hover:bg-gray-700"
@@ -175,9 +175,9 @@
 <Modal bind:modal_open={$pass_enterer_status}>
   <div class="p-2">
     <Authenticate
-      is_verified={writable(false)}
+      is_verified={false}
       show_always={true}
-      user_input_element={user_input_elmnt_login}
+      bind:user_input_element={$user_input_elmnt_login}
       on_verify={(verified) => {
         if (verified) {
           $pass_enterer_status = false;
@@ -190,7 +190,7 @@
 <Modal bind:modal_open={$user_create_modal_status} close_on_click_outside={false}>
   <div class="p-2">
     <NewUser
-      name_input_element={name_input_elmnt_new_user}
+      bind:name_input_element={$name_input_elmnt_new_user}
       on_verify={() => {
         $user_create_modal_status = false;
       }}

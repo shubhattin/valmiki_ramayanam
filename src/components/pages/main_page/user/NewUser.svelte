@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { Writable } from 'svelte/store';
   import { cl_join } from '~/tools/cl_join';
   import { LuUserPlus } from 'svelte-icons-pack/lu';
   import Icon from '~/tools/Icon.svelte';
@@ -8,10 +7,10 @@
 
   interface Props {
     on_verify?: () => void;
-    name_input_element: Writable<HTMLInputElement>;
+    name_input_element: HTMLInputElement;
   }
 
-  let { on_verify = null!, name_input_element }: Props = $props();
+  let { on_verify = null!, name_input_element = $bindable() }: Props = $props();
   let username_input_element: HTMLInputElement = $state(null!);
   let email_input_element: HTMLInputElement = $state(null!);
 
@@ -88,7 +87,7 @@
         name="name"
         type="text"
         bind:value={name}
-        bind:this={$name_input_element}
+        bind:this={name_input_element}
         minlength={4}
         maxlength={50}
         required
