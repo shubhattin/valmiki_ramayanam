@@ -69,7 +69,6 @@
 
   $effect(() => {
     if ($image_kANDa && untrack(() => mounted)) {
-      // ^ accessing writable's value without $ wont trigger it on change
       $image_sarga = 1;
       $image_shloka = 1;
     }
