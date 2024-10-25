@@ -56,8 +56,8 @@
   };
 
   $: $additional_prompt_info =
-    `The Shloka will be from Sarga ${sarga_info.index} named ${sarga_info.name_normal}, Kanda ${kANDa_info.index} ` +
-    `named ${kANDa_info.name_normal} from Ancient Indian Epic(itihAsa) vAlmIkIrAmAyaNam.`;
+    `This Shloka is from Chapter ${sarga_info.index} named ${sarga_info.name_normal}, which is from Book ${kANDa_info.index} ` +
+    `named ${kANDa_info.name_normal} from Ramayan, the ancient Indian Epic.`;
   $: base_prompts[0].content = $base_user_prompt + $additional_prompt_info;
 
   $: !$trans_en_data.isFetching &&
