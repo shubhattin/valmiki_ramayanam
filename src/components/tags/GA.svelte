@@ -1,14 +1,14 @@
 <script lang="ts">
   const ID: string = import.meta.env.VITE_GA_ID;
 
-  let html = `
+  let html = $state(`
         window.dataLayer = window.dataLayer || [];
         function gtag() {
           dataLayer.push(arguments);
         }
         gtag('js', new Date());
         gtag('config', '${ID}');
-      `;
+      `);
 </script>
 
 <svelte:head>

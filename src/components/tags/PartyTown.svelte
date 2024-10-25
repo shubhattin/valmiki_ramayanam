@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { partytownSnippet } from '@builder.io/partytown/integration';
 
-  let scriptEl;
+  let scriptEl = $state();
   onMount(() => {
     if (scriptEl) {
       scriptEl.textContent = partytownSnippet();

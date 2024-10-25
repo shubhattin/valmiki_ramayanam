@@ -24,23 +24,23 @@
 
   export const modalStore = getModalStore();
 
-  let file_download_links: string[] = [];
-  let file_workbooks: Workbook[] = [];
-  let file_list: FileList;
+  let file_download_links: string[] = $state([]);
+  let file_workbooks: Workbook[] = $state([]);
+  let file_list: FileList = $state(null!);
   // let file_list = [{ name: 'vAlamIki.xlsx' }, { name: 'nArada.xlxs' }]; // @warn
 
   // default options
-  let lang_row_index = 1;
-  let text_col_index = 2;
-  let text_row_start_index = 2;
-  let base_lang_code = 'Sanskrit';
-  let file_name_prefix = '';
-  let file_name_postfix = '_transliterated';
+  let lang_row_index = $state(1);
+  let text_col_index = $state(2);
+  let text_row_start_index = $state(2);
+  let base_lang_code = $state('Sanskrit');
+  let file_name_prefix = $state('');
+  let file_name_postfix = $state('_transliterated');
 
-  let file_preview_opened = writable(false);
-  let current_workbook: Workbook;
-  let current_file_preview_link: string;
-  let current_file_name: string;
+  let file_preview_opened = $state(false);
+  let current_workbook: Workbook = $state(null!);
+  let current_file_preview_link = $state('');
+  let current_file_name = $state('');
 
   const excel_transliteration = createMutation({
     mutationKey: ['excel', 'start_transliteration'],
@@ -55,7 +55,7 @@
       response: (resp: boolean) => {
         if (!resp) return;
         file_list = null!;
-        $file_preview_opened = false;
+        file_preview_opened = false;
         current_workbook = null!;
         current_file_name = null!;
         current_file_preview_link = null!;
@@ -151,11 +151,13 @@
     <Accordion>
       <!-- @warn -->
       <AccordionItem open={false}>
-        <svelte:fragment slot="lead"><Icon src={IoOptions} class="text-3xl" /></svelte:fragment>
-        <svelte:fragment slot="summary"
-          ><span class="font-bold">Change Default Options</span></svelte:fragment
-        >
-        <svelte:fragment slot="content">
+        {#snippet lead()}
+          <Icon src={IoOptions} class="text-3xl" />
+        {/snippet}
+        {#snippet summary()}
+          <span class="font-bold">Change Default Options</span>
+        {/snippet}
+        {#snippet content()}
           <label class="block space-x-2">
             <span>Language Row Number</span>
             <input type="number" bind:value={lang_row_index} class="input w-16 rounded-lg" />
@@ -187,10 +189,10 @@
               {/each}
             </select>
           </label>
-        </svelte:fragment>
+        {/snippet}
       </AccordionItem>
     </Accordion>
-    <button class="variant-filled-error btn flex" on:click={clear_file_list}>
+    <button class="variant-filled-error btn flex" onclick={clear_file_list}>
       <Icon src={AiOutlineDelete} class="mr-1 text-2xl" />
       Clear File List
     </button>
@@ -213,7 +215,7 @@
                 <button
                   class="btn m-0 p-0"
                   disabled={$excel_transliteration.isPending}
-                  on:click={() => download_file(file_index)}
+                  onclick={() => download_file(file_index)}
                   ><Icon
                     src={BiSolidDownload}
                     class="text-xl hover:text-gray-500 active:text-green-600 dark:hover:text-gray-400"
@@ -222,11 +224,11 @@
                 <button
                   class="btn m-0 p-0"
                   disabled={$excel_transliteration.isPending}
-                  on:click={() => {
+                  onclick={() => {
                     current_workbook = file_workbooks[file_index];
                     current_file_preview_link = file_download_links[file_index];
                     current_file_name = get_file_name_with_prefix_postfix(file.name);
-                    $file_preview_opened = true;
+                    file_preview_opened = true;
                   }}
                   ><Icon
                     src={VscPreview}
@@ -242,17 +244,17 @@
     </ul>
 
     <button
-      on:click={() => $excel_transliteration.mutate()}
+      onclick={() => $excel_transliteration.mutate()}
       disabled={$excel_transliteration.isPending}
       class="variant-outline-success btn flex font-bold text-green-700 dark:text-white"
     >
       <Icon src={VscDebugStart} class="mr-1 text-2xl" />
       Start Transliteration
     </button>
-    {#if $file_preview_opened}
+    {#if file_preview_opened}
       <PreviewExcel
         workbook={current_workbook}
-        {file_preview_opened}
+        bind:file_preview_opened
         file_name={current_file_name}
         file_link={current_file_preview_link}
       />

@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
   import * as fabric from 'fabric';
   import {
-    canvas,
+    canvas as canvas_obj,
     background_image,
     scaling_factor,
     get_units,
@@ -20,7 +20,6 @@
     main_text_font_configs,
     normal_text_font_config
   } from './state';
-  import { get, writable } from 'svelte/store';
   import {
     sarga_selected,
     kANDa_selected,
@@ -39,7 +38,7 @@
   import { render_all_texts } from './render_text';
   import ImageOptions from './ImageOptions.svelte';
 
-  let mounted = writable(false);
+  let mounted = $state(false);
 
   // in our case we dont need to initialize inside of onMount
   $image_kANDa = $kANDa_selected;
@@ -54,31 +53,41 @@
       window.removeEventListener('resize', update_scaling_factor);
     };
     paint_init_convas().then(() => {
-      $mounted = true;
+      mounted = true;
     });
     return unsub_func;
   });
 
-  let kANDa_names: string[] = [];
-  $: get_kANDa_names($image_script).then((names) => (kANDa_names = names));
-  let sarga_names: string[] = [];
-  $: get_sarga_names($image_kANDa, $image_script).then((names) => (sarga_names = names));
+  let kANDa_names: string[] = $state([]);
+  $effect(() => {
+    get_kANDa_names($image_script).then((names) => (kANDa_names = names));
+  });
+  let sarga_names: string[] = $state([]);
+  $effect(() => {
+    get_sarga_names($image_kANDa, $image_script).then((names) => (sarga_names = names));
+  });
 
-  $: if ($image_kANDa && get(mounted)) {
-    // ^ accessing writable's value without $ wont trigger it on change
-    $image_sarga = 1;
-    $image_shloka = 1;
-  }
-  $: $image_script = get_script_for_lang($image_lang);
+  $effect(() => {
+    if ($image_kANDa && untrack(() => mounted)) {
+      // ^ accessing writable's value without $ wont trigger it on change
+      $image_sarga = 1;
+      $image_shloka = 1;
+    }
+  });
+  $effect(() => {
+    $image_script = get_script_for_lang($image_lang);
+  });
 
-  $: if ($image_sarga) {
-    $image_shloka = 1;
-    // reset after change
-  }
+  $effect(() => {
+    if ($image_sarga) {
+      $image_shloka = 1;
+      // reset after change
+    }
+  });
 
-  $: sarga_loading = $image_sarga_data.isFetching || !$image_sarga_data.isSuccess;
+  let sarga_loading = $derived($image_sarga_data.isFetching || !$image_sarga_data.isSuccess);
 
-  let canvas_element: HTMLCanvasElement;
+  let canvas_element = $state<HTMLCanvasElement>(null!);
 
   function update_scaling_factor() {
     // we can improve the method of calculating the scaling factor later on
@@ -90,7 +99,7 @@
   }
 
   const paint_init_convas = async () => {
-    $canvas = new fabric.Canvas(canvas_element, {
+    $canvas_obj = new fabric.Canvas(canvas_element, {
       width: get_units(IMAGE_DIMENSIONS[0]),
       height: get_units(IMAGE_DIMENSIONS[1]),
       backgroundColor: 'transparent'
@@ -106,16 +115,16 @@
       selection: false
     });
     // Add the image to the canvas
-    $canvas.add($background_image);
+    $canvas_obj.add($background_image);
 
-    $canvas.requestRenderAll();
+    $canvas_obj.requestRenderAll();
   };
 
   const update_canvas_dimensions = () => {
-    if (!$canvas || !mounted) return;
+    if (!$canvas_obj || !mounted) return;
     // Update canvas dimensions
-    $canvas.setWidth(get_units(IMAGE_DIMENSIONS[0]));
-    $canvas.setHeight(get_units(IMAGE_DIMENSIONS[1]));
+    $canvas_obj.setWidth(get_units(IMAGE_DIMENSIONS[0]));
+    $canvas_obj.setHeight(get_units(IMAGE_DIMENSIONS[1]));
     const prev_scaling_factor = $background_image.scaleX;
     // Scale background image
     $background_image.scaleX = $scaling_factor;
@@ -178,34 +187,46 @@
       obj.setCoords();
     };
     // Update positions and scales of text objects
-    $canvas.getObjects().forEach(scale_object);
-    $canvas.requestRenderAll();
+    $canvas_obj.getObjects().forEach(scale_object);
+    $canvas_obj.requestRenderAll();
   };
-  $: $mounted && $scaling_factor && update_canvas_dimensions();
-  $: $mounted && set_background_image_type($shaded_background_image_status);
+  $effect(() => {
+    mounted && $scaling_factor && update_canvas_dimensions();
+  });
+  $effect(() => {
+    mounted && set_background_image_type($shaded_background_image_status);
+  });
 
-  $: mounted &&
-    $image_tool_opened &&
-    setTimeout(async () => {
-      await render_all_texts(get(image_shloka), get(image_script), get(image_lang));
-    }, 600);
+  $effect(() => {
+    mounted &&
+      $image_tool_opened &&
+      setTimeout(async () => {
+        await render_all_texts(
+          untrack(() => $image_shloka),
+          untrack(() => $image_script),
+          untrack(() => $image_lang)
+        );
+      }, 600);
+  });
   // ^ This is to try to fix the issue of text not rendering after opening the image tool second time
 
-  $: mounted &&
-    !$image_sarga_data.isFetching &&
-    $image_sarga_data.isSuccess &&
-    !$image_trans_data.isFetching &&
-    $image_trans_data.isSuccess &&
-    $SPACE_ABOVE_REFERENCE_LINE &&
-    $image_sarga &&
-    $image_kANDa &&
-    $shloka_configs &&
-    $normal_text_font_config &&
-    $trans_text_font_configs &&
-    $main_text_font_configs &&
-    (async () => {
-      await render_all_texts($image_shloka, $image_script, $image_lang);
-    })();
+  $effect(() => {
+    mounted &&
+      !$image_sarga_data.isFetching &&
+      $image_sarga_data.isSuccess &&
+      !$image_trans_data.isFetching &&
+      $image_trans_data.isSuccess &&
+      $SPACE_ABOVE_REFERENCE_LINE &&
+      $image_sarga &&
+      $image_kANDa &&
+      $shloka_configs &&
+      $normal_text_font_config &&
+      $trans_text_font_configs &&
+      $main_text_font_configs &&
+      (async () => {
+        await render_all_texts($image_shloka, $image_script, $image_lang);
+      })();
+  });
 </script>
 
 <div class="space-y-2">
@@ -231,7 +252,7 @@
       <button
         class="btn m-0 p-0"
         disabled={$image_sarga === 1 || sarga_loading}
-        on:click={() => ($image_sarga -= 1)}
+        onclick={() => ($image_sarga -= 1)}
       >
         <Icon src={TiArrowBackOutline} class="-mt-1 text-lg" />
       </button>
@@ -247,7 +268,7 @@
       />
       <button
         class="btn m-0 p-0"
-        on:click={() => ($image_sarga += 1)}
+        onclick={() => ($image_sarga += 1)}
         disabled={$image_sarga === rAmAyaNam_map[$image_kANDa - 1].sarga_count || sarga_loading}
       >
         <Icon src={TiArrowForwardOutline} class="-mt-1 text-lg" />

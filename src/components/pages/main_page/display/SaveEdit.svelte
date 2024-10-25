@@ -113,7 +113,7 @@
 </script>
 
 <button
-  on:click={save_data_func}
+  onclick={save_data_func}
   in:slide
   out:scale
   disabled={$save_data.isPending}
@@ -123,7 +123,7 @@
   <span>Save</span>
 </button>
 <button
-  on:click={cancel_edit_func}
+  onclick={cancel_edit_func}
   in:slide
   out:scale
   disabled={$cancel_edit_data.isPending}

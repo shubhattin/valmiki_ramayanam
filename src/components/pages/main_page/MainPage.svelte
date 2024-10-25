@@ -1,8 +1,9 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import Icon from '~/tools/Icon.svelte';
-  import { onDestroy, onMount } from 'svelte';
+  import { onMount } from 'svelte';
   import { delay } from '~/tools/delay';
-  import { writable, type Unsubscriber } from 'svelte/store';
+  import { writable } from 'svelte/store';
   import { LANG_LIST, SCRIPT_LIST, type script_list_type } from '~/tools/lang_list';
   import LipiLekhikA, { load_parivartak_lang_data, lipi_parivartak_async } from '~/tools/converter';
   import { LanguageIcon } from '~/components/icons';
@@ -41,10 +42,9 @@
   import MetaTags from '~/components/tags/MetaTags.svelte';
   import { loadLocalConfig } from './load_local_config';
 
-  const unsubscribers: Unsubscriber[] = [];
   const query_client = useQueryClient();
 
-  let mounted = false;
+  let mounted = $state(false);
   onMount(async () => {
     if (browser) await ensure_auth_access_status();
     try {
@@ -97,14 +97,13 @@
       if (update_viewing_script_selection) $viewing_script_selection = script;
     }
   });
-  unsubscribers.push(
-    viewing_script_selection.subscribe(async (script) => {
-      $viewing_script_mut.mutate({
-        script,
-        update_viewing_script_selection: false
-      });
-    })
-  );
+  $effect(() => {
+    const _viewing_script_mut = untrack(() => $viewing_script_mut);
+    _viewing_script_mut.mutate({
+      script: $viewing_script_selection,
+      update_viewing_script_selection: false
+    });
+  });
 
   let trans_lang_selection = writable<typeof $trans_lang>('--');
   $trans_lang = $trans_lang_selection;
@@ -127,11 +126,10 @@
       query_client.invalidateQueries({ queryKey: ['sanskrit_mode_texts'] });
     }
   });
-  unsubscribers.push(
-    trans_lang_selection.subscribe(async (lang) => {
-      $trans_lang_mut.mutate(lang);
-    })
-  );
+  $effect(() => {
+    const _trans_lang_mut = untrack(() => $trans_lang_mut);
+    _trans_lang_mut.mutate($trans_lang_selection);
+  });
   // the trans_lang_mut is used to get the translation language
   // this could be removed in future in favour of a simple query
 
@@ -139,60 +137,62 @@
     return `/${kANDa}${sarga ? `/${sarga}` : ''}`;
   };
 
-  let kANDa_names = rAmAyaNam_map.map((kANDa) => kANDa.name_devanagari);
-  $: get_kANDa_names($viewing_script).then((names) => (kANDa_names = names));
-  let sarga_names =
+  let kANDa_names = $state(rAmAyaNam_map.map((kANDa) => kANDa.name_devanagari));
+  $effect(() => {
+    get_kANDa_names($viewing_script).then((names) => (kANDa_names = names));
+  });
+  let sarga_names = $state(
     $kANDa_selected !== 0
       ? rAmAyaNam_map[$kANDa_selected - 1].sarga_data.map((sarga) => sarga.name_devanagari)
-      : [];
-  $: get_sarga_names($kANDa_selected, $viewing_script).then((names) => (sarga_names = names));
-
-  unsubscribers.push(
-    sarga_selected.subscribe(async () => {
-      if ($kANDa_selected === 0 || $sarga_selected === 0) return;
-      if (!browser) return;
-      if (browser && mounted) {
-        // console.log([$kANDa_selected, $sarga_selected]);
-        goto(get_ramayanam_page_link($kANDa_selected, $sarga_selected));
-      }
-    })
+      : []
   );
-  unsubscribers.push(
-    kANDa_selected.subscribe(() => {
-      browser && mounted && ($sarga_selected = 0);
-      if (browser && mounted) {
-        if ($kANDa_selected !== 0 && $sarga_selected === 0) {
-          // console.log('kanda page', [$kANDa_selected, $sarga_selected]);
-          goto(get_ramayanam_page_link($kANDa_selected));
-        } else if (mounted && $kANDa_selected == 0 && $sarga_selected == 0) {
-          // console.log('home');
-          goto('/');
-        }
-      }
-    })
-  );
-  onDestroy(() => {
-    unsubscribers.forEach((unsub) => unsub());
+  $effect(() => {
+    get_sarga_names($kANDa_selected, $viewing_script).then((names) => (sarga_names = names));
   });
 
+  $effect(() => {
+    // only sarga_selected should be subscribed
+    const _kANDa_selected = untrack(() => $kANDa_selected);
+    if (_kANDa_selected === 0 || $sarga_selected === 0) return;
+    if (!browser) return;
+    if (browser && untrack(() => mounted)) {
+      // console.log([_kANDa_selected, $sarga_selected]);
+      goto(get_ramayanam_page_link(_kANDa_selected, $sarga_selected));
+    }
+  });
+  $effect(() => {
+    // only kANDa_selected should be subscribed
+    const _mounted = untrack(() => mounted);
+    $kANDa_selected; // seems this needs to be here for $kANDa_selected to be tracked
+    if (!browser || !_mounted) return;
+    $sarga_selected = 0;
+    const _sarga_selected = untrack(() => $sarga_selected);
+    if ($kANDa_selected !== 0 && _sarga_selected === 0) {
+      // console.log('kanda page', [$kANDa_selected, _sarga_selected]);
+      goto(get_ramayanam_page_link($kANDa_selected));
+    } else if (_mounted && $kANDa_selected == 0 && _sarga_selected == 0) {
+      // console.log('home');
+      goto('/');
+    }
+  });
   // Language Typing for Schwa Deletion
-  $: sanskrit_mode_texts = createQuery({
-    queryKey: ['sanskrit_mode_texts'],
-    enabled: browser && $editing_status_on && $trans_lang !== '--',
-    queryFn: () =>
-      Promise.all(
-        ['राम्', 'राम'].map((text) => lipi_parivartak_async(text, BASE_SCRIPT, $trans_lang))
-      ),
-    placeholderData: ['राम्', 'राम']
-  });
-  onMount(() => {
-    unsubscribers.push(
-      sanskrit_mode_texts.subscribe(({ isFetching, isSuccess }) => {
-        if (!$editing_status_on || isFetching || !isSuccess) return;
-        const lng = LipiLekhikA.k.normalize($trans_lang);
-        $sanskrit_mode = (LipiLekhikA.k.akSharAH as any)[lng].sa;
-      })
-    );
+  let sanskrit_mode_texts = $derived(
+    createQuery({
+      queryKey: ['sanskrit_mode_texts'],
+      enabled: browser && $editing_status_on && $trans_lang !== '--',
+      queryFn: () =>
+        Promise.all(
+          ['राम्', 'राम'].map((text) => lipi_parivartak_async(text, BASE_SCRIPT, $trans_lang))
+        ),
+      placeholderData: ['राम्', 'राम']
+    })
+  );
+  $effect(() => {
+    if (!$editing_status_on || $sanskrit_mode_texts.isFetching || !$sanskrit_mode_texts.isSuccess)
+      return;
+    if ($trans_lang === '--') return;
+    const lng = LipiLekhikA.k.normalize(untrack(() => $trans_lang));
+    $sanskrit_mode = (LipiLekhikA.k.akSharAH as any)[lng].sa;
   });
 
   const get_page_info = () => {
@@ -217,12 +217,12 @@
       description
     };
   };
-  let PAGE_INFO = get_page_info();
-  $: {
+  let PAGE_INFO = $state(get_page_info());
+  $effect(() => {
     $kANDa_selected;
     $sarga_selected;
     PAGE_INFO = get_page_info();
-  }
+  });
 </script>
 
 <MetaTags title={PAGE_INFO.title} description={PAGE_INFO.description} />
@@ -243,7 +243,7 @@
     </label>
     <User />
   </div>
-  <!-- svelte-ignore a11y-label-has-associated-control -->
+  <!-- svelte-ignore a11y_label_has_associated_control -->
   <label class="space-x-4">
     <span class="font-bold">Select kANDa</span>
     <Select
@@ -261,7 +261,7 @@
   </label>
   {#if $kANDa_selected !== 0}
     <div class="space-x-8">
-      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <!-- svelte-ignore a11y_label_has_associated_control -->
       <label class="inline-block space-x-4">
         <span class="font-bold">Select Sarga</span>
         <Select
@@ -289,7 +289,7 @@
     <div class="space-x-3">
       {#if $sarga_selected !== 1}
         <button
-          on:click={() => ($sarga_selected -= 1)}
+          onclick={() => ($sarga_selected -= 1)}
           in:scale
           out:slide
           disabled={$editing_status_on}
@@ -301,7 +301,7 @@
       {/if}
       {#if $sarga_selected !== kANDa.sarga_data.length}
         <button
-          on:click={() => ($sarga_selected += 1)}
+          onclick={() => ($sarga_selected += 1)}
           in:scale
           out:slide
           disabled={$editing_status_on}
@@ -314,7 +314,7 @@
       {#if !($ai_tool_opened && $user_info && $user_info.user_type === 'admin')}
         {#if !$view_translation_status}
           <button
-            on:click={() => {
+            onclick={() => {
               $view_translation_status = true;
             }}
             class="btn bg-primary-800 px-2 py-1 font-bold text-white dark:bg-primary-700"
@@ -342,7 +342,7 @@
           {#if !$editing_status_on && $user_allowed_langs.isSuccess && $user_info}
             {#if $trans_lang !== '--' && (get_possibily_not_undefined($user_info).user_type === 'admin' || $user_allowed_langs.data.indexOf($trans_lang) !== -1)}
               <button
-                on:click={() => ($editing_status_on = true)}
+                onclick={() => ($editing_status_on = true)}
                 class="btn my-1 rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white dark:bg-tertiary-600"
               >
                 <Icon src={BiEdit} class="mr-1 text-2xl" />
@@ -350,7 +350,7 @@
               </button>
             {:else if $trans_lang === '--' && (get_possibily_not_undefined($user_info).user_type === 'admin' || $user_allowed_langs.data.indexOf('English') !== -1)}
               <button
-                on:click={() => ($editing_status_on = true)}
+                onclick={() => ($editing_status_on = true)}
                 class="btn my-1 rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white dark:bg-tertiary-600"
               >
                 <Icon src={BiEdit} class="mr-1 text-2xl" />
@@ -372,7 +372,7 @@
         >
           <Icon src={BsKeyboard} class="text-4xl" />
         </SlideToggle>
-        {#if $edit_language_typer_status && $sanskrit_mode_texts.isSuccess && !$sanskrit_mode_texts.isFetching}
+        {#if $trans_lang !== '--' && $edit_language_typer_status && $sanskrit_mode_texts.isSuccess && !$sanskrit_mode_texts.isFetching}
           <select
             transition:scale
             bind:value={$sanskrit_mode}
@@ -385,7 +385,7 @@
         <button
           class="btn rounded-md p-0 text-sm"
           title={'Language Typing Assistance'}
-          on:click={() => ($typing_assistance_modal_opened = true)}
+          onclick={() => ($typing_assistance_modal_opened = true)}
         >
           <Icon src={BiHelpCircle} class="mt-1 text-3xl text-sky-500 dark:text-sky-400" />
         </button>

@@ -1,17 +1,27 @@
 <script lang="ts">
   import type { IconType } from 'svelte-icons-pack';
   import { cl_join } from './cl_join';
-  export let src: IconType;
-  export let title: string | undefined = undefined;
-  export let outerClass: string | undefined = undefined;
-  let className = '';
-  export { className as class };
-  export let viewBox: string | undefined = undefined;
-  let innerHtml: string;
-
-  $: {
-    innerHtml = (title ? `<title>${title}</title>` : '') + src.c;
+  
+  interface Props {
+    src: IconType;
+    title?: string | undefined;
+    outerClass?: string | undefined;
+    class?: string;
+    viewBox?: string | undefined;
+    children?: import('svelte').Snippet;
   }
+
+  let {
+    src,
+    title = undefined,
+    outerClass = undefined,
+    class: className = '',
+    viewBox = undefined,
+    children
+  }: Props = $props();
+  let innerHtml: string = $derived((title ? `<title>${title}</title>` : '') + src.c);
+
+  
 </script>
 
 <span class={outerClass}>
@@ -28,5 +38,5 @@
   >
     {@html innerHtml}
   </svg>
-  <slot />
+  {@render children?.()}
 </span>
