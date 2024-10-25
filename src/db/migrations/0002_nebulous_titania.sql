@@ -1,0 +1,1 @@
+ALTER TYPE "lang" ADD VALUE 'English';

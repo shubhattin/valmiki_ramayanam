@@ -8,7 +8,13 @@
     added_translations_indexes,
     edited_translations_indexes
   } from '~/state/main_page/main_state';
-  import { trans_lang_data, trans_lang_data_query_key } from '~/state/main_page/data';
+  import {
+    trans_lang_data,
+    trans_lang_data_query_key,
+    english_edit_status,
+    QUERY_KEYS,
+    trans_en_data
+  } from '~/state/main_page/data';
   import { delay } from '~/tools/delay';
   import { client } from '~/api/client';
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
@@ -29,10 +35,11 @@
       added_indexes: number[];
       edited_indexes: number[];
     }) => {
-      if (!$trans_lang_data.isSuccess) return;
+      if (!$english_edit_status ? !$trans_lang_data.isSuccess : !$trans_en_data.isSuccess) return;
       await delay(500);
-      const added_texts = added_indexes.map((index) => $trans_lang_data.data?.get(index)!);
-      const edited_texts = edited_indexes.map((index) => $trans_lang_data.data?.get(index)!);
+      const data_source = $english_edit_status ? $trans_en_data : $trans_lang_data;
+      const added_texts = added_indexes.map((index) => data_source.data?.get(index)!);
+      const edited_texts = edited_indexes.map((index) => data_source.data?.get(index)!);
       const res = await client.translations.edit_translation.mutate({
         data: {
           add_data: added_texts,
@@ -42,7 +49,7 @@
         },
         sarga_num: $sarga_selected,
         kANDa_num: $kANDa_selected,
-        lang: $trans_lang
+        lang: $trans_lang !== '--' ? $trans_lang : 'English'
       });
       if (res.success) {
         $added_translations_indexes = [];
@@ -71,9 +78,13 @@
   const cancel_edit_data = createMutation({
     mutationKey: ['sarga', 'cancel_edit_data'],
     mutationFn: async () => {
-      if (!$trans_lang_data.isSuccess) return;
+      if (!$english_edit_status ? !$trans_lang_data.isSuccess : !$trans_en_data.isSuccess) return;
       await delay(500);
-      await query_client.invalidateQueries({ queryKey: $trans_lang_data_query_key });
+      await query_client.invalidateQueries({
+        queryKey: !$english_edit_status
+          ? $trans_lang_data_query_key
+          : QUERY_KEYS.trans_lang_data('English', $kANDa_selected, $sarga_selected)
+      });
       $added_translations_indexes = [];
       $edited_translations_indexes = new Set();
       $editing_status_on = false;

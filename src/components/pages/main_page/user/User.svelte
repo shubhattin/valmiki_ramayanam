@@ -19,6 +19,8 @@
   import { user_info, user_allowed_langs } from '~/state/main_page/user';
   import { editing_status_on } from '~/state/main_page/main_state';
   import { VscAccount } from 'svelte-icons-pack/vsc';
+  import { client } from '~/api/client';
+  import { OiSync16 } from 'svelte-icons-pack/oi';
 
   const modalStore = getModalStore();
 
@@ -40,6 +42,27 @@
         if (!resp) return;
         deleteAuthCookies();
         $user_info = null;
+      }
+    };
+    modalStore.trigger(modal);
+  };
+
+  const trigger_translations_update = async () => {
+    const modal: ModalSettings = {
+      type: 'confirm',
+      title: 'Are you sure to Sync Database Translations to Main Repository ?',
+      body: 'This will commit the translations stored in the database to the main repository.',
+      response: (resp: boolean) => {
+        if (!resp) return;
+        client.translations.trigger_translations_update.mutate().then((success) => {
+          success &&
+            setTimeout(() => {
+              window.open(
+                'https://github.com/shubhattin/valmiki_ramayanam/actions/workflows/commit_trans.yml',
+                '_blank'
+              );
+            }, 1500);
+        });
       }
     };
     modalStore.trigger(modal);
@@ -102,6 +125,16 @@
             {($user_allowed_langs.data ?? []).join(', ')}
           </span>
         </div>
+      {/if}
+      {#if $user_info.user_type === 'admin'}
+        <button
+          on:click={trigger_translations_update}
+          disabled={$editing_status_on}
+          class="btn m-0 block rounded-md bg-primary-900 px-1 py-0 font-bold text-white dark:bg-primary-900"
+        >
+          <Icon src={OiSync16} class="my-1 mb-1 text-xl" />
+          <span class="text-sm">Sync Translations from DB</span>
+        </button>
       {/if}
     </div>
   {:else}

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { lipi_parivartak_async } from '~/tools/converter';
   import { type Unsubscriber } from 'svelte/store';
-  import { fade, scale, slide } from 'svelte/transition';
+  import { fade } from 'svelte/transition';
   import { cl_join } from '~/tools/cl_join';
   import { onDestroy } from 'svelte';
   import {
@@ -9,13 +9,17 @@
     BASE_SCRIPT,
     viewing_script,
     trans_lang,
-    typing_assistance_modal_opened
+    typing_assistance_modal_opened,
+    kANDa_selected,
+    sarga_selected
   } from '~/state/main_page/main_state';
   import {
+    english_edit_status,
     sarga_data,
     trans_en_data,
     trans_lang_data,
-    trans_lang_data_query_key
+    trans_lang_data_query_key,
+    QUERY_KEYS
   } from '~/state/main_page/data';
   import SaveEdit from './SaveEdit.svelte';
   import { useQueryClient } from '@tanstack/svelte-query';
@@ -42,9 +46,18 @@
   });
 
   async function update_trans_lang_data(index: number, text: string) {
-    const new_data = new Map($trans_lang_data.data);
-    new_data.set(index, text);
-    await query_client.setQueryData($trans_lang_data_query_key, new_data);
+    if (!$english_edit_status) {
+      const new_data = new Map($trans_lang_data.data);
+      new_data.set(index, text);
+      await query_client.setQueryData($trans_lang_data_query_key, new_data);
+    } else {
+      const new_data = new Map($trans_en_data.data);
+      new_data.set(index, text);
+      await query_client.setQueryData(
+        QUERY_KEYS.trans_lang_data('English', $kANDa_selected, $sarga_selected),
+        new_data
+      );
+    }
   }
   // clipboard related
   let enable_copy_to_clipbaord = true;

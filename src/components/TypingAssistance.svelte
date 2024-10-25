@@ -27,9 +27,10 @@
         eager: true,
         query: '?url'
       });
-      const url = (
-        IMAGE_URLS[`/src/tools/converter/resources/images/${typing_assistance_lang}.png`] as any
-      ).default as string;
+      const image_lang =
+        typing_assistance_lang === 'Devanagari' ? 'Sanskrit' : typing_assistance_lang;
+      const url = (IMAGE_URLS[`/src/tools/converter/resources/images/${image_lang}.png`] as any)
+        .default as string;
       const get_image_dimensiona = async (url: string) => {
         return new Promise<{ width: number; height: number }>((resolve, reject) => {
           let img = new Image();

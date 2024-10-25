@@ -1,11 +1,6 @@
 <script lang="ts">
   import { browser } from '$app/environment';
-  import {
-    get_translations,
-    sarga_data,
-    LOCALS_TRANS_LANGS,
-    rAmAyaNam_map
-  } from '~/state/main_page/data';
+  import { get_translations, sarga_data, rAmAyaNam_map } from '~/state/main_page/data';
   import {
     sarga_selected,
     kANDa_selected,
@@ -53,11 +48,6 @@
       const COLUMN_FOR_DEV = 2;
       const TEXT_START_ROW = 2;
       const translation_texts: Map<string, Map<number, string>> = new Map();
-      // load local translations
-      for (let local_lang of LOCALS_TRANS_LANGS) {
-        const trans = await get_translations($kANDa_selected, $sarga_selected, local_lang);
-        translation_texts.set(local_lang, trans);
-      }
       const shloka_count =
         rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].shloka_count_extracted;
       // loading other online databased language translations

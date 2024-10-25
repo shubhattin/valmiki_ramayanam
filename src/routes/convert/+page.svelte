@@ -147,8 +147,8 @@
     <textarea
       bind:value={$to_text}
       class="textarea h-56"
-      style:font-size={`${from_text_font_info.size}rem`}
-      style:font-family={from_text_font_info.family}
+      style:font-size={`${to_text_font_info.size}rem`}
+      style:font-family={to_text_font_info.family}
       placeholder={`Enter text in ${$to_lang}`}
       on:input={(e) => {
         if (to_text_type_enabled)

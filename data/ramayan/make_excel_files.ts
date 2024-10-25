@@ -6,11 +6,43 @@ import { z } from 'zod';
 import { exec } from 'child_process';
 import cliProgress from 'cli-progress';
 import chalk from 'chalk';
+import js_yaml from 'js-yaml';
 
 const TEMPLATE_FILE = './data/ramayan/template/excel_file_template.xlsx';
 const COLUMN_FOR_DEV = 2;
 const TEXT_START_ROW = 2;
 const OUT_FOLDER = './data/ramayan/out';
+
+const get_translation_data = async () => {
+  const data: Map<string, Map<number, string>>[][] = [];
+  // [kanda][sarga]
+
+  for (let kANDa_info of ramAyaNa_map) {
+    data.push([]); // per kanda
+    for (let sarga_info of kANDa_info.sarga_data) {
+      data[kANDa_info.index - 1].push(new Map()); // per sarga
+    }
+  }
+
+  // loading other translations  from backup file
+  if (fs.existsSync('./src/db/scripts/backup/translations.json')) {
+    const input: {
+      lang: string;
+      kANDa_num: number;
+      sarga_num: number;
+      shloka_num: number;
+      text: string;
+    }[] = JSON.parse(fs.readFileSync('./src/db/scripts/backup/translations.json', 'utf8'))[
+      'translations'
+    ] as any;
+    for (let item of input) {
+      if (!data[item.kANDa_num - 1][item.sarga_num - 1].has(item.lang))
+        data[item.kANDa_num - 1][item.sarga_num - 1].set(item.lang, new Map());
+      data[item.kANDa_num - 1][item.sarga_num - 1].get(item.lang)!.set(item.shloka_num, item.text);
+    }
+  }
+  return data;
+};
 
 async function main() {
   if (fs.existsSync(OUT_FOLDER)) {
@@ -18,6 +50,8 @@ async function main() {
   }
   fs.mkdirSync(OUT_FOLDER);
   const start_time = Date.now();
+
+  const translations = await get_translation_data();
 
   async function processSarga(
     kANDa_info: (typeof ramAyaNa_map)[0],
@@ -36,7 +70,17 @@ async function main() {
     for (let i = 0; i < json_data.length; i++) {
       worksheet.getCell(i + TEXT_START_ROW, COLUMN_FOR_DEV).value = json_data[i];
     }
-    await transliterate_xlxs_file(workbook, 'all', 1, COLUMN_FOR_DEV, TEXT_START_ROW, 'Sanskrit');
+    await transliterate_xlxs_file(
+      workbook,
+      'all',
+      1,
+      COLUMN_FOR_DEV,
+      TEXT_START_ROW,
+      'Sanskrit',
+      null,
+      translations[kANDa_info.index - 1][sarga_info.index - 1],
+      sarga_info.shloka_count_extracted
+    );
 
     // saving file to output path
     let sarga_name = sarga_info.name_normal.split('\n')[0];
@@ -67,12 +111,14 @@ async function main() {
   if (!fs.existsSync('./data/ramayan/zipped')) {
     fs.mkdirSync('./data/ramayan/zipped');
   }
-  exec(`cd ${OUT_FOLDER} && zip -r ../zipped/rAmAyaNam.zip *`, (error) => {
-    if (error) {
-      console.log(chalk.red.bold('Failed to make zip:', error.message));
-    } else {
-      console.log(chalk.green.bold('Zip file created successfully!'));
-    }
-  });
+  if (!process.argv.slice(2).includes('--no-zip')) {
+    exec(`cd ${OUT_FOLDER} && zip -r ../zipped/rAmAyaNam.zip *`, (error) => {
+      if (error) {
+        console.log(chalk.red.bold('Failed to make zip:', error.message));
+      } else {
+        console.log(chalk.green.bold('Zip file created successfully!'));
+      }
+    });
+  }
 }
 main();

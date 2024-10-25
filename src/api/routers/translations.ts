@@ -1,11 +1,13 @@
-import { t, publicProcedure, protectedProcedure } from '~/api/trpc_init';
+import { t, publicProcedure, protectedProcedure, protectedAdminProcedure } from '~/api/trpc_init';
 import { db } from '~/db/db';
 import { translations } from '~/db/schema';
 import type { lang_list_type } from '~/tools/lang_list';
 import { and, eq } from 'drizzle-orm';
 import { z } from 'zod';
+import { fetch_post } from '~/tools/fetch';
+import { env } from '$env/dynamic/private';
 
-export const get_translations_per_sarga_route = publicProcedure
+const get_translations_per_sarga_route = publicProcedure
   .input(
     z.object({
       lang: z.string(),
@@ -30,7 +32,7 @@ export const get_translations_per_sarga_route = publicProcedure
     return data;
   });
 
-export const get_all_langs_translations_per_sarga_route = publicProcedure
+const get_all_langs_translations_per_sarga_route = publicProcedure
   .input(
     z.object({
       kANDa_num: z.number().int(),
@@ -49,7 +51,7 @@ export const get_all_langs_translations_per_sarga_route = publicProcedure
     return data;
   });
 
-export const edit_translation_route = protectedProcedure
+const edit_translation_route = protectedProcedure
   .input(
     z.object({
       lang: z.string(),
@@ -125,8 +127,27 @@ export const edit_translation_route = protectedProcedure
     }
   );
 
+const trigger_translations_update_route = protectedAdminProcedure.mutation(async () => {
+  const owner = 'shubhattin';
+  const repo = 'valmiki_ramayanam';
+  const workflow_id = 'commit_trans.yml';
+  const req = await fetch_post(
+    `https://api.github.com/repos/${owner}/${repo}/actions/workflows/${workflow_id}/dispatches`,
+    {
+      headers: {
+        Authorization: `Bearer ${env.GITHUB_API_KEY}`
+      },
+      json: {
+        ref: 'main'
+      }
+    }
+  );
+  return req.ok;
+});
+
 export const translations_router = t.router({
   get_translations_per_sarga: get_translations_per_sarga_route,
   edit_translation: edit_translation_route,
-  get_all_langs_translations_per_sarga: get_all_langs_translations_per_sarga_route
+  get_all_langs_translations_per_sarga: get_all_langs_translations_per_sarga_route,
+  trigger_translations_update: trigger_translations_update_route
 });
