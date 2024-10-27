@@ -92,6 +92,10 @@ const MAIN_FONT_CONFIG = {
     font: 'ADOBE_DEVANAGARI',
     size: 1.45
   },
+  Telugu: {
+    font: 'ADOBE_TELUGU',
+    size: 1.3
+  },
   English: {
     font: 'ROBOTO'
   },
