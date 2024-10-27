@@ -190,23 +190,23 @@
     $canvas_obj.requestRenderAll();
   };
   $effect(() => {
-    mounted && $scaling_factor && update_canvas_dimensions();
+    if (mounted && $scaling_factor) untrack(() => update_canvas_dimensions());
   });
   $effect(() => {
-    mounted && set_background_image_type($shaded_background_image_status);
+    if (mounted) untrack(() => set_background_image_type($shaded_background_image_status));
   });
 
-  $effect(() => {
-    mounted &&
-      $image_tool_opened &&
-      setTimeout(async () => {
-        await render_all_texts(
-          untrack(() => $image_shloka),
-          untrack(() => $image_script),
-          untrack(() => $image_lang)
-        );
-      }, 600);
-  });
+  // $effect(() => {
+  // mounted &&
+  //   $image_tool_opened &&
+  //   setTimeout(async () => {
+  //     await render_all_texts(
+  //       untrack(() => $image_shloka),
+  //       untrack(() => $image_script),
+  //       untrack(() => $image_lang)
+  //     );
+  //   }, 600);
+  // });
   // ^ This is to try to fix the issue of text not rendering after opening the image tool second time
 
   $effect(() => {
