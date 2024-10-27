@@ -162,9 +162,9 @@ export const SHLOKA_FONT_CONFIG = {
     text_for_min_line_height: 'qypgj'
   },
   Telugu: {
-    font: 'NIRMALA_UI',
-    size: 0.8,
-    space_between_main_and_normal: 8,
+    font: 'ADOBE_TELUGU',
+    size: 1.2,
+    space_between_main_and_normal: 6,
     text_for_min_line_height: 'వై'
   }
 } as image_font_config_type;
@@ -186,9 +186,8 @@ export const TRANS_FONT_CONFIG = {
     text_for_min_line_height: 'qypgj'
   },
   Telugu: {
-    font: 'ADOBE_TELUGU',
     size: 1.3,
-    text_for_min_line_height: 'వై'
+    new_line_spacing: 0.35
   }
 } as image_font_config_type;
 
@@ -224,6 +223,7 @@ export const get_image_font_info = (
     if (image_main_conf.text_for_min_line_height)
       text_for_min_height = image_main_conf.text_for_min_line_height;
   }
+
   return {
     family,
     key,
