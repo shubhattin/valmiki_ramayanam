@@ -20,13 +20,13 @@
   let from_text = writable('');
   let to_text = writable('');
 
-  let from_text_type_enabled = true;
-  let to_text_type_enabled = true;
+  let from_text_type_enabled = $state(true);
+  let to_text_type_enabled = $state(true);
 
-  $: {
+  $effect(() => {
     load_parivartak_lang_data($from_lang);
     load_parivartak_lang_data($to_lang);
-  }
+  });
 
   async function convert_text(
     source_text: string,
@@ -48,8 +48,8 @@
 
   let typing_assistance_modal_opened = writable(false);
 
-  $: from_text_font_info = get_font_family_and_size($from_lang);
-  $: to_text_font_info = get_font_family_and_size($to_lang);
+  let from_text_font_info = $derived(get_font_family_and_size($from_lang));
+  let to_text_font_info = $derived(get_font_family_and_size($to_lang));
 </script>
 
 <MetaTags title={PAGE_INFO.title} description={PAGE_INFO.description} />
@@ -65,7 +65,7 @@
       <button
         title="Copy Text"
         class="btn m-0 select-none p-0 outline-none dark:hover:text-gray-400"
-        on:click={() => copy_text_to_clipboard($from_text)}
+        onclick={() => copy_text_to_clipboard($from_text)}
       >
         <Icon src={OiCopy16} class="text-xl" />
       </button>
@@ -85,7 +85,7 @@
       bind:value={$from_text}
       style:font-size={`${from_text_font_info.size}rem`}
       style:font-family={from_text_font_info.family}
-      on:input={(e) => {
+      oninput={(e) => {
         if (from_text_type_enabled)
           // @ts-ignore
           LipiLekhikA.mukhya(e.target, e.data, $from_lang, true, (val) => {
@@ -98,7 +98,7 @@
   <div class="my-3 flex justify-center space-x-3">
     <button
       class="btn m-0 p-0"
-      on:click={() => convert_text($to_text, from_text, $to_lang, $from_lang)}
+      onclick={() => convert_text($to_text, from_text, $to_lang, $from_lang)}
       ><Icon
         src={FaCircleUp}
         class="text-3xl hover:text-gray-500 dark:hover:text-gray-400"
@@ -106,7 +106,7 @@
     >
     <button
       class="btn m-0 p-0"
-      on:click={() => convert_text($from_text, to_text, $from_lang, $to_lang)}
+      onclick={() => convert_text($from_text, to_text, $from_lang, $to_lang)}
       ><Icon
         src={FaCircleDown}
         class="text-3xl hover:text-gray-500 dark:hover:text-gray-400"
@@ -115,7 +115,7 @@
     <button
       class="btn rounded-md p-0 text-sm"
       title={'Language Typing Assistance'}
-      on:click={() => ($typing_assistance_modal_opened = true)}
+      onclick={() => ($typing_assistance_modal_opened = true)}
     >
       <Icon src={BiHelpCircle} class="text-4xl text-sky-500 dark:text-sky-400" />
     </button>
@@ -130,7 +130,7 @@
       <button
         title="Copy Text"
         class="btn m-0 select-none p-0 outline-none dark:hover:text-gray-400"
-        on:click={() => copy_text_to_clipboard($to_text)}
+        onclick={() => copy_text_to_clipboard($to_text)}
       >
         <Icon src={OiCopy16} class="text-xl" />
       </button>
@@ -150,7 +150,7 @@
       style:font-size={`${to_text_font_info.size}rem`}
       style:font-family={to_text_font_info.family}
       placeholder={`Enter text in ${$to_lang}`}
-      on:input={(e) => {
+      oninput={(e) => {
         if (to_text_type_enabled)
           // @ts-ignore
           LipiLekhikA.mukhya(e.target, e.data, $to_lang, true, (val) => {
@@ -161,4 +161,7 @@
     ></textarea>
   </div>
 </div>
-<TypingAssistance modal_opended={typing_assistance_modal_opened} sync_lang_script={from_lang} />
+<TypingAssistance
+  bind:modal_opened={$typing_assistance_modal_opened}
+  sync_lang_script={$from_lang}
+/>

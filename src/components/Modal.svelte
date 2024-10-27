@@ -1,24 +1,39 @@
 <script lang="ts">
   import { cl_join } from '~/tools/cl_join';
-  import { onDestroy, onMount } from 'svelte';
-  import { type Writable } from 'svelte/store';
-  import { scale, slide, fly } from 'svelte/transition';
+  import { onMount } from 'svelte';
+  import { scale, slide } from 'svelte/transition';
   import { AiOutlineClose } from 'svelte-icons-pack/ai';
   import Icon from '~/tools/Icon.svelte';
+  import { untrack } from 'svelte';
 
-  let className: string | null = null!;
-  export { className as class };
-  export let outterClass: string | null = null!;
-  export let modal_open: Writable<boolean>;
-  export let cancel_btn_txt: string | null = null!;
-  export let confirm_btn_txt: string | null = null!;
-  export let onOpen: () => void = null!;
-  export let onClose: () => void = null!;
-  export let onConfirm: () => void = null!;
-  export let close_on_click_outside = true;
+  interface Props {
+    class?: string | null;
+    outterClass?: string | null;
+    modal_open: boolean;
+    cancel_btn_txt?: string | null;
+    confirm_btn_txt?: string | null;
+    onOpen?: () => void;
+    onClose?: () => void;
+    onConfirm?: () => void;
+    close_on_click_outside?: boolean;
+    children?: import('svelte').Snippet;
+  }
 
-  let modalElement: HTMLElement;
-  let opened = false;
+  let {
+    class: className = null!,
+    outterClass = null!,
+    modal_open = $bindable(),
+    cancel_btn_txt = null!,
+    confirm_btn_txt = null!,
+    onOpen = null!,
+    onClose = null!,
+    onConfirm = null!,
+    close_on_click_outside = true,
+    children
+  }: Props = $props();
+
+  let modalElement = $state<HTMLElement>();
+  let opened = $state(false);
 
   const lockScroll = () => {
     document.body.style.overflow = 'hidden';
@@ -29,13 +44,13 @@
   };
 
   const animationDuration = 400;
-  let is_closing = false; // to fix transition not being displayed while exiting
+  let is_closing = $state(false); // to fix transition not being displayed while exiting
   let visibleModal: HTMLElement | null = null;
 
   const openModal = () => {
     if (opened) return;
     setTimeout(() => {
-      visibleModal = modalElement;
+      modalElement && (visibleModal = modalElement);
     }, animationDuration);
     opened = true;
     lockScroll();
@@ -49,7 +64,7 @@
       opened = false;
       is_closing = false;
       unlockScroll();
-      $modal_open = false;
+      modal_open = false;
       if (onClose) onClose();
     }, animationDuration);
   };
@@ -70,12 +85,10 @@
       }
     });
   });
-  const mode_open_unsubscriber = modal_open.subscribe((value) => {
-    if (value && !opened) openModal();
-    else if (!value && opened) closeModal();
-  });
-  onDestroy(() => {
-    mode_open_unsubscriber();
+  $effect(() => {
+    const _opened = untrack(() => opened);
+    if (modal_open && !_opened) openModal();
+    else if (!modal_open && _opened) closeModal();
   });
 </script>
 
@@ -99,22 +112,22 @@
         <button
           aria-label="Close"
           class="absolute cursor-pointer text-gray-500 hover:text-gray-700"
-          on:click={closeModal}><Icon src={AiOutlineClose} /></button
+          onclick={closeModal}><Icon src={AiOutlineClose} /></button
         >
       </div>
       <article class="overflow-scroll rounded-lg bg-white p-3 pt-2 shadow-lg dark:bg-gray-800">
-        <slot />
+        {@render children?.()}
         {#if cancel_btn_txt || confirm_btn_txt}
           <footer class="mt-4 flex justify-end space-x-2">
             {#if cancel_btn_txt}
-              <button class="variant-outline-error btn rounded-lg px-2.5 py-2" on:click={closeModal}
+              <button class="variant-outline-error btn rounded-lg px-2.5 py-2" onclick={closeModal}
                 >{cancel_btn_txt}</button
               >
             {/if}
             {#if confirm_btn_txt}
               <button
                 class="variant-filled-secondary btn rounded-lg px-2.5 py-2"
-                on:click={() => {
+                onclick={() => {
                   closeModal();
                   if (onConfirm) onConfirm();
                 }}>{confirm_btn_txt}</button

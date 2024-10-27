@@ -12,9 +12,17 @@
   import { main_app_bar_info } from '~/state/app_bar';
   import { PAGE_TITLES } from '~/state/page_titles';
 
-  $: page_url = $page.url.pathname;
+  type Props = {
+    start?: import('svelte').Snippet;
+    headline?: import('svelte').Snippet;
+    end?: import('svelte').Snippet;
+  };
 
-  $: {
+  let { start, headline, end }: Props = $props();
+
+  let page_url = $derived($page.url.pathname);
+
+  $effect(() => {
     if (page_url in PAGE_TITLES) {
       const [TITLE, CLASS]: string[] = PAGE_TITLES[page_url as keyof typeof PAGE_TITLES];
       main_app_bar_info.set({
@@ -27,7 +35,7 @@
         className: null
       });
     }
-  }
+  });
 
   const app_menu_popup: PopupSettings = {
     event: 'click',
@@ -38,25 +46,25 @@
 </script>
 
 <AppBar>
-  <svelte:fragment slot="lead">
-    <slot name="start" />
+  {#snippet lead()}
+    {@render start?.()}
     <!-- {#if page_url !== '/'}
-      <a class="mr-2 text-xl" href="/" title="श्रीरामायणम्">
-        <Icon
-          src={BiArrowBack}
-          class="-mt-1 mr-1 text-2xl hover:fill-blue-600 dark:hover:fill-sky-500"
-        />
-      </a>
-    {/if} -->
-    <slot name="headline">
+        <a class="mr-2 text-xl" href="/" title="श्रीरामायणम्">
+          <Icon
+            src={BiArrowBack}
+            class="-mt-1 mr-1 text-2xl hover:fill-blue-600 dark:hover:fill-sky-500"
+          />
+        </a>
+      {/if} -->
+    {#if headline}{@render headline()}{:else}
       <span class={$main_app_bar_info.className ?? ''}>{$main_app_bar_info.title ?? ''}</span>
-    </slot>
-  </svelte:fragment>
+    {/if}
+  {/snippet}
   <!-- <svelte:fragment slot="headline">
 		<slot name="headline"><span></span></slot>
 	</svelte:fragment> -->
-  <svelte:fragment slot="trail">
-    <slot name="end"></slot>
+  {#snippet trail()}
+    {@render end?.()}
     <div class="space-x-2">
       {#if page_url !== '/convert'}
         <a class="text-xl" href="/convert" title="Lipi Parivartak">
@@ -120,5 +128,5 @@
         <ThemeChanger />
       </div>
     </div>
-  </svelte:fragment>
+  {/snippet}
 </AppBar>

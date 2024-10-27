@@ -32,13 +32,15 @@
   const query_client = useQueryClient();
   const unsubscribers: Unsubscriber[] = [];
 
-  let transliterated_sarga_data: string[] = [];
-  $: Promise.all(
-    ($sarga_data.data ?? []).map((shloka_lines) =>
-      lipi_parivartak_async(shloka_lines, BASE_SCRIPT, $viewing_script)
-    )
-  ).then((data) => {
-    transliterated_sarga_data = data;
+  let transliterated_sarga_data = $state<string[]>([]);
+  $effect(() => {
+    Promise.all(
+      ($sarga_data.data ?? []).map((shloka_lines) =>
+        lipi_parivartak_async(shloka_lines, BASE_SCRIPT, $viewing_script)
+      )
+    ).then((data) => {
+      transliterated_sarga_data = data;
+    });
   });
 
   onDestroy(() => {
@@ -61,15 +63,17 @@
   }
   // clipboard related
   let enable_copy_to_clipbaord = true;
-  let copied_text_status = false;
-  $: copied_text_status && setTimeout(() => (copied_text_status = false), 1400);
+  let copied_text_status = $state(false);
+  $effect(() => {
+    copied_text_status && setTimeout(() => (copied_text_status = false), 1400);
+  });
   const copy_text = (text: string) => {
     if (!enable_copy_to_clipbaord) return;
     copy_text_to_clipboard(text);
     copied_text_status = true;
   };
 
-  let sarga_hovered = false;
+  let sarga_hovered = $state(false);
 
   const copy_sarga = () => {
     copy_text(transliterated_sarga_data.join('\n\n'));
@@ -92,15 +96,15 @@
     <button
       transition:fade={{ duration: 150 }}
       title="Copy Sarga Text"
-      on:click={copy_sarga}
+      onclick={copy_sarga}
       class={cl_join('btn absolute right-5 top-2 z-20 select-none p-0 outline-none')}
-      on:mouseenter={() => (sarga_hovered = true)}
+      onmouseenter={() => (sarga_hovered = true)}
     >
       <Icon src={OiCopy16} class="text-lg" />
     </button>
   {/if}
 </div>
-<!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
   class={cl_join(
     'h-[85vh] overflow-scroll rounded-xl border-2 border-gray-400 p-0 dark:border-gray-600',
@@ -108,8 +112,8 @@
     $trans_lang_data.isSuccess && 'h-[95vh]',
     $editing_status_on && 'h-[100vh]'
   )}
-  on:mouseenter={() => (sarga_hovered = true)}
-  on:mouseleave={() => (sarga_hovered = false)}
+  onmouseenter={() => (sarga_hovered = true)}
+  onmouseleave={() => (sarga_hovered = false)}
 >
   {#if !$sarga_data.isFetching}
     <div transition:fade={{ duration: 250 }} class="space-y-[0.15rem]">
@@ -136,8 +140,8 @@
 {#if $typing_assistance_modal_opened}
   {#await import('~/components/TypingAssistance.svelte') then TypingAssistance}
     <TypingAssistance.default
-      sync_lang_script={trans_lang}
-      modal_opended={typing_assistance_modal_opened}
+      sync_lang_script={$trans_lang}
+      bind:modal_opened={$typing_assistance_modal_opened}
     />
   {/await}
 {/if}

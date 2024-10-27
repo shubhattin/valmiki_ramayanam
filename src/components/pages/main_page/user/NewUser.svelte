@@ -1,25 +1,29 @@
 <script lang="ts">
-  import type { Writable } from 'svelte/store';
   import { cl_join } from '~/tools/cl_join';
   import { LuUserPlus } from 'svelte-icons-pack/lu';
   import Icon from '~/tools/Icon.svelte';
   import { client_q } from '~/api/client';
   import { z } from 'zod';
-  export let on_verify: () => void = null!;
-  export let name_input_element: Writable<HTMLInputElement>;
-  let username_input_element: HTMLInputElement = null!;
-  let email_input_element: HTMLInputElement = null!;
 
-  let username: string;
-  let name: string;
-  let password: string;
-  let email: string;
-  let contact_number: string;
+  interface Props {
+    on_verify?: () => void;
+    name_input_element: HTMLInputElement;
+  }
 
-  let user_already_exists = false;
-  let email_already_exists = false;
+  let { on_verify = null!, name_input_element = $bindable() }: Props = $props();
+  let username_input_element: HTMLInputElement = $state(null!);
+  let email_input_element: HTMLInputElement = $state(null!);
 
-  let user_created_status = false;
+  let username = $state('');
+  let name = $state('');
+  let password = $state('');
+  let email = $state('');
+  let contact_number = $state('');
+
+  let user_already_exists = $state(false);
+  let email_already_exists = $state(false);
+
+  let user_created_status = $state(false);
 
   const create_new_user = client_q.auth.add_new_user.mutation({
     onSuccess(res) {
@@ -40,7 +44,8 @@
       }
     }
   });
-  const create_new_user_func = async () => {
+  const create_new_user_func = async (e: Event) => {
+    e.preventDefault();
     if (
       [username, name, password, email].some((v) => !v || v === '') ||
       !z.string().email().safeParse(email).success
@@ -67,13 +72,13 @@
     </div>
     <button
       class="variant-outline-primary btn"
-      on:click={() => {
+      onclick={() => {
         if (on_verify) on_verify();
       }}>Continue</button
     >
   </div>
 {:else}
-  <form on:submit|preventDefault={create_new_user_func} class="mt-2 space-y-2.5 text-base">
+  <form onsubmit={create_new_user_func} class="mt-2 space-y-2.5 text-base">
     <label class="space-y-1">
       <div class="space-x-3 font-bold">
         <span>Name</span>
@@ -82,7 +87,7 @@
         name="name"
         type="text"
         bind:value={name}
-        bind:this={$name_input_element}
+        bind:this={name_input_element}
         minlength={4}
         maxlength={50}
         required

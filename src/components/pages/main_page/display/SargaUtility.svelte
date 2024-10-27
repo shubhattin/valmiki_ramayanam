@@ -1,6 +1,6 @@
 <script lang="ts">
   import { browser } from '$app/environment';
-  import { get_translations, sarga_data, rAmAyaNam_map } from '~/state/main_page/data';
+  import { sarga_data, rAmAyaNam_map } from '~/state/main_page/data';
   import {
     sarga_selected,
     kANDa_selected,
@@ -21,17 +21,16 @@
   import Modal from '~/components/Modal.svelte';
   import { BiImage } from 'svelte-icons-pack/bi';
   import type { Workbook } from 'exceljs';
-  import { writable } from 'svelte/store';
   import { TrOutlineFileTypeTxt } from 'svelte-icons-pack/tr';
   import { download_file_in_browser } from '~/tools/download_file_browser';
   import { lipi_parivartak_async } from '~/tools/converter';
   import { user_info } from '~/state/main_page/user';
   import { RiUserFacesRobot2Line } from 'svelte-icons-pack/ri';
 
-  let current_workbook: Workbook;
-  let current_file_name: string;
-  let current_dowbload_link: string;
-  let excel_preview_opened = writable(false);
+  let current_workbook = $state<Workbook>(null!);
+  let current_file_name = $state<string>(null!);
+  let current_dowbload_link = $state<string>(null!);
+  let excel_preview_opened = $state(false);
 
   const download_excel_file = createMutation({
     mutationKey: ['sarga', 'download_excel_data'],
@@ -88,7 +87,7 @@
       current_dowbload_link = URL.createObjectURL(blob);
       current_file_name = `${$kANDa_selected}-${$sarga_selected}. ${sarga_name}.xlsx`;
       current_workbook = workbook;
-      $excel_preview_opened = true;
+      excel_preview_opened = true;
     }
   });
 
@@ -139,7 +138,7 @@
 </button>
 <div class="card z-50 space-y-1 rounded-lg px-1 py-1 shadow-xl" data-popup="sarga_options">
   <button
-    on:click={() => $download_excel_file.mutate()}
+    onclick={() => $download_excel_file.mutate()}
     class="btn block w-full rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
   >
     <Icon
@@ -149,7 +148,7 @@
     Download Excel File
   </button>
   <button
-    on:click={() => image_tool_opened.set(true)}
+    onclick={() => image_tool_opened.set(true)}
     class="btn block w-full rounded-md px-2 py-1 text-start hover:bg-gray-200 dark:hover:bg-gray-700"
   >
     <Icon src={BiImage} class="-mt-1 fill-sky-500 text-2xl dark:fill-sky-400" />
@@ -157,7 +156,7 @@
   </button>
   {#if $user_info && $user_info.user_type === 'admin'}
     <button
-      on:click={() => {
+      onclick={() => {
         $ai_tool_opened = true;
         $view_translation_status = true;
       }}
@@ -172,25 +171,25 @@
   {/if}
   <button
     class="btn block w-full rounded-md px-2 py-1 text-start hover:bg-gray-200 dark:hover:bg-gray-700"
-    on:click={() => $download_text_file.mutate()}
+    onclick={() => $download_text_file.mutate()}
   >
     <Icon src={TrOutlineFileTypeTxt} class=" mr-1 text-2xl" />
     Download Text File
   </button>
 </div>
 <div>
-  <Modal modal_open={image_tool_opened} close_on_click_outside={false}>
+  <Modal bind:modal_open={$image_tool_opened} close_on_click_outside={false}>
     {#await import('../image_tool/ImageTool.svelte') then ImageTool}
       <ImageTool.default />
     {/await}
   </Modal>
 </div>
-{#if $excel_preview_opened}
+{#if excel_preview_opened}
   {#await import('~/components/PreviewExcel.svelte') then PreviewExcel}
     <PreviewExcel.default
       file_link={current_dowbload_link}
       file_name={current_file_name}
-      file_preview_opened={excel_preview_opened}
+      bind:file_preview_opened={excel_preview_opened}
       workbook={current_workbook}
     />
   {/await}

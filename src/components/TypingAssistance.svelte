@@ -1,61 +1,66 @@
 <script lang="ts">
-  import { createQuery, useIsFetching } from '@tanstack/svelte-query';
+  import { createQuery } from '@tanstack/svelte-query';
   import { load_parivartak_lang_data } from '~/tools/converter';
   import { delay } from '~/tools/delay';
   import { ALL_LANG_SCRIPT_LIST } from '~/tools/lang_list';
   import Modal from '~/components/Modal.svelte';
-  import type { Writable } from 'svelte/store';
   import { cl_join } from '~/tools/cl_join';
   import { onDestroy } from 'svelte';
 
-  export let sync_lang_script: Writable<string>;
-  export let modal_opended: Writable<boolean>;
-  $: typing_assistance_lang = $sync_lang_script;
+  interface Props {
+    sync_lang_script: string;
+    modal_opened: boolean;
+  }
+
+  let { sync_lang_script, modal_opened = $bindable() }: Props = $props();
+  let typing_assistance_lang = $state(sync_lang_script);
 
   const IMAGE_SCALING = 0.85;
   const ONE_PX = 1;
   const HEIGHT = 682 * IMAGE_SCALING;
   const WIDTH = 658 * IMAGE_SCALING;
 
-  $: usage_table = createQuery({
-    queryKey: ['usage_table', typing_assistance_lang],
-    enabled: $modal_opended,
-    queryFn: async () => {
-      await delay(700);
-      await load_parivartak_lang_data(typing_assistance_lang);
-      const IMAGE_URLS = import.meta.glob('/src/tools/converter/resources/images/*.png', {
-        eager: true,
-        query: '?url'
-      });
-      const image_lang =
-        typing_assistance_lang === 'Devanagari' ? 'Sanskrit' : typing_assistance_lang;
-      const url = (IMAGE_URLS[`/src/tools/converter/resources/images/${image_lang}.png`] as any)
-        .default as string;
-      const get_image_dimensiona = async (url: string) => {
-        return new Promise<{ width: number; height: number }>((resolve, reject) => {
-          let img = new Image();
-          img.onload = function () {
-            resolve({
-              // @ts-ignore
-              width: this.width * ONE_PX * IMAGE_SCALING,
-              // @ts-ignore
-              height: this.height * ONE_PX * IMAGE_SCALING
-            });
-          };
-          img.src = url;
+  let usage_table = $derived(
+    createQuery({
+      queryKey: ['usage_table', typing_assistance_lang],
+      enabled: modal_opened,
+      queryFn: async () => {
+        await delay(700);
+        await load_parivartak_lang_data(typing_assistance_lang);
+        const IMAGE_URLS = import.meta.glob('/src/tools/converter/resources/images/*.png', {
+          eager: true,
+          query: '?url'
         });
-      };
-      const { height, width } = await get_image_dimensiona(url);
-      return { url, height, width };
-    }
-  });
+        const image_lang =
+          typing_assistance_lang === 'Devanagari' ? 'Sanskrit' : typing_assistance_lang;
+        const url = (IMAGE_URLS[`/src/tools/converter/resources/images/${image_lang}.png`] as any)
+          .default as string;
+        const get_image_dimensiona = async (url: string) => {
+          return new Promise<{ width: number; height: number }>((resolve, reject) => {
+            let img = new Image();
+            img.onload = function () {
+              resolve({
+                // @ts-ignore
+                width: this.width * ONE_PX * IMAGE_SCALING,
+                // @ts-ignore
+                height: this.height * ONE_PX * IMAGE_SCALING
+              });
+            };
+            img.src = url;
+          });
+        };
+        const { height, width } = await get_image_dimensiona(url);
+        return { url, height, width };
+      }
+    })
+  );
   onDestroy(() => {
-    $modal_opended = false;
+    modal_opened = false;
   });
 </script>
 
 <div>
-  <Modal modal_open={modal_opended} outterClass="mt-0">
+  <Modal bind:modal_open={modal_opened} outterClass="mt-0">
     <select class="select w-40" bind:value={typing_assistance_lang}>
       {#each ALL_LANG_SCRIPT_LIST as lang_script}
         <option value={lang_script}>{lang_script}</option>

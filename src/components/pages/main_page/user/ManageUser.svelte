@@ -3,30 +3,30 @@
   import { client_q } from '~/api/client';
   import { getModalStore, popup } from '@skeletonlabs/skeleton';
   import { RiSystemAddLargeFill, RiSystemCloseLargeLine } from 'svelte-icons-pack/ri';
-  import { onDestroy, onMount } from 'svelte';
   import { browser } from '$app/environment';
   import { LanguageIcon } from '~/components/icons';
   import { FiEdit3 } from 'svelte-icons-pack/fi';
   import { LANG_LIST } from '~/tools/lang_list';
   import { user_info } from '~/state/main_page/user';
-  import type { Unsubscriber } from 'svelte/store';
   import { useQueryClient } from '@tanstack/svelte-query';
+  import { untrack } from 'svelte';
 
   const modal_store = getModalStore();
   const query_client = useQueryClient();
 
-  const unsubscribers: Unsubscriber[] = [];
   const currrent_user_info = $user_info!;
-  let admin_users_index: number[] = [];
-  let normal_users_index: number[] = [];
-  let unverified_normal_users_index: number[] = [];
-  let selected_langs_index: string[][] = [];
+  let admin_users_index = $state<number[]>([]);
+  let normal_users_index = $state<number[]>([]);
+  let unverified_normal_users_index: number[] = $state([]);
+  let selected_langs_index: string[][] = $state([]);
 
-  $: users_info = client_q.user_info.get_all_users_info.query(undefined, {
-    enabled: browser && $user_info?.user_type === 'admin',
-    placeholderData: [],
-    refetchOnMount: 'always'
-  });
+  let users_info = $derived(
+    client_q.user_info.get_all_users_info.query(undefined, {
+      enabled: browser && $user_info?.user_type === 'admin',
+      placeholderData: [],
+      refetchOnMount: 'always'
+    })
+  );
   // the built in invaliadte in `svelte-trpc-query` is not working! so manually invalidate the query
   const USERS_INFO_QUERY_KEY = [['user_info', 'get_all_users_info'], { type: 'query' }];
   const invaliadte_users_info = () =>
@@ -34,29 +34,28 @@
       queryKey: USERS_INFO_QUERY_KEY,
       exact: true
     });
-  onMount(() => {
-    unsubscribers.push(
-      users_info.subscribe((v) => {
-        if (!v.isSuccess) return;
-        // this is simulate onSucess
-        const info = v.data;
-        admin_users_index = [];
-        normal_users_index = [];
-        unverified_normal_users_index = [];
-        selected_langs_index = [];
-        for (let i = 0; i < info.length; i++) {
-          const user = info[i];
-          if (user.user_type === 'admin') {
-            admin_users_index.push(i);
-          } else {
-            if (!user.user_verification_requests) {
-              normal_users_index.push(i);
-              selected_langs_index.push(user.allowed_langs ? user.allowed_langs : []);
-            } else unverified_normal_users_index.push(i);
-          }
+
+  $effect(() => {
+    if (!$users_info.isSuccess) return;
+    // this is simulate onSucess
+    untrack(() => {
+      const info = $users_info.data;
+      admin_users_index = [];
+      normal_users_index = [];
+      unverified_normal_users_index = [];
+      selected_langs_index = [];
+      for (let i = 0; i < info.length; i++) {
+        const user = info[i];
+        if (user.user_type === 'admin') {
+          admin_users_index.push(i);
+        } else {
+          if (!user.user_verification_requests) {
+            normal_users_index.push(i);
+            selected_langs_index.push(user.allowed_langs ? user.allowed_langs : []);
+          } else unverified_normal_users_index.push(i);
         }
-      })
-    );
+      }
+    });
   });
 
   const add_allowed_lang = client_q.auth.add_user_allowed_langs.mutation({
@@ -95,9 +94,6 @@
       }
     });
   };
-  onDestroy(() => {
-    unsubscribers.forEach((u) => u());
-  });
 </script>
 
 <div class="text-2xl font-bold text-orange-600 dark:text-yellow-500">Manage User Settings</div>
@@ -160,7 +156,7 @@
                       {/each}
                     </select>
                     <button
-                      on:click={() =>
+                      onclick={() =>
                         $add_allowed_lang.mutateAsync({
                           id: user.id,
                           langs: selected_langs_index[i]
@@ -169,7 +165,7 @@
                       >Update</button
                     >
                   </div>
-                  <div class="bg-surface-100-800-token arrow" />
+                  <div class="bg-surface-100-800-token arrow"></div>
                 </div>
               </span>
             </div>
@@ -187,14 +183,14 @@
                 <span class="text text-sm text-gray-500 dark:text-gray-400">({user.user_id})</span>
                 <button
                   title="Verify User"
-                  on:click={() => add_unverified_user_func(user.id, user.user_id)}
+                  onclick={() => add_unverified_user_func(user.id, user.user_id)}
                   class="btn mx-1 inline-block p-0"
                 >
                   <Icon src={RiSystemAddLargeFill} class="text-xl" />
                 </button>
                 <button
                   title="Remove User"
-                  on:click={() => remove_unverified_user_func(user.id, user.user_id)}
+                  onclick={() => remove_unverified_user_func(user.id, user.user_id)}
                   class="btn mx-1 inline-block p-0"
                 >
                   <Icon src={RiSystemCloseLargeLine} class="text-xl" />
@@ -208,17 +204,17 @@
       <section class="card w-full space-y-3">
         {#each Array.from({ length: 3 }) as _, i}
           <div class="space-y-2">
-            <div class="placeholder animate-pulse" />
+            <div class="placeholder animate-pulse"></div>
             <div class="grid grid-cols-3 gap-8">
-              <div class="placeholder animate-pulse" />
-              <div class="placeholder animate-pulse" />
-              <div class="placeholder animate-pulse" />
+              <div class="placeholder animate-pulse"></div>
+              <div class="placeholder animate-pulse"></div>
+              <div class="placeholder animate-pulse"></div>
             </div>
             <div class="grid grid-cols-4 gap-4">
-              <div class="placeholder animate-pulse" />
-              <div class="placeholder animate-pulse" />
-              <div class="placeholder animate-pulse" />
-              <div class="placeholder animate-pulse" />
+              <div class="placeholder animate-pulse"></div>
+              <div class="placeholder animate-pulse"></div>
+              <div class="placeholder animate-pulse"></div>
+              <div class="placeholder animate-pulse"></div>
             </div>
           </div>
         {/each}

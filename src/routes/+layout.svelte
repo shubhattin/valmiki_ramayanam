@@ -11,6 +11,12 @@
   import { SvelteQueryDevtools } from '@tanstack/svelte-query-devtools';
   import { queryClient } from '~/state/query';
 
+  interface Props {
+    children?: import('svelte').Snippet;
+  }
+
+  let { children }: Props = $props();
+
   initializeStores();
   storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 </script>
@@ -25,7 +31,7 @@
   <div class="contaiiner mx-auto mb-1 max-w-screen-lg">
     <TopAppBar />
     <div class="mx-2">
-      <slot />
+      {@render children?.()}
     </div>
   </div>
   <SvelteQueryDevtools initialIsOpen={false} />

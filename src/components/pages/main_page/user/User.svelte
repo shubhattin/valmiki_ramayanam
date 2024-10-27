@@ -94,7 +94,7 @@
         {#if $user_info.user_type === 'admin'}
           <button
             disabled={$editing_status_on}
-            on:click={() => ($manage_user_modal_status = true)}
+            onclick={() => ($manage_user_modal_status = true)}
             class="btn space-x-2 rounded-md bg-primary-800 pb-1 pl-1 pr-2 pt-1 font-bold text-white"
           >
             <Icon class="text-2xl" src={LuSettings} />
@@ -103,7 +103,7 @@
         {/if}
         <button
           disabled={$editing_status_on}
-          on:click={log_out}
+          onclick={log_out}
           class="variant-filled-error btn m-0 rounded-md pb-1 pl-1 pr-2 pt-0 font-bold"
         >
           <Icon class="text-2xl" src={BiLogOut} />
@@ -112,7 +112,7 @@
       </div>
       <button
         disabled={$editing_status_on}
-        on:click={() => ($update_password_modal_status = true)}
+        onclick={() => ($update_password_modal_status = true)}
         class="btn m-0 rounded-md bg-secondary-800 pb-1 pl-1 pr-2 pt-0 font-bold text-white dark:bg-secondary-700"
       >
         <Icon class="text-2xl" src={BiLock} />
@@ -128,7 +128,7 @@
       {/if}
       {#if $user_info.user_type === 'admin'}
         <button
-          on:click={trigger_translations_update}
+          onclick={trigger_translations_update}
           disabled={$editing_status_on}
           class="btn m-0 block rounded-md bg-primary-900 px-1 py-0 font-bold text-white dark:bg-primary-900"
         >
@@ -140,7 +140,7 @@
   {:else}
     <div class="space-y-2">
       <button
-        on:click={() => {
+        onclick={() => {
           $pass_enterer_status = true;
           setTimeout(() => {
             $user_input_elmnt_login.focus();
@@ -155,10 +155,10 @@
         <span>Login</span>
       </button>
       <button
-        on:click={() => {
+        onclick={() => {
           $user_create_modal_status = true;
           setTimeout(() => {
-            $user_input_elmnt_login.focus();
+            $name_input_elmnt_new_user.focus();
           }, 500);
         }}
         class="group flex w-full space-x-2 rounded-md px-2 py-1 font-bold hover:bg-gray-200 dark:hover:bg-gray-700"
@@ -172,12 +172,12 @@
     </div>
   {/if}
 </div>
-<Modal modal_open={pass_enterer_status}>
+<Modal bind:modal_open={$pass_enterer_status}>
   <div class="p-2">
     <Authenticate
-      is_verified={writable(false)}
+      is_verified={false}
       show_always={true}
-      user_input_element={user_input_elmnt_login}
+      bind:user_input_element={$user_input_elmnt_login}
       on_verify={(verified) => {
         if (verified) {
           $pass_enterer_status = false;
@@ -187,21 +187,21 @@
     />
   </div>
 </Modal>
-<Modal modal_open={user_create_modal_status} close_on_click_outside={false}>
+<Modal bind:modal_open={$user_create_modal_status} close_on_click_outside={false}>
   <div class="p-2">
     <NewUser
-      name_input_element={name_input_elmnt_new_user}
+      bind:name_input_element={$name_input_elmnt_new_user}
       on_verify={() => {
         $user_create_modal_status = false;
       }}
     />
   </div>
 </Modal>
-<Modal modal_open={manage_user_modal_status} close_on_click_outside={false}>
+<Modal bind:modal_open={$manage_user_modal_status} close_on_click_outside={false}>
   <div class="p-2">
     <ManageUser />
   </div>
 </Modal>
-<Modal modal_open={update_password_modal_status}>
+<Modal bind:modal_open={$update_password_modal_status}>
   <UpdatePassword on_done={() => ($update_password_modal_status = false)} />
 </Modal>

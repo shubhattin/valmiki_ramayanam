@@ -1,12 +1,16 @@
 <script lang="ts">
   import { client_q } from '~/api/client';
 
-  export let on_done: () => void = null!;
+  interface Props {
+    on_done?: () => void;
+  }
 
-  let current_password: string;
-  let new_password: string;
+  let { on_done = null! }: Props = $props();
 
-  let pass_wrong_status = false;
+  let current_password = $state('');
+  let new_password = $state('');
+
+  let pass_wrong_status = $state(false);
 
   const update_password = client_q.auth.update_password.mutation({
     onSuccess(res) {
@@ -18,7 +22,8 @@
       on_done();
     }
   });
-  const update_password_func = async () => {
+  const update_password_func = async (e: Event) => {
+    e.preventDefault();
     if (!current_password || !new_password) return;
     $update_password.mutate({
       current_password: current_password,
@@ -28,7 +33,7 @@
 </script>
 
 <div class="text-2xl font-bold text-orange-600 dark:text-yellow-500">Update Password</div>
-<form on:submit|preventDefault={update_password_func} class="mt-1 space-y-2.5 text-base">
+<form onsubmit={update_password_func} class="mt-1 space-y-2.5 text-base">
   <label class="space-y-1">
     <div class="space-x-2 font-bold">
       <span>Current Password</span>

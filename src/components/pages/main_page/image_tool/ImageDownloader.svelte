@@ -22,8 +22,8 @@
   import Icon from '~/tools/Icon.svelte';
   import { render_all_texts } from './render_text';
 
-  $: kANDa_info = rAmAyaNam_map[$image_kANDa - 1];
-  $: shloka_count = kANDa_info.sarga_data[$image_sarga - 1].shloka_count_extracted;
+  let kANDa_info = $derived(rAmAyaNam_map[$image_kANDa - 1]);
+  let shloka_count = $derived(kANDa_info.sarga_data[$image_sarga - 1].shloka_count_extracted);
 
   const remove_background_image = async () => {
     $canvas.getObjects().forEach((obj) => {
@@ -140,7 +140,7 @@
     target: 'image_download',
     placement: 'bottom'
   }}
-  on:dblclick={() => download_image_as_png(true)}
+  ondblclick={() => download_image_as_png(true)}
   class="btn inline-flex rounded-lg p-1 text-sm"
 >
   <Icon src={BsDownload} class="-mt-1 mr-1 text-2xl" />
@@ -148,19 +148,19 @@
 <div class="card z-50 space-y-0 rounded-md p-1 shadow-xl" data-popup="image_download">
   <div class="flex items-center justify-center space-x-2">
     <button
-      on:click={() => download_image_as_svg()}
+      onclick={() => download_image_as_svg()}
       class="btn rounded-md p-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
     >
       SVG
     </button>
     <button
-      on:click={() => download_image_as_png(true)}
+      onclick={() => download_image_as_png(true)}
       class="btn rounded-md p-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
     >
       PNG
     </button>
     <button
-      on:click={() => download_image_as_png(false)}
+      onclick={() => download_image_as_png(false)}
       class="btn rounded-md p-1 text-xs hover:bg-gray-200 dark:hover:bg-gray-700"
     >
       PNG (with background)
@@ -168,19 +168,19 @@
   </div>
   <div class="flex items-center justify-center space-x-2">
     <button
-      on:click={() => download_svg_zip()}
+      onclick={() => download_svg_zip()}
       class="btn rounded-md p-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
     >
       SVG Zip
     </button>
     <button
-      on:click={() => download_png_zip(true)}
+      onclick={() => download_png_zip(true)}
       class="btn rounded-md p-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
     >
       PNG Zip
     </button>
     <button
-      on:click={() => download_png_zip(false)}
+      onclick={() => download_png_zip(false)}
       class=" btn rounded-md p-1 text-xs hover:bg-gray-200 dark:hover:bg-gray-700"
     >
       PNG Zip (with background)

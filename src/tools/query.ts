@@ -1,6 +1,9 @@
 import type { CreateQueryResult } from '@tanstack/svelte-query';
-import type { Readable, StoresValues } from 'svelte/store';
+import type { Readable } from 'svelte/store';
 import { derived } from 'svelte/store';
+
+type StoresValues<T> =
+  T extends Readable<infer U> ? U : { [K in keyof T]: T[K] extends Readable<infer U> ? U : never };
 
 /**
  * Get a derived store from a `svelte-query` function and a list of stores

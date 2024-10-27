@@ -1,6 +1,10 @@
 <script lang="ts">
-  export let title: string;
-  export let description: string | null = null;
+  interface Props {
+    title: string;
+    description?: string | null;
+  }
+
+  let { title, description = null }: Props = $props();
 </script>
 
 <svelte:head>

@@ -18,16 +18,25 @@
   import { RiSystemAddLargeLine } from 'svelte-icons-pack/ri';
   import LipiLekhikA from '~/tools/converter';
 
-  export let trans_index: number;
-  export let shloka_lines: string;
-  export let update_trans_lang_data: (index: number, text: string) => Promise<void>;
-  export let copy_text: (text: string) => void;
+  interface Props {
+    trans_index: number;
+    shloka_lines: string;
+    update_trans_lang_data: (index: number, text: string) => Promise<void>;
+    copy_text: (text: string) => void;
+  }
 
-  $: main_text_font_info = get_font_family_and_size($viewing_script);
-  $: trans_text_font_info = get_font_family_and_size($trans_lang as lang_list_type);
+  let {
+    trans_index,
+    shloka_lines,
+    update_trans_lang_data,
+    copy_text
+  }: Props = $props();
+
+  let main_text_font_info = $derived(get_font_family_and_size($viewing_script));
+  let trans_text_font_info = $derived(get_font_family_and_size($trans_lang as lang_list_type));
   const en_trans_text_font_info = get_font_family_and_size('English');
 
-  $: line_split = shloka_lines.split('\n');
+  let line_split = $derived(shloka_lines.split('\n'));
 
   const input_func = (
     e: Event & {
@@ -58,11 +67,11 @@
 </script>
 
 <div class="mt-0 w-full space-y-1">
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     style:font-size={`${main_text_font_info.size}rem`}
     style:font-family={main_text_font_info.family}
-    on:dblclick={() => copy_text(shloka_lines)}
+    ondblclick={() => copy_text(shloka_lines)}
   >
     {#each line_split as line_shlk}
       <!-- if needed add 'whitespace-pre-wrap'2 -->
@@ -76,7 +85,7 @@
       <div transition:slide>
         {#if !$trans_en_data.data?.has(trans_index)}
           <button
-            on:click={async () => {
+            onclick={async () => {
               await update_trans_lang_data(trans_index, '');
               $added_translations_indexes.push(trans_index);
             }}
@@ -86,7 +95,7 @@
           </button>
         {:else}
           <textarea
-            on:input={input_func}
+            oninput={input_func}
             class="textarea h-16 w-full"
             value={$trans_en_data.data?.get(trans_index)}
             style:font-size={`${en_trans_text_font_info.size}rem`}
@@ -95,9 +104,9 @@
         {/if}
       </div>
     {:else if $trans_en_data.data.size !== 0}
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
       <div
-        on:dblclick={() =>
+        ondblclick={() =>
           copy_text(get_possibily_not_undefined($trans_en_data.data.get(trans_index)))}
         class="text-stone-500 dark:text-slate-400"
         style:font-size={`${en_trans_text_font_info.size}rem`}
@@ -117,7 +126,7 @@
       <div transition:slide>
         {#if !$trans_lang_data.data?.has(trans_index)}
           <button
-            on:click={async () => {
+            onclick={async () => {
               await update_trans_lang_data(trans_index, '');
               $added_translations_indexes.push(trans_index);
             }}
@@ -127,7 +136,7 @@
           </button>
         {:else}
           <textarea
-            on:input={input_func}
+            oninput={input_func}
             class="textarea h-16 w-full"
             value={$trans_lang_data.data?.get(trans_index)}
             style:font-size={`${trans_text_font_info.size}rem`}
@@ -136,9 +145,9 @@
         {/if}
       </div>
     {:else if $trans_lang !== '--' && $trans_lang_data.data.size !== 0}
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
       <div
-        on:dblclick={() =>
+        ondblclick={() =>
           copy_text(get_possibily_not_undefined($trans_lang_data.data?.get(trans_index)))}
         class="text-yellow-700 dark:text-yellow-500"
         style:font-size={`${trans_text_font_info.size}rem`}

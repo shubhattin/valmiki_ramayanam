@@ -2,19 +2,22 @@
   import Icon from '~/tools/Icon.svelte';
   import { RiSystemDownloadLine } from 'svelte-icons-pack/ri';
   import { TabGroup, Tab } from '@skeletonlabs/skeleton';
-  import type { Writable } from 'svelte/store';
   import type { Workbook, Worksheet } from 'exceljs';
   import Modal from '~/components/Modal.svelte';
   import { normalize_lang_code } from '~/tools/converter';
   import { get_text_font_class } from '~/tools/font_tools';
   import type { script_and_lang_list_type } from '~/tools/lang_list';
 
-  export let file_link: string;
-  export let workbook: Workbook;
-  export let file_name: string;
-  export let file_preview_opened: Writable<boolean>;
+  type Props = {
+    file_link: string;
+    workbook: Workbook;
+    file_name: string;
+    file_preview_opened: boolean;
+  };
 
-  let sheet_number = 0;
+  let { file_link, workbook, file_name, file_preview_opened = $bindable() }: Props = $props();
+
+  let sheet_number = $state(0);
 
   const get_lang_code_of_columnn = (worksheet: Worksheet, column_i: number) => {
     const lang = normalize_lang_code(
@@ -23,12 +26,12 @@
     return lang || '';
   };
 
-  let overflow_behavior = 'hidden';
+  let overflow_behavior: 'hidden' | 'scroll' = $state('hidden');
 </script>
 
 <div>
   <Modal
-    modal_open={file_preview_opened}
+    bind:modal_open={file_preview_opened}
     close_on_click_outside={false}
     class="rounded-lg border-2 border-blue-700 bg-[aliceblue] dark:border-blue-500 dark:bg-slate-800"
   >
@@ -55,7 +58,7 @@
           <span class="font-bold">{worksheet.name}</span>
         </Tab>
       {/each}
-      <div slot="panel" class="overflow-scroll">
+      <div class="overflow-scroll" slot="panel">
         {@const worksheet = workbook.worksheets[sheet_number]}
         <table class="table table-hover table-compact table-cell-fit">
           <thead>
