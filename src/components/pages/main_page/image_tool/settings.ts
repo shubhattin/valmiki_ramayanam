@@ -162,7 +162,8 @@ export const SHLOKA_FONT_CONFIG = {
     text_for_min_line_height: 'qypgj'
   },
   Telugu: {
-    size: 0.8,
+    font: 'ADOBE_TELUGU',
+    size: 1.2,
     space_between_main_and_normal: 8,
     text_for_min_line_height: 'వై'
   }
@@ -185,7 +186,7 @@ export const TRANS_FONT_CONFIG = {
     text_for_min_line_height: 'qypgj'
   },
   Telugu: {
-    size: 0.9,
+    size: 1.3,
     text_for_min_line_height: 'వై'
   }
 } as image_font_config_type;

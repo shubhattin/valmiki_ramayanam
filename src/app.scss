@@ -17,7 +17,8 @@
 
 $fonts: (
   'Nirmala': 'Nirmala UI',
-  'AdobeDevanagari': 'Adobe Devanagari'
+  'AdobeDevanagari': 'Adobe Devanagari',
+  'AdobeTelugu': 'Adobe Telugu'
 );
 
 @each $file, $name in $fonts {

@@ -27,7 +27,8 @@ export const load_font = async (font: string) => {
 export const FONT_FAMILY_NAME = {
   NIRMALA_UI: 'Nirmala UI',
   ADOBE_DEVANAGARI: 'Adobe Devanagari',
-  ROBOTO: 'Roboto'
+  ROBOTO: 'Roboto',
+  ADOBE_TELUGU: 'Adobe Telugu'
 };
 
 type fonts_type = keyof typeof FONT_FAMILY_NAME;
@@ -51,6 +52,10 @@ const FONT_FILE_INFO: Record<
   ROBOTO: {
     file_name: 'Roboto',
     file_type: 'ttf'
+  },
+  ADOBE_TELUGU: {
+    file_name: 'AdobeTelugu',
+    file_type: 'otf'
   }
 };
 
