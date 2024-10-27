@@ -10,7 +10,6 @@
   import { ensure_auth_access_status, get_id_token_info } from '~/tools/auth_tools';
   import { browser } from '$app/environment';
   import SargaDisplay from './display/SargaDisplay.svelte';
-  import { get_possibily_not_undefined } from '~/tools/kry';
   import { BiEdit, BiHelpCircle } from 'svelte-icons-pack/bi';
   import { scale, slide } from 'svelte/transition';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
@@ -340,7 +339,7 @@
             </select>
           </label>
           {#if !$editing_status_on && $user_allowed_langs.isSuccess && $user_info}
-            {#if $trans_lang !== '--' && (get_possibily_not_undefined($user_info).user_type === 'admin' || $user_allowed_langs.data.indexOf($trans_lang) !== -1)}
+            {#if $trans_lang !== '--' && ($user_info!.user_type === 'admin' || $user_allowed_langs.data.indexOf($trans_lang) !== -1)}
               <button
                 onclick={() => ($editing_status_on = true)}
                 class="btn my-1 rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white dark:bg-tertiary-600"
@@ -348,7 +347,7 @@
                 <Icon src={BiEdit} class="mr-1 text-2xl" />
                 Edit
               </button>
-            {:else if $trans_lang === '--' && (get_possibily_not_undefined($user_info).user_type === 'admin' || $user_allowed_langs.data.indexOf('English') !== -1)}
+            {:else if $trans_lang === '--' && ($user_info!.user_type === 'admin' || $user_allowed_langs.data.indexOf('English') !== -1)}
               <button
                 onclick={() => ($editing_status_on = true)}
                 class="btn my-1 rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white dark:bg-tertiary-600"

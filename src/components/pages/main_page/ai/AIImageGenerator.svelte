@@ -9,7 +9,7 @@
   import { SlideToggle } from '@skeletonlabs/skeleton';
   import { client_q, type client } from '~/api/client';
   import { lipi_parivartak_async } from '~/tools/converter';
-  import { copy_text_to_clipboard, get_possibily_not_undefined } from '~/tools/kry';
+  import { copy_text_to_clipboard } from '~/tools/kry';
   import { onMount } from 'svelte';
   import { loadLocalConfig } from '../load_local_config';
   import { BsDownload, BsCopy } from 'svelte-icons-pack/bs';
@@ -286,7 +286,7 @@
       {:else}
         <div>
           <section class="mb-10 grid grid-cols-2 gap-3">
-            {#each get_possibily_not_undefined($image_mut.data) as image}
+            {#each $image_mut.data! as image}
               {#if image}
                 <div class="space-y-1">
                   <img
