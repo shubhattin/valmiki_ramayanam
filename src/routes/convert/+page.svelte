@@ -97,7 +97,7 @@
   </div>
   <div class="my-3 flex justify-center space-x-3">
     <button
-      class="btn m-0 p-0"
+      class="btn m-0 p-0 outline-none"
       onclick={() => convert_text($to_text, from_text, $to_lang, $from_lang)}
       ><Icon
         src={FaCircleUp}
@@ -105,7 +105,7 @@
       /></button
     >
     <button
-      class="btn m-0 p-0"
+      class="btn m-0 p-0 outline-none"
       onclick={() => convert_text($from_text, to_text, $from_lang, $to_lang)}
       ><Icon
         src={FaCircleDown}

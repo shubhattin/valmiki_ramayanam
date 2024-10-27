@@ -1,9 +1,7 @@
 <script lang="ts">
-  import { lipi_parivartak_async } from '~/tools/converter';
-  import { type Unsubscriber } from 'svelte/store';
-  import { fade } from 'svelte/transition';
+  import LipiLekhikA, { lipi_parivartak_async } from '~/tools/converter';
+  import { fade, slide } from 'svelte/transition';
   import { cl_join } from '~/tools/cl_join';
-  import { onDestroy } from 'svelte';
   import {
     editing_status_on,
     BASE_SCRIPT,
@@ -11,7 +9,12 @@
     trans_lang,
     typing_assistance_modal_opened,
     kANDa_selected,
-    sarga_selected
+    sarga_selected,
+    view_translation_status,
+    added_translations_indexes,
+    edited_translations_indexes,
+    edit_language_typer_status,
+    sanskrit_mode
   } from '~/state/main_page/main_state';
   import {
     english_edit_status,
@@ -25,12 +28,13 @@
   import { useQueryClient } from '@tanstack/svelte-query';
   import Icon from '~/tools/Icon.svelte';
   import { BsClipboard2Check } from 'svelte-icons-pack/bs';
-  import ShlokaDisplay from './ShlokaDisplay.svelte';
   import { copy_text_to_clipboard } from '~/tools/kry';
   import { OiCopy16 } from 'svelte-icons-pack/oi';
+  import { get_font_family_and_size } from '~/tools/font_tools';
+  import type { lang_list_type } from '~/tools/lang_list';
+  import { RiSystemAddLargeLine } from 'svelte-icons-pack/ri';
 
   const query_client = useQueryClient();
-  const unsubscribers: Unsubscriber[] = [];
 
   let transliterated_sarga_data = $state<string[]>([]);
   $effect(() => {
@@ -41,10 +45,6 @@
     ).then((data) => {
       transliterated_sarga_data = data;
     });
-  });
-
-  onDestroy(() => {
-    unsubscribers.forEach((unsub) => unsub());
   });
 
   async function update_trans_lang_data(index: number, text: string) {
@@ -77,6 +77,37 @@
 
   const copy_sarga = () => {
     copy_text(transliterated_sarga_data.join('\n\n'));
+  };
+
+  let main_text_font_info = $derived(get_font_family_and_size($viewing_script));
+  let trans_text_font_info = $derived(get_font_family_and_size($trans_lang as lang_list_type));
+  const en_trans_text_font_info = get_font_family_and_size('English');
+  const input_func = (
+    e: Event & {
+      currentTarget: EventTarget & HTMLTextAreaElement;
+    },
+    trans_index: number
+  ) => {
+    if (!$added_translations_indexes.includes(trans_index))
+      $edited_translations_indexes.add(trans_index);
+    let callback_function_called_from_lipi_lekhika = false;
+    if ($edit_language_typer_status && !$english_edit_status)
+      LipiLekhikA.mukhya(
+        e.target,
+        // @ts-ignore
+        e.data,
+        $trans_lang,
+        true,
+        // @ts-ignore
+        (val) => {
+          update_trans_lang_data(trans_index, val);
+          callback_function_called_from_lipi_lekhika = true;
+        },
+        $sanskrit_mode
+      );
+    if (!callback_function_called_from_lipi_lekhika) {
+      update_trans_lang_data(trans_index, e.currentTarget.value);
+    }
   };
 </script>
 
@@ -129,7 +160,22 @@
                 {i}
               </div>
             {/if}
-            <ShlokaDisplay {trans_index} {shloka_lines} {update_trans_lang_data} {copy_text} />
+            <div class="mt-0 w-full space-y-1">
+              <!-- svelte-ignore a11y_no_static_element_interactions -->
+              <div
+                style:font-size={`${main_text_font_info.size}rem`}
+                style:font-family={main_text_font_info.family}
+                ondblclick={() => copy_text(shloka_lines)}
+              >
+                {#each shloka_lines.split('\n') as line_shlk}
+                  <!-- if needed add 'whitespace-pre-wrap'2 -->
+                  <div>
+                    {line_shlk}
+                  </div>
+                {/each}
+              </div>
+              {@render shloka_trans_display(trans_index)}
+            </div>
           </div>
         </div>
       {/each}
@@ -145,3 +191,88 @@
     />
   {/await}
 {/if}
+
+{#snippet shloka_trans_display(trans_index: number)}
+  {#if $view_translation_status && $trans_en_data.isSuccess}
+    {#if $editing_status_on && $english_edit_status}
+      <div transition:slide>
+        {#if !$trans_en_data.data?.has(trans_index)}
+          <button
+            onclick={async () => {
+              await update_trans_lang_data(trans_index, '');
+              $added_translations_indexes.push(trans_index);
+            }}
+            class="btn m-0 rounded-md bg-surface-500 px-1 py-0 font-bold text-white dark:bg-surface-500"
+          >
+            <Icon src={RiSystemAddLargeLine} />
+          </button>
+        {:else}
+          <textarea
+            oninput={(e) => input_func(e, trans_index)}
+            class="textarea h-16 w-full"
+            value={$trans_en_data.data?.get(trans_index)}
+            style:font-size={`${en_trans_text_font_info.size}rem`}
+            style:font-family={en_trans_text_font_info.family}
+          ></textarea>
+        {/if}
+      </div>
+    {:else if $trans_en_data.data.size !== 0}
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div
+        ondblclick={() => copy_text($trans_en_data.data.get(trans_index)!)}
+        class="text-stone-500 dark:text-slate-400"
+        style:font-size={`${en_trans_text_font_info.size}rem`}
+        style:font-family={en_trans_text_font_info.family}
+      >
+        {#if $trans_en_data.data.has(trans_index)}
+          <!-- Usually translations are single but still... -->
+          {#each $trans_en_data.data.get(trans_index)!.split('\n') as line_trans}
+            <div>{line_trans !== '' ? line_trans : '\u200c'}</div>
+          {/each}
+        {/if}
+      </div>
+    {/if}
+  {/if}
+  {#if $view_translation_status && $trans_lang_data.isSuccess}
+    {#if $editing_status_on && !$english_edit_status}
+      <div transition:slide>
+        {#if !$trans_lang_data.data?.has(trans_index)}
+          <button
+            onclick={async () => {
+              await update_trans_lang_data(trans_index, '');
+              $added_translations_indexes.push(trans_index);
+            }}
+            class="btn m-0 rounded-md bg-surface-500 px-1 py-0 font-bold text-white dark:bg-surface-500"
+          >
+            <Icon src={RiSystemAddLargeLine} />
+          </button>
+        {:else}
+          <textarea
+            oninput={(e) => input_func(e, trans_index)}
+            class="textarea h-16 w-full"
+            value={$trans_lang_data.data?.get(trans_index)}
+            style:font-size={`${trans_text_font_info.size}rem`}
+            style:font-family={trans_text_font_info.family}
+          ></textarea>
+        {/if}
+      </div>
+    {:else if $trans_lang !== '--' && $trans_lang_data.data.size !== 0}
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div
+        ondblclick={() => copy_text($trans_lang_data.data?.get(trans_index)!)}
+        class="text-yellow-700 dark:text-yellow-500"
+        style:font-size={`${trans_text_font_info.size}rem`}
+        style:font-family={trans_text_font_info.family}
+      >
+        {#if $trans_lang_data.data?.has(trans_index)}
+          <!-- Usually translations are single but still... -->
+          {#each $trans_lang_data.data?.get(trans_index)!.split('\n') as line_trans}
+            <div>
+              {line_trans !== '' ? line_trans : '\u200c'}
+            </div>
+          {/each}
+        {/if}
+      </div>
+    {/if}
+  {/if}
+{/snippet}
