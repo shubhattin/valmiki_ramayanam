@@ -33,6 +33,7 @@
   import { get_font_family_and_size } from '~/tools/font_tools';
   import type { lang_list_type } from '~/tools/lang_list';
   import { RiSystemAddLargeLine } from 'svelte-icons-pack/ri';
+  import { popup } from '@skeletonlabs/skeleton';
 
   const query_client = useQueryClient();
 
@@ -75,8 +76,26 @@
 
   let sarga_hovered = $state(false);
 
-  const copy_sarga = () => {
+  const copy_sarga_shlokas_only = () => {
     copy_text(transliterated_sarga_data.join('\n\n'));
+  };
+
+  const copy_sarga_with_transliteration_and_translation = async () => {
+    const texts_to_copy = await Promise.all(
+      transliterated_sarga_data.map(async (shloka_lines, i) => {
+        const normal_shloka = await lipi_parivartak_async(
+          $sarga_data.data![i],
+          BASE_SCRIPT,
+          'Normal'
+        );
+        const trans_index = transliterated_sarga_data.length - 1 === i ? -1 : i;
+        let txt = `${shloka_lines}\n${normal_shloka}`;
+        const lang_data = $trans_lang === '--' ? $trans_en_data.data : $trans_lang_data.data;
+        if (lang_data && lang_data.has(trans_index)) txt += `\n\n${lang_data.get(trans_index)}`;
+        return txt;
+      })
+    );
+    copy_text(texts_to_copy.join('\n\n\n'));
   };
 
   let main_text_font_info = $derived(get_font_family_and_size($viewing_script));
@@ -127,12 +146,36 @@
     <button
       transition:fade={{ duration: 150 }}
       title="Copy Sarga Text"
-      onclick={copy_sarga}
       class={cl_join('btn absolute right-5 top-2 z-20 select-none p-0 outline-none')}
+      use:popup={{
+        event: 'click',
+        target: 'sarga_copy',
+        placement: 'bottom'
+      }}
       onmouseenter={() => (sarga_hovered = true)}
     >
+      <!-- onclick={copy_sarga} -->
       <Icon src={OiCopy16} class="text-lg" />
     </button>
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div
+      onmouseenter={() => (sarga_hovered = true)}
+      class="card z-50 space-y-1 rounded-lg px-1 py-1 shadow-xl"
+      data-popup="sarga_copy"
+    >
+      <button
+        onclick={copy_sarga_shlokas_only}
+        class="btn block w-full rounded-md px-2 py-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
+      >
+        Copy Shlokas
+      </button>
+      <button
+        onclick={copy_sarga_with_transliteration_and_translation}
+        class="btn block w-full text-wrap rounded-md px-2 py-1 text-xs hover:bg-gray-200 dark:hover:bg-gray-700"
+      >
+        Copy Shlokas with Tranlsiteration and Translation
+      </button>
+    </div>
   {/if}
 </div>
 <!-- svelte-ignore a11y_no_static_element_interactions -->
