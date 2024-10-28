@@ -193,7 +193,7 @@
     if (mounted && $scaling_factor) untrack(() => update_canvas_dimensions());
   });
   $effect(() => {
-    if (mounted) untrack(() => set_background_image_type($shaded_background_image_status));
+    if (mounted) set_background_image_type($shaded_background_image_status);
   });
 
   // $effect(() => {
