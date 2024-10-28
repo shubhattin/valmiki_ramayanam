@@ -178,7 +178,7 @@
     href="https://app-lipilekhika.pages.dev/parivartak"
     target="_blank"
     class="text-blue-500 underline dark:text-blue-400">Lipi Lekhika (Lipi Parivartak)</a
-  >
+  > for more functionality and wider language support.
 </div>
 <TypingAssistance
   bind:modal_opened={$typing_assistance_modal_opened}

@@ -387,7 +387,7 @@
           </select>
         {/if}
         <button
-          class="btn rounded-md p-0 text-sm"
+          class="btn rounded-md p-0 text-sm outline-none"
           title={'Language Typing Assistance'}
           onclick={() => ($typing_assistance_modal_opened = true)}
         >

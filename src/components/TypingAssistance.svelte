@@ -105,7 +105,7 @@
             target="_blank"
             class="text-blue-500 underline dark:text-blue-400">Lipi Lekhika</a
           >
-          to familiarise yourself the typing tool.
+          to familiarise yourself with the typing tool.
         </div>
       {/if}
     </div>
