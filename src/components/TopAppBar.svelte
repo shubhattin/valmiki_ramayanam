@@ -6,7 +6,6 @@
   import { SiGithub } from 'svelte-icons-pack/si';
   import { SiConvertio } from './icons';
   import { AiOutlineMenu } from 'svelte-icons-pack/ai';
-  import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
   import { YoutubeIcon } from '~/components/icons';
   import { page } from '$app/stores';
   import { main_app_bar_info } from '~/state/app_bar';
@@ -92,7 +91,7 @@
         />
         <span>Lipi Parivartak</span>
       </a>
-      <a
+      <!-- <a
         href="/excel_tool"
         class="will-close flex space-x-1 rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
       >
@@ -101,7 +100,7 @@
           class="-mt-1 text-xl text-green-600 dark:text-green-400"
         />
         <span>Excel File Transliterator</span>
-      </a>
+      </a> -->
       <a
         href="https://www.youtube.com/c/thesanskritchannel"
         target="_blank"
