@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createQuery } from '@tanstack/svelte-query';
-  import { load_parivartak_lang_data } from '~/tools/converter';
+  import { lipi_parivartak, load_parivartak_lang_data } from '~/tools/converter';
   import { delay } from '~/tools/delay';
   import { ALL_LANG_SCRIPT_LIST } from '~/tools/lang_list';
   import Modal from '~/components/Modal.svelte';
@@ -15,10 +15,12 @@
   let { sync_lang_script, modal_opened = $bindable() }: Props = $props();
   let typing_assistance_lang = $state(sync_lang_script);
 
-  const IMAGE_SCALING = 0.85;
+  const IMAGE_SCALING = 0.81;
   const ONE_PX = 1;
   const HEIGHT = 682 * IMAGE_SCALING;
   const WIDTH = 658 * IMAGE_SCALING;
+
+  const EXTRA_INFO_LIST = ['q.', '.x', 'qq', '.A', '.i', '.I', '.u', '.U', '.ai', '.au'];
 
   let usage_table = $derived(
     createQuery({
@@ -26,7 +28,7 @@
       enabled: modal_opened,
       queryFn: async () => {
         await delay(700);
-        await load_parivartak_lang_data(typing_assistance_lang);
+        const script_data_load_promise = load_parivartak_lang_data(typing_assistance_lang);
         const IMAGE_URLS = import.meta.glob('/src/tools/converter/resources/images/*.png', {
           eager: true,
           query: '?url'
@@ -50,6 +52,7 @@
           });
         };
         const { height, width } = await get_image_dimensiona(url);
+        await Promise.all([script_data_load_promise]);
         return { url, height, width };
       }
     })
@@ -62,7 +65,7 @@
 <div>
   <Modal bind:modal_open={modal_opened} outterClass="mt-0">
     <select class="select w-40" bind:value={typing_assistance_lang}>
-      {#each ALL_LANG_SCRIPT_LIST as lang_script}
+      {#each ALL_LANG_SCRIPT_LIST.filter((src) => src !== 'English') as lang_script}
         <option value={lang_script}>{lang_script}</option>
       {/each}
     </select>
@@ -79,20 +82,41 @@
     "
     >
       {#if $usage_table.isFetching}
-        <div class="h-full w-full space-y-2">
-          <div class="placeholder animate-pulse rounded-md"></div>
-          <!-- <div class="placeholder animate-pulse"></div> -->
+        <div class="h-full w-full space-y-1">
           <div class="placeholder h-full w-full animate-pulse rounded-lg"></div>
+          <div class="placeholder animate-pulse rounded-md"></div>
         </div>
       {:else if $usage_table.isSuccess}
         {@const { url, height, width } = $usage_table.data}
         <img
           style:height={`${height}px`}
           style:width={`${width}px`}
-          alt={typing_assistance_lang}
+          alt={`${typing_assistance_lang} Usage Table`}
           src={url}
+          class="block"
         />
+        {#if !['Romanized'].includes(typing_assistance_lang)}
+          {@render extra_info()}
+        {/if}
       {/if}
     </div>
   </Modal>
 </div>
+
+{#snippet extra_info()}
+  <div class="mb-2">
+    <div
+      class="grid grid-cols-4 gap-1 rounded-md border-2 border-gray-400 px-0 py-1 sm:grid-cols-6 dark:border-gray-600"
+    >
+      {#each EXTRA_INFO_LIST as char}
+        <div class="inline-block space-x-1 text-center text-base">
+          <span class="text-gray-500 dark:text-gray-400">{char}</span>
+          ➜
+          {#await lipi_parivartak(char, 'Normal', typing_assistance_lang) then text}
+            <span class="font-bold">{text}</span>
+          {/await}
+        </div>
+      {/each}
+    </div>
+  </div>
+{/snippet}

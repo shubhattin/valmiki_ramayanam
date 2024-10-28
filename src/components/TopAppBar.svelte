@@ -25,15 +25,15 @@
   $effect(() => {
     if (page_url in PAGE_TITLES) {
       const [TITLE, CLASS]: string[] = PAGE_TITLES[page_url as keyof typeof PAGE_TITLES];
-      main_app_bar_info.set({
+      $main_app_bar_info = {
         title: TITLE,
         className: CLASS
-      });
+      };
     } else if ($page.error) {
-      main_app_bar_info.set({
+      $main_app_bar_info = {
         title: null,
         className: null
-      });
+      };
     }
   });
 

@@ -38,6 +38,8 @@ for lang in a:
     c = a[lang]
     update(".", "q", -2)
     add(".q", ["‌", "", 2])
+    update("q", ".", -2)
+    c["q"]["q."] = [".", "", 2]
     if "n" not in get(".", -2):
         update(".", "n", -2)
         add(
