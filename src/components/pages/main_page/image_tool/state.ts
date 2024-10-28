@@ -43,6 +43,7 @@ export let image_kANDa = writable<number>(0);
 export let image_sarga = writable<number>(0);
 // ^ kanda and sarga will be inherited from the main during mount
 export let image_shloka = writable<number>(1);
+export let image_rendering_state = writable<boolean>(false);
 
 export const image_sarga_data = get_derived_query(
   [image_kANDa, image_sarga],

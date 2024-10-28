@@ -319,7 +319,7 @@
   )}
     <textarea
       oninput={(e) => input_func(e, trans_index)}
-      class="textarea h-16 w-full"
+      class="textarea h-28 w-full md:h-24"
       value={lang_data?.get(trans_index)}
       style:font-size={`${font_info.size}rem`}
       style:font-family={font_info.family}

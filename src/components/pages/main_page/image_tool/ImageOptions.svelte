@@ -5,6 +5,7 @@
     DEFAULT_TRANS_TEXT_FONT_CONFIGS,
     image_kANDa,
     image_lang,
+    image_rendering_state,
     image_sarga,
     image_script,
     image_shloka,
@@ -50,9 +51,9 @@
   <div class="inline-block space-x-1">
     <button
       class="btn m-0 p-0"
-      disabled={$image_shloka === 0}
+      disabled={$image_shloka === 0 || $image_rendering_state}
       onclick={() => {
-        if ($image_shloka !== -1) $image_shloka -= 1;
+        if ($image_shloka !== -1) $image_shloka--;
         else $image_shloka = shloka_count;
       }}
     >
@@ -68,10 +69,10 @@
     <button
       class="btn m-0 p-0"
       onclick={() => {
-        if ($image_shloka !== shloka_count) $image_shloka += 1;
+        if ($image_shloka !== shloka_count) $image_shloka++;
         else $image_shloka = -1;
       }}
-      disabled={$image_shloka === -1}
+      disabled={$image_shloka === -1 || $image_rendering_state}
     >
       <Icon src={TiArrowForwardOutline} class="-mt-1 text-lg" />
     </button>

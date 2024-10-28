@@ -18,7 +18,8 @@
     image_trans_data,
     trans_text_font_configs,
     main_text_font_configs,
-    normal_text_font_config
+    normal_text_font_config,
+    image_rendering_state
   } from './state';
   import {
     sarga_selected,
@@ -210,7 +211,8 @@
   // ^ This is to try to fix the issue of text not rendering after opening the image tool second time
 
   $effect(() => {
-    mounted &&
+    if (
+      mounted &&
       !$image_sarga_data.isFetching &&
       $image_sarga_data.isSuccess &&
       !$image_trans_data.isFetching &&
@@ -221,9 +223,12 @@
       $shloka_configs &&
       $normal_text_font_config &&
       $trans_text_font_configs &&
-      $main_text_font_configs &&
+      $main_text_font_configs
+    )
       (async () => {
+        $image_rendering_state = true;
         await render_all_texts($image_shloka, $image_script, $image_lang);
+        $image_rendering_state = false;
       })();
   });
 </script>

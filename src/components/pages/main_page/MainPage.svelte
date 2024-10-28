@@ -376,9 +376,9 @@
         >
           <Icon src={BsKeyboard} class="text-4xl" />
         </SlideToggle>
-        {#if $edit_language_typer_status && $sanskrit_mode_texts.isSuccess && !$sanskrit_mode_texts.isFetching}
+        {#if $sanskrit_mode_texts.isSuccess && !$sanskrit_mode_texts.isFetching}
           <select
-            transition:scale
+            disabled={!$edit_language_typer_status}
             bind:value={$sanskrit_mode}
             class="select m-0 w-28 text-clip px-1 py-1 text-sm"
           >

@@ -181,7 +181,7 @@
     </button>
     <button
       onclick={() => download_png_zip(false)}
-      class=" btn rounded-md p-1 text-xs hover:bg-gray-200 dark:hover:bg-gray-700"
+      class="btn rounded-md p-1 text-xs hover:bg-gray-200 dark:hover:bg-gray-700"
     >
       PNG Zip (with background)
     </button>
