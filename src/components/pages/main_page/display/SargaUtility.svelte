@@ -26,6 +26,8 @@
   import { lipi_parivartak_async } from '~/tools/converter';
   import { user_info } from '~/state/main_page/user';
   import { RiUserFacesRobot2Line } from 'svelte-icons-pack/ri';
+  import * as test_worker from './worker_test?worker';
+  import { onMount } from 'svelte';
 
   let current_workbook = $state<Workbook>(null!);
   let current_file_name = $state<string>(null!);
@@ -121,6 +123,14 @@
         `${$kANDa_selected}-${$sarga_selected} ${sarga_name_script}${is_not_brahmic_script ? '' : ` (${sarga_name_normal})`}.txt`
       );
     }
+  });
+  onMount(() => {
+    const worker = new test_worker.default();
+    worker.onmessage = function (event) {
+      const factorialResult = event.data;
+      console.log(factorialResult);
+    };
+    worker.postMessage('sarvebhyoH namaH');
   });
 </script>
 
