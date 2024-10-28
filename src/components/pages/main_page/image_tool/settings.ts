@@ -112,7 +112,7 @@ export let shloka_configs = writable(copy_plain_object(DEFAULT_SHLOKA_CONFIG));
 export let current_shloka_type = writable<shloka_number_type>();
 
 export const TRANSLATION_BOUNDIND_COORDS = {
-  left: 610,
+  left: 670,
   top: 650,
   right: 1860,
   bottom: 970
@@ -163,7 +163,7 @@ export const SHLOKA_FONT_CONFIG = {
   },
   Telugu: {
     font: 'NOTO_SERIF_TELUGU',
-    size: 1.0,
+    size: 0.95,
     space_between_main_and_normal: 6,
     text_for_min_line_height: 'వై'
   }
@@ -186,7 +186,7 @@ export const TRANS_FONT_CONFIG = {
     text_for_min_line_height: 'qypgj'
   },
   Telugu: {
-    size: 1.1,
+    size: 1.05,
     new_line_spacing: 0.35
   }
 } as image_font_config_type;
