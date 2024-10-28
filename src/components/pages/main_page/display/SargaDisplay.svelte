@@ -128,6 +128,13 @@
       update_trans_lang_data(trans_index, e.currentTarget.value);
     }
   };
+
+  const detect_shortcut_pressed = (event: KeyboardEvent) => {
+    event.preventDefault();
+    if (event.altKey && event.key.toLowerCase() === 'x') {
+      $edit_language_typer_status = !$edit_language_typer_status;
+    }
+  };
 </script>
 
 {#if $editing_status_on}
@@ -250,13 +257,7 @@
             <Icon src={RiSystemAddLargeLine} />
           </button>
         {:else}
-          <textarea
-            oninput={(e) => input_func(e, trans_index)}
-            class="textarea h-16 w-full"
-            value={$trans_en_data.data?.get(trans_index)}
-            style:font-size={`${en_trans_text_font_info.size}rem`}
-            style:font-family={en_trans_text_font_info.family}
-          ></textarea>
+          {@render edit_textarea_elm($trans_en_data.data, en_trans_text_font_info)}
         {/if}
       </div>
     {:else if $trans_en_data.data.size !== 0}
@@ -290,13 +291,7 @@
             <Icon src={RiSystemAddLargeLine} />
           </button>
         {:else}
-          <textarea
-            oninput={(e) => input_func(e, trans_index)}
-            class="textarea h-16 w-full"
-            value={$trans_lang_data.data?.get(trans_index)}
-            style:font-size={`${trans_text_font_info.size}rem`}
-            style:font-family={trans_text_font_info.family}
-          ></textarea>
+          {@render edit_textarea_elm($trans_lang_data.data, trans_text_font_info)}
         {/if}
       </div>
     {:else if $trans_lang !== '--' && $trans_lang_data.data.size !== 0}
@@ -318,4 +313,17 @@
       </div>
     {/if}
   {/if}
+  {#snippet edit_textarea_elm(
+    lang_data: typeof $trans_lang_data.data,
+    font_info: ReturnType<typeof get_font_family_and_size>
+  )}
+    <textarea
+      oninput={(e) => input_func(e, trans_index)}
+      class="textarea h-16 w-full"
+      value={lang_data?.get(trans_index)}
+      style:font-size={`${font_info.size}rem`}
+      style:font-family={font_info.family}
+      onkeyup={detect_shortcut_pressed}
+    ></textarea>
+  {/snippet}
 {/snippet}

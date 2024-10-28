@@ -50,6 +50,10 @@
 
   let from_text_font_info = $derived(get_font_family_and_size($from_lang));
   let to_text_font_info = $derived(get_font_family_and_size($to_lang));
+  const detect_shortcut_pressed = (event: KeyboardEvent, callback: (() => void) | null = null) => {
+    event.preventDefault();
+    if (event.altKey && event.key.toLowerCase() === 'x') callback && callback();
+  };
 </script>
 
 <MetaTags title={PAGE_INFO.title} description={PAGE_INFO.description} />
@@ -78,6 +82,9 @@
       >
         <Icon src={BsKeyboard} class="text-4xl" />
       </SlideToggle>
+      <span class="mt-4 inline-block text-center text-sm text-stone-500 dark:text-stone-400"
+        >Use <span class="font-semibold">Alt+x</span> to toggle</span
+      >
     </div>
     <textarea
       class="textarea h-56"
@@ -93,6 +100,8 @@
           });
         else $from_text = e.currentTarget.value;
       }}
+      onkeyup={(e) =>
+        detect_shortcut_pressed(e, () => (from_text_type_enabled = !from_text_type_enabled))}
     ></textarea>
   </div>
   <div class="my-3 flex justify-center space-x-3">
@@ -158,8 +167,18 @@
           });
         else $to_text = e.currentTarget.value;
       }}
+      onkeyup={(e) =>
+        detect_shortcut_pressed(e, () => (to_text_type_enabled = !to_text_type_enabled))}
     ></textarea>
   </div>
+</div>
+<div class="mb-2 mt-4 text-sm text-stone-500 dark:text-stone-400">
+  You should also refer
+  <a
+    href="https://app-lipilekhika.pages.dev/parivartak"
+    target="_blank"
+    class="text-blue-500 underline dark:text-blue-400">Lipi Lekhika (Lipi Parivartak)</a
+  >
 </div>
 <TypingAssistance
   bind:modal_opened={$typing_assistance_modal_opened}

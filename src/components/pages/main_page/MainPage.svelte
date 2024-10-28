@@ -364,7 +364,8 @@
         {/if}
       {/if}
     </div>
-    {#if $editing_status_on && !($ai_tool_opened && $user_info && $user_info.user_type === 'admin')}
+    <!-- !== --, as we dont need it for english -->
+    {#if $trans_lang !== '--' && $editing_status_on && !($ai_tool_opened && $user_info && $user_info.user_type === 'admin')}
       <div class="flex space-x-4">
         <SlideToggle
           name="edit_lang"
@@ -375,7 +376,7 @@
         >
           <Icon src={BsKeyboard} class="text-4xl" />
         </SlideToggle>
-        {#if $trans_lang !== '--' && $edit_language_typer_status && $sanskrit_mode_texts.isSuccess && !$sanskrit_mode_texts.isFetching}
+        {#if $edit_language_typer_status && $sanskrit_mode_texts.isSuccess && !$sanskrit_mode_texts.isFetching}
           <select
             transition:scale
             bind:value={$sanskrit_mode}
@@ -392,6 +393,9 @@
         >
           <Icon src={BiHelpCircle} class="mt-1 text-3xl text-sky-500 dark:text-sky-400" />
         </button>
+        <span class="mt-3 inline-block text-center text-sm text-stone-500 dark:text-stone-400"
+          >Use <span class="font-semibold">Alt+x</span> to toggle</span
+        >
       </div>
     {/if}
     {#if !$ai_tool_opened}

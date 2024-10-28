@@ -98,6 +98,15 @@
         {#if !['Romanized'].includes(typing_assistance_lang)}
           {@render extra_info()}
         {/if}
+        <div class="text-wrap text-sm text-stone-500 dark:text-stone-400">
+          Also use <span class="font-semibold">Lekhan Sahayika</span> in
+          <a
+            href="https://app-lipilekhika.pages.dev"
+            target="_blank"
+            class="text-blue-500 underline dark:text-blue-400">Lipi Lekhika</a
+          >
+          to familiarise yourself the typing tool.
+        </div>
       {/if}
     </div>
   </Modal>
