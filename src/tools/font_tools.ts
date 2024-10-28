@@ -28,7 +28,8 @@ export const FONT_FAMILY_NAME = {
   NIRMALA_UI: 'Nirmala UI',
   ADOBE_DEVANAGARI: 'Adobe Devanagari',
   ROBOTO: 'Roboto',
-  ADOBE_TELUGU: 'Adobe Telugu'
+  ADOBE_TELUGU: 'Adobe Telugu',
+  NOTO_SERIF_TELUGU: 'Noto Serif Telugu'
 };
 
 type fonts_type = keyof typeof FONT_FAMILY_NAME;
@@ -56,6 +57,10 @@ const FONT_FILE_INFO: Record<
   ADOBE_TELUGU: {
     file_name: 'AdobeTelugu',
     file_type: 'otf'
+  },
+  NOTO_SERIF_TELUGU: {
+    file_name: 'NotoSerifTelugu',
+    file_type: 'ttf'
   }
 };
 
@@ -93,8 +98,8 @@ const MAIN_FONT_CONFIG = {
     size: 1.45
   },
   Telugu: {
-    font: 'ADOBE_TELUGU',
-    size: 1.3
+    font: 'NOTO_SERIF_TELUGU',
+    size: 1.25
   },
   English: {
     font: 'ROBOTO'

@@ -1,6 +1,6 @@
 import { dbClient_ext as db, queryClient } from './client';
 import { readFile } from 'fs/promises';
-import { dbMode, take_input } from '~/tools/kry_server';
+import { dbMode, take_input } from '~/tools/kry.server';
 import { translations, user_verification_requests, users } from '~/db/schema';
 import {
   UsersSchemaZod,

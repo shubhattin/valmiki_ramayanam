@@ -162,7 +162,7 @@ export const SHLOKA_FONT_CONFIG = {
     text_for_min_line_height: 'qypgj'
   },
   Telugu: {
-    font: 'ADOBE_TELUGU',
+    font: 'NOTO_SERIF_TELUGU',
     size: 1.0,
     space_between_main_and_normal: 6,
     text_for_min_line_height: 'వై'

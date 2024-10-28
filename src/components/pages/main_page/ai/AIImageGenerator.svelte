@@ -5,7 +5,7 @@
   import Icon from '~/tools/Icon.svelte';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import { writable } from 'svelte/store';
-  import base_prompts from './base_prompt.yaml';
+  import ai_text_prompts from './ai_text_prompts.yaml';
   import { SlideToggle } from '@skeletonlabs/skeleton';
   import { client_q, type client } from '~/api/client';
   import { lipi_parivartak_async } from '~/tools/converter';
@@ -22,6 +22,12 @@
   import { OiCopy16 } from 'svelte-icons-pack/oi';
   import { BsClipboard2Check } from 'svelte-icons-pack/bs';
 
+  let base_prompts = ai_text_prompts as {
+    main_prompt: {
+      role: 'user' | 'assistant';
+      content: string;
+    }[];
+  };
   let kANDa_info = $derived(rAmAyaNam_map[$kANDa_selected - 1]);
   let sarga_info = $derived(kANDa_info.sarga_data[$sarga_selected - 1]);
   let shloka_count = $derived(sarga_info.shloka_count_extracted);
@@ -39,7 +45,7 @@
     }
   });
   let shloka_numb = writable(1);
-  let base_user_prompt = writable<string>(base_prompts[0].content);
+  let base_user_prompt = writable<string>(base_prompts.main_prompt[0].content);
   let auto_gen_image = writable(false);
   let additional_prompt_info = writable('');
   let shloka_text_prompt = writable('');
@@ -63,9 +69,6 @@
       `This Shloka is from Chapter ${sarga_info.index} named ${sarga_info.name_normal}, which is from Book ${kANDa_info.index} ` +
       `named ${kANDa_info.name_normal} from Ramayan, the ancient Indian Epic.`;
   });
-  $effect(() => {
-    base_prompts[0].content = $base_user_prompt + $additional_prompt_info;
-  });
 
   $effect(() => {
     !$trans_en_data.isFetching &&
@@ -76,7 +79,6 @@
         const shloka_text = $sarga_data.data![$shloka_numb];
         const shloka_text_normal = await lipi_parivartak_async(shloka_text, BASE_SCRIPT, 'Normal');
         let prompt = shloka_text + '\n' + shloka_text_normal;
-
         const trans_en_all = $trans_en_data.data!;
         if (trans_en_all.has($shloka_numb)) prompt += '\n\n' + trans_en_all.get($shloka_numb);
         $shloka_text_prompt = prompt;
@@ -86,14 +88,15 @@
   const generate_image_prompt = async () => {
     await $image_prompt_mut.mutateAsync({
       messages: [
-        ...(base_prompts as {
-          role: 'user' | 'assistant';
-          content: string;
-        }[]),
         {
           role: 'user',
-          content: $shloka_text_prompt
-        }
+          content: base_prompts.main_prompt[0].content + $additional_prompt_info
+        },
+        {
+          role: 'assistant',
+          content: base_prompts.main_prompt[1].content
+        },
+        { role: 'user', content: $shloka_text_prompt }
       ],
       use_sample_data: load_ai_sample_data
     });

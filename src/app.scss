@@ -15,7 +15,7 @@
   --theme-font-family-heading: 'Roboto', 'Nirmala UI', sans-serif;
 }
 
-$fonts: (
+$fonts_multi: (
   'Nirmala': (
     'Nirmala UI',
     'ttf'
@@ -30,7 +30,7 @@ $fonts: (
   )
 );
 
-@each $file, $font in $fonts {
+@each $file, $font in $fonts_multi {
   @font-face {
     font-family: nth($font, 1);
     src:
@@ -51,9 +51,28 @@ $fonts: (
   }
 }
 
+$fonts_variable: (
+  'NotoSerifTelugu': (
+    'Noto Serif Telugu',
+    'ttf'
+  )
+);
+
+@each $file, $font in $fonts_variable {
+  @font-face {
+    font-family: nth($font, 1);
+    src:
+      url('./fonts/variable/woff2/#{$file}.woff2') format('woff2'),
+      url('./fonts/variable/#{$file}.#{nth($font, 2)}');
+    // font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+}
+
 .indic-font {
-  font-family: map-get($fonts, 'Nirmala');
+  font-family: map-get($fonts_multi, 'Nirmala');
 }
 .normal-font {
-  font-family: map-get($fonts, 'AdobeDevanagari');
+  font-family: map-get($fonts_multi, 'AdobeDevanagari');
 }
