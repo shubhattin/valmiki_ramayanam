@@ -91,3 +91,10 @@ export function get_permutations(range: [number, number], count: number = 1): nu
   }
   return permutations;
 }
+
+/**
+ * This replaces `{key}` with the corresponding value in `options`
+ */
+export function format_string_text(text: string, options: Record<string, any>) {
+  return text.replace(/{(\w+)}/g, (match, key) => options[key] ?? `{${key}}`);
+}

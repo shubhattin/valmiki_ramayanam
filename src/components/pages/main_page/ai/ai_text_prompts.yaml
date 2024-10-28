@@ -7,3 +7,5 @@ main_prompt:
       To create consistent image prompts that encapsulate the essence of the translations from Valmiki Ramayanam, I will aim to generate a detailed, descriptive prompt based on the meaning and context of each shloka. These prompts will focus on the visual elements of the scene described in the translation, while keeping the artistic and cultural essence intact.
 
       Feel free to provide the shloka and translation when you're ready, and I'll start generating a suitable image prompt for it.
+additional_prompt_info: >
+  This Shloka is from Chapter {sarga_index} named {sarga_name_normal}, which is from Book {kANDa_index} named {kANDa_name_normal} from Ramayan, the ancient Indian Epic.

@@ -133,7 +133,7 @@
   // this could be removed in future in favour of a simple query
 
   const get_ramayanam_page_link = (kANDa: number, sarga: number | null = null) => {
-    return `/${kANDa}${sarga ? `/${sarga}` : ''}`;
+    return `/${kANDa}${!sarga || sarga === 0 ? '' : `/${sarga}`}`;
   };
 
   let kANDa_names = $state(rAmAyaNam_map.map((kANDa) => kANDa.name_devanagari));
@@ -150,10 +150,14 @@
   });
 
   $effect(() => {
+    if (!browser) return;
     // only sarga_selected should be subscribed
     const _kANDa_selected = untrack(() => $kANDa_selected);
-    if (_kANDa_selected === 0 || $sarga_selected === 0) return;
-    if (!browser) return;
+    if (_kANDa_selected === 0) return;
+    if ($sarga_selected === 0) {
+      goto(get_ramayanam_page_link(_kANDa_selected));
+      return;
+    }
     if (browser && untrack(() => mounted)) {
       // console.log([_kANDa_selected, $sarga_selected]);
       goto(get_ramayanam_page_link(_kANDa_selected, $sarga_selected));

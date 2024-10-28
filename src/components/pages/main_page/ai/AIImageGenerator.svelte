@@ -9,7 +9,7 @@
   import { SlideToggle } from '@skeletonlabs/skeleton';
   import { client_q, type client } from '~/api/client';
   import { lipi_parivartak_async } from '~/tools/converter';
-  import { copy_text_to_clipboard } from '~/tools/kry';
+  import { copy_text_to_clipboard, format_string_text } from '~/tools/kry';
   import { onMount } from 'svelte';
   import { loadLocalConfig } from '../load_local_config';
   import { BsDownload, BsCopy } from 'svelte-icons-pack/bs';
@@ -27,6 +27,7 @@
       role: 'user' | 'assistant';
       content: string;
     }[];
+    additional_prompt_info: string;
   };
   let kANDa_info = $derived(rAmAyaNam_map[$kANDa_selected - 1]);
   let sarga_info = $derived(kANDa_info.sarga_data[$sarga_selected - 1]);
@@ -47,7 +48,6 @@
   let shloka_numb = writable(1);
   let base_user_prompt = writable<string>(base_prompts.main_prompt[0].content);
   let auto_gen_image = writable(false);
-  let additional_prompt_info = writable('');
   let shloka_text_prompt = writable('');
   let image_prompt = writable('');
   let load_ai_sample_data = $state(false);
@@ -64,11 +64,14 @@
     // 'dall-e-2': ['DALL-E 2', '$0.02 (₹1.68) / image']
   };
 
-  $effect(() => {
-    $additional_prompt_info =
-      `This Shloka is from Chapter ${sarga_info.index} named ${sarga_info.name_normal}, which is from Book ${kANDa_info.index} ` +
-      `named ${kANDa_info.name_normal} from Ramayan, the ancient Indian Epic.`;
-  });
+  let additional_prompt_info = $derived(
+    format_string_text(base_prompts.additional_prompt_info, {
+      sarga_index: sarga_info.index,
+      sarga_name_normal: sarga_info.name_normal,
+      kANDa_index: kANDa_info.index,
+      kANDa_name_normal: kANDa_info.name_normal
+    })
+  );
 
   $effect(() => {
     !$trans_en_data.isFetching &&
@@ -90,7 +93,7 @@
       messages: [
         {
           role: 'user',
-          content: base_prompts.main_prompt[0].content + $additional_prompt_info
+          content: base_prompts.main_prompt[0].content + additional_prompt_info
         },
         {
           role: 'assistant',
@@ -164,7 +167,7 @@
       <span class="font-bold">Base Prompt</span>
       <button
         class="btn m-0 p-0 outline-none"
-        onclick={() => copy_text_to_clipboard($base_user_prompt + $additional_prompt_info)}
+        onclick={() => copy_text_to_clipboard($base_user_prompt + additional_prompt_info)}
         title="Copy Base Prompt"
       >
         <Icon src={LuCopy} />
@@ -174,7 +177,7 @@
         title="Copy Full Prompt"
         onclick={() =>
           copy_text_to_clipboard(
-            $base_user_prompt + $additional_prompt_info + '\n\n\n' + $shloka_text_prompt
+            $base_user_prompt + additional_prompt_info + '\n\n\n' + $shloka_text_prompt
           )}
       >
         <Icon src={OiCopy16} class="text-[1.2rem]" />
@@ -187,7 +190,7 @@
     ></textarea>
   </div>
   <div class="break-words text-xs text-stone-500 dark:text-stone-400">
-    {$additional_prompt_info}
+    {additional_prompt_info}
   </div>
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
