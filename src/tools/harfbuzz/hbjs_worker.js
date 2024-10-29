@@ -1,8 +1,39 @@
 import { load_hbjs } from './load_hbjs';
+/**
+ * @import {WorkerMessage} from './types';
+ */
 
 /**
  * @type {Record<string, Uint8Array>}
  */
+
+self.onmessage = async function (event) {
+  /** @type {WorkerMessage} */
+  const input = event.data;
+  if (input.func_name === 'get_text_svg_path') {
+    const result = await get_text_svg_path(input.args.text, input.args.font);
+    self.postMessage({
+      func_name: input.func_name,
+      uuid: input.uuid,
+      response: result
+    });
+  } else if (input.func_name === 'preload_harfbuzzjs_wasm') {
+    await preload_harbuzzjs_wasm();
+    self.postMessage({
+      func_name: input.func_name,
+      uuid: input.uuid,
+      response:undefined
+    });
+  } else if (input.func_name === 'preload_font_from_url') {
+    await preload_font_from_url(input.args.url);
+    self.postMessage({
+      func_name: input.func_name,
+      uuid: input.uuid,
+      response: undefined
+    });
+  }
+};
+
 const FONT_CACHE = {};
 
 const load_font_from_url = async (font_url) => {
