@@ -26,7 +26,7 @@
   import { lipi_parivartak_async } from '~/tools/converter';
   import { user_info } from '~/state/main_page/user';
   import { RiUserFacesRobot2Line } from 'svelte-icons-pack/ri';
-  import * as test_worker from './worker_test?worker';
+  import test_worker from './worker_test?worker';
   import { onMount } from 'svelte';
 
   let current_workbook = $state<Workbook>(null!);
@@ -125,7 +125,7 @@
     }
   });
   onMount(() => {
-    const worker = new test_worker.default();
+    const worker = new test_worker();
     worker.onmessage = function (event) {
       const factorialResult = event.data;
       console.log(factorialResult);
