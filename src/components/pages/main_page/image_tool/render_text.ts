@@ -328,13 +328,6 @@ export const render_all_texts = async (
     preload_harbuzzjs_wasm()
   ]);
 
-  // remove all previous texts, textboxes and lines
-  $canvas.getObjects().forEach((obj) => {
-    if (!obj || obj.type === 'image') return;
-    $canvas.remove(obj);
-  });
-  $canvas.discardActiveObject();
-
   // fetch shloka config
   const shloka_data =
     $image_sarga_data.data![
@@ -363,7 +356,7 @@ export const render_all_texts = async (
   current_shloka_type.set(shloka_lines.length as keyof typeof $shloka_configs);
   const shloka_config = $shloka_configs[get(current_shloka_type)];
 
-  await draw_bounding_and_reference_lines(shloka_config);
+  const canvasObjects: fabric.Object[] = [];
 
   // shloka
   for (let i = 0; i < shloka_lines.length; i++) {
@@ -412,8 +405,8 @@ export const render_all_texts = async (
           get_units($SPACE_BETWEEN_MAIN_AND_NORM) +
           (text_norm_group.height + get_units($SPACE_ABOVE_REFERENCE_LINE)))
     });
-    $canvas.add(text_main_group.group);
-    $canvas.add(text_norm_group.group);
+    canvasObjects.push(text_main_group.group);
+    canvasObjects.push(text_norm_group.group);
     if (i === shloka_lines.length - 1) {
       const number_main_text = main_text.split(' ').at(-1)!;
       const number_indicator_main = await render_text({
@@ -428,7 +421,7 @@ export const render_all_texts = async (
         align: 'right',
         top: shloka_config.bounding_coords.top + 8
       });
-      $canvas.add(number_indicator_main.group);
+      canvasObjects.push(number_indicator_main.group);
 
       const number_indicator_norm = await render_text({
         text: norm_text.split(' ').at(-1)!,
@@ -445,7 +438,7 @@ export const render_all_texts = async (
       number_indicator_norm.group.set({
         top: number_indicator_main.group.top + get_units(5) + number_indicator_main.height
       });
-      $canvas.add(number_indicator_norm.group);
+      canvasObjects.push(number_indicator_norm.group);
     }
   }
 
@@ -470,8 +463,19 @@ export const render_all_texts = async (
       lockScalingY: false,
       new_line_spacing_factor: trans_text_font_info.new_line_spacing
     });
-    $canvas.add(trans_text.group);
+    canvasObjects.push(trans_text.group);
   }
+
+  // remove all previous texts, textboxes and lines
+  $canvas.getObjects().forEach((obj) => {
+    if (!obj || obj.type === 'image') return;
+    $canvas.remove(obj);
+  });
+  $canvas.discardActiveObject();
+  await draw_bounding_and_reference_lines(shloka_config);
+  canvasObjects.forEach((obj) => {
+    $canvas.add(obj);
+  });
   $canvas.requestRenderAll();
   return shloka_config;
 };
