@@ -1,5 +1,5 @@
-import load_hdjs_worker from './hbjs_worker?worker'
-import type { WorkerMessage, WorkerMessageNoUUID } from './types'
+import load_hdjs_worker from './core/worker?worker'
+import type { WorkerMessage, WorkerMessageNoUUID } from './core/types'
 
 const hbjs_worker = new load_hdjs_worker();
 
@@ -46,7 +46,7 @@ export async function get_text_svg_path(text: string, font: string | Uint8Array)
     }) as string;
 }
 
-export async function preload_harbuzzjs_wasm() {
+export async function preload_harfbuzzjs_wasm() {
     return await postMessage({
         func_name: "preload_harfbuzzjs_wasm"
     }) as void;

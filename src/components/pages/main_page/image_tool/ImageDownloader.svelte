@@ -12,7 +12,8 @@
     background_image,
     IMAGE_DIMENSIONS,
     get_units,
-    image_lang
+    image_lang,
+    image_rendering_state
   } from './state';
   import { download_file_in_browser } from '~/tools/download_file_browser';
   import JSZip from 'jszip';
@@ -102,6 +103,7 @@
 
   const download_png_zip = async (remove_back: boolean) => {
     const zip = new JSZip();
+    $image_rendering_state = true;
     for (let i = -1; i <= shloka_count; i++) {
       await render_all_texts(i, $image_script, $image_lang);
       const { url, name } = await download_image_as_png(remove_back, false, i, false);
@@ -109,6 +111,7 @@
       zip.file(name, blob);
     }
     await render_all_texts($image_shloka, $image_script, $image_lang);
+    $image_rendering_state = false;
     const zip_blob = await zip.generateAsync({ type: 'blob' });
     download_file_in_browser(
       URL.createObjectURL(zip_blob),
@@ -119,12 +122,14 @@
   };
   const download_svg_zip = async () => {
     const zip = new JSZip();
+    $image_rendering_state = true;
     for (let i = -1; i <= shloka_count; i++) {
       await render_all_texts(i, $image_script, $image_lang);
       const { blob, name } = await download_image_as_svg(false, i);
       zip.file(name, blob);
     }
     await render_all_texts($image_shloka, $image_script, $image_lang);
+    $image_rendering_state = false;
     const zip_blob = await zip.generateAsync({ type: 'blob' });
     download_file_in_browser(
       URL.createObjectURL(zip_blob),
