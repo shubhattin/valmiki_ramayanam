@@ -1,12 +1,12 @@
-import type * as func_types from './core/hbjs';
+import type * as functions from './core/hbjs';
 
-export type Arg<F extends keyof typeof func_types> = {
+export type Arg<F extends keyof typeof functions> = {
   func_name: F;
-  args: Parameters<(typeof func_types)[F]>;
+  args: Parameters<(typeof functions)[F]>;
 };
 
-export type ArgUUID<F extends keyof typeof func_types> = {
+export type ArgUUID<F extends keyof typeof functions> = {
   func_name: F;
-  args: Parameters<(typeof func_types)[F]>;
+  args: Parameters<(typeof functions)[F]>;
   uuid: string;
 };

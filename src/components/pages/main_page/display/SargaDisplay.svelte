@@ -263,6 +263,7 @@
     {:else if $trans_en_data.data.size !== 0}
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <div
+        transition:slide
         ondblclick={() => copy_text($trans_en_data.data.get(trans_index)!)}
         class="text-stone-500 dark:text-slate-400"
         style:font-size={`${en_trans_text_font_info.size}rem`}
@@ -297,6 +298,7 @@
     {:else if $trans_lang !== '--' && $trans_lang_data.data.size !== 0}
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <div
+        transition:slide
         ondblclick={() => copy_text($trans_lang_data.data?.get(trans_index)!)}
         class="text-yellow-700 dark:text-yellow-500"
         style:font-size={`${trans_text_font_info.size}rem`}

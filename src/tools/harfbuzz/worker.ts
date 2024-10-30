@@ -1,11 +1,8 @@
 import * as functions from './core/hbjs';
+import type { ArgUUID } from './types';
 
 self.onmessage = async function (event) {
-  const input: {
-    func_name: string;
-    uuid: string;
-    args: any[];
-  } = event.data;
+  const input: ArgUUID<keyof typeof functions> = event.data;
   const function_names = Object.keys(functions) as (keyof typeof functions)[];
   for (const func_name of function_names) {
     if (func_name === input.func_name) {

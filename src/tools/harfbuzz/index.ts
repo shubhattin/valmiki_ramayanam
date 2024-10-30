@@ -1,6 +1,6 @@
 import load_hdjs_worker from './worker?worker';
 import type { Arg, ArgUUID } from './types';
-import type * as functions from './core/hbjs';2
+import type * as functions from './core/hbjs';
 
 const hbjs_worker = new load_hdjs_worker();
 
