@@ -8,7 +8,11 @@ import {
   trans_text_font_configs
 } from './state';
 import * as fabric from 'fabric';
-import { get_text_svg_path, preload_font_from_url, preload_harfbuzzjs_wasm } from '~/tools/harfbuzz';
+import {
+  get_text_svg_path,
+  preload_font_from_url,
+  preload_harfbuzzjs_wasm
+} from '~/tools/harfbuzz';
 import {
   current_shloka_type,
   shloka_configs,

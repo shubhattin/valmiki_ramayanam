@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { IconType } from 'svelte-icons-pack';
   import { cl_join } from './cl_join';
-  
+
   interface Props {
     src: IconType;
     title?: string | undefined;
@@ -20,8 +20,6 @@
     children
   }: Props = $props();
   let innerHtml: string = $derived((title ? `<title>${title}</title>` : '') + src.c);
-
-  
 </script>
 
 <span class={outerClass}>
