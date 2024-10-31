@@ -6,7 +6,7 @@
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import { writable } from 'svelte/store';
   import ai_text_prompts from './ai_text_prompts.yaml';
-  import { SlideToggle } from '@skeletonlabs/skeleton';
+  import { SlideToggle, ProgressRadial } from '@skeletonlabs/skeleton';
   import { client_q, type client } from '~/api/client';
   import { lipi_parivartak } from '~/tools/converter';
   import { copy_text_to_clipboard, format_string_text } from '~/tools/kry';
@@ -57,9 +57,9 @@
     typeof client.ai.get_generated_images.mutate
   >[0]['image_model'];
   let image_model: image_models_type = $state('dall-e-3');
-  const IMAGE_MODELS: Record<image_models_type, [string, string]> = {
-    'dall-e-3': ['DALL-E 3', '$0.04 (₹3.4) / image'],
-    'sd3-core': ['SD3 Core', '$0.03 (₹2.5) / image']
+  const IMAGE_MODELS: Record<image_models_type, [string, string, number]> = {
+    'dall-e-3': ['DALL-E 3', '$0.04 (₹3.4) / image', 15],
+    'sd3-core': ['SD3 Core', '$0.03 (₹2.5) / image', 16]
     // sdxl: ['SDXL', '$0.002 (₹0.17) / image'],
     // 'dall-e-2': ['DALL-E 2', '$0.02 (₹1.68) / image']
   };
@@ -105,14 +105,25 @@
     });
   };
   const NUMBER_OF_IMAGES = 1;
+  let image_gen_time_taken = $state(0);
   // ^ Also update grid-cols-<num> in image rendering
   const generate_image = async () => {
+    image_gen_time_taken = 0;
+    const interval = setInterval(() => {
+      image_gen_time_taken++;
+      if (image_gen_time_taken === IMAGE_MODELS[image_model][2]) {
+        clearInterval(interval);
+        return;
+      }
+    }, 1000);
     await $image_mut.mutateAsync({
       image_prompt: $image_prompt,
       number_of_images: NUMBER_OF_IMAGES,
       use_sample_data: load_ai_sample_data,
       image_model
     });
+    clearInterval(interval);
+    image_gen_time_taken = 0;
   };
   const image_prompt_mut = client_q.ai.get_image_prompt.mutation({
     async onSuccess(dt) {
@@ -277,6 +288,17 @@
       >
         <Icon src={BsCopy} class="text-lg" />
       </button>
+      {#if $image_mut.isPending}
+        <ProgressRadial
+          value={(image_gen_time_taken / IMAGE_MODELS[image_model][2]) * 100}
+          stroke={100}
+          width="w-6"
+          class="-mb-2 inline-block"
+          meter="stroke-primary-500"
+          track="stroke-primary-500/30"
+          strokeLinecap="butt"
+        />
+      {/if}
     </div>
     <textarea
       class={cl_join(
