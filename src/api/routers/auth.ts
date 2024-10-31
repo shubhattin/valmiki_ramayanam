@@ -168,7 +168,6 @@ const add_new_user_route = publicProcedure
     username = cleanUpWhitespace(username);
     name = cleanUpWhitespace(name);
     email = cleanUpWhitespace(email);
-    if (contact_number) contact_number = cleanUpWhitespace(contact_number);
     const returning_data = await db
       .insert(users)
       .values({
