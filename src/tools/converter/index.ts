@@ -59,11 +59,22 @@ export const get_sa_mode = async (lang: string) => {
   });
 };
 
-export const load_parivartak_lang_data = async (lang: string, base_lang_folder = './src') => {
-  return await postMessage({
-    func_name: 'load_parivartak_lang_data',
-    args: [lang, base_lang_folder]
-  });
+export const load_parivartak_lang_data = async (
+  lang: string,
+  base_lang_folder = './src',
+  load_in_main = false
+) => {
+  await Promise.all([
+    await postMessage({
+      func_name: 'load_parivartak_lang_data',
+      args: [lang, base_lang_folder]
+    }),
+    load_in_main &&
+      postMessage(
+        { func_name: 'load_parivartak_lang_data', args: [lang, base_lang_folder] },
+        'only'
+      )
+  ]);
 };
 
 const _lipi_parivartak = async (val: string, from: string, to: string) => {
@@ -111,9 +122,7 @@ export const lekhika_typing_tool = async (
     func_name: 'lekhika_typing_tool',
     args: [event_data, lang, on_status, sa_mode]
   });
-  if (!input_data) {
-    return;
-  }
+  if (!input_data) return;
   const { val, from_click } = input_data;
   let dyn = elm.value;
   let current_cursor_pos = elm.selectionStart + 1;
