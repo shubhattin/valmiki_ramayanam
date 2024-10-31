@@ -23,17 +23,20 @@ if (typeof Worker !== 'undefined') {
   };
 }
 
-const get_lipi_lekhika_instance = async () => {
+export const load_lipi_lekhika_instance = async () => {
   return await import('./lekhika_core');
 };
 
-async function postMessage<F extends keyof typeof functions>(message: Arg<F>) {
+async function postMessage<F extends keyof typeof functions>(
+  message: Arg<F>,
+  load_main: 'both' | 'only' | false = false
+) {
   return new Promise<ReturnType<(typeof functions)[F]>>(async (resolve, reject) => {
-    if (!lekhika_worker) {
-      const lipi_lekhika = await get_lipi_lekhika_instance();
+    if (!lekhika_worker || load_main) {
+      const lipi_lekhika = await load_lipi_lekhika_instance();
       // @ts-ignore
       resolve(lipi_lekhika[message.func_name](...message.args));
-      return;
+      if (!load_main || load_main === 'only') return;
     }
     const uuid = crypto.randomUUID();
     const post_message: ArgUUID<F> = {
