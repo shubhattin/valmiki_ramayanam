@@ -98,9 +98,7 @@
   let trans_text_font_info = $derived(get_font_family_and_size($trans_lang as lang_list_type));
   const en_trans_text_font_info = get_font_family_and_size('English');
   const input_func = async (
-    e: Event & {
-      currentTarget: EventTarget & HTMLTextAreaElement;
-    },
+    e: any,
     trans_index: number
   ) => {
     if (!$added_translations_indexes.includes(trans_index))
@@ -121,7 +119,7 @@
         $sanskrit_mode as 0 | 1
       );
     if (!callback_function_called_from_lipi_lekhika) {
-      update_trans_lang_data(trans_index, e.currentTarget.value);
+      update_trans_lang_data(trans_index, e.target.value);
     }
   };
 

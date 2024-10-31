@@ -102,7 +102,7 @@
           await lekhika_typing_tool(e.target, e.data, $from_lang, true, (val) => {
             $from_text = val;
           });
-        else $from_text = e.currentTarget.value;
+        else $from_text = (e.target as any).value;
       }}
       onkeyup={(e) =>
         detect_shortcut_pressed(e, () => (from_text_type_enabled = !from_text_type_enabled))}
@@ -169,7 +169,7 @@
           await lekhika_typing_tool(e.target, e.data, $to_lang, true, (val) => {
             $to_text = val;
           });
-        else $to_text = e.currentTarget.value;
+        else $to_text = (e.target as any).value;
       }}
       onkeyup={(e) =>
         detect_shortcut_pressed(e, () => (to_text_type_enabled = !to_text_type_enabled))}

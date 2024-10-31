@@ -97,7 +97,7 @@ export const lipi_parivartak = async (val: string, from: string, to: string) => 
  * @returns {Promise<void>}
  */
 export const lekhika_typing_tool = async (
-  elmt: any,
+  elm: any,
   event_data: string = '',
   lang: string = '',
   on_status: boolean = true,
@@ -108,10 +108,10 @@ export const lekhika_typing_tool = async (
     func_name: 'lekhika_typing_tool',
     args: [event_data, lang, on_status, sa_mode]
   });
-
-  if (!input_data) return;
+  if (!input_data) {
+    return;
+  }
   const { val, from_click } = input_data;
-  let elm = elmt;
   let dyn = elm.value;
   let current_cursor_pos = elm.selectionStart + 1;
   let ex = 0;
@@ -132,8 +132,5 @@ export const lekhika_typing_tool = async (
   elm.focus();
   elm.selectionStart = length;
   elm.selectionEnd = length;
-  if (callback) {
-    callback(new_value);
-    callback = null;
-  }
+  callback && callback(new_value);
 };
