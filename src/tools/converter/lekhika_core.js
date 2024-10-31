@@ -662,10 +662,7 @@ const _lipi_parivartak = async (val, from, to) => {
  * @returns {any} - A promise that resolves to the converted text or array of texts
  */
 export const lipi_parivartak = async (val, from, to) => {
-  await Promise.all([
-    load_parivartak_lang_data(from),
-    load_parivartak_lang_data(to)
-  ]);
+  await Promise.all([load_parivartak_lang_data(from), load_parivartak_lang_data(to)]);
   if (Array.isArray(val)) {
     return await Promise.all(val.map((text) => _lipi_parivartak(text, from, to)));
   }

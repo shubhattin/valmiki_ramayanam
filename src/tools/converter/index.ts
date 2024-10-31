@@ -85,11 +85,15 @@ export const load_parivartak_lang_data = async (
  * It does not require the user to manually load the languages before converting the text
  * It is used to convert the text from one script to another
  **/
-export const lipi_parivartak = async <T extends string | string[]>(val: T, from: string, to: string) => {
-  return await postMessage({
+export const lipi_parivartak = async <T extends string | string[]>(
+  val: T,
+  from: string,
+  to: string
+) => {
+  return (await postMessage({
     func_name: 'lipi_parivartak',
     args: [val, from, to]
-  }) as Promise<T extends string ? string : string[]>;
+  })) as Promise<T extends string ? string : string[]>;
 };
 
 /**
@@ -146,4 +150,3 @@ export const lekhika_typing_tool = async (
   elm.selectionEnd = length;
   callback && callback(new_value);
 };
-

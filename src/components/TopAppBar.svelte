@@ -8,7 +8,6 @@
   import { AiOutlineMenu } from 'svelte-icons-pack/ai';
   import { YoutubeIcon } from '~/components/icons';
   import { page } from '$app/stores';
-  import { main_app_bar_info } from '~/state/app_bar';
   import { PAGE_TITLES } from '~/state/page_titles';
 
   type Props = {
@@ -19,22 +18,7 @@
 
   let { start, headline, end }: Props = $props();
 
-  let page_url = $derived($page.url.pathname);
-
-  $effect(() => {
-    if (page_url in PAGE_TITLES) {
-      const [TITLE, CLASS]: string[] = PAGE_TITLES[page_url as keyof typeof PAGE_TITLES];
-      $main_app_bar_info = {
-        title: TITLE,
-        className: CLASS
-      };
-    } else if ($page.error) {
-      $main_app_bar_info = {
-        title: null,
-        className: null
-      };
-    }
-  });
+  let route_id = $derived($page.route.id as keyof typeof PAGE_TITLES);
 
   const app_menu_popup: PopupSettings = {
     event: 'click',
@@ -55,8 +39,11 @@
           />
         </a>
       {/if} -->
-    {#if headline}{@render headline()}{:else}
-      <span class={$main_app_bar_info.className ?? ''}>{$main_app_bar_info.title ?? ''}</span>
+    {@render headline?.()}
+    {#if route_id in PAGE_TITLES}
+      <span class={PAGE_TITLES[route_id as keyof typeof PAGE_TITLES][1]}>
+        {PAGE_TITLES[route_id as keyof typeof PAGE_TITLES][0]}
+      </span>
     {/if}
   {/snippet}
   <!-- <svelte:fragment slot="headline">
@@ -65,7 +52,7 @@
   {#snippet trail()}
     {@render end?.()}
     <div class="space-x-2">
-      {#if page_url !== '/convert'}
+      {#if route_id !== '/convert'}
         <a class="text-xl" href="/convert" title="Lipi Parivartak">
           <Icon
             src={SiConvertio}
