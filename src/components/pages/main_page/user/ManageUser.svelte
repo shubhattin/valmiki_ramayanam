@@ -1,6 +1,6 @@
 <script lang="ts">
   import Icon from '~/tools/Icon.svelte';
-  import { client_q } from '~/api/client';
+  import { client, client_q } from '~/api/client';
   import { getModalStore, popup } from '@skeletonlabs/skeleton';
   import { RiSystemAddLargeFill, RiSystemCloseLargeLine } from 'svelte-icons-pack/ri';
   import { browser } from '$app/environment';
@@ -8,55 +8,52 @@
   import { FiEdit3 } from 'svelte-icons-pack/fi';
   import { LANG_LIST } from '~/tools/lang_list';
   import { user_info } from '~/state/main_page/user';
-  import { useQueryClient } from '@tanstack/svelte-query';
-  import { untrack } from 'svelte';
+  import { useQueryClient, createQuery } from '@tanstack/svelte-query';
 
   const modal_store = getModalStore();
   const query_client = useQueryClient();
 
   const currrent_user_info = $user_info!;
-  let admin_users_index = $state<number[]>([]);
-  let normal_users_index = $state<number[]>([]);
-  let unverified_normal_users_index: number[] = $state([]);
-  let selected_langs_index: string[][] = $state([]);
+  let admin_users_index = $state.raw<number[]>([]);
+  let normal_users_index = $state.raw<number[]>([]);
+  let unverified_normal_users_index: number[] = $state.raw([]);
+  let selected_langs_index: string[][] = $state.raw([]);
 
+  // the built in invaliadte in `svelte-trpc-query` is not working! so manually invalidate the query
+  const USERS_INFO_QUERY_KEY = [['user_info', 'get_all_users_info'], { type: 'query' }];
   let users_info = $derived(
-    client_q.user_info.get_all_users_info.query(undefined, {
+    createQuery({
       enabled: browser && $user_info?.user_type === 'admin',
+      queryKey: USERS_INFO_QUERY_KEY,
+      queryFn: async () => {
+        const info = await client.user_info.get_all_users_info.query();
+        admin_users_index = [];
+        normal_users_index = [];
+        unverified_normal_users_index = [];
+        selected_langs_index = [];
+        for (let i = 0; i < info.length; i++) {
+          const user = info[i];
+          if (user.user_type === 'admin') {
+            admin_users_index.push(i);
+          } else {
+            if (!user.user_verification_requests) {
+              normal_users_index.push(i);
+              selected_langs_index.push(user.allowed_langs ? user.allowed_langs : []);
+            } else unverified_normal_users_index.push(i);
+          }
+        }
+        return info;
+      },
       placeholderData: [],
       refetchOnMount: 'always'
     })
   );
-  // the built in invaliadte in `svelte-trpc-query` is not working! so manually invalidate the query
-  const USERS_INFO_QUERY_KEY = [['user_info', 'get_all_users_info'], { type: 'query' }];
+
   const invaliadte_users_info = () =>
     query_client.invalidateQueries({
       queryKey: USERS_INFO_QUERY_KEY,
       exact: true
     });
-
-  $effect(() => {
-    if (!$users_info.isSuccess) return;
-    // this is simulate onSucess
-    untrack(() => {
-      const info = $users_info.data;
-      admin_users_index = [];
-      normal_users_index = [];
-      unverified_normal_users_index = [];
-      selected_langs_index = [];
-      for (let i = 0; i < info.length; i++) {
-        const user = info[i];
-        if (user.user_type === 'admin') {
-          admin_users_index.push(i);
-        } else {
-          if (!user.user_verification_requests) {
-            normal_users_index.push(i);
-            selected_langs_index.push(user.allowed_langs ? user.allowed_langs : []);
-          } else unverified_normal_users_index.push(i);
-        }
-      }
-    });
-  });
 
   const add_allowed_lang = client_q.auth.add_user_allowed_langs.mutation({
     onSuccess() {
