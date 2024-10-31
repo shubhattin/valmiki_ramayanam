@@ -25,7 +25,7 @@ import { canvas } from './state';
 import { get } from 'svelte/store';
 import { browser } from '$app/environment';
 import type { lang_list_type, script_list_type } from '~/tools/lang_list';
-import { lipi_parivartak_async } from '~/tools/converter';
+import { lipi_parivartak } from '~/tools/converter';
 import { get_font_url } from '~/tools/font_tools';
 import { BASE_SCRIPT } from '~/state/main_page/main_state';
 
@@ -364,7 +364,7 @@ export const render_all_texts = async (
 
   // shloka
   for (let i = 0; i < shloka_lines.length; i++) {
-    const main_text = await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, $image_script);
+    const main_text = await lipi_parivartak(shloka_lines[i], BASE_SCRIPT, $image_script);
     const text_main_group = await render_text({
       text: main_text,
       font_url: get_font_url(main_text_font_info.key, 'bold'),
@@ -380,7 +380,7 @@ export const render_all_texts = async (
       align: 'center',
       lockMovementY: false
     });
-    const norm_text = await lipi_parivartak_async(shloka_lines[i], BASE_SCRIPT, 'Normal');
+    const norm_text = await lipi_parivartak(shloka_lines[i], BASE_SCRIPT, 'Normal');
     const text_norm_group = await render_text({
       text: norm_text,
       font_url: get_font_url(norm_text_font_info.key, 'regular'),

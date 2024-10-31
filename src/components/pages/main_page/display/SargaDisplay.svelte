@@ -1,5 +1,5 @@
 <script lang="ts">
-  import LipiLekhikA, { lipi_parivartak_async } from '~/tools/converter';
+  import { lekhika_typing_tool, lipi_parivartak } from '~/tools/converter';
   import { fade, slide } from 'svelte/transition';
   import { cl_join } from '~/tools/cl_join';
   import {
@@ -41,7 +41,7 @@
   $effect(() => {
     Promise.all(
       ($sarga_data.data ?? []).map((shloka_lines) =>
-        lipi_parivartak_async(shloka_lines, BASE_SCRIPT, $viewing_script)
+        lipi_parivartak(shloka_lines, BASE_SCRIPT, $viewing_script)
       )
     ).then((data) => {
       transliterated_sarga_data = data;
@@ -83,11 +83,7 @@
   const copy_sarga_with_transliteration_and_translation = async () => {
     const texts_to_copy = await Promise.all(
       transliterated_sarga_data.map(async (shloka_lines, i) => {
-        const normal_shloka = await lipi_parivartak_async(
-          $sarga_data.data![i],
-          BASE_SCRIPT,
-          'Normal'
-        );
+        const normal_shloka = await lipi_parivartak($sarga_data.data![i], BASE_SCRIPT, 'Normal');
         const trans_index = transliterated_sarga_data.length - 1 === i ? -1 : i;
         let txt = `${shloka_lines}\n${normal_shloka}`;
         const lang_data = $trans_lang === '--' ? $trans_en_data.data : $trans_lang_data.data;
@@ -101,7 +97,7 @@
   let main_text_font_info = $derived(get_font_family_and_size($viewing_script));
   let trans_text_font_info = $derived(get_font_family_and_size($trans_lang as lang_list_type));
   const en_trans_text_font_info = get_font_family_and_size('English');
-  const input_func = (
+  const input_func = async (
     e: Event & {
       currentTarget: EventTarget & HTMLTextAreaElement;
     },
@@ -111,7 +107,7 @@
       $edited_translations_indexes.add(trans_index);
     let callback_function_called_from_lipi_lekhika = false;
     if ($edit_language_typer_status && !$english_edit_status)
-      LipiLekhikA.mukhya(
+      await lekhika_typing_tool(
         e.target,
         // @ts-ignore
         e.data,
@@ -122,7 +118,7 @@
           update_trans_lang_data(trans_index, val);
           callback_function_called_from_lipi_lekhika = true;
         },
-        $sanskrit_mode
+        $sanskrit_mode as 0 | 1
       );
     if (!callback_function_called_from_lipi_lekhika) {
       update_trans_lang_data(trans_index, e.currentTarget.value);

@@ -2,7 +2,11 @@
   import Icon from '~/tools/Icon.svelte';
   import { SlideToggle } from '@skeletonlabs/skeleton';
   import { SCRIPT_LIST, type script_list_type } from '~/tools/lang_list';
-  import LipiLekhikA, { load_parivartak_lang_data, lipi_parivartak_async } from '~/tools/converter';
+  import {
+    load_parivartak_lang_data,
+    lipi_parivartak,
+    lekhika_typing_tool
+  } from '~/tools/converter';
   import { FaCircleUp, FaCircleDown } from 'svelte-icons-pack/fa';
   import { writable } from 'svelte/store';
   import type { Writable } from 'svelte/store';
@@ -34,7 +38,7 @@
     source_lang: string,
     target_lang: string
   ) {
-    target.set(await lipi_parivartak_async(source_text, source_lang, target_lang));
+    target.set(await lipi_parivartak(source_text, source_lang, target_lang));
   }
   const copy_text_to_clipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -92,10 +96,10 @@
       bind:value={$from_text}
       style:font-size={`${from_text_font_info.size}rem`}
       style:font-family={from_text_font_info.family}
-      oninput={(e) => {
+      oninput={async (e) => {
         if (from_text_type_enabled)
           // @ts-ignore
-          LipiLekhikA.mukhya(e.target, e.data, $from_lang, true, (val) => {
+          await lekhika_typing_tool(e.target, e.data, $from_lang, true, (val) => {
             $from_text = val;
           });
         else $from_text = e.currentTarget.value;
@@ -159,10 +163,10 @@
       style:font-size={`${to_text_font_info.size}rem`}
       style:font-family={to_text_font_info.family}
       placeholder={`Enter text in ${$to_lang}`}
-      oninput={(e) => {
+      oninput={async (e) => {
         if (to_text_type_enabled)
           // @ts-ignore
-          LipiLekhikA.mukhya(e.target, e.data, $to_lang, true, (val) => {
+          await lekhika_typing_tool(e.target, e.data, $to_lang, true, (val) => {
             $to_text = val;
           });
         else $to_text = e.currentTarget.value;

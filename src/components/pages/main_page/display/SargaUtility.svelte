@@ -23,7 +23,7 @@
   import type { Workbook } from 'exceljs';
   import { TrOutlineFileTypeTxt } from 'svelte-icons-pack/tr';
   import { download_file_in_browser } from '~/tools/download_file_browser';
-  import { lipi_parivartak_async } from '~/tools/converter';
+  import { lipi_parivartak } from '~/tools/converter';
   import { user_info } from '~/state/main_page/user';
   import { RiUserFacesRobot2Line } from 'svelte-icons-pack/ri';
 
@@ -98,7 +98,7 @@
       const text = (
         await Promise.all(
           $sarga_data.data!.map((shloka_lines) =>
-            lipi_parivartak_async(shloka_lines, BASE_SCRIPT, $viewing_script)
+            lipi_parivartak(shloka_lines, BASE_SCRIPT, $viewing_script)
           )
         )
       ).join('\n\n');
@@ -108,7 +108,7 @@
         rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].name_normal.split(
           '\n'
         )[0];
-      const sarga_name_script = await lipi_parivartak_async(
+      const sarga_name_script = await lipi_parivartak(
         rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].name_devanagari.split(
           '\n'
         )[0],

@@ -1,5 +1,5 @@
 import type ExcelJS from 'exceljs';
-import LipiLekhikA, { normalize_lang_code, lipi_parivartak_async } from '~/tools/converter';
+import { normalize_lang_code, lipi_parivartak, load_parivartak_lang_data } from '~/tools/converter';
 
 /**
  * To transliterate text in a given Excel file
@@ -27,13 +27,7 @@ export const transliterate_xlxs_file = async (
     if (sheets_to_process !== 'all' && !sheets_to_process.includes(i_worksheet + 1)) continue;
     const worksheet = workbook.worksheets[i_worksheet];
 
-    await LipiLekhikA.k.load_lang(
-      base_lang_code,
-      null,
-      false,
-      true,
-      base_folder_path_lipi_parivartak!
-    );
+    await load_parivartak_lang_data(base_lang_code, base_folder_path_lipi_parivartak!);
 
     const lang_row = worksheet.getRow(lang_row_index);
     const text_col = worksheet.getColumn(text_col_index);
@@ -50,17 +44,11 @@ export const transliterate_xlxs_file = async (
         const script_name = cell.value!.toLocaleString().trim().replaceAll(' ', ''); // trimming white spaces and
         const script_code = normalize_lang_code(script_name);
         if (script_code && script_code !== base_lang_code) {
-          await LipiLekhikA.k.load_lang(
-            script_code,
-            null,
-            false,
-            true,
-            base_folder_path_lipi_parivartak!
-          );
+          await load_parivartak_lang_data(script_code, base_folder_path_lipi_parivartak!);
           for (let val_pair of texts) {
             const text = val_pair[1];
             const i = val_pair[0];
-            const out = await lipi_parivartak_async(text, base_lang_code, script_code);
+            const out = await lipi_parivartak(text, base_lang_code, script_code);
             worksheet.getCell(i, col_i).value = out;
           }
         }

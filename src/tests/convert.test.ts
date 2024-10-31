@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { lipi_parivartak_async } from '../tools/converter';
+import { lipi_parivartak } from '../tools/converter';
 
 describe('Test Custom Patches on Normal <-> Devangari Texts', () => {
   const dev_to_normal_texts = [
@@ -24,7 +24,7 @@ describe('Test Custom Patches on Normal <-> Devangari Texts', () => {
     for (let data of TESTS) {
       const dev_text = data[0];
       const expected = data[1];
-      const out_data = await lipi_parivartak_async(dev_text, SOURCE_LANG, TARGET_LANG);
+      const out_data = await lipi_parivartak(dev_text, SOURCE_LANG, TARGET_LANG);
       expect(out_data).toBe(expected);
     }
   });
@@ -34,7 +34,7 @@ describe('Test Custom Patches on Normal <-> Devangari Texts', () => {
     for (let data of dev_to_normal_texts) {
       const normal_text = data[1];
       const expected = data[0];
-      const out_data = await lipi_parivartak_async(normal_text, SOURCE_LANG, TARGET_LANG);
+      const out_data = await lipi_parivartak(normal_text, SOURCE_LANG, TARGET_LANG);
       expect(out_data).toBe(expected);
     }
   });
@@ -58,8 +58,8 @@ describe('Test anunAsika', () => {
       const SOURCE_LANG = 'Sanskrit';
       const TARGET_LANG = lang;
       for (let data of TESTS) {
-        const out_data_1 = await lipi_parivartak_async(data[0], SOURCE_LANG, TARGET_LANG);
-        const out_data_2 = await lipi_parivartak_async(data[1], SOURCE_LANG, TARGET_LANG);
+        const out_data_1 = await lipi_parivartak(data[0], SOURCE_LANG, TARGET_LANG);
+        const out_data_2 = await lipi_parivartak(data[1], SOURCE_LANG, TARGET_LANG);
         expect(out_data_1).toBe(out_data_2);
       }
     }

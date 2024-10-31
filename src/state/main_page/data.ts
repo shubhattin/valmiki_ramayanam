@@ -6,7 +6,7 @@ import { queryClient } from '~/state/query';
 import { derived } from 'svelte/store';
 import { client } from '~/api/client';
 import rAmAyaNam_map from '@data/ramayan/ramayan_map.json';
-import { lipi_parivartak_async } from '~/tools/converter';
+import { lipi_parivartak } from '~/tools/converter';
 
 import {
   BASE_SCRIPT,
@@ -39,7 +39,7 @@ export const QUERY_KEYS = {
 export const get_kANDa_names = async (lang: string) => {
   const data = rAmAyaNam_map.map((kANDa) => kANDa.name_devanagari);
   if (!browser) return data;
-  return Promise.all(data.map((kANDa) => lipi_parivartak_async(kANDa, BASE_SCRIPT, lang)));
+  return Promise.all(data.map((kANDa) => lipi_parivartak(kANDa, BASE_SCRIPT, lang)));
 };
 
 export const get_sarga_names = async (kANDa_num: number, lang: string) => {
@@ -48,7 +48,7 @@ export const get_sarga_names = async (kANDa_num: number, lang: string) => {
       ? rAmAyaNam_map[kANDa_num - 1].sarga_data.map((sarga) => sarga.name_devanagari)
       : [];
   if (!browser) return data;
-  return Promise.all(data.map((sarga) => lipi_parivartak_async(sarga, BASE_SCRIPT, lang)));
+  return Promise.all(data.map((sarga) => lipi_parivartak(sarga, BASE_SCRIPT, lang)));
 };
 
 // SARGA_DATA

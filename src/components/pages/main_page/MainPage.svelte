@@ -5,7 +5,7 @@
   import { delay } from '~/tools/delay';
   import { writable } from 'svelte/store';
   import { LANG_LIST, SCRIPT_LIST, type script_list_type } from '~/tools/lang_list';
-  import LipiLekhikA, { load_parivartak_lang_data, lipi_parivartak_async } from '~/tools/converter';
+  import { load_parivartak_lang_data, lipi_parivartak, get_sa_mode } from '~/tools/converter';
   import { LanguageIcon } from '~/components/icons';
   import { ensure_auth_access_status, get_id_token_info } from '~/tools/auth_tools';
   import { browser } from '$app/environment';
@@ -184,18 +184,17 @@
       queryKey: ['sanskrit_mode_texts'],
       enabled: browser && $editing_status_on && $trans_lang !== '--',
       queryFn: () =>
-        Promise.all(
-          ['राम्', 'राम'].map((text) => lipi_parivartak_async(text, BASE_SCRIPT, $trans_lang))
-        ),
+        Promise.all(['राम्', 'राम'].map((text) => lipi_parivartak(text, BASE_SCRIPT, $trans_lang))),
       placeholderData: ['राम्', 'राम']
     })
   );
   $effect(() => {
-    if (!$editing_status_on || $sanskrit_mode_texts.isFetching || !$sanskrit_mode_texts.isSuccess)
-      return;
-    if ($trans_lang === '--') return;
-    const lng = LipiLekhikA.k.normalize(untrack(() => $trans_lang));
-    $sanskrit_mode = (LipiLekhikA.k.akSharAH as any)[lng].sa;
+    (async () => {
+      if (!$editing_status_on || $sanskrit_mode_texts.isFetching || !$sanskrit_mode_texts.isSuccess)
+        return;
+      if ($trans_lang === '--') return;
+      $sanskrit_mode = await get_sa_mode(untrack(() => $trans_lang));
+    })();
   });
 
   const get_page_info = () => {
