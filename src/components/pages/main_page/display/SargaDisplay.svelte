@@ -39,11 +39,9 @@
 
   let transliterated_sarga_data = $state<string[]>([]);
   $effect(() => {
-    Promise.all(
-      ($sarga_data.data ?? []).map((shloka_lines) =>
-        lipi_parivartak(shloka_lines, BASE_SCRIPT, $viewing_script)
-      )
-    ).then((data) => {
+    // console.time('transliterate_sarga_data');
+    lipi_parivartak($sarga_data.data ?? [], BASE_SCRIPT, $viewing_script).then((data) => {
+      // console.timeEnd('transliterate_sarga_data');
       transliterated_sarga_data = data;
     });
   });

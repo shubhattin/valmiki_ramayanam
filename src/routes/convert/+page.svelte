@@ -28,8 +28,8 @@
   let to_text_type_enabled = $state(true);
 
   $effect(() => {
-    load_parivartak_lang_data($from_lang);
-    load_parivartak_lang_data($to_lang);
+    load_parivartak_lang_data($from_lang, 'src', true);
+    load_parivartak_lang_data($to_lang, 'src', true);
   });
 
   async function convert_text(

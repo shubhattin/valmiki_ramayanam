@@ -613,15 +613,7 @@ const VARGANI = [
 const HALANT = '्';
 const ANUNASIK = 'ं';
 
-/**
- * This function is used to convert the text from one script to another
- * @param {string} val - The text to be converted
- * @param {string} from - The script of the text to be converted
- * @param {string} to - The script to which the text is to be converted
- * @returns {string} - The text converted to the desired script
- *
- */
-export const _lipi_parivartak = async (val, from, to) => {
+const _lipi_parivartak = async (val, from, to) => {
   from = normalize_lang_code(from);
   to = normalize_lang_code(to);
   if (from == 'Normal') {
@@ -659,6 +651,25 @@ export const _lipi_parivartak = async (val, from, to) => {
     }
   }
   return out;
+};
+
+/**
+ * This function is used to convert the text from one script to another
+ * @template T
+ * @param {T extends string | string[]} val - The text or array of texts to be converted
+ * @param {string} from - The script of the text(s) to be converted
+ * @param {string} to - The script to which the text(s) is to be converted
+ * @returns {any} - A promise that resolves to the converted text or array of texts
+ */
+export const lipi_parivartak = async (val, from, to) => {
+  await Promise.all([
+    load_parivartak_lang_data(from),
+    load_parivartak_lang_data(to)
+  ]);
+  if (Array.isArray(val)) {
+    return await Promise.all(val.map((text) => _lipi_parivartak(text, from, to)));
+  }
+  return await _lipi_parivartak(val, from, to);
 };
 
 /**

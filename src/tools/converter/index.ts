@@ -23,8 +23,11 @@ if (typeof Worker !== 'undefined') {
   };
 }
 
+let lipi_lekhika_lib: typeof import('./lekhika_core') = null!;
+
 export const load_lipi_lekhika_instance = async () => {
-  return await import('./lekhika_core');
+  if (!lipi_lekhika_lib) lipi_lekhika_lib = await import('./lekhika_core');
+  return lipi_lekhika_lib;
 };
 
 async function postMessage<F extends keyof typeof functions>(
@@ -77,26 +80,16 @@ export const load_parivartak_lang_data = async (
   ]);
 };
 
-const _lipi_parivartak = async (val: string, from: string, to: string) => {
-  return await postMessage({
-    func_name: '_lipi_parivartak',
-    args: [val, from, to]
-  });
-};
-
 /**
  * This function is an async version of the lipi_parivartak function
  * It does not require the user to manually load the languages before converting the text
  * It is used to convert the text from one script to another
- * @param {string} val - The text to be converted
- * @param {string} from - The script of the text to be converted
- * @param {string} to - The script to which the text is to be converted
- * @returns {Promise<string>} - The text converted to the desired script
  **/
-export const lipi_parivartak = async (val: string, from: string, to: string) => {
-  await load_parivartak_lang_data(from);
-  await load_parivartak_lang_data(to);
-  return await _lipi_parivartak(val, from, to);
+export const lipi_parivartak = async <T extends string | string[]>(val: T, from: string, to: string) => {
+  return await postMessage({
+    func_name: 'lipi_parivartak',
+    args: [val, from, to]
+  }) as Promise<T extends string ? string : string[]>;
 };
 
 /**
@@ -118,10 +111,17 @@ export const lekhika_typing_tool = async (
   callback: any = null,
   sa_mode: 0 | 1 | undefined | null = null
 ) => {
-  const input_data = await postMessage({
-    func_name: 'lekhika_typing_tool',
-    args: [event_data, lang, on_status, sa_mode]
-  });
+  // console.time('lekhika_typing_tool');
+  const input_data = await postMessage(
+    {
+      func_name: 'lekhika_typing_tool',
+      args: [event_data, lang, on_status, sa_mode]
+    },
+    'only'
+  );
+  // console.timeEnd('lekhika_typing_tool');
+  // only load the main lipi_lekhika_lib to improve as some lag noticed while typing
+  // the latencry is at least 6x higher than worker method (direct :- 0.14ms, worker :- 10ms)
   if (!input_data) return;
   const { val, from_click } = input_data;
   let dyn = elm.value;
@@ -146,3 +146,4 @@ export const lekhika_typing_tool = async (
   elm.selectionEnd = length;
   callback && callback(new_value);
 };
+
