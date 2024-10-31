@@ -98,3 +98,9 @@ export function get_permutations(range: [number, number], count: number = 1): nu
 export function format_string_text(text: string, options: Record<string, any>) {
   return text.replace(/{(\w+)}/g, (match, key) => options[key] ?? `{${key}}`);
 }
+
+export function cleanUpWhitespace(input: string, replace_multiple_white_spaces = true): string {
+  input = input.trim();
+  if (replace_multiple_white_spaces) input = input.replace(/\s+/g, ' ');
+  return input;
+}

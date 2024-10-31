@@ -12,5 +12,8 @@ export default defineConfig({
     fs: {
       allow: ['./data/ramayan', './static/img']
     }
+  },
+  worker: {
+    format: 'es'
   }
 });

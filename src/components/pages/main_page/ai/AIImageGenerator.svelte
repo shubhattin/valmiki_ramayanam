@@ -8,7 +8,7 @@
   import ai_text_prompts from './ai_text_prompts.yaml';
   import { SlideToggle } from '@skeletonlabs/skeleton';
   import { client_q, type client } from '~/api/client';
-  import { lipi_parivartak_async } from '~/tools/converter';
+  import { lipi_parivartak } from '~/tools/converter';
   import { copy_text_to_clipboard, format_string_text } from '~/tools/kry';
   import { onMount } from 'svelte';
   import { loadLocalConfig } from '../load_local_config';
@@ -80,7 +80,7 @@
       $sarga_data.isSuccess &&
       (async () => {
         const shloka_text = $sarga_data.data![$shloka_numb];
-        const shloka_text_normal = await lipi_parivartak_async(shloka_text, BASE_SCRIPT, 'Normal');
+        const shloka_text_normal = await lipi_parivartak(shloka_text, BASE_SCRIPT, 'Normal');
         let prompt = shloka_text + '\n' + shloka_text_normal;
         const trans_en_all = $trans_en_data.data!;
         if (trans_en_all.has($shloka_numb)) prompt += '\n\n' + trans_en_all.get($shloka_numb);

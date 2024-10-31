@@ -9,6 +9,7 @@ import { user_verification_requests, users } from '~/db/schema';
 import { eq } from 'drizzle-orm';
 import type { lang_list_type } from '~/tools/lang_list';
 import { delay } from '~/tools/delay';
+import { cleanUpWhitespace } from '~/tools/kry';
 
 export const user_info_schema = UsersSchemaZod.pick({
   user_id: true,
@@ -164,6 +165,9 @@ const add_new_user_route = publicProcedure
     const slt = gen_salt();
     const hashed_password = (await hash_256(password + slt)) + slt;
 
+    username = cleanUpWhitespace(username);
+    name = cleanUpWhitespace(name);
+    email = cleanUpWhitespace(email);
     const returning_data = await db
       .insert(users)
       .values({

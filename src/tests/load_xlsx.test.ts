@@ -1,7 +1,7 @@
 // this file should be called root of project
 import { describe, it } from 'vitest';
 import ExcelJS from 'exceljs';
-import { normalize_lang_code, lipi_parivartak_async } from '~/tools/converter';
+import { normalize_lang_code, lipi_parivartak } from '~/tools/converter';
 
 // Define file paths
 const inputFilePath = './src/tests/data/nAradavAkyam.xlsx';
@@ -27,7 +27,7 @@ async function processExcelFile() {
       if (lang_code && lang_code !== 'Sanskrit') {
         for (let i = 0; i < texts.length; i++) {
           const text = texts[i];
-          const out = await lipi_parivartak_async(text, 'de', lang_code);
+          const out = await lipi_parivartak(text, 'de', lang_code);
           worksheet.getCell(i + 2, col_i).value = out;
         }
       }

@@ -97,7 +97,7 @@ export class lipi_helper {
   }
   normalize(ln) {
     // function to normalize the names of scripts
-    let a = ln.split('-');
+    let a = ln.trim().split('-');
     for (let x = 0; x < a.length; x++) a[x] = a[x].charAt(0).toUpperCase() + a[x].substring(1);
     let ln1 = a.join('-');
     if (this.in(this.langs, ln1)) return ln1;
