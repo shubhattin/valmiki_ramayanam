@@ -1,13 +1,5 @@
 <script>
-  import { onMount } from 'svelte';
   import { partytownSnippet } from '@builder.io/partytown/integration';
-
-  let scriptEl = $state();
-  onMount(() => {
-    if (scriptEl) {
-      scriptEl.textContent = partytownSnippet();
-    }
-  });
 </script>
 
 <svelte:head>
@@ -17,6 +9,6 @@
         forward: ['dataLayer.push']
       };
     </script>
-    <script bind:this={scriptEl}></script>
+    {@html '<script>' + partytownSnippet() + '</script>'}
   {/if}
 </svelte:head>
