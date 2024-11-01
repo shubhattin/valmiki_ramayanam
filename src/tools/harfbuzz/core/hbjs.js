@@ -13,7 +13,7 @@ const load_font_from_url = async (font_url) => {
 };
 export const preload_font_from_url = load_font_from_url;
 
-export const preload_harbuzzjs_wasm = async () => {
+export const preload_harfbuzzjs_wasm = async () => {
   await load_hbjs();
 };
 

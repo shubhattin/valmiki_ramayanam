@@ -45,6 +45,8 @@ export let image_sarga = writable<number>(0);
 export let image_shloka = writable<number>(1);
 export let image_rendering_state = writable<boolean>(false);
 
+export let zip_download_state = writable<[number, number] | null>(null);
+
 export const image_sarga_data = get_derived_query(
   [image_kANDa, image_sarga],
   ([$image_kANDa, $image_sarga]) => {

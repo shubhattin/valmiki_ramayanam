@@ -10,7 +10,6 @@
   import { QueryClientProvider } from '@tanstack/svelte-query';
   import { SvelteQueryDevtools } from '@tanstack/svelte-query-devtools';
   import { queryClient } from '~/state/query';
-  import { main_app_bar_info } from '~/state/app_bar';
 
   interface Props {
     children?: import('svelte').Snippet;
@@ -20,11 +19,6 @@
 
   initializeStores();
   storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
-
-  $main_app_bar_info = {
-    className: null,
-    title: null
-  };
 </script>
 
 <svelte:head>

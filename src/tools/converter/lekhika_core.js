@@ -31,22 +31,23 @@ class LipiParivartak {
     ];
     this.second_cap_time = 0;
     // patch
-    this.callback_func_for_state_update = null;
+    /** @type {{from_click: boolean, val: [string, number]}} */
+    this.input_helper_values = {
+      from_click: false,
+      val: []
+    };
   }
 
   /**
    * The mukhya function performs a specific task.
    *
-   * @param {any} elmt - The textarea element parameter.
    * @param {string} [event_data=''] - The text parameter. Default value is an empty string.
    * @param {string} [lang=''] - The lang parameter. Default value is an empty string.
    * @param {boolean} [on_status=true] - The on_status parameter. Default value is true.
-   * @param {any} [callback=null] - The callback parameter. Default value is null.
-   * @param {0|1|ndefined|null} [sa_mode=null] - The sa_mode parameter. Default value is null.
-   * @returns {void}
+   * @param {0|1|undefined|null} [sa_mode=null] - The sa_mode parameter. Default value is null.
    */
 
-  mukhya(elmt, event_data = '', lang = '', on_status = true, callback = null, sa_mode = null) {
+  mukhya(event_data = '', lang = '', on_status = true, sa_mode = null) {
     // if (!this.karya) return;
     if (!on_status) return;
     if (event_data == null || event_data == undefined) {
@@ -59,14 +60,13 @@ class LipiParivartak {
       if (!elf) this.clear_all_val(true);
       let lng = lang;
       lng = this.k.normalize(lng);
-      this.callback_func_for_state_update = callback;
       this.prakriyA({
         text: event_data,
         typing: 1, // sanskrit mode
         lang: lng,
-        mode: sa_mode ?? this.k.akSharAH[lng].sa, // element mode, 0 for text mode
-        element: elmt
+        mode: sa_mode ?? this.k.akSharAH[lng].sa // element mode, 0 for text mode
       });
+      return this.input_helper_values;
     } else this.clear_all_val(true);
   }
   elphased_time() {
@@ -286,37 +286,11 @@ class LipiParivartak {
       for (let p = 0; p < val[1]; p++) this.dev_text.pop();
       for (let x of val[0]) this.dev_text.push(x);
     } else if (mode == 1) {
-      let is_input = false;
-      // if (l.in(['input', 'textarea'], elm[0].tagName.toLowerCase())) is_input = true;
-      // in this we assume it to be true
-      is_input = true;
-      if (is_input) {
-        let dyn = elm.value;
-        let current_cursor_pos = elm.selectionStart + 1;
-        let ex = 0;
-        if (this.from_click) {
-          current_cursor_pos++;
-          ex = 1;
-        }
-        let pre_part = dyn.substring(0, current_cursor_pos - val[1] - 2);
-        let changing_part = val[0];
-        let post_part = '';
-        if (dyn.length + 1 + (this.from_click ? 1 : 0) == current_cursor_pos)
-          post_part = dyn.substring(current_cursor_pos + 1);
-        else if (dyn.length + 1 != current_cursor_pos)
-          post_part = dyn.substring(current_cursor_pos - 1 - ex);
-        let length = pre_part.length + changing_part.length;
-        const new_value = pre_part + changing_part + post_part;
-        elm.value = new_value;
-        elm.focus();
-        elm.selectionStart = length;
-        elm.selectionEnd = length;
-        if (this.callback_func_for_state_update) {
-          this.callback_func_for_state_update(new_value);
-          this.callback_func_for_state_update = null;
-        }
-        if (this.from_click) this.from_click = false;
-      }
+      this.input_helper_values = {
+        from_click: this.from_click,
+        val: val
+      };
+      if (this.from_click) this.from_click = false;
     }
     if (this.capital[0] == 3) this.capital = [0, '', -1, -1, 0, 0, false];
     if (
@@ -591,18 +565,25 @@ const lipi_hlp = new lipi_helper();
 const LipiLekhikA = new LipiParivartak();
 lipi_hlp.k = LipiLekhikA;
 
-export default LipiLekhikA;
-
 /**
  * @param {string} lang
  * @returns {string}
  */
 export const normalize_lang_code = (lang) => {
-  return lipi_hlp.normalize(lang);
+  return LipiLekhikA.k.normalize(lang);
 };
 
-export const load_parivartak_lang_data = async (lang) => {
-  await LipiLekhikA.k.load_lang(lang);
+/**
+ * @param {string} lang
+ * @returns {Promise<number>}
+ */
+export const get_sa_mode = async (lang) => {
+  lang = normalize_lang_code(lang);
+  return LipiLekhikA.k.akSharAH[lang].sa;
+};
+
+export const load_parivartak_lang_data = async (lang, base_lang_folder = './src') => {
+  await LipiLekhikA.k.load_lang(lang, null, false, true, base_lang_folder);
 };
 
 const pacham_patches = [
@@ -632,15 +613,7 @@ const VARGANI = [
 const HALANT = '्';
 const ANUNASIK = 'ं';
 
-/**
- * This function is used to convert the text from one script to another
- * @param {string} val - The text to be converted
- * @param {string} from - The script of the text to be converted
- * @param {string} to - The script to which the text is to be converted
- * @returns {string} - The text converted to the desired script
- *
- */
-export const lipi_parivartak = (val, from, to) => {
+const _lipi_parivartak = async (val, from, to) => {
   from = normalize_lang_code(from);
   to = normalize_lang_code(to);
   if (from == 'Normal') {
@@ -681,16 +654,36 @@ export const lipi_parivartak = (val, from, to) => {
 };
 
 /**
- * This function is an async version of the lipi_parivartak function
- * It does not require the user to manually load the languages before converting the text
- * It is used to convert the text from one script to another
- * @param {string} val - The text to be converted
- * @param {string} from - The script of the text to be converted
- * @param {string} to - The script to which the text is to be converted
- * @returns {Promise<string>} - The text converted to the desired script
- **/
-export const lipi_parivartak_async = async (val, from, to) => {
-  await load_parivartak_lang_data(from);
-  await load_parivartak_lang_data(to);
-  return lipi_parivartak(val, from, to);
+ * This function is used to convert the text from one script to another
+ * @template T
+ * @param {T extends string | string[]} val - The text or array of texts to be converted
+ * @param {string} from - The script of the text(s) to be converted
+ * @param {string} to - The script to which the text(s) is to be converted
+ * @returns {any} - A promise that resolves to the converted text or array of texts
+ */
+export const lipi_parivartak = async (val, from, to) => {
+  await Promise.all([load_parivartak_lang_data(from), load_parivartak_lang_data(to)]);
+  if (Array.isArray(val)) {
+    return await Promise.all(val.map((text) => _lipi_parivartak(text, from, to)));
+  }
+  return await _lipi_parivartak(val, from, to);
+};
+
+/**
+ * The mukhya function performs a specific task.
+ *
+ * @param {string} [event_data=''] - The text parameter. Default value is an empty string.
+ * @param {string} [lang=''] - The lang parameter. Default value is an empty string.
+ * @param {boolean} [on_status=true] - The on_status parameter. Default value is true.
+ * @param {any} [callback=null] - The callback parameter. Default value is null.
+ * @param {0|1|undefined|null} [sa_mode=null] - The sa_mode parameter. Default value is null.
+ */
+export const lekhika_typing_tool = async (
+  event_data = '',
+  lang = '',
+  on_status = true,
+  sa_mode = null
+) => {
+  const input_data = LipiLekhikA.mukhya(event_data, lang, on_status, sa_mode);
+  return input_data;
 };

@@ -46,12 +46,7 @@
       "compositePrimaryKeys": {
         "translations_lang_kANDa_num_sarga_num_shloka_num_pk": {
           "name": "translations_lang_kANDa_num_sarga_num_shloka_num_pk",
-          "columns": [
-            "lang",
-            "kANDa_num",
-            "sarga_num",
-            "shloka_num"
-          ]
+          "columns": ["lang", "kANDa_num", "sarga_num", "shloka_num"]
         }
       },
       "uniqueConstraints": {}
@@ -73,12 +68,8 @@
           "name": "user_verification_requests_id_users_id_fk",
           "tableFrom": "user_verification_requests",
           "tableTo": "users",
-          "columnsFrom": [
-            "id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -148,16 +139,12 @@
         "users_user_id_unique": {
           "name": "users_user_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "user_id"
-          ]
+          "columns": ["user_id"]
         },
         "users_user_email_unique": {
           "name": "users_user_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "user_email"
-          ]
+          "columns": ["user_email"]
         }
       }
     }
@@ -182,10 +169,7 @@
     "public.user_type": {
       "name": "user_type",
       "schema": "public",
-      "values": [
-        "admin",
-        "non-admin"
-      ]
+      "values": ["admin", "non-admin"]
     }
   },
   "schemas": {},
