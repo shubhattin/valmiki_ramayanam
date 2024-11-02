@@ -7,7 +7,7 @@ const config = {
 
   kit: {
     adapter: adapter({
-      regions: 'sin1'
+      regions: ['sin1']
     }),
     alias: {
       '~': 'src',
