@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@modyfi/vite-plugin-yaml": "^1.1.0",
+    "@sveltejs/adapter-node": "^5.2.9",
     "@sveltejs/adapter-vercel": "^5.4.6",
     "@sveltejs/kit": "^2.7.3",
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
