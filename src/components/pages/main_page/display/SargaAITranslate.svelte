@@ -38,6 +38,7 @@
         new_data.set(translation.shloka_num, translation.text);
         $added_translations_indexes.push(translation.shloka_num);
       });
+      $added_translations_indexes = $added_translations_indexes;
       await query_client.setQueryData($trans_lang_data_query_key, new_data);
     }
   });
