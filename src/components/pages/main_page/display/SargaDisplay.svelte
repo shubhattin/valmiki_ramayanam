@@ -34,6 +34,7 @@
   import type { lang_list_type } from '~/tools/lang_list';
   import { RiSystemAddLargeLine } from 'svelte-icons-pack/ri';
   import { popup } from '@skeletonlabs/skeleton';
+  import SargaAiTranslate from './SargaAITranslate.svelte';
 
   const query_client = useQueryClient();
 
@@ -129,6 +130,7 @@
 {#if $editing_status_on}
   <SaveEdit />
 {/if}
+<SargaAiTranslate />
 {#if copied_text_status}
   <div
     class="fixed bottom-2 right-2 z-50 cursor-default select-none font-bold text-green-700 dark:text-green-300"

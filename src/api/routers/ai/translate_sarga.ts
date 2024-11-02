@@ -8,6 +8,16 @@ import type { lang_list_type } from '~/tools/lang_list';
 
 const openai_text_model = createOpenAI({ apiKey: env.OPENAI_API_KEY });
 
+const translation_out_schema = z
+  .object({
+    text: z.string().describe('The trnalstion text'),
+    shloka_num: z
+      .number()
+      .describe('The index of shlokas to be generated, use 0 for starting and -1 for ending.')
+  })
+  .array()
+  .describe('This array will contain the text and the index of the shlokas to be generated.');
+
 export const translate_sarga_route = protectedProcedure
   .input(
     z.object({
@@ -19,6 +29,12 @@ export const translate_sarga_route = protectedProcedure
         })
         .array()
     })
+  )
+  .output(
+    z.union([
+      z.object({ success: z.literal(true), translations: translation_out_schema }),
+      z.object({ success: z.literal(false) })
+    ])
   )
   .mutation(async ({ ctx: { user }, input: { lang, messages } }) => {
     if (user.user_type !== 'admin') {
@@ -36,24 +52,10 @@ export const translate_sarga_route = protectedProcedure
       const response = await generateObject({
         model: openai_text_model('gpt-4o'),
         messages,
-        schema: z.object({
-          translations: z
-            .object({
-              text: z.string().describe('The trnalstion text'),
-              shloka_num: z
-                .number()
-                .describe(
-                  'The index of shlokas to be generated, use 0 for starting and -1 for ending.'
-                )
-            })
-            .array()
-            .describe(
-              'This array will contain the text and the index of the shlokas to be generated.'
-            )
-        })
+        schema: z.object({ translations: translation_out_schema })
       });
-      return response.object;
+      return { ...response.object, success: true };
     } catch {
-      return { translations: null };
+      return { success: false };
     }
   });

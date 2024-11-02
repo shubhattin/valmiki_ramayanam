@@ -1,0 +1,8 @@
+prompts:
+  - role: user
+    content: >
+      I will be providing you with Sanskrit shlokas of a sarga of the Ramayana along with its English tranlsations. Generate {lang} Translations to all those shlokas based on both the Sanskrit shloka and English Translation. Also make it contain the entire essence of the English translation. Do not return English translations but translate it to {lang} Language.
+
+
+
+      {text}
