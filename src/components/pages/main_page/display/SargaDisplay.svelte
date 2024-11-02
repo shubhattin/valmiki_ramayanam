@@ -97,8 +97,10 @@
   let trans_text_font_info = $derived(get_font_family_and_size($trans_lang as lang_list_type));
   const en_trans_text_font_info = get_font_family_and_size('English');
   const input_func = async (e: any, trans_index: number) => {
-    if (!$added_translations_indexes.includes(trans_index))
+    if (!$added_translations_indexes.includes(trans_index)) {
       $edited_translations_indexes.add(trans_index);
+      $edited_translations_indexes = $edited_translations_indexes;
+    }
     let callback_function_called_from_lipi_lekhika = false;
     if ($edit_language_typer_status && !$english_edit_status)
       await lekhika_typing_tool(
@@ -242,6 +244,7 @@
             onclick={async () => {
               await update_trans_lang_data(trans_index, '');
               $added_translations_indexes.push(trans_index);
+              $added_translations_indexes = $added_translations_indexes;
             }}
             class="btn m-0 rounded-md bg-surface-500 px-1 py-0 font-bold text-white dark:bg-surface-500"
           >
@@ -277,6 +280,7 @@
             onclick={async () => {
               await update_trans_lang_data(trans_index, '');
               $added_translations_indexes.push(trans_index);
+              $added_translations_indexes = $added_translations_indexes;
             }}
             class="btn m-0 rounded-md bg-surface-500 px-1 py-0 font-bold text-white dark:bg-surface-500"
           >

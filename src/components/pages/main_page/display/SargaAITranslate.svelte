@@ -5,7 +5,8 @@
     editing_status_on,
     kANDa_selected,
     sarga_selected,
-    trans_lang
+    trans_lang,
+    added_translations_indexes
   } from '~/state/main_page/main_state';
   import {
     rAmAyaNam_map,
@@ -35,6 +36,7 @@
       translations.forEach((translation) => {
         if (new_data.has(translation.shloka_num)) return;
         new_data.set(translation.shloka_num, translation.text);
+        $added_translations_indexes.push(translation.shloka_num);
       });
       await query_client.setQueryData($trans_lang_data_query_key, new_data);
     }
