@@ -87,7 +87,8 @@
 </script>
 
 <!-- All English Translations(atleast 70%) should be there and the language tranlations (Atleast one untransated) should not be there -->
-{#if $editing_status_on && $trans_lang !== '--' && ($trans_lang_data.data?.size ?? 0) < shloka_count + 2 && ($trans_en_data.data?.size ?? 0) >= shloka_count * 0.7}
+<!-- Currently facing timeout issues in production -->
+{#if import.meta.env.DEV && $editing_status_on && $trans_lang !== '--' && ($trans_lang_data.data?.size ?? 0) < shloka_count + 2 && ($trans_en_data.data?.size ?? 0) >= shloka_count * 0.7}
   <button
     disabled={$translate_sarga_mut.isPending}
     onclick={translate_sarga_func}
