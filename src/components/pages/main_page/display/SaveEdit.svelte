@@ -116,7 +116,8 @@
   onclick={save_data_func}
   in:slide
   out:scale
-  disabled={$save_data.isPending}
+  disabled={$save_data.isPending ||
+    $added_translations_indexes.length + $edited_translations_indexes.size === 0}
   class="btn rounded-lg bg-primary-700 px-1 py-1 text-white dark:bg-primary-600"
 >
   <Icon src={FiSave} class="text-2xl" />
