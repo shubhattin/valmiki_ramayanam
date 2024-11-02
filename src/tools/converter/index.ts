@@ -90,6 +90,7 @@ export const lipi_parivartak = async <T extends string | string[]>(
   from: string,
   to: string
 ) => {
+  if (normalize_lang_code(from) === normalize_lang_code(to)) return val;
   return (await postMessage({
     func_name: 'lipi_parivartak',
     args: [val, from, to]
