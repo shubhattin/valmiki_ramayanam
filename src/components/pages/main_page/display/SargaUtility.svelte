@@ -46,20 +46,13 @@
       const worksheet = workbook.getWorksheet(1)!;
       const COLUMN_FOR_DEV = 2;
       const TEXT_START_ROW = 2;
-      const translation_texts: Map<string, Map<number, string>> = new Map();
-      const shloka_count =
-        rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].shloka_count_extracted;
-      // loading other online databased language translations
-      const other_translations =
+      const translation_texts =
         await client.translations.get_all_langs_translations_per_sarga.query({
           kANDa_num: $kANDa_selected,
           sarga_num: $sarga_selected
         });
-      for (let data of other_translations) {
-        if (!translation_texts.has(data.lang)) translation_texts.set(data.lang, new Map());
-        translation_texts.get(data.lang)!.set(data.shloka_num, data.text);
-      }
-
+      const shloka_count =
+        rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].shloka_count_extracted;
       for (let i = 0; i < $sarga_data.data!.length; i++) {
         worksheet.getCell(i + COLUMN_FOR_DEV, TEXT_START_ROW).value = $sarga_data.data![i];
       }

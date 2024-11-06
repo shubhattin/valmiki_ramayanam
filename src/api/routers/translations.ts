@@ -29,7 +29,9 @@ const get_translations_per_sarga_route = publicProcedure
           eq(struct.sarga_num, sarga_num)
         )
     });
-    return data;
+    const data_map = new Map<number, string>();
+    for (let i = 0; i < data.length; i++) data_map.set(data[i].shloka_num, data[i].text);
+    return data_map;
   });
 
 const get_all_langs_translations_per_sarga_route = publicProcedure
@@ -48,7 +50,12 @@ const get_all_langs_translations_per_sarga_route = publicProcedure
       },
       where: (struct, { eq }) => eq(struct.kANDa_num, kANDa_num) && eq(struct.sarga_num, sarga_num)
     });
-    return data;
+    const data_map = new Map<(typeof data)[0]['lang'], Map<number, string>>();
+    for (let i = 0; i < data.length; i++) {
+      if (!data_map.has(data[i].lang)) data_map.set(data[i].lang, new Map());
+      data_map.get(data[i].lang)!.set(data[i].shloka_num, data[i].text);
+    }
+    return data_map;
   });
 
 const edit_translation_route = protectedProcedure

@@ -132,16 +132,11 @@ export const trans_lang_data = get_derived_query(
 export async function get_translations(kanda: number, sarga: number, lang: string) {
   await delay(400);
 
-  const data = await client.translations.get_translations_per_sarga.query({
+  const data_map = await client.translations.get_translations_per_sarga.query({
     lang: lang,
     kANDa_num: kanda,
     sarga_num: sarga
   });
-  const data_map = new Map<number, string>();
-  for (let val of data) {
-    // we dont need to manually care abouy 0 or -1, it will be handled while making changes
-    data_map.set(val.shloka_num, val.text);
-  }
   return data_map;
 }
 

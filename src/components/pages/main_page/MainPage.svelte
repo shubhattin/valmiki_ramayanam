@@ -114,8 +114,7 @@
       await delay(300);
       let script = get_script_for_lang(lang);
       await Promise.all([
-        $viewing_script_mut.mutateAsync({ script, update_viewing_script_selection: true }),
-        load_parivartak_lang_data(lang, 'src', true)
+        $viewing_script_mut.mutateAsync({ script, update_viewing_script_selection: true })
       ]);
       return lang;
     },
@@ -124,6 +123,10 @@
       $trans_lang = lang;
       query_client.invalidateQueries({ queryKey: ['sanskrit_mode_texts'] });
     }
+  });
+  $effect(() => {
+    if ($editing_status_on && $trans_lang !== '--')
+      load_parivartak_lang_data($trans_lang, 'src', true);
   });
   $effect(() => {
     const _trans_lang_mut = untrack(() => $trans_lang_mut);
