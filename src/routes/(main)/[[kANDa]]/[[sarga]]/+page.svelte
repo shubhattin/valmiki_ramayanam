@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { browser } from '$app/environment';
   import { page } from '$app/stores';
   import { z } from 'zod';
   import MainPage from '~/components/pages/main_page/MainPage.svelte';
@@ -10,13 +11,13 @@
   });
 
   const params = $derived(params_schema.parse($page.params));
-  // svelte-ignore state_referenced_locally
-  $kANDa_selected = params.kANDa;
-  // svelte-ignore state_referenced_locally
-  $sarga_selected = params.sarga;
-  $effect(() => {
+  function set_kanda_sarga() {
     $kANDa_selected = params.kANDa;
     $sarga_selected = params.sarga;
+  }
+  set_kanda_sarga();
+  $effect(() => {
+    if (browser) set_kanda_sarga();
   });
 </script>
 
