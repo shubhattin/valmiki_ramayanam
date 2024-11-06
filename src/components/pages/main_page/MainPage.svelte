@@ -156,6 +156,7 @@
     if (!browser) return;
     // only sarga_selected should be subscribed
     const _kANDa_selected = untrack(() => $kANDa_selected);
+    $sarga_selected;
     if (_kANDa_selected === 0) return;
     if ($sarga_selected === 0) {
       goto(get_ramayanam_page_link(_kANDa_selected));

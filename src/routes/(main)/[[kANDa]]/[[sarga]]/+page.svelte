@@ -9,9 +9,15 @@
     sarga: z.coerce.number().int().optional().default(0)
   });
 
-  const params = params_schema.parse($page.params);
+  const params = $derived(params_schema.parse($page.params));
+  // svelte-ignore state_referenced_locally
   $kANDa_selected = params.kANDa;
+  // svelte-ignore state_referenced_locally
   $sarga_selected = params.sarga;
+  $effect(() => {
+    $kANDa_selected = params.kANDa;
+    $sarga_selected = params.sarga;
+  });
 </script>
 
 <MainPage />
