@@ -166,6 +166,12 @@ export const SHLOKA_FONT_CONFIG = {
     size: 0.95,
     space_between_main_and_normal: 6,
     text_for_min_line_height: 'వై'
+  },
+  Kannada: {
+    font: 'NOTO_SERIF_KANNADA',
+    size: 0.9,
+    space_between_main_and_normal: 6,
+    text_for_min_line_height: 'ವೈ'
   }
 } as image_font_config_type;
 
@@ -188,6 +194,10 @@ export const TRANS_FONT_CONFIG = {
   Telugu: {
     size: 1.05,
     new_line_spacing: 0.35
+  },
+  Kannada: {
+    size: 1.05,
+    new_line_spacing: 0.45
   }
 } as image_font_config_type;
 
