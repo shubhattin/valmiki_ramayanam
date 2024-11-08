@@ -69,6 +69,8 @@ async function main() {
     // adding text to main column
     for (let i = 0; i < json_data.length; i++) {
       worksheet.getCell(i + TEXT_START_ROW, COLUMN_FOR_DEV).value = json_data[i];
+      worksheet.getCell(i + COLUMN_FOR_DEV, 1).value =
+        i === sarga_info.shloka_count_extracted + 1 ? -1 : i;
     }
     await transliterate_xlxs_file(
       workbook,

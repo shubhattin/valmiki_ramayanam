@@ -55,6 +55,7 @@
         rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].shloka_count_extracted;
       for (let i = 0; i < $sarga_data.data!.length; i++) {
         worksheet.getCell(i + COLUMN_FOR_DEV, TEXT_START_ROW).value = $sarga_data.data![i];
+        worksheet.getCell(i + COLUMN_FOR_DEV, 1).value = i === shloka_count + 1 ? -1 : i;
       }
       await transliterate_xlxs_file(
         workbook,
