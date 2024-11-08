@@ -29,7 +29,9 @@ export const FONT_FAMILY_NAME = {
   ADOBE_DEVANAGARI: 'Adobe Devanagari',
   ROBOTO: 'Roboto',
   ADOBE_TELUGU: 'Adobe Telugu',
-  NOTO_SERIF_TELUGU: 'Noto Serif Telugu'
+  NOTO_SERIF_TELUGU: 'Noto Serif Telugu',
+  NOTO_SERIF_KANNADA: 'Noto Serif Kannada',
+  NOTO_SERIF_SINHALA: 'Noto Serif Sinhala'
 };
 
 type fonts_type = keyof typeof FONT_FAMILY_NAME;
@@ -60,6 +62,14 @@ const FONT_FILE_INFO: Record<
   },
   NOTO_SERIF_TELUGU: {
     file_name: 'NotoSerifTelugu',
+    file_type: 'ttf'
+  },
+  NOTO_SERIF_KANNADA: {
+    file_name: 'NotoSerifKannada',
+    file_type: 'ttf'
+  },
+  NOTO_SERIF_SINHALA: {
+    file_name: 'NotoSerifSinhala',
     file_type: 'ttf'
   }
 };
@@ -93,14 +103,6 @@ export const get_font_url = (font: fonts_type, type: 'regular' | 'bold') => {
  * Default font config for main web app
  */
 const MAIN_FONT_CONFIG = {
-  Devanagari: {
-    font: 'ADOBE_DEVANAGARI',
-    size: 1.45
-  },
-  Telugu: {
-    font: 'NOTO_SERIF_TELUGU',
-    size: 1.25
-  },
   English: {
     font: 'ROBOTO'
   },
@@ -109,6 +111,22 @@ const MAIN_FONT_CONFIG = {
   },
   Normal: {
     font: 'ROBOTO'
+  },
+  Devanagari: {
+    font: 'ADOBE_DEVANAGARI',
+    size: 1.45
+  },
+  Telugu: {
+    font: 'NOTO_SERIF_TELUGU',
+    size: 1.25
+  },
+  Kannada: {
+    font: 'NOTO_SERIF_KANNADA',
+    size: 1.2
+  },
+  Sinhala: {
+    font: 'NOTO_SERIF_SINHALA',
+    size: 1
   }
 } as font_config_type;
 
