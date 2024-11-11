@@ -22,7 +22,9 @@
     trans_en_data,
     trans_lang_data,
     trans_lang_data_query_key,
-    QUERY_KEYS
+    QUERY_KEYS,
+    bulk_text_edit_status,
+    bulk_text_data
   } from '~/state/main_page/data';
   import SaveEdit from './SaveEdit.svelte';
   import { useQueryClient } from '@tanstack/svelte-query';
@@ -130,6 +132,14 @@
       $edit_language_typer_status = !$edit_language_typer_status;
     }
   };
+
+  $effect(() => {
+    // reset bulk edit status on editting status toggles
+    $editing_status_on;
+    tab_edit_name = 'main';
+    $bulk_text_data = '';
+    $bulk_text_edit_status = false;
+  });
 </script>
 
 {#if $editing_status_on}
@@ -192,7 +202,7 @@
       {#if tab_edit_name === 'main'}
         {@render main()}
       {:else}
-        <BulkEdit />
+        <BulkEdit bind:tab_edit_name />
       {/if}
     </svelte:fragment>
   </TabGroup>
