@@ -8,7 +8,7 @@
   import { SlideToggle, ProgressRadial } from '@skeletonlabs/skeleton';
   import { client } from '~/api/client';
   import { lipi_parivartak } from '~/tools/converter';
-  import { copy_text_to_clipboard, format_string_text } from '~/tools/kry';
+  import { copy_text_to_clipboard, format_string_text, get_permutations } from '~/tools/kry';
   import { onMount } from 'svelte';
   import { loadLocalConfig } from '../load_local_config';
   import { BsDownload, BsCopy } from 'svelte-icons-pack/bs';
@@ -21,6 +21,8 @@
   import { OiCopy16 } from 'svelte-icons-pack/oi';
   import { BsClipboard2Check } from 'svelte-icons-pack/bs';
   import { createMutation } from '@tanstack/svelte-query';
+  import { ai_sample_data } from './ai_sample_data';
+  import { delay } from '~/tools/delay';
 
   let base_prompts = ai_text_prompts as {
     main_prompt: {
@@ -100,8 +102,7 @@
           content: base_prompts.main_prompt[1].content
         },
         { role: 'user', content: $shloka_text_prompt }
-      ],
-      use_sample_data: load_ai_sample_data
+      ]
     });
   };
   const NUMBER_OF_IMAGES = 1;
@@ -119,7 +120,6 @@
     await $image_mut.mutateAsync({
       image_prompt: $image_prompt,
       number_of_images: NUMBER_OF_IMAGES,
-      use_sample_data: load_ai_sample_data,
       image_model
     });
     clearInterval(interval);
@@ -127,6 +127,10 @@
   };
   const image_prompt_mut = createMutation({
     mutationFn: async (input: Parameters<typeof client.ai.get_image_prompt.mutate>[0]) => {
+      if (import.meta.env.DEV && load_ai_sample_data) {
+        await delay(1000);
+        return { image_prompt: ai_sample_data.sample_text_prompt };
+      }
       return await client.ai.get_image_prompt.mutate(input);
     },
     async onSuccess(dt) {
@@ -141,6 +145,30 @@
   });
   const image_mut = createMutation({
     mutationFn: async (input: Parameters<typeof client.ai.get_generated_images.mutate>[0]) => {
+      if (import.meta.env.DEV && load_ai_sample_data) {
+        await delay(2000);
+        const list: {
+          url: string;
+          created: number;
+          prompt: string;
+          file_format: 'png';
+          model: 'dall-e-3';
+          out_format: 'url';
+        }[] = [];
+        const permutation = get_permutations([1, 4], 1)[0];
+        for (let i = 0; i < input.number_of_images; i++) {
+          const image_index = permutation[i] - 1;
+          list.push({
+            url: ai_sample_data.sample_images[image_index],
+            created: new Date().getTime(),
+            prompt: `Sample Image ${image_index + 1}`,
+            file_format: 'png', // although its webp
+            model: 'dall-e-3',
+            out_format: 'url'
+          });
+        }
+        return list;
+      }
       return await client.ai.get_generated_images.mutate(input);
     },
     onSuccess(data) {

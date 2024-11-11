@@ -188,7 +188,7 @@
   oninput={(e) => ($bulk_text_edit_status = true) && input_func(e)}
 ></textarea>
 
-<style lang="scss">
+<style lang="postcss">
   code {
     @apply text-xs;
   }
