@@ -1,4 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: Cannot subscribe to stores that are not declared at the top level of the component -->
 <script lang="ts">
   import { rAmAyaNam_map, sarga_data, trans_en_data } from '~/state/main_page/data';
   import { BASE_SCRIPT, kANDa_selected, sarga_selected } from '~/state/main_page/main_state';
@@ -7,7 +6,7 @@
   import { writable } from 'svelte/store';
   import ai_text_prompts from './ai_text_prompts.yaml';
   import { SlideToggle, ProgressRadial } from '@skeletonlabs/skeleton';
-  import { client_q, type client } from '~/api/client';
+  import { client } from '~/api/client';
   import { lipi_parivartak } from '~/tools/converter';
   import { copy_text_to_clipboard, format_string_text } from '~/tools/kry';
   import { onMount } from 'svelte';
@@ -21,6 +20,7 @@
   import { LuCopy } from 'svelte-icons-pack/lu';
   import { OiCopy16 } from 'svelte-icons-pack/oi';
   import { BsClipboard2Check } from 'svelte-icons-pack/bs';
+  import { createMutation } from '@tanstack/svelte-query';
 
   let base_prompts = ai_text_prompts as {
     main_prompt: {
@@ -125,7 +125,10 @@
     clearInterval(interval);
     image_gen_time_taken = 0;
   };
-  const image_prompt_mut = client_q.ai.get_image_prompt.mutation({
+  const image_prompt_mut = createMutation({
+    mutationFn: async (input: Parameters<typeof client.ai.get_image_prompt.mutate>[0]) => {
+      return await client.ai.get_image_prompt.mutate(input);
+    },
     async onSuccess(dt) {
       if (dt.image_prompt) {
         $image_prompt = dt.image_prompt;
@@ -136,7 +139,10 @@
       }
     }
   });
-  const image_mut = client_q.ai.get_generated_images.mutation({
+  const image_mut = createMutation({
+    mutationFn: async (input: Parameters<typeof client.ai.get_generated_images.mutate>[0]) => {
+      return await client.ai.get_generated_images.mutate(input);
+    },
     onSuccess(data) {
       $image_data = data;
     }
