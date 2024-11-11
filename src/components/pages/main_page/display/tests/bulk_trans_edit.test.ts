@@ -107,7 +107,7 @@ Good Text
 Contents of Shloka 2
 
 
-3. Shloka 3
+3: Shloka 3
 Contents of Shloka 3
 
 
@@ -163,7 +163,7 @@ Contents of Shloka 15
 Contents of Shloka 16
 
 
-17. ${NON_EXIST_INDICATOR}
+17. ----
 
 
 -1. Shloka Ends`;
