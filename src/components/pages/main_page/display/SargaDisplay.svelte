@@ -35,9 +35,12 @@
   import { RiSystemAddLargeLine } from 'svelte-icons-pack/ri';
   import { popup } from '@skeletonlabs/skeleton';
   import SargaAiTranslate from './SargaAITranslate.svelte';
+  import { Tab, TabGroup } from '@skeletonlabs/skeleton';
+  import BulkEdit from './BulkEdit.svelte';
 
   const query_client = useQueryClient();
 
+  let tab_edit_name: 'main' | 'bulk' = $state('main');
   let transliterated_sarga_data = $state<string[]>([]);
   $effect(() => {
     // console.time('transliterate_sarga_data');
@@ -178,53 +181,71 @@
     </div>
   {/if}
 </div>
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<div
-  class={cl_join(
-    'h-[85vh] overflow-scroll rounded-xl border-2 border-gray-400 p-0 dark:border-gray-600',
-    $trans_en_data.isSuccess && 'h-[90vh]',
-    $trans_lang_data.isSuccess && 'h-[95vh]',
-    $editing_status_on && 'h-[100vh]'
-  )}
-  onmouseenter={() => (sarga_hovered = true)}
-  onmouseleave={() => (sarga_hovered = false)}
->
-  {#if !$sarga_data.isFetching}
-    <div transition:fade={{ duration: 250 }} class="space-y-[0.15rem]">
-      {#each transliterated_sarga_data as shloka_lines, i (i)}
-        <!-- with 0 and -1 index -->
-        {@const trans_index = transliterated_sarga_data.length - 1 === i ? -1 : i}
-        <div class="rounded-lg px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-800">
-          <div class="flex space-x-2">
-            {#if i !== 0 && i !== transliterated_sarga_data.length - 1}
-              <div
-                class="flex select-none items-center align-top text-[0.75rem] leading-[1.5rem] text-gray-500 dark:text-gray-300"
-              >
-                {i}
+
+{#if !$editing_status_on}
+  {@render main()}
+{:else}
+  <TabGroup>
+    <Tab bind:group={tab_edit_name} name="tab1" value={'main'}>Main</Tab>
+    <Tab bind:group={tab_edit_name} name="tab2" value={'bulk'}>Batch</Tab>
+    <svelte:fragment slot="panel">
+      {#if tab_edit_name === 'main'}
+        {@render main()}
+      {:else}
+        <BulkEdit />
+      {/if}
+    </svelte:fragment>
+  </TabGroup>
+{/if}
+{#snippet main()}
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <div
+    class={cl_join(
+      'h-[85vh] overflow-scroll rounded-xl border-2 border-gray-400 p-0 dark:border-gray-600',
+      $trans_en_data.isSuccess && 'h-[90vh]',
+      $trans_lang_data.isSuccess && 'h-[95vh]',
+      $editing_status_on && 'h-[100vh]'
+    )}
+    onmouseenter={() => (sarga_hovered = true)}
+    onmouseleave={() => (sarga_hovered = false)}
+  >
+    {#if !$sarga_data.isFetching}
+      <div transition:fade={{ duration: 250 }} class="space-y-[0.15rem]">
+        {#each transliterated_sarga_data as shloka_lines, i (i)}
+          <!-- with 0 and -1 index -->
+          {@const trans_index = transliterated_sarga_data.length - 1 === i ? -1 : i}
+          <div class="rounded-lg px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-800">
+            <div class="flex space-x-2">
+              {#if i !== 0 && i !== transliterated_sarga_data.length - 1}
+                <div
+                  class="flex select-none items-center align-top text-[0.75rem] leading-[1.5rem] text-gray-500 dark:text-gray-300"
+                >
+                  {i}
+                </div>
+              {/if}
+              <div class="mt-0 w-full space-y-1">
+                <!-- svelte-ignore a11y_no_static_element_interactions -->
+                <div
+                  style:font-size={`${main_text_font_info.size}rem`}
+                  style:font-family={main_text_font_info.family}
+                  ondblclick={() => copy_text(shloka_lines)}
+                >
+                  {#each shloka_lines.split('\n') as line_shlk}
+                    <!-- if needed add 'whitespace-pre-wrap'2 -->
+                    <div>
+                      {line_shlk}
+                    </div>
+                  {/each}
+                </div>
+                {@render shloka_trans_display(trans_index)}
               </div>
-            {/if}
-            <div class="mt-0 w-full space-y-1">
-              <!-- svelte-ignore a11y_no_static_element_interactions -->
-              <div
-                style:font-size={`${main_text_font_info.size}rem`}
-                style:font-family={main_text_font_info.family}
-                ondblclick={() => copy_text(shloka_lines)}
-              >
-                {#each shloka_lines.split('\n') as line_shlk}
-                  <!-- if needed add 'whitespace-pre-wrap'2 -->
-                  <div>
-                    {line_shlk}
-                  </div>
-                {/each}
-              </div>
-              {@render shloka_trans_display(trans_index)}
             </div>
           </div>
-        </div>
-      {/each}
-    </div>
-  {/if}
-</div>
+        {/each}
+      </div>
+    {/if}
+  </div>
+{/snippet}
 
 {#if $typing_assistance_modal_opened}
   {#await import('~/components/TypingAssistance.svelte') then TypingAssistance}
