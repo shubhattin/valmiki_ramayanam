@@ -49,3 +49,4 @@ src/components/pages/main_page/local_config.yaml
 
 temp
 src/db/scripts/out/
+.trigger

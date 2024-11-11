@@ -1,11 +1,8 @@
 import { protectedAdminProcedure } from '~/api/trpc_init';
 import { env } from '$env/dynamic/private';
 import { z } from 'zod';
-import { ai_sample_data } from './sample_data/sample_data';
-import { delay } from '~/tools/delay';
 import { fetch_post } from '~/tools/fetch';
 import type OpenAI from 'openai';
-import { get_permutations } from '~/tools/kry';
 
 const available_models_schema = z.enum(['dall-e-3', 'sd3-core']);
 
@@ -141,28 +138,10 @@ export const get_generated_images_route = protectedAdminProcedure
     z.object({
       image_prompt: z.string(),
       number_of_images: z.number().int().min(1).max(4),
-      use_sample_data: z.boolean().optional().default(false),
       image_model: available_models_schema
     })
   )
-  .mutation(async ({ input: { image_prompt, number_of_images, use_sample_data, image_model } }) => {
-    if (use_sample_data) {
-      await delay(2000);
-      const list: image_output_type[] = [];
-      const permutation = get_permutations([1, 4], 1)[0];
-      for (let i = 0; i < number_of_images; i++) {
-        const image_index = permutation[i] - 1;
-        list.push({
-          url: ai_sample_data.sample_images[image_index],
-          created: new Date().getTime(),
-          prompt: `Sample Image ${image_index + 1}`,
-          file_format: 'png', // although its webp
-          model: 'dall-e-3',
-          out_format: 'url'
-        });
-      }
-      return list;
-    }
+  .mutation(async ({ input: { image_prompt, number_of_images, image_model } }) => {
     if (image_model === 'sd3-core')
       return await make_image_sd3_core(image_prompt, number_of_images);
     // default` dall-e-3`
