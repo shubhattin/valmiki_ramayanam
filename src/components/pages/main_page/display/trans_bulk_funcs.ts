@@ -23,18 +23,38 @@ export function trans_map_to_text(trans_map: Map<number, string>, shloka_count: 
  * - **Format 2**
  *   - If shlokas have missing index markers then they will be interpreted in the usual order, i.e. 0, 1, 2 to last and -1.
  *   - Shlokas can't be inserted in between with this format
+ *   - If the number of shlokas are more than the shloka count then the limit is only considered.
  */
 export function text_to_trans_map(text: string, shloka_count: number) {
-  text = text.replaceAll(/(?<=\n\n\n)\n+/gm, '\n\n\n'); // replace extra new lines
+  text = text.replace(/(?<=\n\n\n)\n+/gm, ''); // remove extra new lines
   const texts = text.split('\n\n\n');
   const trans_map = new Map<number, string>();
+  let second_format_found = false;
   for (let i = 0; i < texts.length; i++) {
-    const shloka = texts[i];
-    const shloka_text = /(?<=-?\d+\.|: ).+/gms.exec(shloka)?.[0].trim()!;
-    const shloka_num = parseInt(/^-?\d+(?=\.|: )/gm.exec(shloka)?.[0]!); // shloka number extractions
-    if (shloka_num >= -1 && shloka_num <= shloka_count && !/^---+$/g.test(shloka_text))
-      // ignore if line starts with --- or more dashes
-      trans_map.set(shloka_num, shloka_text);
+    const shloka = texts[i].trim();
+    const shloka_text = /(?<=^-?\d+(\.|:) ).+/gms.exec(shloka)?.[0].trim();
+    if (shloka_text) {
+      const shloka_num = parseInt(/^-?\d+(?=\.|: )/gm.exec(shloka)?.[0]!); // shloka number extractions
+      if (shloka_num >= -1 && shloka_num <= shloka_count && !/^---+$/g.test(shloka_text))
+        // ignore if line starts with --- or more dashes
+        trans_map.set(shloka_num, shloka_text);
+    } else if (i == 0) {
+      // if the first(only) one is undefined then we assume that the whole text is in the 2nd format
+      second_format_found = true;
+      break;
+    }
+  }
+  if (second_format_found) {
+    let i = 0;
+    for (; i < texts.length && i <= shloka_count; i++) {
+      // i <= shloka_count+1 because we don't want to include the last shloka
+      // we will check for what index to set for last shloka
+      const shloka = texts[i].trim();
+      trans_map.set(i, shloka);
+    }
+    if (i > shloka_count && i < texts.length) {
+      trans_map.set(-1, texts[i].trim());
+    }
   }
   return trans_map;
 }
