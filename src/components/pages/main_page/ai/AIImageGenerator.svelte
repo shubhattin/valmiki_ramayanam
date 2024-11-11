@@ -23,6 +23,7 @@
   import { createMutation } from '@tanstack/svelte-query';
   import { ai_sample_data } from './ai_sample_data';
   import { delay } from '~/tools/delay';
+  import { auth, runs } from '@trigger.dev/sdk/v3';
 
   let base_prompts = ai_text_prompts as {
     main_prompt: {
@@ -131,9 +132,16 @@
         await delay(1000);
         return { image_prompt: ai_sample_data.sample_text_prompt };
       }
-      return await client.ai.get_image_prompt.mutate(input);
+      const { handle, output_type } = await client.ai.get_image_prompt.mutate(input);
+      auth.configure({
+        accessToken: handle.publicAccessToken
+      });
+      for await (const run of runs.subscribeToRun<typeof output_type>(handle.id)) {
+        if (run.status === 'COMPLETED') return run.output!;
+      }
     },
     async onSuccess(dt) {
+      dt = dt!;
       if (dt.image_prompt) {
         $image_prompt = dt.image_prompt;
         if ($auto_gen_image) generate_image();
