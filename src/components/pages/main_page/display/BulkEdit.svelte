@@ -127,7 +127,7 @@
     <svelte:fragment slot="lead">
       <Icon src={TrOutlineHelpSquare} class="-m-1.5  -mt-2 text-2xl" />
     </svelte:fragment>
-    <span slot="summary" class="text-lg font-bold">Help</span>
+    <span slot="summary" class="text-base font-bold">Instructions</span>
     <svelte:fragment slot="content">
       <ul class="list-disc">
         <li>Each shloka should be separated by two or more blank lines</li>
@@ -155,6 +155,7 @@
             <li>Shlokas have to be strictly in the same order and number.</li>
           </ul>
         </li>
+        <li>Avoid using it for single or minor changes.</li>
       </ul>
     </svelte:fragment>
   </AccordionItem>
