@@ -3,7 +3,7 @@ import { createQuery } from '@tanstack/svelte-query';
 import { delay } from '~/tools/delay';
 import { get_derived_query } from '~/tools/query';
 import { queryClient } from '~/state/query';
-import { derived } from 'svelte/store';
+import { derived, writable } from 'svelte/store';
 import { client } from '~/api/client';
 import rAmAyaNam_map from '@data/ramayan/ramayan_map.json';
 import { lipi_parivartak } from '~/tools/converter';
@@ -147,3 +147,6 @@ export let english_edit_status = derived(
     (($user_info && $user_info.user_type === 'admin') ||
       ($user_allowed_langs.isSuccess && $user_allowed_langs.data.includes('English')))
 );
+
+export let bulk_text_edit_status = writable(false);
+export let bulk_text_data = writable('');
