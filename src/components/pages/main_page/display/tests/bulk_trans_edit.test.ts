@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { text_to_trans_map, trans_map_to_text } from '../trans_bulk_funcs';
+import { text_to_trans_map, trans_map_to_text, NON_EXIST_INDICATOR } from '../trans_bulk_funcs';
 
 const text = `0. Shloka Starts
 
@@ -69,7 +69,7 @@ Contents of Shloka 15
 Contents of Shloka 16
 
 
-17. ---------------
+17. ${NON_EXIST_INDICATOR}
 
 
 -1. Shloka Ends`;
@@ -92,7 +92,7 @@ map.set(13, 'Shloka 13\nContents of Shloka 13');
 map.set(14, 'Shloka 14\nContents of Shloka 14');
 map.set(15, 'Shloka 15\nContents of Shloka 15');
 map.set(16, 'Shloka 16\nContents of Shloka 16');
-map.set(17, '---------------');
+// map.set(17, 'Missing');
 map.set(-1, 'Shloka Ends');
 
 const text1 = `0. Shloka Starts
@@ -163,7 +163,7 @@ Contents of Shloka 15
 Contents of Shloka 16
 
 
-17. ---------------
+17. ${NON_EXIST_INDICATOR}
 
 
 -1. Shloka Ends`;
