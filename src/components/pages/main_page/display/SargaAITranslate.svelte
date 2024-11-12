@@ -18,9 +18,8 @@
   import { createMutation, useQueryClient } from '@tanstack/svelte-query';
   import { format_string_text } from '~/tools/kry';
   import trans_prompts from './translation_prompts.yaml';
-  import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
+  import { getModalStore } from '@skeletonlabs/skeleton';
   import { lipi_parivartak } from '~/tools/converter';
-  import { auth, runs } from '@trigger.dev/sdk/v3';
 
   const query_client = useQueryClient();
   const modal_store = getModalStore();
@@ -32,12 +31,8 @@
   const translate_sarga_mut = createMutation({
     mutationFn: async (input: Parameters<typeof client.ai.translate_sarga.mutate>[0]) => {
       const { handle, output_type } = await client.ai.translate_sarga.mutate(input);
-      auth.configure({
-        accessToken: handle!.publicAccessToken
-      });
-      for await (const run of runs.subscribeToRun(handle!.id)) {
-        if (run.status === 'COMPLETED') return run.output! as typeof output_type;
-      }
+      const { get_result_from_trigger_dev_handle } = await import('~/tools/trigger');
+      return await get_result_from_trigger_dev_handle<typeof output_type>(handle!);
     },
     async onSuccess(response) {
       response = response!;
