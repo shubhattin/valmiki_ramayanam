@@ -8,7 +8,7 @@ const openai_text_model = createOpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export const translate_sarga = task({
   id: 'ai_translate_sarga',
-  maxDuration: 200, // in seconds
+  maxDuration: 300, // in seconds
   run: async (payload: z.infer<typeof sarga_translate_schema.input>) => {
     payload = sarga_translate_schema.input.parse(payload);
     const { messages } = payload;
