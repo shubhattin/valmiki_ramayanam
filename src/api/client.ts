@@ -4,11 +4,11 @@ import { createTRPCClient } from 'trpc-sveltekit';
 import transformer from './transformer';
 import { createTRPCSvelte } from 'trpc-svelte-query';
 
-let jwt_token: string;
+let access_token: string;
 
 export const setAccessToken = (token: string) => {
   // to set the jwt_token while we make trpc request
-  jwt_token = token;
+  access_token = token;
 };
 
 const client_options = {
@@ -17,7 +17,7 @@ const client_options = {
       url: '/trpc',
       headers() {
         return {
-          Authorization: `Bearer ${jwt_token}`
+          Authorization: `Bearer ${access_token}`
         };
       }
     })
