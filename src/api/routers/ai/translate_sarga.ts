@@ -1,41 +1,15 @@
-import { createOpenAI } from '@ai-sdk/openai';
-import { generateObject } from 'ai';
 import { z } from 'zod';
 import { env } from '$env/dynamic/private';
 import { protectedProcedure } from '~/api/trpc_init';
 import { db } from '~/db/db';
 import type { lang_list_type } from '~/tools/lang_list';
+import { tasks } from '@trigger.dev/sdk/v3';
+import { sarga_translate_schema } from '~/api/routers/ai/ai_types';
 
-const openai_text_model = createOpenAI({ apiKey: env.OPENAI_API_KEY });
-
-const translation_out_schema = z
-  .object({
-    text: z.string().describe('The trnalstion text'),
-    shloka_num: z
-      .number()
-      .describe('The index of shlokas to be generated, use 0 for starting and -1 for ending.')
-  })
-  .array()
-  .describe('This array will contain the text and the index of the shlokas to be generated.');
+process.env.TRIGGER_SECRET_KEY = env.TRIGGER_SECRET_KEY;
 
 export const translate_sarga_route = protectedProcedure
-  .input(
-    z.object({
-      lang: z.string(),
-      messages: z
-        .object({
-          role: z.union([z.literal('user'), z.literal('assistant')]),
-          content: z.string()
-        })
-        .array()
-    })
-  )
-  .output(
-    z.union([
-      z.object({ success: z.literal(true), translations: translation_out_schema }),
-      z.object({ success: z.literal(false) })
-    ])
-  )
+  .input(sarga_translate_schema.input)
   .mutation(async ({ ctx: { user }, input: { lang, messages } }) => {
     if (user.user_type !== 'admin') {
       const { allowed_langs } = (await db.query.users.findFirst({
@@ -47,15 +21,10 @@ export const translate_sarga_route = protectedProcedure
       if (!allowed_langs || !allowed_langs.includes(lang as lang_list_type))
         return { success: false };
     }
+    const handle = await tasks.trigger('ai_translate_sarga', {
+      lang,
+      messages
+    });
 
-    try {
-      const response = await generateObject({
-        model: openai_text_model('gpt-4o'),
-        messages,
-        schema: z.object({ translations: translation_out_schema })
-      });
-      return { ...response.object, success: true };
-    } catch {
-      return { success: false };
-    }
+    return { handle, output_type: null! as z.infer<typeof sarga_translate_schema.output> };
   });

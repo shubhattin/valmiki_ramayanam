@@ -197,7 +197,9 @@
 {:else}
   <TabGroup>
     <Tab bind:group={tab_edit_name} name="tab1" value={'main'}>Main</Tab>
-    <Tab bind:group={tab_edit_name} name="tab2" value={'bulk'}>Batch Edit</Tab>
+    <Tab bind:group={tab_edit_name} name="tab2" value={'bulk'}
+      ><span class="text-sm">Batch Edit</span></Tab
+    >
     <svelte:fragment slot="panel">
       {#if tab_edit_name === 'main'}
         {@render main()}

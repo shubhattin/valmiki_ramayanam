@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { client_q } from '~/api/client';
+  import { client } from '~/api/client';
   import {
     BASE_SCRIPT,
     editing_status_on,
@@ -15,11 +15,12 @@
     trans_lang_data,
     trans_lang_data_query_key
   } from '~/state/main_page/data';
-  import { useQueryClient } from '@tanstack/svelte-query';
+  import { createMutation, useQueryClient } from '@tanstack/svelte-query';
   import { format_string_text } from '~/tools/kry';
   import trans_prompts from './translation_prompts.yaml';
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
   import { lipi_parivartak } from '~/tools/converter';
+  import { auth, runs } from '@trigger.dev/sdk/v3';
 
   const query_client = useQueryClient();
   const modal_store = getModalStore();
@@ -28,8 +29,18 @@
   let sarga_info = $derived(kANDa_info.sarga_data[$sarga_selected - 1]);
   let shloka_count = $derived(sarga_info.shloka_count_extracted);
 
-  const translate_sarga_mut = client_q.ai.translate_sarga.mutation({
+  const translate_sarga_mut = createMutation({
+    mutationFn: async (input: Parameters<typeof client.ai.translate_sarga.mutate>[0]) => {
+      const { handle, output_type } = await client.ai.translate_sarga.mutate(input);
+      auth.configure({
+        accessToken: handle!.publicAccessToken
+      });
+      for await (const run of runs.subscribeToRun(handle!.id)) {
+        if (run.status === 'COMPLETED') return run.output! as typeof output_type;
+      }
+    },
     async onSuccess(response) {
+      response = response!;
       if (!response.success) return;
       const translations = response.translations;
       const new_data = new Map($trans_lang_data.data);
