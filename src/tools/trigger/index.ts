@@ -35,6 +35,9 @@ export const get_result_from_trigger_dev_handle = async <T>(handle: {
   id: string;
   taskIdentifier: string;
 }) => {
+  // this has been written to indirectly call the trigger_dev API as it seems to mess up with superjson lib
+  // and lead to errors in the trpc transformer
+  // so running it in an isolated worker
   return (await postMessage({
     func_name: 'get_result_from_trigger_dev_handle',
     args: [handle]

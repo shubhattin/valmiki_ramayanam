@@ -12,6 +12,8 @@
     "migration:push": "cd ./src/db && tsx migrate.ts",
     "migration:drop": "drizzle-kit drop",
     "migration:direct-push": "drizzle-kit push",
+    "trigger:dev": "pnpm dlx trigger.dev@latest dev",
+    "trigger:deploy": "pnpm dlx trigger.dev@latest deploy",
     "test": "vitest",
     "test-ui": "vitest --ui",
     "lint": "prettier --check .",
