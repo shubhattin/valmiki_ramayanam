@@ -3,10 +3,12 @@ import { env } from '$env/dynamic/private';
 import { protectedProcedure } from '~/api/trpc_init';
 import { db } from '~/db/db';
 import type { lang_list_type } from '~/tools/lang_list';
-import { tasks } from '@trigger.dev/sdk/v3';
+import { tasks, auth } from '@trigger.dev/sdk/v3';
 import { sarga_translate_schema } from '~/api/routers/ai/ai_types';
 
-process.env.TRIGGER_SECRET_KEY = env.TRIGGER_SECRET_KEY;
+auth.configure({
+  secretKey: env.TRIGGER_SECRET_KEY
+});
 
 export const translate_sarga_route = protectedProcedure
   .input(sarga_translate_schema.input)

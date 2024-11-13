@@ -20,6 +20,8 @@
   import trans_prompts from './translation_prompts.yaml';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import { lipi_parivartak } from '~/tools/converter';
+  import { AIIcon } from '~/components/icons';
+  import Icon from '~/tools/Icon.svelte';
 
   const query_client = useQueryClient();
   const modal_store = getModalStore();
@@ -98,8 +100,9 @@
   <button
     disabled={$translate_sarga_mut.isPending}
     onclick={translate_sarga_func}
-    class="btn ml-3 rounded-lg bg-surface-700 px-1 py-1 text-white dark:bg-surface-600"
+    class="btn ml-3 rounded-lg bg-surface-600 px-2 py-1 text-white dark:bg-surface-600"
   >
-    Translate Sarga
+    <Icon src={AIIcon} class="-mt-1 mr-1 text-2xl" />
+    Translate Sarga with AI
   </button>
 {/if}

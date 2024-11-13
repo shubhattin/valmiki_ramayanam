@@ -113,8 +113,8 @@
       title: 'Sure to sync the text to Main Tab ?',
       body:
         'This will write the shloka contents to the main tab text which can then be verified and saved from there' +
-        '\nAlso be sure to verify if there was no distortion of the previous, it sometimes adds spaces or new lines on its own. ' +
-        'If you are adding it from new it should be fine.',
+        '\nAlso be sure to verify if there was distortion of any sorts, it sometimes adds spaces or new lines on its own. ' +
+        'If you are adding to an empty non translated shloka it should be fine.',
       response: (r: boolean) => {
         if (r) on_confirm();
       }
