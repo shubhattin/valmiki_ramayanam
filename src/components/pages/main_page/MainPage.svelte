@@ -403,8 +403,8 @@
     {#if !$ai_tool_opened}
       <SargaDisplay />
     {:else if $user_info && $user_info.user_type === 'admin'}
-      {#await import('./ai/AITools.svelte') then AITools}
-        <AITools.default />
+      {#await import('./ai_image_tool/AIImageGenerator.svelte') then AIImageGenerator}
+        <AIImageGenerator.default />
       {/await}
     {/if}
   {/if}
