@@ -48,10 +48,19 @@
       });
       $added_translations_indexes = $added_translations_indexes;
       await query_client.setQueryData($trans_lang_data_query_key, new_data);
+      (globalThis as any).translated_once = true;
     }
   });
 
   function translate_sarga_func() {
+    if ((globalThis as any).translated_once === true) {
+      modal_store.trigger({
+        type: 'alert',
+        title: 'Refresh Page to translate again',
+        body: 'Due to some issue the translation feature works only once after reload. Please refresh the page to use this.'
+      });
+      return;
+    }
     modal_store.trigger({
       type: 'confirm',
       title: 'Are you sure to translate the sarga ?',
