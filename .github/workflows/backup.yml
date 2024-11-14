@@ -2,7 +2,7 @@ name: Data Backup
 
 on:
   schedule:
-    - cron: '30 4 */2 * *' # Run wvery days at 10:00 AM IST every 2 days
+    - cron: '30 17 */2 * *' # Run every days at 11:00 PM IST every 2 days
 
 jobs:
   backup_db_data:
@@ -20,7 +20,6 @@ jobs:
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
-          version: 8
           run_install: true
       - name: Setup PostgreSQL
         uses: tj-actions/install-postgresql@v3
