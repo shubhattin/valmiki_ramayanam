@@ -36,9 +36,9 @@
   import type { lang_list_type } from '~/tools/lang_list';
   import { RiSystemAddLargeLine } from 'svelte-icons-pack/ri';
   import { popup } from '@skeletonlabs/skeleton';
-  import SargaAiTranslate from './SargaAITranslate.svelte';
+  import SargaAiTranslate from './ai_sarga_translate/SargaAITranslate.svelte';
   import { Tab, TabGroup } from '@skeletonlabs/skeleton';
-  import BulkEdit from './BulkEdit.svelte';
+  import BulkEdit from './bulk/BulkEdit.svelte';
 
   const query_client = useQueryClient();
 

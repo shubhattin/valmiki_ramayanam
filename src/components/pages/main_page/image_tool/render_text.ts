@@ -223,44 +223,25 @@ const render_text = async (input: z.input<typeof render_text_args_schema>) => {
 };
 
 const draw_bounding_and_reference_lines = async (shloka_config: shloka_type_config) => {
-  const bounds = shloka_config.bounding_coords;
+  const shloka = shloka_config.bounding_coords;
   const $canvas = get(canvas);
   const $current_shloka_type = get(current_shloka_type);
+  const trans = TRANSLATION_BOUNDIND_COORDS;
   for (let line_coord of [
     [
       // the main area bounding box
       // x1 y1 x2 y2
-      [bounds.left, bounds.top, bounds.left, bounds.bottom], // left line
-      [bounds.right, bounds.top, bounds.right, bounds.bottom], // top line
-      [bounds.left, bounds.top, bounds.right, bounds.top], // right line
-      [bounds.left, bounds.bottom, bounds.right, bounds.bottom] // bottom line
+      [shloka.left, shloka.top, shloka.left, shloka.bottom], // left line
+      [shloka.right, shloka.top, shloka.right, shloka.bottom], // top line
+      [shloka.left, shloka.top, shloka.right, shloka.top], // right line
+      [shloka.left, shloka.bottom, shloka.right, shloka.bottom] // bottom line
     ],
     [
       // translation area bounding box
-      [
-        TRANSLATION_BOUNDIND_COORDS.left,
-        TRANSLATION_BOUNDIND_COORDS.top,
-        TRANSLATION_BOUNDIND_COORDS.left,
-        TRANSLATION_BOUNDIND_COORDS.bottom
-      ], // left line
-      [
-        TRANSLATION_BOUNDIND_COORDS.right,
-        TRANSLATION_BOUNDIND_COORDS.top,
-        TRANSLATION_BOUNDIND_COORDS.right,
-        TRANSLATION_BOUNDIND_COORDS.bottom
-      ], // top line
-      [
-        TRANSLATION_BOUNDIND_COORDS.left,
-        TRANSLATION_BOUNDIND_COORDS.top,
-        TRANSLATION_BOUNDIND_COORDS.right,
-        TRANSLATION_BOUNDIND_COORDS.top
-      ], // right line
-      [
-        TRANSLATION_BOUNDIND_COORDS.left,
-        TRANSLATION_BOUNDIND_COORDS.bottom,
-        TRANSLATION_BOUNDIND_COORDS.right,
-        TRANSLATION_BOUNDIND_COORDS.bottom
-      ] // bottom line
+      [trans.left, trans.top, trans.left, trans.bottom], // left line
+      [trans.right, trans.top, trans.right, trans.bottom], // top line
+      [trans.left, trans.top, trans.right, trans.top], // right line
+      [trans.left, trans.bottom, trans.right, trans.bottom] // bottom line
     ]
   ])
     for (let line_pos of line_coord)
@@ -285,7 +266,7 @@ const draw_bounding_and_reference_lines = async (shloka_config: shloka_type_conf
     const top = shloka_config.reference_lines.top + top_i * shloka_config.reference_lines.spacing;
     $canvas.add(
       new fabric.Line(
-        [get_units(bounds.left), get_units(top), get_units(bounds.right), get_units(top)],
+        [get_units(shloka.left), get_units(top), get_units(shloka.right), get_units(top)],
         {
           stroke: 'hsla(0, 59%, 41%, 1)',
           strokeWidth: get_units(2),
