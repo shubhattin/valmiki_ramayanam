@@ -73,7 +73,7 @@
     modal_store.trigger({
       type: 'confirm',
       title: 'Are you sure to translate the sarga ?',
-      body: `This will translate the untranslated shlokas to ${$trans_lang} which you can edit and then save.`,
+      body: `This will translate the untranslated shlokas to ${$trans_lang !== '--' ? $trans_lang : 'English'} which you can edit and then save.`,
       response(r: boolean) {
         if (!r) return;
         (async () => {
