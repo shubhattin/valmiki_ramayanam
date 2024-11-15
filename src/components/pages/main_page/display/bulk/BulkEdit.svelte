@@ -152,16 +152,19 @@
               If shlokas have missing index markers then they will be interpreted in the usual
               order, i.e. 0, 1, 2 to last and -1.
             </li>
-            <li>Shlokas have to be strictly in the same order and number.</li>
+            <li>
+              Shlokas have to be strictly in the same order and number. All the way from 0, 1, 2, 3
+              ..... n, -1.
+            </li>
           </ul>
         </li>
-        <li>Avoid using it for single or minor changes.</li>
       </ul>
     </svelte:fragment>
   </AccordionItem>
 </Accordion>
 
 <div class="mt-3 p-1">
+  <div class="pb-2 text-sm">⚠️ Avoid using it for single/minor changes or unless necessary.</div>
   {#if !$bulk_text_edit_status}
     <div class="text-xs italic">Start Editing Text here...</div>
   {:else}
