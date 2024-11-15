@@ -112,13 +112,20 @@
       type: 'confirm',
       title: 'Sure to sync the text to Main Tab ?',
       body:
-        'This will write the shloka contents to the main tab text which can then be verified and saved from there' +
-        '\nAlso be sure to verify if there was distortion of any sorts, it sometimes adds spaces or new lines on its own. ' +
+        'This will write the shloka contents to the main tab text which can then be verified and saved from there.' +
+        '\nAlso be sure to verify for any sorts of distortions, it sometimes adds spaces or new lines on its own (nothing too serious). ' +
         'If you are adding to an empty non translated shloka it should be fine.',
       response: (r: boolean) => {
         if (r) on_confirm();
       }
     });
+  };
+
+  const detect_shortcut_pressed = (event: KeyboardEvent) => {
+    event.preventDefault();
+    if (event.altKey && event.key.toLowerCase() === 'x') {
+      $edit_language_typer_status = !$edit_language_typer_status;
+    }
   };
 </script>
 
@@ -189,6 +196,7 @@
   class="textarea mt-2.5 h-[60vh]"
   value={$bulk_text_data}
   oninput={(e) => ($bulk_text_edit_status = true) && input_func(e)}
+  onkeyup={detect_shortcut_pressed}
 ></textarea>
 
 <style lang="postcss">
