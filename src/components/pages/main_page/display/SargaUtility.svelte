@@ -160,7 +160,7 @@
         src={RiUserFacesRobot2Line}
         class="-mt-1 mr-1 fill-blue-500 text-2xl dark:fill-blue-400"
       />
-      AI Tool
+      AI Image Generator
     </button>
   {/if}
   <button

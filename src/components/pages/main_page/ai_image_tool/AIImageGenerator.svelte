@@ -1,6 +1,11 @@
 <script lang="ts">
   import { rAmAyaNam_map, sarga_data, trans_en_data } from '~/state/main_page/data';
-  import { BASE_SCRIPT, kANDa_selected, sarga_selected } from '~/state/main_page/main_state';
+  import {
+    BASE_SCRIPT,
+    kANDa_selected,
+    sarga_selected,
+    TEXT_MODEL_LIST
+  } from '~/state/main_page/main_state';
   import Icon from '~/tools/Icon.svelte';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import { writable } from 'svelte/store';
@@ -34,6 +39,8 @@
   let kANDa_info = $derived(rAmAyaNam_map[$kANDa_selected - 1]);
   let sarga_info = $derived(kANDa_info.sarga_data[$sarga_selected - 1]);
   let shloka_count = $derived(sarga_info.shloka_count_extracted);
+
+  let selected_text_model: keyof typeof TEXT_MODEL_LIST = $state('gpt-4o');
 
   onMount(async () => {
     if (import.meta.env.DEV) {
@@ -102,7 +109,8 @@
           content: base_prompts.main_prompt[1].content
         },
         { role: 'user', content: $shloka_text_prompt }
-      ]
+      ],
+      model: selected_text_model
     });
   };
   const NUMBER_OF_IMAGES = 1;
@@ -206,6 +214,54 @@
     Copied to Clipboard
   </div>
 {/if}
+<div class="space-x-3">
+  <span class="space-x-1">
+    <span class="font-semibold">Shloka No.</span>
+    <button
+      class="btn m-0 p-0"
+      disabled={$shloka_numb === 0}
+      onclick={() => {
+        if ($shloka_numb !== -1) $shloka_numb -= 1;
+        else $shloka_numb = shloka_count;
+      }}
+    >
+      <Icon src={TiArrowBackOutline} class="-mt-1 text-lg" />
+    </button>
+    <select class="select inline-block w-14 p-1 text-sm" bind:value={$shloka_numb}>
+      <option value={0}>0</option>
+      {#each Array(shloka_count) as _, index}
+        <option value={index + 1}>{index + 1}</option>
+      {/each}
+      <option value={-1}>-1</option>
+    </select>
+    <button
+      class="btn m-0 p-0"
+      onclick={() => {
+        if ($shloka_numb !== shloka_count) $shloka_numb += 1;
+        else $shloka_numb = -1;
+      }}
+      disabled={$shloka_numb === -1}
+    >
+      <Icon src={TiArrowForwardOutline} class="-mt-1 text-lg" />
+    </button>
+  </span>
+  <button
+    onclick={generate_image_prompt}
+    disabled={$image_prompt_mut.isPending}
+    class="btn rounded-md bg-surface-600 px-2 py-1 font-bold text-white dark:bg-surface-600"
+  >
+    Generate Image Prompt
+  </button>
+  <select
+    class="select ml-3 inline-block w-28 px-1 py-1 text-xs outline-none"
+    bind:value={selected_text_model}
+    title={TEXT_MODEL_LIST[selected_text_model][1]}
+  >
+    {#each Object.entries(TEXT_MODEL_LIST) as [key, value]}
+      <option value={key} title={value[1]}>{value[0]}</option>
+    {/each}
+  </select>
+</div>
 <div>
   <div class="block space-y-1.5">
     <div class="space-x-2">
@@ -250,49 +306,13 @@
   </div>
 </div>
 <div class="flex space-x-3">
-  <span class="space-x-1">
-    <button
-      class="btn m-0 p-0"
-      disabled={$shloka_numb === 0}
-      onclick={() => {
-        if ($shloka_numb !== -1) $shloka_numb -= 1;
-        else $shloka_numb = shloka_count;
-      }}
-    >
-      <Icon src={TiArrowBackOutline} class="-mt-1 text-lg" />
-    </button>
-    <select class="select inline-block w-14 p-1 text-sm" bind:value={$shloka_numb}>
-      <option value={0}>0</option>
-      {#each Array(shloka_count) as _, index}
-        <option value={index + 1}>{index + 1}</option>
-      {/each}
-      <option value={-1}>-1</option>
-    </select>
-    <button
-      class="btn m-0 p-0"
-      onclick={() => {
-        if ($shloka_numb !== shloka_count) $shloka_numb += 1;
-        else $shloka_numb = -1;
-      }}
-      disabled={$shloka_numb === -1}
-    >
-      <Icon src={TiArrowForwardOutline} class="-mt-1 text-lg" />
-    </button>
-  </span>
-  <button
-    onclick={generate_image_prompt}
-    disabled={$image_prompt_mut.isPending}
-    class="btn rounded-md bg-surface-600 px-2 py-1 font-bold text-white dark:bg-surface-600"
-  >
-    Generate Image Prompt
-  </button>
   <select
     class="select w-24 px-1 py-1 text-sm"
     bind:value={image_model}
     title={IMAGE_MODELS[image_model][1]}
   >
     {#each Object.entries(IMAGE_MODELS) as option}
-      <option class="text-sm" value={option[0]}>{option[1][0]}</option>
+      <option class="text-sm" value={option[0]} title={option[1][1]}>{option[1][0]}</option>
     {/each}
   </select>
   <SlideToggle

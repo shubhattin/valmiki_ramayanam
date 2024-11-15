@@ -5,7 +5,8 @@
     kANDa_selected,
     sarga_selected,
     trans_lang,
-    added_translations_indexes
+    added_translations_indexes,
+    TEXT_MODEL_LIST
   } from '~/state/main_page/main_state';
   import {
     QUERY_KEYS,
@@ -28,6 +29,8 @@
   let kANDa_info = $derived(rAmAyaNam_map[$kANDa_selected - 1]);
   let sarga_info = $derived(kANDa_info.sarga_data[$sarga_selected - 1]);
   let shloka_count = $derived(sarga_info.shloka_count_extracted);
+
+  let selected_model: keyof typeof TEXT_MODEL_LIST = $state('gpt-4o');
 
   const translate_sarga_mut = createMutation({
     mutationFn: async (input: Parameters<typeof client.ai.translate_sarga.mutate>[0]) => {
@@ -98,7 +101,7 @@
           const text = texts.join('\n\n\n');
           $translate_sarga_mut.mutateAsync({
             lang: $trans_lang,
-            model: 'gpt-4o',
+            model: selected_model,
             messages: [
               {
                 role: 'user',
@@ -134,9 +137,18 @@
   <button
     disabled={$translate_sarga_mut.isPending}
     onclick={translate_sarga_func}
-    class="btn ml-3 rounded-lg bg-surface-600 px-2 py-1 text-white dark:bg-surface-600"
+    class="btn ml-3 inline-block rounded-lg bg-surface-600 px-2 py-1 text-white dark:bg-surface-600"
   >
     <Icon src={AIIcon} class="-mt-1 mr-1 text-2xl" />
     Translate Sarga with AI
   </button>
+  <select
+    class="select ml-3 inline-block w-28 px-1 py-1 text-xs outline-none"
+    bind:value={selected_model}
+    title={TEXT_MODEL_LIST[selected_model][1]}
+  >
+    {#each Object.entries(TEXT_MODEL_LIST) as [key, value]}
+      <option value={key} title={value[1]}>{value[0]}</option>
+    {/each}
+  </select>
 {/if}

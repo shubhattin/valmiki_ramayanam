@@ -10,10 +10,12 @@ export const translation_out_schema = z
   .array()
   .describe('This array will contain the text and the index of the shlokas to be generated.');
 
+export const text_models_enum = z.enum(['gpt-4o', 'claude-3.5-sonnet']);
+
 export const sarga_translate_schema = {
   input: z.object({
     lang: z.string(),
-    model: z.enum(['gpt-4o', 'claude-3.5']),
+    model: text_models_enum,
     messages: z
       .object({
         role: z.union([z.literal('user'), z.literal('assistant')]),

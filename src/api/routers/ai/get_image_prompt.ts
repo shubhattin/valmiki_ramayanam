@@ -1,10 +1,13 @@
-import { protectedAdminProcedure, t } from '~/api/trpc_init';
+import { protectedAdminProcedure } from '~/api/trpc_init';
 import { generateObject } from 'ai';
 import { z } from 'zod';
 import { createOpenAI } from '@ai-sdk/openai';
+import { createAnthropic } from '@ai-sdk/anthropic';
 import { env } from '$env/dynamic/private';
+import { text_models_enum } from './ai_types';
 
 const openai_text_model = createOpenAI({ apiKey: env.OPENAI_API_KEY });
+const anthropic_text_model = createAnthropic({ apiKey: env.ANTHROPIC_API_KEY });
 
 export const get_image_prompt_route = protectedAdminProcedure
   .input(
@@ -14,13 +17,17 @@ export const get_image_prompt_route = protectedAdminProcedure
           role: z.union([z.literal('user'), z.literal('assistant')]),
           content: z.string()
         })
-        .array()
+        .array(),
+      model: text_models_enum
     })
   )
-  .mutation(async ({ input: { messages } }) => {
+  .mutation(async ({ input: { messages, model } }) => {
     try {
       const result = await generateObject({
-        model: openai_text_model('gpt-4o'),
+        model: {
+          'gpt-4o': openai_text_model('gpt-4o'),
+          'claude-3.5-sonnet': anthropic_text_model('claude-3-5-sonnet-latest')
+        }[model],
         messages,
         schema: z.object({
           image_prompt: z.string()
