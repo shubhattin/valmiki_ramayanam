@@ -1,7 +1,6 @@
 <script lang="ts">
   import { client } from '~/api/client';
   import {
-    BASE_SCRIPT,
     editing_status_on,
     kANDa_selected,
     sarga_selected,
@@ -19,7 +18,6 @@
   import { format_string_text } from '~/tools/kry';
   import trans_prompts from './translation_prompts.yaml';
   import { getModalStore } from '@skeletonlabs/skeleton';
-  import { lipi_parivartak } from '~/tools/converter';
   import { AIIcon } from '~/components/icons';
   import Icon from '~/tools/Icon.svelte';
 
@@ -71,16 +69,21 @@
           // Sanskrit Shlokas + Transliteration + English Translation
           const texts = await Promise.all(
             $sarga_data.data!.map(async (shloka_lines, i) => {
-              const normal_shloka = await lipi_parivartak(
-                $sarga_data.data![i],
-                BASE_SCRIPT,
-                'Normal'
-              );
+              // # Currently not adding transliteration as context as it seems to work fine without that as well.
+
+              // const normal_shloka = await lipi_parivartak(
+              //   $sarga_data.data![i],
+              //   BASE_SCRIPT,
+              //   'Normal'
+              // );
               const trans_index = $sarga_data.data!.length - 1 === i ? -1 : i;
-              let txt = `${shloka_lines}\n${normal_shloka}`;
-              const lang_data = $trans_en_data.data;
-              if (lang_data && lang_data.has(trans_index))
-                txt += `\n\n${lang_data.get(trans_index)}`;
+              let txt = `${shloka_lines}`;
+              // let txt = `${shloka_lines}\n${normal_shloka}`;
+              if ($trans_lang !== '--') {
+                const lang_data = $trans_en_data.data;
+                if (lang_data && lang_data.has(trans_index))
+                  txt += `\n\n${lang_data.get(trans_index)}`;
+              }
               return txt;
             })
           );
@@ -90,10 +93,15 @@
             messages: [
               {
                 role: 'user',
-                content: format_string_text(trans_prompts.prompts[0].content, {
-                  text,
-                  lang: $trans_lang
-                })
+                content: format_string_text(
+                  $trans_lang !== '--'
+                    ? trans_prompts.prompts[0].content
+                    : trans_prompts.prompts_english[0].content,
+                  {
+                    text,
+                    lang: $trans_lang
+                  }
+                )
               }
             ]
           });
@@ -101,11 +109,19 @@
       }
     });
   }
+
+  let other_lang_allow_translate = $derived(
+    $trans_lang !== '--' &&
+      ($trans_lang_data.data?.size ?? 0) < shloka_count + 2 && // atleast 1 untranslated shlokas should be there
+      ($trans_en_data.data?.size ?? 0) >= shloka_count * 0.7 // atleast 70% of the translations should be there
+  );
+  let english_allow_translate = $derived(
+    $trans_lang === '--' && ($trans_en_data.data?.size ?? 0) !== shloka_count + 2
+    // all english translations should not be there, anyway we wont be sending it as context to the API anyway
+  );
 </script>
 
-<!-- All English Translations(atleast 70%) should be there and the language tranlations (Atleast one untransated) should not be there -->
-<!-- Currently facing timeout issues in production -->
-{#if $editing_status_on && $trans_lang !== '--' && ($trans_lang_data.data?.size ?? 0) < shloka_count + 2 && ($trans_en_data.data?.size ?? 0) >= shloka_count * 0.7}
+{#if $editing_status_on && (other_lang_allow_translate || english_allow_translate)}
   <button
     disabled={$translate_sarga_mut.isPending}
     onclick={translate_sarga_func}

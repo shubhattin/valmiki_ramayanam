@@ -4,7 +4,7 @@
   import Icon from '~/tools/Icon.svelte';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import { writable } from 'svelte/store';
-  import ai_text_prompts from './ai_text_prompts.yaml';
+  import image_tool_prompts from './image_tool_prompts.yaml';
   import { SlideToggle, ProgressRadial } from '@skeletonlabs/skeleton';
   import { client } from '~/api/client';
   import { lipi_parivartak } from '~/tools/converter';
@@ -24,7 +24,7 @@
   import { ai_sample_data } from './ai_sample_data';
   import { delay } from '~/tools/delay';
 
-  let base_prompts = ai_text_prompts as {
+  let base_prompts = image_tool_prompts as {
     main_prompt: {
       role: 'user' | 'assistant';
       content: string;

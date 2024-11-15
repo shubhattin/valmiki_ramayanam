@@ -3,8 +3,19 @@ prompts:
     content: >
       I will be providing you with Sanskrit shlokas of a sarga of the Ramayana along with its English tranlsations. Generate {lang} Translations to all those shlokas based on both the Sanskrit shloka and English Translation. Use vocabulary which is generally used while translating Ramayana and other such Hindu religious (dharmic) texts to {lang}.
       Include translations for all the shlokas in the sarga, use 0 for starting(अथ) and -1 for ending(इति) shlokas. Dont leave out any shloka translation make sure to include 0 and -1 as well.
-      Also make it contain the entire essence and detail of the English translation. 
+      Also make it contain the entire essence and detail of the English translation, please do not miss any details.
       Do not return English translations rather translate it to {lang} Language.
+
+
+
+      {text}
+prompts_english:
+  - role: user
+    content: >
+      I will be providing you with Sanskrit shlokas of a sarga of the Ramayana along. Generate {lang} Translations to all those shlokas based on both the Sanskrit shloka. Use vocabulary which is generally used while translating Ramayana and other such Hindu religious (dharmic) texts to {lang}.
+      Include translations for all the shlokas in the sarga, use 0 for starting(अथ) and -1 for ending(इति) shlokas. Dont leave out any shloka translation make sure to include 0 and -1 as well.
+      Also make it contain the entire essence and detail of the Sanskrit Shloka, please do not miss any details.
+      Do not return Sanskrit Shlokas rather translate it to {lang}.
 
 
 
