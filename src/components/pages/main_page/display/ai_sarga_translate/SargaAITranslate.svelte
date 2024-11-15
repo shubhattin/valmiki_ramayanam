@@ -98,6 +98,7 @@
           const text = texts.join('\n\n\n');
           $translate_sarga_mut.mutateAsync({
             lang: $trans_lang,
+            model: 'gpt-4o',
             messages: [
               {
                 role: 'user',

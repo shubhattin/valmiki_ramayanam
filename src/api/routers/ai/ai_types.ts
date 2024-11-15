@@ -13,6 +13,7 @@ export const translation_out_schema = z
 export const sarga_translate_schema = {
   input: z.object({
     lang: z.string(),
+    model: z.enum(['gpt-4o', 'claude-3.5']),
     messages: z
       .object({
         role: z.union([z.literal('user'), z.literal('assistant')]),

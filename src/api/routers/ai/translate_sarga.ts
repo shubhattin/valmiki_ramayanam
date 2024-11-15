@@ -12,7 +12,7 @@ auth.configure({
 
 export const translate_sarga_route = protectedProcedure
   .input(sarga_translate_schema.input)
-  .mutation(async ({ ctx: { user }, input: { lang, messages } }) => {
+  .mutation(async ({ ctx: { user }, input: { lang, messages, model } }) => {
     if (user.user_type !== 'admin') {
       const { allowed_langs } = (await db.query.users.findFirst({
         columns: {
@@ -25,7 +25,8 @@ export const translate_sarga_route = protectedProcedure
     }
     const handle = await tasks.trigger('ai_translate_sarga', {
       lang,
-      messages
+      messages,
+      model
     });
 
     return { handle, output_type: null! as z.infer<typeof sarga_translate_schema.output> };
