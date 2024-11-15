@@ -8,6 +8,7 @@
     added_translations_indexes
   } from '~/state/main_page/main_state';
   import {
+    QUERY_KEYS,
     rAmAyaNam_map,
     sarga_data,
     trans_en_data,
@@ -38,14 +39,21 @@
       response = response!;
       if (!response.success) return;
       const translations = response.translations;
-      const new_data = new Map($trans_lang_data.data);
+
+      const new_data = new Map($trans_lang !== '--' ? $trans_lang_data.data : $trans_en_data.data);
       translations.forEach((translation) => {
         if (new_data.has(translation.shloka_num)) return;
         new_data.set(translation.shloka_num, translation.text);
         $added_translations_indexes.push(translation.shloka_num);
       });
       $added_translations_indexes = $added_translations_indexes;
-      await query_client.setQueryData($trans_lang_data_query_key, new_data);
+      if ($trans_lang !== '--')
+        await query_client.setQueryData($trans_lang_data_query_key, new_data);
+      else
+        await query_client.setQueryData(
+          QUERY_KEYS.trans_lang_data('English', $kANDa_selected, $sarga_selected),
+          new_data
+        );
       (globalThis as any).translated_once = true;
     }
   });
@@ -99,7 +107,7 @@
                     : trans_prompts.prompts_english[0].content,
                   {
                     text,
-                    lang: $trans_lang
+                    lang: $trans_lang !== '--' ? $trans_lang : 'English'
                   }
                 )
               }
