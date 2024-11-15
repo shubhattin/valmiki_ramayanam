@@ -129,6 +129,7 @@ export const lekhika_typing_tool = async (
   // the latencry is at least 6x higher than worker method (direct :- 0.14ms, worker :- 10ms)
   if (!input_data) return;
   const { val, from_click } = input_data;
+  if ((val as any[]).length === 0) return;
   let dyn = elm.value;
   let current_cursor_pos = elm.selectionStart + 1;
   let ex = 0;

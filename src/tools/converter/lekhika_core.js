@@ -56,6 +56,10 @@ class LipiParivartak {
     }
     event_data = event_data.substring(event_data.length - 1);
     let elf = this.elphased_time() < 15.0;
+    this.input_helper_values = {
+      from_click: false,
+      val: []
+    };
     if (this.k.in(this.k.pUrNasarve, event_data)) {
       if (!elf) this.clear_all_val(true);
       let lng = lang;

@@ -54,6 +54,7 @@
 
   let from_text_font_info = $derived(get_font_family_and_size($from_lang));
   let to_text_font_info = $derived(get_font_family_and_size($to_lang));
+
   const detect_shortcut_pressed = (event: KeyboardEvent, callback: (() => void) | null = null) => {
     event.preventDefault();
     if (event.altKey && event.key.toLowerCase() === 'x') callback && callback();
