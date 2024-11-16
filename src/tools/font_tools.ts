@@ -31,7 +31,8 @@ export const FONT_FAMILY_NAME = {
   ADOBE_TELUGU: 'Adobe Telugu',
   NOTO_SERIF_TELUGU: 'Noto Serif Telugu',
   NOTO_SERIF_KANNADA: 'Noto Serif Kannada',
-  NOTO_SERIF_SINHALA: 'Noto Serif Sinhala'
+  NOTO_SERIF_SINHALA: 'Noto Serif Sinhala',
+  ISKOOLA_POTA: 'Iskoola Pota'
 };
 
 type fonts_type = keyof typeof FONT_FAMILY_NAME;
@@ -70,6 +71,10 @@ const FONT_FILE_INFO: Record<
   },
   NOTO_SERIF_SINHALA: {
     file_name: 'NotoSerifSinhala',
+    file_type: 'ttf'
+  },
+  ISKOOLA_POTA: {
+    file_name: 'IskoolaPota',
     file_type: 'ttf'
   }
 };
