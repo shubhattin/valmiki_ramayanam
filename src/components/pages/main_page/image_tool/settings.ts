@@ -174,8 +174,8 @@ export const SHLOKA_FONT_CONFIG = {
     text_for_min_line_height: 'ವೈ'
   },
   Sinhala: {
-    font: 'NOTO_SERIF_SINHALA',
-    size: 0.8,
+    font: 'ISKOOLA_POTA',
+    size: 1.05,
     space_between_main_and_normal: 6,
     text_for_min_line_height: 'පූ'
   }
@@ -206,7 +206,7 @@ export const TRANS_FONT_CONFIG = {
     new_line_spacing: 0.45
   },
   Sinhala: {
-    size: 0.9,
+    size: 1.2,
     new_line_spacing: 0.45
   }
 } as image_font_config_type;
