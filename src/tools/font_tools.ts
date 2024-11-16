@@ -130,8 +130,8 @@ const MAIN_FONT_CONFIG = {
     size: 1.2
   },
   Sinhala: {
-    font: 'ISKOOLA_POTA',
-    size: 1.3
+    font: 'NOTO_SERIF_SINHALA',
+    size: 1
   }
 } as font_config_type;
 
