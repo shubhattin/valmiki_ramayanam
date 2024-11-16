@@ -632,6 +632,9 @@ const _lipi_parivartak = async (val, from, to) => {
         val = val.replaceAll(varga[4] + HALANT + varga[i], ANUNASIK + varga[i]);
     }
   }
+  if (from === 'Sanskrit' && to === 'Sinhala') {
+    val = val.replaceAll(HALANT, HALANT + '\u200d');
+  }
   let out = LipiLekhikA._parivartak(val, from, to);
   if (to === 'Normal' || to === 'Romanized') {
     // Doing this type of a patch here, for now because its better not touch the main lipi parivartak codebase
