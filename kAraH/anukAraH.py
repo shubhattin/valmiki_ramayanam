@@ -99,6 +99,7 @@ def anukarah(a):
             p1["M"] = ["m", 2]
             del p1["z"]
             del p1["\u200c"]
+            del p1["\u200d"]
             for x in ak:
                 if not (x.isascii() and x.isupper()) or len(x) > 1 or x in "SM":
                     continue

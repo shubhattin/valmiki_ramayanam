@@ -37,7 +37,8 @@ def get(key, ind=None):
 for lang in a:
     c = a[lang]
     update(".", "q", -2)
-    add(".q", ["‌", "", 2])
+    add(".q", ["\u200c", "1", 2])
+    add(".q1", ["\u200d", "", 2])
     update("q", ".", -2)
     c["q"]["q."] = [".", "", 2]
     if "n" not in get(".", -2):
