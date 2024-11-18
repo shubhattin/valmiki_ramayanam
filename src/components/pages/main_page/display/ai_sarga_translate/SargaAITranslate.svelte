@@ -45,18 +45,17 @@
             run_token: run_token!
           });
           if ('error_code' in out) {
-            clearInterval(interval);
             reject(out.error_code);
           } else if (out.completed) {
-            clearInterval(interval);
             resolve(out.output);
           } else if (!out.completed) {
             // this should rerun
+            set_call_timeout();
             return;
           }
         };
-        const interval = setInterval(get_info, 5.5 * 1000);
-        // ^ every 5.5 seconds
+        const set_call_timeout = () => setTimeout(get_info, 4 * 1000);
+        set_call_timeout();
       });
     },
     async onSuccess(response) {
