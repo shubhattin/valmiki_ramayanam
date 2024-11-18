@@ -55,7 +55,6 @@
             return;
           }
         };
-        get_info();
         const interval = setInterval(get_info, 5.5 * 1000);
         // ^ every 5.5 seconds
       });
