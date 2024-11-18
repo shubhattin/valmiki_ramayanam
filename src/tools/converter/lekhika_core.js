@@ -634,6 +634,7 @@ const _lipi_parivartak = async (val, from, to) => {
   }
   if (from === 'Sanskrit' && to === 'Sinhala') {
     val = val.replaceAll(HALANT, HALANT + '\u200d');
+    // ^ This enforces the ancient form of Sinhala in conversion rather than the modern(standard) form
   }
   let out = LipiLekhikA._parivartak(val, from, to);
   if (to === 'Normal' || to === 'Romanized') {
