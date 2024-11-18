@@ -33,10 +33,32 @@
   let selected_model: keyof typeof TEXT_MODEL_LIST = $state('gpt-4o');
 
   const translate_sarga_mut = createMutation({
-    mutationFn: async (input: Parameters<typeof client.ai.translate_sarga.mutate>[0]) => {
-      const { handle, output_type } = await client.ai.translate_sarga.mutate(input);
-      const { get_result_from_trigger_dev_handle } = await import('~/tools/trigger');
-      return await get_result_from_trigger_dev_handle<typeof output_type>(handle!);
+    mutationFn: async (
+      input: Parameters<typeof client.ai.trigger_funcs.translate_sarga.mutate>[0]
+    ) => {
+      const { run_token, output_type } =
+        await client.ai.trigger_funcs.translate_sarga.mutate(input);
+
+      return await new Promise<typeof output_type>((resolve, reject) => {
+        const get_info = async () => {
+          const out = await client.ai.trigger_funcs.retrive_run_info.query({
+            run_token: run_token!
+          });
+          if ('error_code' in out) {
+            clearInterval(interval);
+            reject(out.error_code);
+          } else if (out.completed) {
+            clearInterval(interval);
+            resolve(out.output);
+          } else if (!out.completed) {
+            // this should rerun
+            return;
+          }
+        };
+        get_info();
+        const interval = setInterval(get_info, 5.5 * 1000);
+        // ^ every 5.5 seconds
+      });
     },
     async onSuccess(response) {
       response = response!;
@@ -57,19 +79,10 @@
           QUERY_KEYS.trans_lang_data('English', $kANDa_selected, $sarga_selected),
           new_data
         );
-      (globalThis as any).translated_once = true;
     }
   });
 
   function translate_sarga_func() {
-    if ((globalThis as any).translated_once === true) {
-      modal_store.trigger({
-        type: 'alert',
-        title: 'Refresh Page to translate again',
-        body: 'Due to some issue the translation feature works only once after reload. Please refresh the page to use this.'
-      });
-      return;
-    }
     modal_store.trigger({
       type: 'confirm',
       title: 'Are you sure to translate the sarga ?',
