@@ -142,10 +142,16 @@ export const get_generated_images_route = protectedAdminProcedure
     })
   )
   .mutation(async ({ input: { image_prompt, number_of_images, image_model } }) => {
+    const time_start = Date.now();
+    let response: (image_output_type | null)[] = null!;
     if (image_model === 'sd3-core')
-      return await make_image_sd3_core(image_prompt, number_of_images);
+      response = await make_image_sd3_core(image_prompt, number_of_images);
+    else response = await make_image_dall_e_3(image_prompt, number_of_images);
     // default` dall-e-3`
-    return await make_image_dall_e_3(image_prompt, number_of_images);
+    return {
+      images: response,
+      time_taken: Date.now() - time_start
+    };
   });
 
 // const make_image_sdxl = async (image_prompt: string, number_of_images: number) => {
