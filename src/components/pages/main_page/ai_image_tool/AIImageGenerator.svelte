@@ -28,6 +28,7 @@
   import { createMutation } from '@tanstack/svelte-query';
   import { ai_sample_data } from './ai_sample_data';
   import { delay } from '~/tools/delay';
+  import pretty_ms from 'pretty-ms';
 
   let base_prompts = image_tool_prompts as {
     main_prompt: {
@@ -137,12 +138,13 @@
     mutationFn: async (input: Parameters<typeof client.ai.get_image_prompt.mutate>[0]) => {
       if (import.meta.env.DEV && load_ai_sample_data) {
         await delay(1000);
-        return { image_prompt: ai_sample_data.sample_text_prompt };
+        return { image_prompt: ai_sample_data.sample_text_prompt, time_taken: 0 };
       }
       return await client.ai.get_image_prompt.mutate(input);
     },
     async onSuccess(dt) {
       if (dt.image_prompt) {
+        console.log(pretty_ms(dt.time_taken));
         $image_prompt = dt.image_prompt;
         if ($auto_gen_image) generate_image();
         image_prompt_request_error = false;
@@ -175,15 +177,18 @@
             out_format: 'url'
           });
         }
-        return list;
+        return { images: list, time_taken: 0 };
       }
       return await client.ai.get_generated_images.mutate(input);
     },
     onSuccess(data) {
-      $image_data = data;
+      $image_data = data.images;
+      console.log(pretty_ms(data.time_taken));
     }
   });
-  type image_data_type = Awaited<ReturnType<typeof client.ai.get_generated_images.mutate>>[0];
+  type image_data_type = Awaited<
+    ReturnType<typeof client.ai.get_generated_images.mutate>
+  >['images'][0];
   let image_data = writable<image_data_type[]>([]);
 
   const download_image = (image: image_data_type) => {
@@ -368,7 +373,7 @@
       {:else}
         <div>
           <section class="mb-10 grid grid-cols-2 gap-3">
-            {#each $image_mut.data! as image}
+            {#each $image_mut.data.images! as image}
               {#if image}
                 <div class="space-y-1">
                   <img

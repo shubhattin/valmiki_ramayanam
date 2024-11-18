@@ -22,6 +22,8 @@
   import { getModalStore } from '@skeletonlabs/skeleton';
   import { AIIcon } from '~/components/icons';
   import Icon from '~/tools/Icon.svelte';
+  import { get_result_from_trigger_run_id } from '~/tools/trigger';
+  import pretty_ms from 'pretty-ms';
 
   const query_client = useQueryClient();
   const modal_store = getModalStore();
@@ -39,27 +41,11 @@
       const { run_token, output_type } =
         await client.ai.trigger_funcs.translate_sarga.mutate(input);
 
-      return await new Promise<typeof output_type>((resolve, reject) => {
-        const get_info = async () => {
-          const out = await client.ai.trigger_funcs.retrive_run_info.query({
-            run_token: run_token!
-          });
-          if ('error_code' in out) {
-            reject(out.error_code);
-          } else if (out.completed) {
-            resolve(out.output);
-          } else if (!out.completed) {
-            // this should rerun
-            set_call_timeout();
-            return;
-          }
-        };
-        const set_call_timeout = () => setTimeout(get_info, 4 * 1000);
-        set_call_timeout();
-      });
+      return await get_result_from_trigger_run_id<typeof output_type>(run_token!);
     },
     async onSuccess(response) {
       response = response!;
+      console.log(pretty_ms(response.time_taken));
       if (!response.success) return;
       const translations = response.translations;
 
