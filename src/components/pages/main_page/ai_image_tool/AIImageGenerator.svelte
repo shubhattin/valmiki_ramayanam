@@ -14,7 +14,7 @@
   import { client } from '~/api/client';
   import { lipi_parivartak } from '~/tools/converter';
   import { copy_text_to_clipboard, format_string_text, get_permutations } from '~/tools/kry';
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import { loadLocalConfig } from '../load_local_config';
   import { BsDownload, BsCopy } from 'svelte-icons-pack/bs';
   import {
@@ -23,7 +23,7 @@
   } from '~/tools/download_file_browser';
   import { cl_join } from '~/tools/cl_join';
   import { LuCopy } from 'svelte-icons-pack/lu';
-  import { OiCopy16 } from 'svelte-icons-pack/oi';
+  import { OiCopy16, OiStopwatch16 } from 'svelte-icons-pack/oi';
   import { BsClipboard2Check } from 'svelte-icons-pack/bs';
   import { createMutation } from '@tanstack/svelte-query';
   import { ai_sample_data } from './ai_sample_data';
@@ -62,6 +62,28 @@
   let image_prompt = writable('');
   let load_ai_sample_data = $state(false);
   let image_prompt_request_error = $state(false);
+
+  let show_prompt_time_status = $state(false);
+  let show_image_time_status = $state(false);
+
+  onDestroy(() => {
+    show_prompt_time_status = false;
+    show_image_time_status = false;
+    // ^ may be not needed
+  });
+
+  $effect(() => {
+    if (show_prompt_time_status) {
+      const t_id = setTimeout(() => (show_prompt_time_status = false), 10 * 1000);
+      return () => clearTimeout(t_id);
+    }
+  });
+  $effect(() => {
+    if (show_image_time_status) {
+      const t_id = setTimeout(() => (show_image_time_status = false), 10 * 1000);
+      return () => clearTimeout(t_id);
+    }
+  });
 
   type image_models_type = Parameters<
     typeof client.ai.get_generated_images.mutate
@@ -136,6 +158,7 @@
   };
   const image_prompt_mut = createMutation({
     mutationFn: async (input: Parameters<typeof client.ai.get_image_prompt.mutate>[0]) => {
+      show_prompt_time_status = false;
       if (import.meta.env.DEV && load_ai_sample_data) {
         await delay(1000);
         return { image_prompt: ai_sample_data.sample_text_prompt, time_taken: 0 };
@@ -144,10 +167,10 @@
     },
     async onSuccess(dt) {
       if (dt.image_prompt) {
-        console.log(pretty_ms(dt.time_taken));
         $image_prompt = dt.image_prompt;
         if ($auto_gen_image) generate_image();
         image_prompt_request_error = false;
+        show_prompt_time_status = true;
       } else {
         image_prompt_request_error = true;
       }
@@ -155,6 +178,7 @@
   });
   const image_mut = createMutation({
     mutationFn: async (input: Parameters<typeof client.ai.get_generated_images.mutate>[0]) => {
+      show_image_time_status = false;
       if (import.meta.env.DEV && load_ai_sample_data) {
         await delay(2000);
         const list: {
@@ -183,7 +207,7 @@
     },
     onSuccess(data) {
       $image_data = data.images;
-      console.log(pretty_ms(data.time_taken));
+      show_image_time_status = true;
     }
   });
   type image_data_type = Awaited<
@@ -266,6 +290,12 @@
       <option value={key} title={value[1]}>{value[0]}</option>
     {/each}
   </select>
+  {#if show_prompt_time_status && $image_prompt_mut.isSuccess && $image_prompt_mut.data.image_prompt}
+    <span class="ml-4 select-none text-xs text-stone-500 dark:text-stone-300">
+      <Icon src={OiStopwatch16} class="text-base" />
+      {pretty_ms($image_prompt_mut.data.time_taken)}
+    </span>
+  {/if}
 </div>
 <div>
   <div class="block space-y-1.5">
@@ -357,6 +387,11 @@
           track="stroke-primary-500/30"
           strokeLinecap="butt"
         />
+      {:else if show_image_time_status && $image_mut.isSuccess}
+        <span class="ml-4 select-none text-xs text-stone-500 dark:text-stone-300">
+          <Icon src={OiStopwatch16} class="text-base" />
+          {pretty_ms($image_mut.data.time_taken)}
+        </span>
       {/if}
     </div>
     <textarea

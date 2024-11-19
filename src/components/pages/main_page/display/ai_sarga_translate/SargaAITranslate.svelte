@@ -38,6 +38,14 @@
 
   onDestroy(() => {
     show_time_status = false;
+    // ^ may be not needed
+  });
+
+  $effect(() => {
+    if (show_time_status) {
+      const t_id = setTimeout(() => (show_time_status = false), 10 * 1000);
+      return () => clearTimeout(t_id);
+    }
   });
 
   let selected_model: keyof typeof TEXT_MODEL_LIST = $state('gpt-4o');
