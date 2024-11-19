@@ -7,7 +7,6 @@ import { sarga_translate_schema } from '~/api/routers/ai/ai_types';
 import { JWT_SECRET } from '~/tools/jwt.server';
 import { jwtVerify, SignJWT } from 'jose';
 import type { lang_list_type } from '~/tools/lang_list';
-import prettyMilliseconds from 'pretty-ms';
 
 auth.configure({
   secretKey: env.TRIGGER_SECRET_KEY

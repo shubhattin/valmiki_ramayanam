@@ -24,6 +24,7 @@
   import Icon from '~/tools/Icon.svelte';
   import { get_result_from_trigger_run_id } from '~/tools/trigger';
   import pretty_ms from 'pretty-ms';
+  import { OiStopwatch16 } from 'svelte-icons-pack/oi';
 
   const query_client = useQueryClient();
   const modal_store = getModalStore();
@@ -148,4 +149,9 @@
       <option value={key} title={value[1]}>{value[0]}</option>
     {/each}
   </select>
+{:else if $editing_status_on && $translate_sarga_mut.isSuccess}
+  <span class="ml-4 select-none text-xs text-stone-500 dark:text-stone-300">
+    <Icon src={OiStopwatch16} class="text-base" />
+    {pretty_ms($translate_sarga_mut.data.time_taken)}
+  </span>
 {/if}

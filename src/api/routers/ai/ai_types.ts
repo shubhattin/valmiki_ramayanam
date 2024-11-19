@@ -2,13 +2,14 @@ import { z } from 'zod';
 
 export const translation_out_schema = z
   .object({
-    text: z.string().describe('The trnalstion text'),
+    text: z.string().describe('The translation text'),
     shloka_num: z
       .number()
       .describe('The index of shlokas to be generated, use 0 for starting and -1 for ending.')
   })
-  .array()
-  .describe('This array will contain the text and the index of the shlokas to be generated.');
+  .describe(
+    'This object will contain the translated text and the index of the shloka to be generated.'
+  );
 
 export const text_models_enum = z.enum(['gpt-4o', 'claude-3.5-sonnet']);
 
@@ -24,7 +25,7 @@ export const sarga_translate_schema = {
       .array()
   }),
   output: z.union([
-    z.object({ success: z.literal(true), translations: translation_out_schema }),
+    z.object({ success: z.literal(true), translations: translation_out_schema.array() }),
     z.object({ success: z.literal(false) })
   ])
 };
