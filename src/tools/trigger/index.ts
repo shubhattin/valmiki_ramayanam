@@ -1,6 +1,9 @@
 import { client } from '~/api/client';
 
-export const get_result_from_trigger_run_id = async <T>(run_token: string) => {
+/**
+ * @param time_interval  Dwfault 2 seconds
+ */
+export const get_result_from_trigger_run_id = async <T>(run_token: string, time_interval = 2) => {
   return await new Promise<
     T & {
       time_taken: number;
@@ -20,7 +23,7 @@ export const get_result_from_trigger_run_id = async <T>(run_token: string) => {
         return;
       }
     };
-    const set_call_timeout = () => setTimeout(get_info, 4 * 1000);
+    const set_call_timeout = () => setTimeout(get_info, time_interval * 1000);
     set_call_timeout();
   });
 };
