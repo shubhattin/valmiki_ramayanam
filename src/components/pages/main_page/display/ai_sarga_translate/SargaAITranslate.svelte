@@ -109,7 +109,11 @@
                     : trans_prompts.prompts_english[0].content,
                   {
                     text,
-                    lang: $trans_lang !== '--' ? $trans_lang : 'English'
+                    lang: $trans_lang !== '--' ? $trans_lang : 'English',
+                    sarga_name: sarga_info.name_normal,
+                    sarga_num: sarga_info.index,
+                    kANDa_name: kANDa_info.name_normal,
+                    kANDa_num: kANDa_info.index
                   }
                 )
               }
