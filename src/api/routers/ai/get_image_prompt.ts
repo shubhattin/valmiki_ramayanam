@@ -23,6 +23,7 @@ export const get_image_prompt_route = protectedAdminProcedure
   )
   .mutation(async ({ input: { messages, model } }) => {
     try {
+      const time_start = Date.now();
       const result = await generateObject({
         model: {
           'gpt-4o': openai_text_model('gpt-4o'),
@@ -33,7 +34,7 @@ export const get_image_prompt_route = protectedAdminProcedure
           image_prompt: z.string()
         })
       });
-      return result.object;
+      return { ...result.object, time_taken: Date.now() - time_start };
     } catch (e) {
       return { image_prompt: null };
     }

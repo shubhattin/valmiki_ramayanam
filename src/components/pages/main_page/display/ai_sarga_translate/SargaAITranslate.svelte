@@ -22,6 +22,10 @@
   import { getModalStore } from '@skeletonlabs/skeleton';
   import { AIIcon } from '~/components/icons';
   import Icon from '~/tools/Icon.svelte';
+  import { get_result_from_trigger_run_id } from '~/tools/trigger';
+  import pretty_ms from 'pretty-ms';
+  import { OiStopwatch16 } from 'svelte-icons-pack/oi';
+  import { onDestroy } from 'svelte';
 
   const query_client = useQueryClient();
   const modal_store = getModalStore();
@@ -30,33 +34,31 @@
   let sarga_info = $derived(kANDa_info.sarga_data[$sarga_selected - 1]);
   let shloka_count = $derived(sarga_info.shloka_count_extracted);
 
+  let show_time_status = $state(false);
+
+  onDestroy(() => {
+    show_time_status = false;
+    // ^ may be not needed
+  });
+
+  $effect(() => {
+    if (show_time_status) {
+      const t_id = setTimeout(() => (show_time_status = false), 10 * 1000);
+      return () => clearTimeout(t_id);
+    }
+  });
+
   let selected_model: keyof typeof TEXT_MODEL_LIST = $state('gpt-4o');
 
   const translate_sarga_mut = createMutation({
     mutationFn: async (
       input: Parameters<typeof client.ai.trigger_funcs.translate_sarga.mutate>[0]
     ) => {
+      show_time_status = false;
       const { run_token, output_type } =
         await client.ai.trigger_funcs.translate_sarga.mutate(input);
 
-      return await new Promise<typeof output_type>((resolve, reject) => {
-        const get_info = async () => {
-          const out = await client.ai.trigger_funcs.retrive_run_info.query({
-            run_token: run_token!
-          });
-          if ('error_code' in out) {
-            reject(out.error_code);
-          } else if (out.completed) {
-            resolve(out.output);
-          } else if (!out.completed) {
-            // this should rerun
-            set_call_timeout();
-            return;
-          }
-        };
-        const set_call_timeout = () => setTimeout(get_info, 4 * 1000);
-        set_call_timeout();
-      });
+      return await get_result_from_trigger_run_id<typeof output_type>(run_token!);
     },
     async onSuccess(response) {
       response = response!;
@@ -77,58 +79,63 @@
           QUERY_KEYS.trans_lang_data('English', $kANDa_selected, $sarga_selected),
           new_data
         );
+      show_time_status = true;
     }
   });
 
   function translate_sarga_func() {
+    const func = async () => {
+      // Sanskrit Shlokas + Transliteration + English Translation
+      const texts = await Promise.all(
+        $sarga_data.data!.map(async (shloka_lines, i) => {
+          // # Currently not adding transliteration as context as it seems to work fine without that as well.
+
+          // const normal_shloka = await lipi_parivartak(
+          //   $sarga_data.data![i],
+          //   BASE_SCRIPT,
+          //   'Normal'
+          // );
+          const trans_index = $sarga_data.data!.length - 1 === i ? -1 : i;
+          let txt = `${shloka_lines}`;
+          // let txt = `${shloka_lines}\n${normal_shloka}`;
+          if ($trans_lang !== '--') {
+            const lang_data = $trans_en_data.data;
+            if (lang_data && lang_data.has(trans_index)) txt += `\n\n${lang_data.get(trans_index)}`;
+          }
+          return txt;
+        })
+      );
+      const text = texts.join('\n\n\n');
+      await $translate_sarga_mut.mutateAsync({
+        lang: $trans_lang,
+        model: selected_model,
+        messages: [
+          {
+            role: 'user',
+            content: format_string_text(
+              $trans_lang !== '--'
+                ? trans_prompts.prompts[0].content
+                : trans_prompts.prompts_english[0].content,
+              {
+                text,
+                lang: $trans_lang !== '--' ? $trans_lang : 'English',
+                sarga_name: sarga_info.name_normal,
+                sarga_num: sarga_info.index,
+                kANDa_name: kANDa_info.name_normal,
+                kANDa_num: kANDa_info.index
+              }
+            )
+          }
+        ]
+      });
+    };
     modal_store.trigger({
       type: 'confirm',
       title: 'Are you sure to translate the sarga ?',
       body: `This will translate the untranslated shlokas to ${$trans_lang !== '--' ? $trans_lang : 'English'} which you can edit and then save.`,
       response(r: boolean) {
         if (!r) return;
-        (async () => {
-          // Sanskrit Shlokas + Transliteration + English Translation
-          const texts = await Promise.all(
-            $sarga_data.data!.map(async (shloka_lines, i) => {
-              // # Currently not adding transliteration as context as it seems to work fine without that as well.
-
-              // const normal_shloka = await lipi_parivartak(
-              //   $sarga_data.data![i],
-              //   BASE_SCRIPT,
-              //   'Normal'
-              // );
-              const trans_index = $sarga_data.data!.length - 1 === i ? -1 : i;
-              let txt = `${shloka_lines}`;
-              // let txt = `${shloka_lines}\n${normal_shloka}`;
-              if ($trans_lang !== '--') {
-                const lang_data = $trans_en_data.data;
-                if (lang_data && lang_data.has(trans_index))
-                  txt += `\n\n${lang_data.get(trans_index)}`;
-              }
-              return txt;
-            })
-          );
-          const text = texts.join('\n\n\n');
-          $translate_sarga_mut.mutateAsync({
-            lang: $trans_lang,
-            model: selected_model,
-            messages: [
-              {
-                role: 'user',
-                content: format_string_text(
-                  $trans_lang !== '--'
-                    ? trans_prompts.prompts[0].content
-                    : trans_prompts.prompts_english[0].content,
-                  {
-                    text,
-                    lang: $trans_lang !== '--' ? $trans_lang : 'English'
-                  }
-                )
-              }
-            ]
-          });
-        })();
+        func();
       }
     });
   }
@@ -162,4 +169,9 @@
       <option value={key} title={value[1]}>{value[0]}</option>
     {/each}
   </select>
+{:else if $editing_status_on && $translate_sarga_mut.isSuccess && show_time_status}
+  <span class="ml-4 select-none text-xs text-stone-500 dark:text-stone-300">
+    <Icon src={OiStopwatch16} class="text-base" />
+    {pretty_ms($translate_sarga_mut.data.time_taken)}
+  </span>
 {/if}

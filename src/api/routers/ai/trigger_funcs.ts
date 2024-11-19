@@ -54,7 +54,8 @@ const retrive_run_info_route = protectedProcedure
       z.object({ completed: z.literal(false) }),
       z.object({
         completed: z.literal(true),
-        output: z.any()
+        output: z.any(),
+        time_taken: z.number().int()
       }),
       z.object({
         error_code: z.string()
@@ -73,7 +74,10 @@ const retrive_run_info_route = protectedProcedure
     if (!run_id) return { error_code: 'UNAUTHORIZED' };
     const run_info = await runs.retrieve(run_id);
     if (run_info.status !== 'COMPLETED') return { completed: false };
-    else if (run_info.status === 'COMPLETED') return { completed: true, output: run_info.output };
+    else if (run_info.status === 'COMPLETED') {
+      const time_taken = run_info.finishedAt!.getTime() - run_info.startedAt!.getTime();
+      return { completed: true, output: run_info.output, time_taken };
+    }
     return { error_code: run_info.status };
   });
 

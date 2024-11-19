@@ -1,45 +1,26 @@
-import load_trigger_dev_worker from './worker?worker';
-import type * as functions from './trigger_dev';
-import type { Arg, ArgUUID } from './types';
+import { client } from '~/api/client';
 
-const trigger_dev_worker = new load_trigger_dev_worker();
-
-// uuid: [func_name, callback]
-const messages_queue: Record<string, [string, (response: any) => void]> = {};
-
-trigger_dev_worker.onmessage = (event) => {
-  const data = event.data;
-  if (data.uuid in messages_queue) {
-    const [func_name, resolve] = messages_queue[data.uuid];
-    if (data.func_name === func_name) {
-      resolve(data?.response);
-      delete messages_queue[data.uuid];
+export const get_result_from_trigger_run_id = async <T>(run_token: string) => {
+  return await new Promise<
+    T & {
+      time_taken: number;
     }
-  }
-};
-
-async function postMessage<F extends keyof typeof functions>(message: Arg<F>) {
-  return new Promise<ReturnType<(typeof functions)[F]>>((resolve, reject) => {
-    const uuid = crypto.randomUUID();
-    const post_message: ArgUUID<F> = {
-      ...message,
-      uuid
+  >((resolve, reject) => {
+    const get_info = async () => {
+      const out = await client.ai.trigger_funcs.retrive_run_info.query({
+        run_token: run_token!
+      });
+      if ('error_code' in out) {
+        reject(out.error_code);
+      } else if (out.completed) {
+        resolve({ ...out.output, time_taken: out.time_taken });
+      } else if (!out.completed) {
+        // this should rerun
+        set_call_timeout();
+        return;
+      }
     };
-    messages_queue[uuid] = [message.func_name, resolve];
-    trigger_dev_worker.postMessage(post_message);
+    const set_call_timeout = () => setTimeout(get_info, 4 * 1000);
+    set_call_timeout();
   });
-}
-
-export const get_result_from_trigger_dev_handle = async <T>(handle: {
-  publicAccessToken: string;
-  id: string;
-  taskIdentifier: string;
-}) => {
-  // this has been written to indirectly call the trigger_dev API as it seems to mess up with superjson lib
-  // and lead to errors in the trpc transformer
-  // so running it in an isolated worker
-  return (await postMessage({
-    func_name: 'get_result_from_trigger_dev_handle',
-    args: [handle]
-  })) as T;
 };

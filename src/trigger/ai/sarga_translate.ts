@@ -22,9 +22,13 @@ export const translate_sarga = task({
           'claude-3.5-sonnet': anthropic_text_model('claude-3-5-sonnet-latest')
         }[model],
         messages,
-        schema: z.object({ translations: translation_out_schema })
+        output: 'array',
+        schema: translation_out_schema,
+        schemaDescription:
+          'This should be an array of objects, each object containing the translation text and the index of the shloka to be generated.',
+        schemaName: 'ai_translations_text_schema'
       });
-      return { ...response.object, success: true };
+      return { translations: response.object, success: true };
     } catch (e) {
       console.log(e);
       return { success: false };
