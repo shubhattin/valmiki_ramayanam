@@ -636,6 +636,11 @@ const _lipi_parivartak = async (val, from, to) => {
     val = val.replaceAll(HALANT, HALANT + '\u200d');
     // ^ This enforces the ancient form of Sinhala in conversion rather than the modern(standard) form
   }
+  const SINHALA_HALANT = '\u0dca';
+  if (from === 'Sinhala') {
+    val = val.replaceAll(SINHALA_HALANT + '\u200d', SINHALA_HALANT);
+    // revert to normal while conversion
+  }
   let out = LipiLekhikA._parivartak(val, from, to);
   if (to === 'Normal' || to === 'Romanized') {
     // Doing this type of a patch here, for now because its better not touch the main lipi parivartak codebase
