@@ -1,5 +1,5 @@
 const str_to_array_buffer = (str: string) => {
-  return new TextEncoder().encode(str).buffer;
+  return new TextEncoder().encode(str);
 };
 const array_buffer_to_str = (buff: ArrayBuffer) => {
   return Array.from(new Uint8Array(buff))
@@ -33,7 +33,7 @@ export const hash_256 = async (str: string) => {
  * Generate a random salt of length `32`
  */
 export const gen_salt = () => {
-  return array_buffer_to_str(crypto.getRandomValues(new Uint8Array(16)));
+  return array_buffer_to_str(crypto.getRandomValues(new Uint8Array(16)).buffer);
 };
 
 /** Hash verifier for `sha-256` */
