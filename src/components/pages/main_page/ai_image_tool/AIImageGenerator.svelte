@@ -25,7 +25,7 @@
   import { LuCopy } from 'svelte-icons-pack/lu';
   import { OiCopy16, OiStopwatch16 } from 'svelte-icons-pack/oi';
   import { BsClipboard2Check } from 'svelte-icons-pack/bs';
-  import { createMutation, createQuery } from '@tanstack/svelte-query';
+  import { createQuery } from '@tanstack/svelte-query';
   import { ai_sample_data } from './ai_sample_data';
   import { delay } from '~/tools/delay';
   import pretty_ms from 'pretty-ms';
@@ -173,12 +173,16 @@
       },
       enabled: false,
       placeholderData: undefined,
-      staleTime: ms('20mins')
+      staleTime: ms('30mins')
     })
   );
   let auto_image_generated = false;
   $effect(() => {
-    if ($image_prompt_q.isSuccess && $image_prompt_q.data.image_prompt)
+    if (
+      !$image_prompt_q.isFetching &&
+      $image_prompt_q.isSuccess &&
+      $image_prompt_q.data.image_prompt
+    )
       untrack(() => {
         $image_prompt = $image_prompt_q.data.image_prompt!;
         if (!auto_image_generated && $auto_gen_image) {
@@ -189,12 +193,6 @@
         show_prompt_time_status = true;
       });
     else image_prompt_request_error = true;
-    if (!$image_prompt_q.isFetching && untrack(() => image_gen_interval_obj))
-      untrack(() => {
-        clearInterval(image_gen_interval_obj);
-        image_gen_interval_obj = null!;
-        image_gen_time_taken = 0;
-      });
   });
 
   const image_q = $derived(
@@ -234,11 +232,20 @@
       },
       enabled: false,
       placeholderData: undefined,
-      staleTime: ms('15mins')
+      staleTime: ms('30mins')
     })
   );
   $effect(() => {
-    if ($image_q.isSuccess) show_image_time_status = true;
+    if (!$image_q.isFetching && $image_q.isSuccess) {
+      show_image_time_status = true;
+      if (image_gen_interval_obj)
+        untrack(() => {
+          // clear interval
+          clearInterval(image_gen_interval_obj);
+          image_gen_interval_obj = null!;
+          image_gen_time_taken = 0;
+        });
+    }
   });
   type image_data_type = Awaited<
     ReturnType<typeof client.ai.get_generated_images.mutate>
