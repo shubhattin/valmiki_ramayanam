@@ -14,7 +14,7 @@
   import { client } from '~/api/client';
   import { lipi_parivartak } from '~/tools/converter';
   import { copy_text_to_clipboard, format_string_text, get_permutations } from '~/tools/kry';
-  import { onDestroy, onMount } from 'svelte';
+  import { onDestroy, onMount, untrack } from 'svelte';
   import { loadLocalConfig } from '../load_local_config';
   import { BsDownload, BsCopy } from 'svelte-icons-pack/bs';
   import {
@@ -131,19 +131,19 @@
 
   const NUMBER_OF_IMAGES = 1;
   let image_gen_time_taken = $state(0);
+
+  let image_gen_interval_obj: ReturnType<typeof setInterval> = null!;
   // ^ Also update grid-cols-<num> in image rendering
   const generate_image = async () => {
     image_gen_time_taken = 0;
-    const interval = setInterval(() => {
+    image_gen_interval_obj = setInterval(() => {
       image_gen_time_taken++;
       if (image_gen_time_taken === IMAGE_MODELS[image_model][2]) {
-        clearInterval(interval);
+        clearInterval(image_gen_interval_obj);
         return;
       }
     }, 1000);
     await $image_q.refetch();
-    clearInterval(interval);
-    image_gen_time_taken = 0;
   };
 
   const image_prompt_q = $derived(
@@ -151,6 +151,7 @@
       queryKey: ['shloka_text_prompt', $sarga_selected, $kANDa_selected, $shloka_numb],
       queryFn: async () => {
         show_prompt_time_status = false;
+        auto_image_generated = false;
         if (import.meta.env.DEV && load_ai_sample_data) {
           await delay(1000);
           return { image_prompt: ai_sample_data.sample_text_prompt, time_taken: 0 };
@@ -175,13 +176,25 @@
       staleTime: ms('20mins')
     })
   );
+  let auto_image_generated = false;
   $effect(() => {
-    if ($image_prompt_q.isSuccess && $image_prompt_q.data.image_prompt) {
-      $image_prompt = $image_prompt_q.data.image_prompt;
-      if ($auto_gen_image) generate_image();
-      image_prompt_request_error = false;
-      show_prompt_time_status = true;
-    } else image_prompt_request_error = true;
+    if ($image_prompt_q.isSuccess && $image_prompt_q.data.image_prompt)
+      untrack(() => {
+        $image_prompt = $image_prompt_q.data.image_prompt!;
+        if (!auto_image_generated && $auto_gen_image) {
+          generate_image();
+          auto_image_generated = true;
+        }
+        image_prompt_request_error = false;
+        show_prompt_time_status = true;
+      });
+    else image_prompt_request_error = true;
+    if (!$image_prompt_q.isFetching && untrack(() => image_gen_interval_obj))
+      untrack(() => {
+        clearInterval(image_gen_interval_obj);
+        image_gen_interval_obj = null!;
+        image_gen_time_taken = 0;
+      });
   });
 
   const image_q = $derived(
@@ -291,7 +304,10 @@
     </button>
   </span>
   <button
-    onclick={() => $image_prompt_q.refetch()}
+    onclick={async () => {
+      await $image_prompt_q.refetch();
+      // ^ this regetch is not a reliable alternative to onSuccess
+    }}
     disabled={$image_prompt_q.isFetching}
     class="btn rounded-md bg-surface-600 px-2 py-1 font-bold text-white dark:bg-surface-600"
   >
@@ -381,7 +397,7 @@
     <div class="space-x-3">
       <span class="font-bold">Image Prompt</span>
       <button
-        disabled={$image_q.isPending}
+        disabled={$image_q.isFetching}
         onclick={generate_image}
         class="btn rounded-md bg-tertiary-800 px-1 py-0 font-bold text-white dark:bg-tertiary-700"
         >Generate Image</button
@@ -393,7 +409,7 @@
       >
         <Icon src={BsCopy} class="text-lg" />
       </button>
-      {#if $image_q.isPending}
+      {#if $image_q.isFetching}
         <ProgressRadial
           value={(image_gen_time_taken / IMAGE_MODELS[image_model][2]) * 100}
           stroke={100}
@@ -419,7 +435,7 @@
       bind:value={$image_prompt}
     ></textarea>
     {#if $image_q.data}
-      {#if $image_q.isPending || !$image_q.isSuccess}
+      {#if $image_q.isFetching || !$image_q.isSuccess}
         <div class="placeholder h-96 animate-pulse rounded-md"></div>
       {:else}
         <div>
