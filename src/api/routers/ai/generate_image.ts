@@ -141,7 +141,7 @@ export const get_generated_images_route = protectedAdminProcedure
       image_model: available_models_schema
     })
   )
-  .mutation(async ({ input: { image_prompt, number_of_images, image_model } }) => {
+  .query(async ({ input: { image_prompt, number_of_images, image_model } }) => {
     const time_start = Date.now();
     let response: (image_output_type | null)[] = null!;
     if (image_model === 'sd3-core')

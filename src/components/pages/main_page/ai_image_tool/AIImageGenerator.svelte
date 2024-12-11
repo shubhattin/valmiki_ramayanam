@@ -14,7 +14,7 @@
   import { client } from '~/api/client';
   import { lipi_parivartak } from '~/tools/converter';
   import { copy_text_to_clipboard, format_string_text, get_permutations } from '~/tools/kry';
-  import { onDestroy, onMount } from 'svelte';
+  import { onDestroy, onMount, untrack } from 'svelte';
   import { loadLocalConfig } from '../load_local_config';
   import { BsDownload, BsCopy } from 'svelte-icons-pack/bs';
   import {
@@ -25,10 +25,11 @@
   import { LuCopy } from 'svelte-icons-pack/lu';
   import { OiCopy16, OiStopwatch16 } from 'svelte-icons-pack/oi';
   import { BsClipboard2Check } from 'svelte-icons-pack/bs';
-  import { createMutation } from '@tanstack/svelte-query';
+  import { createQuery } from '@tanstack/svelte-query';
   import { ai_sample_data } from './ai_sample_data';
   import { delay } from '~/tools/delay';
   import pretty_ms from 'pretty-ms';
+  import ms from 'ms';
 
   let base_prompts = image_tool_prompts as {
     main_prompt: {
@@ -86,7 +87,7 @@
   });
 
   type image_models_type = Parameters<
-    typeof client.ai.get_generated_images.mutate
+    typeof client.ai.get_generated_images.query
   >[0]['image_model'];
   let image_model: image_models_type = $state('dall-e-3');
   const IMAGE_MODELS: Record<image_models_type, [string, string, number]> = {
@@ -120,100 +121,135 @@
       })();
   });
 
-  const generate_image_prompt = async () => {
-    await $image_prompt_mut.mutateAsync({
-      messages: [
-        {
-          role: 'user',
-          content: base_prompts.main_prompt[0].content + additional_prompt_info
-        },
-        {
-          role: 'assistant',
-          content: base_prompts.main_prompt[1].content
-        },
-        { role: 'user', content: $shloka_text_prompt }
-      ],
-      model: selected_text_model
-    });
-  };
+  $effect(() => {
+    // reset image prompt text on change of kanda, sarga or shloka
+    $kANDa_selected;
+    $sarga_selected;
+    $shloka_numb;
+    $image_prompt = '';
+  });
+
   const NUMBER_OF_IMAGES = 1;
   let image_gen_time_taken = $state(0);
+
+  let image_gen_interval_obj: ReturnType<typeof setInterval> = null!;
   // ^ Also update grid-cols-<num> in image rendering
   const generate_image = async () => {
     image_gen_time_taken = 0;
-    const interval = setInterval(() => {
+    image_gen_interval_obj = setInterval(() => {
       image_gen_time_taken++;
       if (image_gen_time_taken === IMAGE_MODELS[image_model][2]) {
-        clearInterval(interval);
+        clearInterval(image_gen_interval_obj);
         return;
       }
     }, 1000);
-    await $image_mut.mutateAsync({
-      image_prompt: $image_prompt,
-      number_of_images: NUMBER_OF_IMAGES,
-      image_model
-    });
-    clearInterval(interval);
-    image_gen_time_taken = 0;
+    await $image_q.refetch();
   };
-  const image_prompt_mut = createMutation({
-    mutationFn: async (input: Parameters<typeof client.ai.get_image_prompt.mutate>[0]) => {
-      show_prompt_time_status = false;
-      if (import.meta.env.DEV && load_ai_sample_data) {
-        await delay(1000);
-        return { image_prompt: ai_sample_data.sample_text_prompt, time_taken: 0 };
-      }
-      return await client.ai.get_image_prompt.mutate(input);
-    },
-    async onSuccess(dt) {
-      if (dt.image_prompt) {
-        $image_prompt = dt.image_prompt;
-        if ($auto_gen_image) generate_image();
+
+  const image_prompt_q = $derived(
+    createQuery({
+      queryKey: ['shloka_text_prompt', $sarga_selected, $kANDa_selected, $shloka_numb],
+      queryFn: async () => {
+        show_prompt_time_status = false;
+        auto_image_generated = false;
+        if (import.meta.env.DEV && load_ai_sample_data) {
+          await delay(1000);
+          return { image_prompt: ai_sample_data.sample_text_prompt, time_taken: 0 };
+        }
+        return await client.ai.get_image_prompt.query({
+          messages: [
+            {
+              role: 'user',
+              content: base_prompts.main_prompt[0].content + additional_prompt_info
+            },
+            {
+              role: 'assistant',
+              content: base_prompts.main_prompt[1].content
+            },
+            { role: 'user', content: $shloka_text_prompt }
+          ],
+          model: selected_text_model
+        });
+      },
+      enabled: false,
+      placeholderData: undefined,
+      staleTime: ms('30mins')
+    })
+  );
+  let auto_image_generated = false;
+  $effect(() => {
+    if (
+      !$image_prompt_q.isFetching &&
+      $image_prompt_q.isSuccess &&
+      $image_prompt_q.data.image_prompt
+    )
+      untrack(() => {
+        $image_prompt = $image_prompt_q.data.image_prompt!;
+        if (!auto_image_generated && $auto_gen_image) {
+          generate_image();
+          auto_image_generated = true;
+        }
         image_prompt_request_error = false;
         show_prompt_time_status = true;
-      } else {
-        image_prompt_request_error = true;
-      }
-    }
+      });
+    else image_prompt_request_error = true;
   });
-  const image_mut = createMutation({
-    mutationFn: async (input: Parameters<typeof client.ai.get_generated_images.mutate>[0]) => {
-      show_image_time_status = false;
-      if (import.meta.env.DEV && load_ai_sample_data) {
-        await delay(2000);
-        const list: {
-          url: string;
-          created: number;
-          prompt: string;
-          file_format: 'png';
-          model: 'dall-e-3';
-          out_format: 'url';
-        }[] = [];
-        const permutation = get_permutations([1, 4], 1)[0];
-        for (let i = 0; i < input.number_of_images; i++) {
-          const image_index = permutation[i] - 1;
-          list.push({
-            url: ai_sample_data.sample_images[image_index],
-            created: new Date().getTime(),
-            prompt: `Sample Image ${image_index + 1}`,
-            file_format: 'png', // although its webp
-            model: 'dall-e-3',
-            out_format: 'url'
-          });
+
+  const image_q = $derived(
+    createQuery({
+      queryKey: ['shloka_image', $kANDa_selected, $sarga_selected, $shloka_numb],
+      queryFn: async () => {
+        show_image_time_status = false;
+        if (import.meta.env.DEV && load_ai_sample_data) {
+          await delay(2000);
+          const list: {
+            url: string;
+            created: number;
+            prompt: string;
+            file_format: 'png';
+            model: 'dall-e-3';
+            out_format: 'url';
+          }[] = [];
+          const permutation = get_permutations([1, 4], 1)[0];
+          for (let i = 0; i < NUMBER_OF_IMAGES; i++) {
+            const image_index = permutation[i] - 1;
+            list.push({
+              url: ai_sample_data.sample_images[image_index],
+              created: new Date().getTime(),
+              prompt: `Sample Image ${image_index + 1}`,
+              file_format: 'png', // although its webp
+              model: 'dall-e-3',
+              out_format: 'url'
+            });
+          }
+          return { images: list, time_taken: 0 };
         }
-        return { images: list, time_taken: 0 };
-      }
-      return await client.ai.get_generated_images.mutate(input);
-    },
-    onSuccess(data) {
-      $image_data = data.images;
+        return await client.ai.get_generated_images.query({
+          image_prompt: $image_prompt,
+          number_of_images: NUMBER_OF_IMAGES,
+          image_model
+        });
+      },
+      enabled: false,
+      placeholderData: undefined,
+      staleTime: ms('30mins')
+    })
+  );
+  $effect(() => {
+    if (!$image_q.isFetching && $image_q.isSuccess) {
       show_image_time_status = true;
+      if (image_gen_interval_obj)
+        untrack(() => {
+          // clear interval
+          clearInterval(image_gen_interval_obj);
+          image_gen_interval_obj = null!;
+          image_gen_time_taken = 0;
+        });
     }
   });
   type image_data_type = Awaited<
-    ReturnType<typeof client.ai.get_generated_images.mutate>
+    ReturnType<typeof client.ai.get_generated_images.query>
   >['images'][0];
-  let image_data = writable<image_data_type[]>([]);
 
   const download_image = (image: image_data_type) => {
     if (!image) return;
@@ -275,8 +311,11 @@
     </button>
   </span>
   <button
-    onclick={generate_image_prompt}
-    disabled={$image_prompt_mut.isPending}
+    onclick={async () => {
+      await $image_prompt_q.refetch();
+      // ^ this regetch is not a reliable alternative to onSuccess
+    }}
+    disabled={$image_prompt_q.isFetching}
     class="btn rounded-md bg-surface-600 px-2 py-1 font-bold text-white dark:bg-surface-600"
   >
     Generate Image Prompt
@@ -290,10 +329,10 @@
       <option value={key} title={value[1]}>{value[0]}</option>
     {/each}
   </select>
-  {#if show_prompt_time_status && $image_prompt_mut.isSuccess && $image_prompt_mut.data.image_prompt}
+  {#if show_prompt_time_status && $image_prompt_q.isSuccess && $image_prompt_q.data.image_prompt}
     <span class="ml-4 select-none text-xs text-stone-500 dark:text-stone-300">
       <Icon src={OiStopwatch16} class="text-base" />
-      {pretty_ms($image_prompt_mut.data.time_taken)}
+      {pretty_ms($image_prompt_q.data.time_taken)}
     </span>
   {/if}
 </div>
@@ -358,14 +397,14 @@
     bind:checked={$auto_gen_image}>Auto Generate Image</SlideToggle
   >
 </div>
-{#if !$image_prompt_mut.isIdle}
-  {#if $image_prompt_mut.isPending || !$image_prompt_mut.isSuccess}
+{#if $image_prompt_q.data !== undefined || $image_prompt_q.isFetching}
+  {#if $image_prompt_q.isFetching || !$image_prompt_q.isSuccess}
     <div class="placeholder h-80 animate-pulse rounded-md"></div>
   {:else}
     <div class="space-x-3">
       <span class="font-bold">Image Prompt</span>
       <button
-        disabled={$image_mut.isPending}
+        disabled={$image_q.isFetching}
         onclick={generate_image}
         class="btn rounded-md bg-tertiary-800 px-1 py-0 font-bold text-white dark:bg-tertiary-700"
         >Generate Image</button
@@ -377,7 +416,7 @@
       >
         <Icon src={BsCopy} class="text-lg" />
       </button>
-      {#if $image_mut.isPending}
+      {#if $image_q.isFetching}
         <ProgressRadial
           value={(image_gen_time_taken / IMAGE_MODELS[image_model][2]) * 100}
           stroke={100}
@@ -387,10 +426,10 @@
           track="stroke-primary-500/30"
           strokeLinecap="butt"
         />
-      {:else if show_image_time_status && $image_mut.isSuccess}
+      {:else if show_image_time_status && $image_q.isSuccess}
         <span class="ml-4 select-none text-xs text-stone-500 dark:text-stone-300">
           <Icon src={OiStopwatch16} class="text-base" />
-          {pretty_ms($image_mut.data.time_taken)}
+          {pretty_ms($image_q.data.time_taken)}
         </span>
       {/if}
     </div>
@@ -402,13 +441,13 @@
       spellcheck="false"
       bind:value={$image_prompt}
     ></textarea>
-    {#if !$image_mut.isIdle}
-      {#if $image_mut.isPending || !$image_mut.isSuccess}
+    {#if $image_q.data}
+      {#if $image_q.isFetching || !$image_q.isSuccess}
         <div class="placeholder h-96 animate-pulse rounded-md"></div>
       {:else}
         <div>
           <section class="mb-10 grid grid-cols-2 gap-3">
-            {#each $image_mut.data.images! as image}
+            {#each $image_q.data.images as image}
               {#if image}
                 <div class="space-y-1">
                   <img
