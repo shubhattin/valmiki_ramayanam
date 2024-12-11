@@ -21,7 +21,7 @@ export const get_image_prompt_route = protectedAdminProcedure
       model: text_models_enum
     })
   )
-  .mutation(async ({ input: { messages, model } }) => {
+  .query(async ({ input: { messages, model } }) => {
     try {
       const time_start = Date.now();
       const result = await generateObject({

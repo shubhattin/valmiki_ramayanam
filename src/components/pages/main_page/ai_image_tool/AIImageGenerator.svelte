@@ -87,7 +87,7 @@
   });
 
   type image_models_type = Parameters<
-    typeof client.ai.get_generated_images.mutate
+    typeof client.ai.get_generated_images.query
   >[0]['image_model'];
   let image_model: image_models_type = $state('dall-e-3');
   const IMAGE_MODELS: Record<image_models_type, [string, string, number]> = {
@@ -156,7 +156,7 @@
           await delay(1000);
           return { image_prompt: ai_sample_data.sample_text_prompt, time_taken: 0 };
         }
-        return await client.ai.get_image_prompt.mutate({
+        return await client.ai.get_image_prompt.query({
           messages: [
             {
               role: 'user',
@@ -224,7 +224,7 @@
           }
           return { images: list, time_taken: 0 };
         }
-        return await client.ai.get_generated_images.mutate({
+        return await client.ai.get_generated_images.query({
           image_prompt: $image_prompt,
           number_of_images: NUMBER_OF_IMAGES,
           image_model
@@ -248,7 +248,7 @@
     }
   });
   type image_data_type = Awaited<
-    ReturnType<typeof client.ai.get_generated_images.mutate>
+    ReturnType<typeof client.ai.get_generated_images.query>
   >['images'][0];
 
   const download_image = (image: image_data_type) => {
