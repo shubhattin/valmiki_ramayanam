@@ -1,3 +1,5 @@
+import { Buffer } from 'buffer';
+
 export const search_with_key = <T, K extends keyof T>(key: K, value: T[K], data_list: T[]) => {
   // this function can also be used in frontend despite of this file using node modules (using treeshaking)
   for (let i = 0; i < data_list.length; i++) if (data_list[i][key] === value) return i;
@@ -39,14 +41,12 @@ export const bin_str_to_str = (binary: string) => {
 /** `encode=false` by default */
 export const to_base64 = (str: string, encode = false) => {
   if (encode) str = str_to_bin_str(str);
-  if (typeof window === 'undefined') str = Buffer.from(str, 'utf-8').toString('base64');
-  else str = window.btoa(str);
+  str = Buffer.from(str, 'utf-8').toString('base64');
   return str;
 };
 /** `decode=false` by default */
 export const from_base64 = (str: string, decode = false) => {
-  if (typeof window === 'undefined') str = Buffer.from(str, 'base64').toString('utf-8');
-  else str = window.atob(str);
+  str = Buffer.from(str, 'base64').toString('utf-8');
   try {
     if (decode) str = bin_str_to_str(str);
   } catch {}

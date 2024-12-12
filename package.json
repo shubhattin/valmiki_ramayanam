@@ -69,6 +69,7 @@
     "@types/ms": "^0.7.34",
     "ai": "^3.4.33",
     "autoprefixer": "^10.4.20",
+    "buffer": "^6.0.3",
     "clsx": "^2.1.1",
     "devalue": "^5.1.1",
     "drizzle-orm": "^0.33.0",
