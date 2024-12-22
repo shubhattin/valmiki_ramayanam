@@ -104,3 +104,7 @@ export function cleanUpWhitespace(input: string, replace_multiple_white_spaces =
   if (replace_multiple_white_spaces) input = input.replace(/\s+/g, ' ');
   return input;
 }
+
+export function get_randon_number(start: number, end: number) {
+  return Math.floor(Math.random() * (end - start + 1) + start);
+}

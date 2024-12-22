@@ -25,7 +25,7 @@
 
   let user_created_status = $state(false);
 
-  const create_new_user = client_q.auth.add_new_user.mutation({
+  const create_new_user = client_q.user.add_new_user.mutation({
     onSuccess(res) {
       user_already_exists = false;
       email_already_exists = false;
@@ -56,7 +56,7 @@
       password: password,
       username: username,
       name: name,
-      contact_number: contact_number
+      contact_number: contact_number !== '' ? contact_number : null
     });
   };
 </script>
@@ -66,9 +66,8 @@
   <div class="mt-2 space-y-2">
     <div class="font-bold text-green-600 dark:text-green-500">User created successfully</div>
     <div>
-      But your account is not yet activated to make changes to Translations. Also you have not been
-      assigned any language to work upon. Please contact the admin to activate your account and
-      assign you language(s).
+      <span class="font-semibold">Your account needs verification.</span> Verify your Email Address and
+      then contact the admin to assign you language(s).
     </div>
     <button
       class="variant-outline-primary btn"
@@ -80,8 +79,9 @@
 {:else}
   <form onsubmit={create_new_user_func} class="mt-2 space-y-2.5 text-base">
     <label class="space-y-1">
-      <div class="space-x-3 font-bold">
+      <div class="font-bold">
         <span>Name</span>
+        <span class="text-red-500">*</span>
       </div>
       <input
         name="name"
@@ -97,7 +97,7 @@
     </label>
     <label class="space-y-1">
       <div class="space-x-3 font-bold">
-        <span>Username</span>
+        <span>Username <span class="text-red-500">*</span></span>
         {#if user_already_exists}
           <span class="text-red-600 dark:text-red-500">Username already exists</span>
         {/if}
@@ -116,7 +116,7 @@
     </label>
     <label class="space-y-1">
       <div class="space-x-3 font-bold">
-        <span>Email</span>
+        <span>Email <span class="text-red-500">*</span></span>
         {#if email_already_exists}
           <span class="text-red-600 dark:text-red-500">Email already exists</span>
         {/if}
@@ -132,7 +132,7 @@
       />
     </label>
     <label class="space-y-1">
-      <span class="font-bold">Password</span>
+      <span class="font-bold">Password <span class="text-red-500">*</span></span>
       <input
         name="password"
         class={cl_join('input variant-form-material')}

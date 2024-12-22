@@ -6,7 +6,8 @@ import {
   pgEnum,
   smallint,
   integer,
-  primaryKey
+  primaryKey,
+  boolean
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
@@ -39,7 +40,10 @@ export const users = pgTable('users', {
 export const user_verification_requests = pgTable('user_verification_requests', {
   id: integer('id')
     .primaryKey()
-    .references(() => users.id, { onDelete: 'cascade' })
+    .references(() => users.id, { onDelete: 'cascade' }),
+  email_verified: boolean('email_verified').default(false).notNull(),
+  otp: varchar('otp', { length: 6 }).notNull()
+  // ^ on initial registration an otp will be generated, it can also be regenerated unless verified, so notNull
 });
 
 export const translations = pgTable(
