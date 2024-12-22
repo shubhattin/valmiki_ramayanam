@@ -7,7 +7,7 @@ import { user_verification_requests, users } from '~/db/schema';
 import { delay } from '~/tools/delay';
 import { cleanUpWhitespace, get_randon_number } from '~/tools/kry';
 import type { lang_list_type } from '~/tools/lang_list';
-import { BCRYPT_COST_FACTOR } from './_auth_security';
+import { bcrypt_hash } from './_auth_security';
 
 const add_new_user_route = publicProcedure
   .input(
@@ -36,12 +36,7 @@ const add_new_user_route = publicProcedure
       return { success, status_code: 'email_already_exist' };
 
     // hashing password
-    const salt = crypto.getRandomValues(new Uint8Array(16));
-    const hashed_password = await bcrypt({
-      password: password,
-      salt: salt,
-      costFactor: BCRYPT_COST_FACTOR
-    });
+    const hashed_password = await bcrypt_hash(password);
 
     username = cleanUpWhitespace(username);
     name = cleanUpWhitespace(name);
