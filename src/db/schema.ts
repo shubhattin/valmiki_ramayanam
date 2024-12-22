@@ -29,7 +29,7 @@ export const users = pgTable('users', {
   user_name: varchar('user_name', { length: 50 }).notNull(),
   user_id: varchar('user_id', { length: 25 }).notNull().unique(),
   user_email: text('user_email').notNull().unique(),
-  password_hash: varchar('password_hash', { length: 96 }).notNull(), // sha-256 + hash -> 64 + 32
+  password_hash: varchar('password_hash', { length: 96 }).notNull(), // bcrypt hash (60)
   contact_number: varchar('contact_number', { length: 17 }), // optional
   user_type: userTypeEnum('user_type').default('non-admin').notNull(),
   allowed_langs: langEnum('allowed_langs').array()
