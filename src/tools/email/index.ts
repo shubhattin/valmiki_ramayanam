@@ -6,7 +6,8 @@ const email_options = z.object({
   senders_name: z.string().min(3),
   recipient_emails: z.string().email().array(),
   subject: z.string(),
-  text: z.string()
+  text: z.string().optional(),
+  html: z.string().optional()
 });
 const email_output = z.discriminatedUnion('success', [
   z.object({
@@ -22,7 +23,7 @@ const email_output = z.discriminatedUnion('success', [
 ]);
 
 export const send_email = async (options: z.infer<typeof email_options>) => {
-  const { senders_name, recipient_emails, subject, text } = options;
+  const { senders_name, recipient_emails, subject, text, html } = options;
 
   const SENDERS_EMAIL = z.string().min(3).parse(env.EMAIL_DOMAIN_ADRESS);
   const EMAIL_DOMAIN = SENDERS_EMAIL.split('@')[1];
@@ -33,7 +34,8 @@ export const send_email = async (options: z.infer<typeof email_options>) => {
     formData.append('to', email);
   });
   formData.append('subject', subject);
-  formData.append('text', text);
+  if (text) formData.append('text', text);
+  if (html) formData.append('html', html);
 
   const auth = Buffer.from(`api:${env.MAILGUN_API_KEY}`).toString('base64');
   const response = await fetch(`https://api.mailgun.net/v3/${EMAIL_DOMAIN}/messages`, {
