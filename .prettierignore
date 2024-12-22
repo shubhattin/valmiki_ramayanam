@@ -7,6 +7,8 @@ node_modules
 .svelte-kit
 build
 
+.netlify
+
 src/tools/converter/resources/dattAMsh/
 
 data/ramayan/data
