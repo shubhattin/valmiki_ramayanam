@@ -19,8 +19,10 @@
   import { user_info, user_allowed_langs } from '~/state/main_page/user';
   import { editing_status_on } from '~/state/main_page/main_state';
   import { VscAccount } from 'svelte-icons-pack/vsc';
-  import { client } from '~/api/client';
+  import { client, client_q } from '~/api/client';
   import { OiSync16 } from 'svelte-icons-pack/oi';
+  import OtpVerification from './OTPVerification.svelte';
+  import { queryClient } from '~/state/query';
 
   const modalStore = getModalStore();
 
@@ -29,6 +31,8 @@
 
   let user_create_modal_status = writable(false);
   let name_input_elmnt_new_user = writable<HTMLInputElement>(null!);
+
+  let email_verify_modal_status = writable(false);
 
   let update_password_modal_status = writable(false);
 
@@ -66,6 +70,13 @@
       }
     };
     modalStore.trigger(modal);
+  };
+
+  const user_verified_info = client_q.user.get_user_verified_status.query();
+
+  const open_otp_verification_modal = async () => {
+    await client.user.send_user_email_verify_otp.query();
+    $email_verify_modal_status = true;
   };
 </script>
 
@@ -136,6 +147,21 @@
           <span class="text-sm">Sync Translations from DB</span>
         </button>
       {/if}
+      {#if !$user_verified_info.isFetching && $user_verified_info.isSuccess}
+        {#if !$user_verified_info.data.user_approved}
+          {#if !$user_verified_info.data.email_verified}
+            <div class="text-sm text-warning-600 dark:text-warning-400">
+              Your Email is not Verified. <button
+                onclick={open_otp_verification_modal}
+                class="btn rounded-lg bg-primary-600 px-1 py-0 font-bold text-white">Verify</button
+              >
+            </div>
+          {/if}
+          <div class="text-sm text-error-600 dark:text-error-400">
+            Your account is not approved by the Admin.
+          </div>
+        {/if}
+      {/if}
     </div>
   {:else}
     <div class="space-y-2">
@@ -204,4 +230,15 @@
 </Modal>
 <Modal bind:modal_open={$update_password_modal_status}>
   <UpdatePassword on_done={() => ($update_password_modal_status = false)} />
+</Modal>
+<Modal bind:modal_open={$email_verify_modal_status}>
+  <OtpVerification
+    id={$user_info!.id}
+    on_verified={() => {
+      $email_verify_modal_status = false;
+      queryClient.invalidateQueries({
+        queryKey: [['user', 'get_user_verified_status'], { type: 'query' }]
+      });
+    }}
+  />
 </Modal>

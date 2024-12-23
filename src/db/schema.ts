@@ -42,7 +42,7 @@ export const user_verification_requests = pgTable('user_verification_requests', 
     .primaryKey()
     .references(() => users.id, { onDelete: 'cascade' }),
   email_verified: boolean('email_verified').default(false).notNull(),
-  otp: varchar('otp', { length: 6 }).notNull() // for now 4 in use, sending OTP in start itself
+  otp: varchar('otp', { length: 6 }).notNull() // for now 4 in use, sending OTP at start itself
 });
 
 export const translations = pgTable(

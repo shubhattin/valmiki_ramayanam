@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
-import { protectedAdminProcedure, publicProcedure, t } from '~/api/trpc_init';
+import { protectedAdminProcedure, protectedProcedure, publicProcedure, t } from '~/api/trpc_init';
 import { db } from '~/db/db';
 import { user_verification_requests, users } from '~/db/schema';
 import { delay } from '~/tools/delay';
@@ -122,10 +122,56 @@ const update_user_allowed_langs_route = protectedAdminProcedure
     await db.update(users).set({ allowed_langs: langs_type }).where(eq(users.id, id));
   });
 
+const get_user_verified_status_route = protectedProcedure.query(
+  async ({
+    ctx: {
+      user: { id }
+    }
+  }) => {
+    const user_info = (await db.query.users.findFirst({
+      where: (tbl, { eq }) => eq(tbl.id, id),
+      columns: {
+        id: true
+      },
+      with: {
+        user_verification_requests: {
+          columns: {
+            email_verified: true
+          }
+        }
+      }
+    }))!;
+    return {
+      user_approved: !user_info.user_verification_requests, // if null then user verfied
+      email_verified: user_info.user_verification_requests?.email_verified ?? false
+    };
+  }
+);
+
+const send_user_email_verify_otp_route = protectedProcedure.query(async ({ ctx: { user } }) => {
+  const email = (await db.query.users.findFirst({
+    where: (tbl, { eq }) => eq(tbl.id, user.id),
+    columns: {
+      user_email: true
+    }
+  }))!.user_email;
+
+  const otp = get_randon_number(1000, 9999).toString();
+  await Promise.all([
+    await send_email_verify_otp(email, otp),
+    await db
+      .update(user_verification_requests)
+      .set({ otp: otp })
+      .where(eq(user_verification_requests.id, user.id))
+  ]);
+});
+
 export const user_router = t.router({
   add_new_user: add_new_user_route,
   verify_unverified_user: verify_user_route,
   delete_unverified_user: delete_unverified_user_route,
   add_user_allowed_langs: update_user_allowed_langs_route,
-  verify_user_email: verify_user_email_route
+  verify_user_email: verify_user_email_route,
+  get_user_verified_status: get_user_verified_status_route,
+  send_user_email_verify_otp: send_user_email_verify_otp_route
 });
