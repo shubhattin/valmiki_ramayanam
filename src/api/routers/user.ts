@@ -163,37 +163,11 @@ const update_user_allowed_langs_route = protectedAdminProcedure
           senders_name: env.EMAIL_SENDER_NAME,
           subject: 'Translation Language Alloted for Contribution',
           html:
-            `Now you can contribute to the Valmiki Ramayanam Translations for the following languages: <b>${langs_allowed.join(',')}</b><br/>` +
+            `Now you can contribute to the Valmiki Ramayanam Translations for the following languages: <b>${langs_allowed.join(', ')}</b><br/>` +
             '<i>Your Contributions to the Project are Appreciated.</i><br/><br/><b>Praṇāma</b>'
         }))
     ]);
   });
-
-const get_user_verified_status_route = protectedProcedure.query(
-  async ({
-    ctx: {
-      user: { id }
-    }
-  }) => {
-    const user_info = (await db.query.users.findFirst({
-      where: (tbl, { eq }) => eq(tbl.id, id),
-      columns: {
-        id: true
-      },
-      with: {
-        user_verification_requests: {
-          columns: {
-            email_verified: true
-          }
-        }
-      }
-    }))!;
-    return {
-      user_approved: !user_info.user_verification_requests, // if null then user verfied
-      email_verified: user_info.user_verification_requests?.email_verified ?? false
-    };
-  }
-);
 
 const send_user_email_verify_otp_route = protectedProcedure.query(async ({ ctx: { user } }) => {
   const email = (await db.query.users.findFirst({
@@ -213,12 +187,63 @@ const send_user_email_verify_otp_route = protectedProcedure.query(async ({ ctx: 
   ]);
 });
 
+const correct_unverified_user_email_route = protectedProcedure
+  .input(z.object({ new_email: z.string().email() }))
+  .output(
+    z.object({
+      success: z.boolean(),
+      status_code: z.enum(['email_not_unverified', 'email_already_exists', 'email_updated'])
+    })
+  )
+  .mutation(async ({ input: { new_email }, ctx: { user } }) => {
+    let success = false;
+    await delay(700);
+    const user_info = (await db.query.users.findFirst({
+      where: ({ id }, { eq }) => eq(id, user.id),
+      columns: {},
+      with: {
+        user_verification_requests: {
+          columns: {
+            email_verified: true
+          }
+        }
+      }
+    }))!;
+    if (
+      !user_info.user_verification_requests ||
+      user_info.user_verification_requests.email_verified
+    )
+      return {
+        success,
+        status_code: 'email_not_unverified'
+      };
+
+    const new_email_exists = await db.query.users.findFirst({
+      where: ({ user_email }, { eq }) => eq(user_email, new_email),
+      columns: {
+        id: true
+      }
+    });
+    if (new_email_exists)
+      return {
+        success,
+        status_code: 'email_already_exists'
+      };
+
+    await db.update(users).set({ user_email: new_email }).where(eq(users.id, user.id));
+    success = true;
+    return {
+      success,
+      status_code: 'email_updated'
+    };
+  });
+
 export const user_router = t.router({
   add_new_user: add_new_user_route,
   verify_unverified_user: verify_user_route,
   delete_unverified_user: delete_unverified_user_route,
   add_user_allowed_langs: update_user_allowed_langs_route,
   verify_user_email: verify_user_email_route,
-  get_user_verified_status: get_user_verified_status_route,
-  send_user_email_verify_otp: send_user_email_verify_otp_route
+  send_user_email_verify_otp: send_user_email_verify_otp_route,
+  correct_unverified_user_email: correct_unverified_user_email_route
 });

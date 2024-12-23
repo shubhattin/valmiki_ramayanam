@@ -22,6 +22,8 @@
   import { client, client_q } from '~/api/client';
   import { OiSync16 } from 'svelte-icons-pack/oi';
   import OtpVerification from './OTPVerification.svelte';
+  import CorrectEmail from './CorrectEmail.svelte';
+  import { createQuery } from '@tanstack/svelte-query';
 
   const modalStore = getModalStore();
 
@@ -32,6 +34,7 @@
   let name_input_elmnt_new_user = writable<HTMLInputElement>(null!);
 
   let email_verify_modal_status = writable(false);
+  let email_correct_modal_status = writable(false);
 
   let update_password_modal_status = writable(false);
 
@@ -71,7 +74,13 @@
     modalStore.trigger(modal);
   };
 
-  const user_verified_info = client_q.user.get_user_verified_status.query();
+  const user_verified_info = createQuery({
+    queryKey: ['user_info', 'get_user_verified_status'],
+    queryFn: async () => {
+      return await client.user_info.get_user_verified_status.query();
+    },
+    enabled: $user_info?.user_type !== 'admin'
+  });
 
   const open_otp_verification_modal = async () => {
     await client.user.send_user_email_verify_otp.query();
@@ -150,9 +159,15 @@
         {#if !$user_verified_info.data.user_approved}
           {#if !$user_verified_info.data.email_verified}
             <div class="text-sm text-warning-600 dark:text-warning-400">
-              Your Email is not Verified. <button
+              Your Email is not Verified.
+              <button
                 onclick={open_otp_verification_modal}
                 class="btn rounded-lg bg-primary-600 px-1 py-0 font-bold text-white">Verify</button
+              >
+              <button
+                onclick={() => ($email_correct_modal_status = true)}
+                class="btn ml-1 rounded-lg bg-secondary-600 px-1 py-0 text-sm font-bold text-white"
+                >Correct Email</button
               >
             </div>
           {/if}
@@ -237,4 +252,7 @@
       $email_verify_modal_status = false;
     }}
   />
+</Modal>
+<Modal bind:modal_open={$email_correct_modal_status} close_on_click_outside={false}>
+  <CorrectEmail on_done={() => ($email_correct_modal_status = false)} />
 </Modal>

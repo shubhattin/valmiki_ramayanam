@@ -23,6 +23,9 @@
   const verify_email_otp_mut = client_q.user.verify_user_email.mutation({
     onSuccess(res) {
       if (res.verified) {
+        query_client.invalidateQueries({
+          queryKey: ['user_info', 'get_user_verified_status']
+        });
         on_verified && on_verified();
       } else {
         invalid_otp = true;
@@ -31,9 +34,6 @@
         setTimeout(() => {
           invalid_otp = false;
         }, 1000);
-        query_client.invalidateQueries({
-          queryKey: [['user', 'get_user_verified_status'], { type: 'query' }]
-        });
       }
     }
   });
@@ -70,7 +70,8 @@
   {#if after_signup}
     <div class="text-surface-100-800-token text-sm">
       You can also do this later on, click continue to do it later. Although it is a necessary step
-      before you start contributing.
+      before you start contributing. <br />
+      You can also correct your email if you have entered it wrong from the user menu later on.
     </div>
   {/if}
 </div>

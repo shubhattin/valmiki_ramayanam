@@ -45,6 +45,14 @@ export const user_verification_requests = pgTable('user_verification_requests', 
   otp: varchar('otp', { length: 6 }).notNull() // for now 4 in use, sending OTP at start itself
 });
 
+export const forgot_pass_otp = pgTable('forgot_pass_otp', {
+  id: integer('id')
+    .primaryKey()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  otp: varchar('otp', { length: 6 }).notNull() // for now 4 in use
+});
+// we dont need to backup this one, as it is only for temporary use
+
 export const translations = pgTable(
   'translations',
   {
@@ -61,12 +69,20 @@ export const translations = pgTable(
 
 /* The relations defined below are only for the `query` API of drizzle */
 export const userRelation = relations(users, ({ one }) => ({
-  user_verification_requests: one(user_verification_requests)
+  user_verification_requests: one(user_verification_requests),
+  forgot_pass_otp: one(forgot_pass_otp)
 }));
 
 export const userVerificationRelation = relations(user_verification_requests, ({ one }) => ({
-  users: one(users, {
+  user: one(users, {
     fields: [user_verification_requests.id],
+    references: [users.id]
+  })
+}));
+
+export const forgotPassOtpRelation = relations(forgot_pass_otp, ({ one }) => ({
+  user: one(users, {
+    fields: [forgot_pass_otp.id],
     references: [users.id]
   })
 }));
