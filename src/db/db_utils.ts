@@ -2,9 +2,12 @@ import { z } from 'zod';
 
 export const get_db_url = (env: any): string => {
   let url: string = null!;
-  if (process.env.DB_MODE === 'PROD') url = env.PG_DATABASE_URL1;
-  else if (process.env.DB_MODE === 'PREVIEW') url = env.PG_DATABASE_URL2;
-  else url = env.PG_DATABASE_URL;
+  if (typeof process !== 'undefined') {
+    // this is to prevent error in netlify edge
+    if (process.env.DB_MODE === 'PROD') url = env.PG_DATABASE_URL1;
+    else if (process.env.DB_MODE === 'PREVIEW') url = env.PG_DATABASE_URL2;
+    else url = env.PG_DATABASE_URL;
+  } else url = env.PG_DATABASE_URL;
   const url_parse = z
     .string({
       description: 'Connection string for PostgreSQL'

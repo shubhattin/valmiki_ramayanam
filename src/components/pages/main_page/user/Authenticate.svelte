@@ -4,6 +4,7 @@
   import { cl_join } from '~/tools/cl_join';
   import Icon from '~/tools/Icon.svelte';
   import { BiLogIn } from 'svelte-icons-pack/bi';
+  import ResetPassword from './ResetPassword.svelte';
 
   let pass_input_element = $state<HTMLInputElement>(null!);
 
@@ -12,19 +13,23 @@
     is_verified: boolean;
     show_always?: boolean;
     user_input_element?: HTMLInputElement;
+    pass_input_modal_open: boolean;
   }
 
   let {
     on_verify = null!,
     is_verified = $bindable(),
     show_always = false,
-    user_input_element = $bindable(null!)
+    user_input_element = $bindable(null!),
+    pass_input_modal_open = $bindable()
   }: Props = $props();
 
   let username_or_email = $state('');
   let password = $state('');
   let wrong_pass_status = $state(false);
   let user_not_found_status = $state(false);
+
+  let reset_pass_mode = $state(false);
 
   const check_pass = client_q.auth.verify_pass.mutation({
     onSuccess(res) {
@@ -58,6 +63,13 @@
 </script>
 
 {#if show_always || !is_verified}
+  {#if !reset_pass_mode}
+    {@render login()}
+  {:else}
+    <ResetPassword on_done={() => (pass_input_modal_open = false)} />
+  {/if}
+{/if}
+{#snippet login()}
   <div class="text-2xl font-bold text-orange-600 dark:text-yellow-500">Authentication</div>
   <form onsubmit={check_pass_func} class="mt-2 space-y-2.5">
     <label class="space-y-1">
@@ -99,4 +111,8 @@
       <span>Login</span>
     </button>
   </form>
-{/if}
+  <button
+    onclick={() => (reset_pass_mode = true)}
+    class="btn mt-2 block rounded-lg bg-tertiary-600 px-1 py-0">Reset Password</button
+  >
+{/snippet}

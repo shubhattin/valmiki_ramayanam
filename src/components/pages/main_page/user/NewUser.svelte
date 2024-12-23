@@ -2,8 +2,11 @@
   import { cl_join } from '~/tools/cl_join';
   import { LuUserPlus } from 'svelte-icons-pack/lu';
   import Icon from '~/tools/Icon.svelte';
-  import { client_q } from '~/api/client';
+  import { client_q, client } from '~/api/client';
   import { z } from 'zod';
+  import { get_id_token_info, storeAuthInfo } from '~/tools/auth_tools';
+  import { user_info } from '~/state/main_page/user';
+  import OtpVerification from './OTPVerification.svelte';
 
   interface Props {
     on_verify?: () => void;
@@ -19,14 +22,15 @@
   let password = $state('');
   let email = $state('');
   let contact_number = $state('');
+  let auto_login = $state(true);
 
   let user_already_exists = $state(false);
   let email_already_exists = $state(false);
 
   let user_created_status = $state(false);
 
-  const create_new_user = client_q.auth.add_new_user.mutation({
-    onSuccess(res) {
+  const create_new_user = client_q.user.add_new_user.mutation({
+    async onSuccess(res) {
       user_already_exists = false;
       email_already_exists = false;
       if (!res.success) {
@@ -41,6 +45,16 @@
         }
       } else {
         user_created_status = true;
+        if (auto_login) {
+          const user = await client.auth.verify_pass.mutate({
+            username_or_email: username,
+            password: password
+          });
+          if (user.verified) {
+            storeAuthInfo(user);
+            $user_info = get_id_token_info().user;
+          }
+        }
       }
     }
   });
@@ -56,7 +70,7 @@
       password: password,
       username: username,
       name: name,
-      contact_number: contact_number
+      contact_number: contact_number !== '' ? contact_number : null
     });
   };
 </script>
@@ -64,12 +78,24 @@
 <div class="text-2xl font-bold text-orange-600 dark:text-yellow-500">Create New User</div>
 {#if user_created_status}
   <div class="mt-2 space-y-2">
-    <div class="font-bold text-green-600 dark:text-green-500">User created successfully</div>
-    <div>
-      But your account is not yet activated to make changes to Translations. Also you have not been
-      assigned any language to work upon. Please contact the admin to activate your account and
-      assign you language(s).
-    </div>
+    {#if $create_new_user.isPending}
+      <div class="text-lg font-bold text-primary-600 dark:text-primary-500">Creating User...</div>
+    {:else if $create_new_user.isSuccess && $create_new_user.data.success}
+      <div class="text-lg font-bold text-green-600 dark:text-green-500">
+        User created successfully
+      </div>
+      <div>
+        <span class="font-semibold text-warning-500">Your account needs verification.</span> Verify your
+        Email Address after Login and then contact the admin to assign you language(s).
+      </div>
+      <OtpVerification
+        id={$create_new_user.data.user_id}
+        after_signup={true}
+        on_verified={on_verify}
+      />
+    {:else}
+      <div class="text-lg font-bold text-red-600 dark:text-red-500">User creation failed</div>
+    {/if}
     <button
       class="variant-outline-primary btn"
       onclick={() => {
@@ -80,8 +106,9 @@
 {:else}
   <form onsubmit={create_new_user_func} class="mt-2 space-y-2.5 text-base">
     <label class="space-y-1">
-      <div class="space-x-3 font-bold">
+      <div class="font-bold">
         <span>Name</span>
+        <span class="text-red-500">*</span>
       </div>
       <input
         name="name"
@@ -97,7 +124,7 @@
     </label>
     <label class="space-y-1">
       <div class="space-x-3 font-bold">
-        <span>Username</span>
+        <span>Username <span class="text-red-500">*</span></span>
         {#if user_already_exists}
           <span class="text-red-600 dark:text-red-500">Username already exists</span>
         {/if}
@@ -116,7 +143,7 @@
     </label>
     <label class="space-y-1">
       <div class="space-x-3 font-bold">
-        <span>Email</span>
+        <span>Email <span class="text-red-500">*</span></span>
         {#if email_already_exists}
           <span class="text-red-600 dark:text-red-500">Email already exists</span>
         {/if}
@@ -132,7 +159,7 @@
       />
     </label>
     <label class="space-y-1">
-      <span class="font-bold">Password</span>
+      <span class="font-bold">Password <span class="text-red-500">*</span></span>
       <input
         name="password"
         class={cl_join('input variant-form-material')}
@@ -154,6 +181,10 @@
         class="input variant-form-material"
         placeholder="Contact Number (Optional)"
       />
+    </label>
+    <label class="text-sm">
+      <input type="checkbox" bind:checked={auto_login} class="checkbox" />
+      Auto Login after Signup
     </label>
     <button
       type="submit"

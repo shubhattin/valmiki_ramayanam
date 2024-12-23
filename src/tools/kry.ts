@@ -104,3 +104,33 @@ export function cleanUpWhitespace(input: string, replace_multiple_white_spaces =
   if (replace_multiple_white_spaces) input = input.replace(/\s+/g, ' ');
   return input;
 }
+
+export function get_randon_number(start: number, end: number) {
+  return Math.floor(Math.random() * (end - start + 1) + start);
+}
+
+export function mask_email(
+  email: string,
+  options: {
+    startChars?: number;
+    endChars?: number;
+  } = { startChars: 3, endChars: 2 }
+): string {
+  if (!email || !email.includes('@')) return email;
+
+  const mask_part = (text: string, startChars: number, endChars: number) => {
+    if (text.length <= startChars + endChars) return text;
+    const start = text.slice(0, startChars);
+    const end = text.slice(-endChars);
+    const maskLength = text.length - startChars - endChars;
+    return `${start}${'*'.repeat(maskLength)}${end}`;
+  };
+
+  const { startChars = 1, endChars = 1 } = options;
+  const [localPart, domain] = email.split('@');
+  const maskedLocalPart = mask_part(localPart, startChars, endChars);
+  const [domainName, tld] = domain.split('.');
+  const maskedDomain = mask_part(domainName, 1, 2);
+
+  return `${maskedLocalPart}@${maskedDomain}.${tld}`;
+}
