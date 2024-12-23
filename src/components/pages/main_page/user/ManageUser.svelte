@@ -55,17 +55,17 @@
       exact: true
     });
 
-  const add_allowed_lang = client_q.user.add_user_allowed_langs.mutation({
+  const add_allowed_lang = client_q.user.admin_controls.add_user_allowed_langs.mutation({
     onSuccess() {
       invaliadte_users_info();
     }
   });
-  const add_unverified_user = client_q.user.verify_unverified_user.mutation({
+  const add_unverified_user = client_q.user.admin_controls.verify_unverified_user.mutation({
     onSuccess() {
       invaliadte_users_info();
     }
   });
-  const remove_unverified_user = client_q.user.delete_unverified_user.mutation({
+  const remove_unverified_user = client_q.user.admin_controls.delete_unverified_user.mutation({
     onSuccess() {
       invaliadte_users_info();
     }

@@ -23,19 +23,21 @@
   let new_email = $state('');
   let email_already_exists = $state(false);
 
-  const correct_email_mut = client_q.user.correct_unverified_user_email.mutation({
-    onSuccess(res) {
-      email_already_exists = false;
-      if (res.success) {
-        query_client.invalidateQueries({
-          queryKey: ['user_info', 'get_current_user_info']
-        });
-        on_done();
-      } else {
-        if (res.status_code === 'email_already_exists') email_already_exists = true;
+  const correct_email_mut = client_q.user.email_verification.correct_unverified_user_email.mutation(
+    {
+      onSuccess(res) {
+        email_already_exists = false;
+        if (res.success) {
+          query_client.invalidateQueries({
+            queryKey: ['user_info', 'get_current_user_info']
+          });
+          on_done();
+        } else {
+          if (res.status_code === 'email_already_exists') email_already_exists = true;
+        }
       }
     }
-  });
+  );
   const update_email_func = async (e: Event) => {
     e.preventDefault();
     if (!current_user_info || !new_email) return;

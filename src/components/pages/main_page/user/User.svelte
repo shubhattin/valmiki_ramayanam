@@ -83,7 +83,7 @@
   });
 
   const open_otp_verification_modal = async () => {
-    await client.user.send_user_email_verify_otp.query();
+    await client.user.email_verification.send_user_email_verify_otp.query();
     $email_verify_modal_status = true;
   };
 </script>
@@ -212,12 +212,13 @@
     </div>
   {/if}
 </div>
-<Modal bind:modal_open={$pass_enterer_status}>
+<Modal bind:modal_open={$pass_enterer_status} close_on_click_outside={false}>
   <div class="p-2">
     <Authenticate
       is_verified={false}
       show_always={true}
       bind:user_input_element={$user_input_elmnt_login}
+      bind:pass_input_modal_open={$pass_enterer_status}
       on_verify={(verified) => {
         if (verified) {
           $pass_enterer_status = false;

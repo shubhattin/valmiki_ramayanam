@@ -240,10 +240,14 @@ const correct_unverified_user_email_route = protectedProcedure
 
 export const user_router = t.router({
   add_new_user: add_new_user_route,
-  verify_unverified_user: verify_user_route,
-  delete_unverified_user: delete_unverified_user_route,
-  add_user_allowed_langs: update_user_allowed_langs_route,
-  verify_user_email: verify_user_email_route,
-  send_user_email_verify_otp: send_user_email_verify_otp_route,
-  correct_unverified_user_email: correct_unverified_user_email_route
+  admin_controls: t.router({
+    verify_unverified_user: verify_user_route,
+    delete_unverified_user: delete_unverified_user_route,
+    add_user_allowed_langs: update_user_allowed_langs_route
+  }),
+  email_verification: t.router({
+    send_user_email_verify_otp: send_user_email_verify_otp_route,
+    verify_user_email: verify_user_email_route,
+    correct_unverified_user_email: correct_unverified_user_email_route
+  })
 });

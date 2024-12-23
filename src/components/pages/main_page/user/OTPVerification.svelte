@@ -20,7 +20,7 @@
     otp_input_element.focus();
   });
 
-  const verify_email_otp_mut = client_q.user.verify_user_email.mutation({
+  const verify_email_otp_mut = client_q.user.email_verification.verify_user_email.mutation({
     onSuccess(res) {
       if (res.verified) {
         query_client.invalidateQueries({
@@ -47,7 +47,7 @@
 </script>
 
 <div class="space-y-1">
-  <div class="text-lg font-bold">Email OTP Verification</div>
+  <div class="text-lg font-bold text-orange-600 dark:text-yellow-500">Email OTP Verification</div>
   <form onsubmit={handle_submit} class="space-y-2">
     <label class="space-x-2">
       <spab class="font-semibold">OTP</spab>

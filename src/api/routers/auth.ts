@@ -4,10 +4,13 @@ import { JWT_SECRET } from '~/tools/jwt.server';
 import { jwtVerify, SignJWT } from 'jose';
 import { UsersSchemaZod } from '~/db/schema_zod';
 import { db } from '~/db/db';
-import { users } from '~/db/schema';
+import { forgot_pass_otp, users } from '~/db/schema';
 import { eq } from 'drizzle-orm';
 import { delay } from '~/tools/delay';
 import { bcrypt_hash, bcrypt_verify } from './_auth_security';
+import { get_randon_number, mask_email } from '~/tools/kry';
+import { send_email } from '~/tools/email';
+import { env } from '$env/dynamic/private';
 
 export const user_info_schema = UsersSchemaZod.pick({
   user_id: true,
@@ -155,8 +158,74 @@ const update_password_route = protectedProcedure
     return { success: true };
   });
 
+const send_reset_password_otp_route = publicProcedure
+  .input(z.object({ username_or_email: z.string() }))
+  .output(
+    z.discriminatedUnion('success', [
+      z.object({ success: z.literal(false) }),
+      z.object({ success: z.literal(true), masked_email: z.string(), user_id: z.number().int() })
+    ])
+  )
+  .mutation(async ({ input: { username_or_email } }) => {
+    await delay(600);
+    const user_info = await db.query.users.findFirst({
+      where: ({ user_email, user_id }, { eq, or }) =>
+        or(eq(user_email, username_or_email), eq(user_id, username_or_email)),
+      columns: {
+        id: true,
+        user_email: true
+      }
+    });
+    if (!user_info) return { success: false };
+    const otp = get_randon_number(1000, 9999).toString();
+    await Promise.all([
+      await db.insert(forgot_pass_otp).values({
+        id: user_info.id,
+        otp: otp
+      }),
+      await send_email({
+        recipient_emails: [user_info.user_email],
+        senders_name: env.EMAIL_SENDER_NAME,
+        subject: 'Reset Password OTP for Valmiki Ramayanam',
+        html: `Please reset your password by entering the OTP : <b>${otp}</b> in the reset password page.<br/><br/><b>Praṇāma</b>`
+      })
+    ]);
+    return {
+      success: true,
+      masked_email: mask_email(user_info.user_email, { startChars: 3, endChars: 2 }),
+      user_id: user_info.id
+    };
+  });
+
+const reset_password_via_otp_route = publicProcedure
+  .input(
+    z.object({
+      id: z.number().int(),
+      otp: z.string().length(4),
+      new_password: z.string().min(6)
+    })
+  )
+  .mutation(async ({ input: { id, otp, new_password } }) => {
+    await delay(550);
+    const otp_info = await db.query.forgot_pass_otp.findFirst({
+      where: (tbl, { eq }) => eq(tbl.id, id)
+    });
+    if (!otp_info) return { success: false };
+    if (otp !== otp_info.otp) return { success: false };
+    const hashed_password = await bcrypt_hash(new_password);
+    await Promise.all([
+      await db.update(users).set({ password_hash: hashed_password }).where(eq(users.id, id)),
+      await db.delete(forgot_pass_otp).where(eq(forgot_pass_otp.id, id))
+    ]);
+    return { success: true };
+  });
+
 export const auth_router = t.router({
   verify_pass: verify_pass_route,
   renew_access_token: renew_access_token_route,
-  update_password: update_password_route
+  update_password: update_password_route,
+  reset_password: t.router({
+    send_reset_password_otp: send_reset_password_otp_route,
+    reset_password_via_otp: reset_password_via_otp_route
+  })
 });
