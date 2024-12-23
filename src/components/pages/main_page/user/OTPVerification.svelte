@@ -1,17 +1,34 @@
 <script lang="ts">
   import { client_q } from '~/api/client';
+  import { cl_join } from '~/tools/cl_join';
 
-  let { on_verified }: { on_verified?: () => void } = $props();
+  let {
+    on_verified,
+    id,
+    after_signup = false
+  }: { on_verified?: () => void; id: number; after_signup: boolean } = $props();
 
-  let otp = $state('');
+  let otp = $state<number>(null!);
+  let invalid_otp = $state(false);
 
-  const verify_email_otp_mut = client_q.user.verify_user_email.mutation();
+  const verify_email_otp_mut = client_q.user.verify_user_email.mutation({
+    onSuccess(res) {
+      if (res.verified) {
+        on_verified && on_verified();
+      } else {
+        invalid_otp = true;
+        otp = null!;
+        setTimeout(() => {
+          invalid_otp = false;
+        }, 1000);
+      }
+    }
+  });
 
   const handle_submit = async (e: Event) => {
     e.preventDefault();
-    if (otp.length !== 4) {
-      await $verify_email_otp_mut.mutateAsync({ otp: otp });
-      on_verified && on_verified();
+    if (otp && otp.toString().length === 4) {
+      await $verify_email_otp_mut.mutateAsync({ otp: otp.toString(), id });
     }
   };
 </script>
@@ -26,7 +43,8 @@
         name="otp"
         bind:value={otp}
         type="number"
-        class="input variant-form-material w-24"
+        placeholder="Enter OTP"
+        class={cl_join('input variant-form-material w-28', invalid_otp && 'input-error')}
       />
     </label>
     <button
@@ -34,4 +52,10 @@
       class="btn bg-primary-600 font-semibold text-white dark:bg-primary-600">Verify</button
     >
   </form>
+  {#if after_signup}
+    <div class="text-surface-100-800-token text-sm">
+      You can also do this later on, click continue to do it later. Although it is a necessary step
+      before you start contributing.
+    </div>
+  {/if}
 </div>

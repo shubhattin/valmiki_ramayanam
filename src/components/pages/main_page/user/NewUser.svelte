@@ -2,8 +2,11 @@
   import { cl_join } from '~/tools/cl_join';
   import { LuUserPlus } from 'svelte-icons-pack/lu';
   import Icon from '~/tools/Icon.svelte';
-  import { client_q } from '~/api/client';
+  import { client_q, client } from '~/api/client';
   import { z } from 'zod';
+  import { get_id_token_info, storeAuthInfo } from '~/tools/auth_tools';
+  import { user_info } from '~/state/main_page/user';
+  import OtpVerification from './OTPVerification.svelte';
 
   interface Props {
     on_verify?: () => void;
@@ -19,6 +22,7 @@
   let password = $state('');
   let email = $state('');
   let contact_number = $state('');
+  let auto_login = $state(true);
 
   let user_already_exists = $state(false);
   let email_already_exists = $state(false);
@@ -26,7 +30,7 @@
   let user_created_status = $state(false);
 
   const create_new_user = client_q.user.add_new_user.mutation({
-    onSuccess(res) {
+    async onSuccess(res) {
       user_already_exists = false;
       email_already_exists = false;
       if (!res.success) {
@@ -41,6 +45,16 @@
         }
       } else {
         user_created_status = true;
+        if (auto_login) {
+          const user = await client.auth.verify_pass.mutate({
+            username_or_email: username,
+            password: password
+          });
+          if (user.verified) {
+            storeAuthInfo(user);
+            $user_info = get_id_token_info().user;
+          }
+        }
       }
     }
   });
@@ -64,13 +78,24 @@
 <div class="text-2xl font-bold text-orange-600 dark:text-yellow-500">Create New User</div>
 {#if user_created_status}
   <div class="mt-2 space-y-2">
-    <div class="text-lg font-bold text-green-600 dark:text-green-500">
-      User created successfully
-    </div>
-    <div>
-      <span class="font-semibold text-warning-500">Your account needs verification.</span> Verify your
-      Email Address after Login and then contact the admin to assign you language(s).
-    </div>
+    {#if $create_new_user.isPending}
+      <div class="text-lg font-bold text-primary-600 dark:text-primary-500">Creating User...</div>
+    {:else if $create_new_user.isSuccess && $create_new_user.data.success}
+      <div class="text-lg font-bold text-green-600 dark:text-green-500">
+        User created successfully
+      </div>
+      <div>
+        <span class="font-semibold text-warning-500">Your account needs verification.</span> Verify your
+        Email Address after Login and then contact the admin to assign you language(s).
+      </div>
+      <OtpVerification
+        id={$create_new_user.data.user_id}
+        after_signup={true}
+        on_verified={on_verify}
+      />
+    {:else}
+      <div class="text-lg font-bold text-red-600 dark:text-red-500">User creation failed</div>
+    {/if}
     <button
       class="variant-outline-primary btn"
       onclick={() => {
@@ -156,6 +181,10 @@
         class="input variant-form-material"
         placeholder="Contact Number (Optional)"
       />
+    </label>
+    <label class="text-sm">
+      <input type="checkbox" bind:checked={auto_login} class="checkbox" />
+      Auto Login after Signup
     </label>
     <button
       type="submit"
