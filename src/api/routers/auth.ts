@@ -177,12 +177,20 @@ const send_reset_password_otp_route = publicProcedure
       }
     });
     if (!user_info) return { success: false };
+    const otp_exists = await db.query.forgot_pass_otp.findFirst({
+      where: ({ id }, { eq }) => eq(id, user_info.id),
+      columns: {
+        id: true
+      }
+    });
     const otp = get_randon_number(1000, 9999).toString();
     await Promise.all([
-      await db.insert(forgot_pass_otp).values({
-        id: user_info.id,
-        otp: otp
-      }),
+      !otp_exists
+        ? await db.insert(forgot_pass_otp).values({
+            id: user_info.id,
+            otp: otp
+          })
+        : await db.update(forgot_pass_otp).set({ otp }).where(eq(forgot_pass_otp.id, user_info.id)),
       await send_email({
         recipient_emails: [user_info.user_email],
         senders_name: env.EMAIL_SENDER_NAME,
