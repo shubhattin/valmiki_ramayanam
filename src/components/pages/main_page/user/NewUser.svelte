@@ -64,10 +64,12 @@
 <div class="text-2xl font-bold text-orange-600 dark:text-yellow-500">Create New User</div>
 {#if user_created_status}
   <div class="mt-2 space-y-2">
-    <div class="font-bold text-green-600 dark:text-green-500">User created successfully</div>
+    <div class="text-lg font-bold text-green-600 dark:text-green-500">
+      User created successfully
+    </div>
     <div>
-      <span class="font-semibold">Your account needs verification.</span> Verify your Email Address and
-      then contact the admin to assign you language(s).
+      <span class="font-semibold text-warning-500">Your account needs verification.</span> Verify your
+      Email Address after Login and then contact the admin to assign you language(s).
     </div>
     <button
       class="variant-outline-primary btn"
