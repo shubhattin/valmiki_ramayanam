@@ -22,7 +22,6 @@
   import { client, client_q } from '~/api/client';
   import { OiSync16 } from 'svelte-icons-pack/oi';
   import OtpVerification from './OTPVerification.svelte';
-  import { queryClient } from '~/state/query';
 
   const modalStore = getModalStore();
 
@@ -147,7 +146,7 @@
           <span class="text-sm">Sync Translations from DB</span>
         </button>
       {/if}
-      {#if !$user_verified_info.isFetching && $user_verified_info.isSuccess}
+      {#if $user_info.user_type !== 'admin' && !$user_verified_info.isFetching && $user_verified_info.isSuccess}
         {#if !$user_verified_info.data.user_approved}
           {#if !$user_verified_info.data.email_verified}
             <div class="text-sm text-warning-600 dark:text-warning-400">
@@ -236,9 +235,6 @@
     id={$user_info!.id}
     on_verified={() => {
       $email_verify_modal_status = false;
-      queryClient.invalidateQueries({
-        queryKey: [['user', 'get_user_verified_status'], { type: 'query' }]
-      });
     }}
   />
 </Modal>

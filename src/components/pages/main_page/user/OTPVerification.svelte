@@ -2,6 +2,9 @@
   import { onMount } from 'svelte';
   import { client_q } from '~/api/client';
   import { cl_join } from '~/tools/cl_join';
+  import { useQueryClient } from '@tanstack/svelte-query';
+
+  const query_client = useQueryClient();
 
   let {
     on_verified,
@@ -28,6 +31,9 @@
         setTimeout(() => {
           invalid_otp = false;
         }, 1000);
+        query_client.invalidateQueries({
+          queryKey: [['user', 'get_user_verified_status'], { type: 'query' }]
+        });
       }
     }
   });

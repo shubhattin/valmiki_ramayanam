@@ -25,7 +25,7 @@ const email_output = z.discriminatedUnion('success', [
 export const send_email = async (options: z.infer<typeof email_options>) => {
   const { senders_name, recipient_emails, subject, text, html } = options;
 
-  const SENDERS_EMAIL = z.string().min(3).parse(env.EMAIL_DOMAIN_ADRESS);
+  const SENDERS_EMAIL = z.string().min(3).parse(env.EMAIL_DOMAIN_ADDRESS);
   const EMAIL_DOMAIN = SENDERS_EMAIL.split('@')[1];
 
   const formData = new FormData();

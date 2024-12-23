@@ -7,6 +7,8 @@ import { delay } from '~/tools/delay';
 import { cleanUpWhitespace, get_randon_number } from '~/tools/kry';
 import type { lang_list_type } from '~/tools/lang_list';
 import { bcrypt_hash, send_email_verify_otp } from './_auth_security';
+import { send_email } from '~/tools/email';
+import { env } from '$env/dynamic/private';
 
 const add_new_user_route = publicProcedure
   .input(
@@ -106,7 +108,34 @@ const verify_user_email_route = publicProcedure
 const verify_user_route = protectedAdminProcedure
   .input(z.object({ id: z.number().int() }))
   .mutation(async ({ input: { id } }) => {
-    await db.delete(user_verification_requests).where(eq(user_verification_requests.id, id));
+    const user_info = (await db.query.users.findFirst({
+      where: (tbl, { eq }) => eq(tbl.id, id),
+      columns: {
+        id: true,
+        user_email: true
+      },
+      with: {
+        user_verification_requests: {
+          columns: {
+            email_verified: true
+          }
+        }
+      }
+    }))!;
+    const email = user_info.user_email;
+    const email_verified = user_info.user_verification_requests!.email_verified;
+
+    if (email_verified) {
+      await Promise.all([
+        await db.delete(user_verification_requests).where(eq(user_verification_requests.id, id)),
+        await send_email({
+          recipient_emails: [email],
+          senders_name: env.EMAIL_SENDER_NAME,
+          subject: 'Your Account has been Approved',
+          html: `Your Account has been approved by the Admin for the Valmiki Ramayanam Project. <i>Your Effort, Time and Contributions are very much appreciated</i>.<br/><br/><b>Praṇāma</b>`
+        })
+      ]);
+    }
   });
 
 const delete_unverified_user_route = protectedAdminProcedure
@@ -118,8 +147,26 @@ const delete_unverified_user_route = protectedAdminProcedure
 const update_user_allowed_langs_route = protectedAdminProcedure
   .input(z.object({ id: z.number().int(), langs: z.string().array() }))
   .mutation(async ({ input: { id, langs } }) => {
-    const langs_type = langs as lang_list_type[];
-    await db.update(users).set({ allowed_langs: langs_type }).where(eq(users.id, id));
+    const email = (await db.query.users.findFirst({
+      where: (tbl, { eq }) => eq(tbl.id, id),
+      columns: {
+        user_email: true
+      }
+    }))!.user_email;
+
+    const langs_allowed = langs as lang_list_type[];
+    await Promise.all([
+      await db.update(users).set({ allowed_langs: langs_allowed }).where(eq(users.id, id)),
+      langs_allowed.length > 0 &&
+        (await send_email({
+          recipient_emails: [email],
+          senders_name: env.EMAIL_SENDER_NAME,
+          subject: 'Translation Language Alloted for Contribution',
+          html:
+            `Now you can contribute to the Valmiki Ramayanam Translations for the following languages: <b>${langs_allowed.join(',')}</b><br/>` +
+            '<i>Your Contributions to the Project are Appreciated.</i><br/><br/><b>Praṇāma</b>'
+        }))
+    ]);
   });
 
 const get_user_verified_status_route = protectedProcedure.query(

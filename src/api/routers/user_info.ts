@@ -17,7 +17,11 @@ const get_all_user_info_route = protectedAdminProcedure.query(async ({ ctx: { us
     orderBy: ({ user_name }, { asc }) => asc(user_name),
     where: ({ id }, { eq, not }) => not(eq(id, user.id)),
     with: {
-      user_verification_requests: true
+      user_verification_requests: {
+        columns: {
+          email_verified: true
+        }
+      }
     }
   });
   return other_users_data;

@@ -171,15 +171,17 @@
       {/if}
       {#if unverified_normal_users_index.length !== 0}
         <div>
-          <div class="text-lg font-bold underline">Unverified Normal Users</div>
+          <div class="text-lg font-bold underline">Unverified Users</div>
           <div class="space-y-1">
             {#each unverified_normal_users_index as index ($users_info.data[index].user_id)}
               {@const user = $users_info.data[index]}
+              {@const user_email_verified = user.user_verification_requests!.email_verified}
               <div class="space-x-1">
                 <span class="font-bold">{user.user_name}</span>
                 <span class="text text-sm text-gray-500 dark:text-gray-400">({user.user_id})</span>
                 <button
-                  title="Verify User"
+                  title={user_email_verified ? 'Approve User' : "User's Email is not verified"}
+                  disabled={!user_email_verified}
                   onclick={() => add_unverified_user_func(user.id, user.user_id)}
                   class="btn mx-1 inline-block p-0"
                 >
