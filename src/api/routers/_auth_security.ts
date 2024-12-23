@@ -22,7 +22,7 @@ export const bcrypt_verify = async (text: string, hash: string) => {
 
 export const send_email_verify_otp = async (email: string, otp: string) => {
   return send_email({
-    senders_name: env.EMAIL_SENDER_NAME,
+    senders_name: env.EMAIL_SENDER_NAME!,
     recipient_emails: [email],
     subject: 'OTP for Email Verification',
     html: `Please verify your Account for Valmiki Ramayanam Project. Your OTP is <b>${otp}</b>.<br/><br/><b>Praṇāma</b>`

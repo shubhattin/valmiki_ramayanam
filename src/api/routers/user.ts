@@ -130,7 +130,7 @@ const verify_user_route = protectedAdminProcedure
         await db.delete(user_verification_requests).where(eq(user_verification_requests.id, id)),
         await send_email({
           recipient_emails: [email],
-          senders_name: env.EMAIL_SENDER_NAME,
+          senders_name: env.EMAIL_SENDER_NAME!,
           subject: 'Your Account has been Approved',
           html: `Your Account has been approved by the Admin for the Valmiki Ramayanam Project. <i>Your Effort, Time and Contributions are very much appreciated</i>.<br/><br/><b>Praṇāma</b>`
         })
@@ -160,7 +160,7 @@ const update_user_allowed_langs_route = protectedAdminProcedure
       langs_allowed.length > 0 &&
         (await send_email({
           recipient_emails: [email],
-          senders_name: env.EMAIL_SENDER_NAME,
+          senders_name: env.EMAIL_SENDER_NAME!,
           subject: 'Translation Language Alloted for Contribution',
           html:
             `Now you can contribute to the Valmiki Ramayanam Translations for the following languages: <b>${langs_allowed.join(', ')}</b><br/>` +

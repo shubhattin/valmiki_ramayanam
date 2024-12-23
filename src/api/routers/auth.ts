@@ -193,7 +193,7 @@ const send_reset_password_otp_route = publicProcedure
         : await db.update(forgot_pass_otp).set({ otp }).where(eq(forgot_pass_otp.id, user_info.id)),
       await send_email({
         recipient_emails: [user_info.user_email],
-        senders_name: env.EMAIL_SENDER_NAME,
+        senders_name: env.EMAIL_SENDER_NAME!,
         subject: 'Reset Password OTP for Valmiki Ramayanam',
         html: `Please reset your password by entering the OTP : <b>${otp}</b> in the reset password page.<br/><br/><b>Praṇāma</b>`
       })
