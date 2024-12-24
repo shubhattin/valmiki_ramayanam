@@ -2,7 +2,6 @@ import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { z } from 'zod';
 import rAmayaNa_map from '@data/ramayan/ramayan_map.json';
-import { get_sarga_data } from '~/api/routers/translations';
 
 export const load: PageServerLoad = async ({ params }) => {
   const params_schema = z.object({
@@ -24,8 +23,5 @@ export const load: PageServerLoad = async ({ params }) => {
         message: `Sarga '${sarga}' not found in Kanda ${kANDa}`
       });
     }
-    return {
-      data: await get_sarga_data(kANDa, sarga)
-    };
   }
 };
