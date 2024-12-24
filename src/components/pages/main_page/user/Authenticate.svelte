@@ -29,7 +29,7 @@
   let wrong_pass_status = $state(false);
   let user_not_found_status = $state(false);
 
-  let reset_pass_mode = $state(false);
+  let forgot_pass_mode = $state(false);
 
   const check_pass = client_q.auth.verify_pass.mutation({
     onSuccess(res) {
@@ -63,7 +63,7 @@
 </script>
 
 {#if show_always || !is_verified}
-  {#if !reset_pass_mode}
+  {#if !forgot_pass_mode}
     {@render login()}
   {:else}
     <ResetPassword on_done={() => (pass_input_modal_open = false)} />
@@ -112,7 +112,7 @@
     </button>
   </form>
   <button
-    onclick={() => (reset_pass_mode = true)}
-    class="btn mt-2 block rounded-lg bg-tertiary-600 px-1 py-0">Reset Password</button
+    onclick={() => (forgot_pass_mode = true)}
+    class="btn mt-2 block rounded-lg bg-tertiary-600 px-1 py-0">Forgot Password</button
   >
 {/snippet}
