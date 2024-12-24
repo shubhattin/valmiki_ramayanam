@@ -60,14 +60,16 @@ export const sarga_data = get_derived_query(
         queryKey: QUERY_KEYS.sarga_data($kANDa_selected, $sarga_selected),
         enabled: browser && $kANDa_selected !== 0 && $sarga_selected !== 0,
         placeholderData: [],
-        queryFn: () => get_sarga_data($kANDa_selected, $sarga_selected)
+        queryFn: async () => {
+          if (!browser) return [];
+          return await get_sarga_data($kANDa_selected, $sarga_selected);
+        }
       },
       queryClient
     )
 );
 
 export async function get_sarga_data(kANDa_num: number, sarga_num: number) {
-  if (!browser) return [];
   // ^ This is to prevent this to be bundled in edge functions as it a limit of 1mb(gzip)
   const glob_path = `/data/ramayan/data/*/*.json` as const;
   const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
