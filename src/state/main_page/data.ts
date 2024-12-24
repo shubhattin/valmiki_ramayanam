@@ -62,22 +62,16 @@ export const sarga_data = get_derived_query(
         placeholderData: [],
         queryFn: async () => {
           if (!browser) return [];
-          return await get_sarga_data($kANDa_selected, $sarga_selected);
+          return await client.translations.get_sarga_data.query({
+            kANDa_num: $kANDa_selected,
+            sarga_num: $sarga_selected
+          });
         }
       },
       queryClient
     )
 );
 
-export async function get_sarga_data(kANDa_num: number, sarga_num: number) {
-  // ^ This is to prevent this to be bundled in edge functions as it a limit of 1mb(gzip)
-  const glob_path = `/data/ramayan/data/*/*.json` as const;
-  const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
-  const data = ((await all_sargas[glob_path.replace('*/*', `${kANDa_num}/${sarga_num}`)]()) as any)
-    .default as string[];
-  await delay(350);
-  return data;
-}
 // Translations
 export const trans_en_data = get_derived_query(
   [kANDa_selected, sarga_selected, view_translation_status, editing_status_on],

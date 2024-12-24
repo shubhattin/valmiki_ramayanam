@@ -2,7 +2,7 @@ import { get, writable } from 'svelte/store';
 import type * as fabric from 'fabric';
 import { get_derived_query } from '~/tools/query';
 import { browser } from '$app/environment';
-import { get_sarga_data, get_translations, QUERY_KEYS } from '~/state/main_page/data';
+import { get_translations, QUERY_KEYS } from '~/state/main_page/data';
 import { createQuery } from '@tanstack/svelte-query';
 import { queryClient } from '~/state/query';
 import background_image_url from './img/background_vr.png';
@@ -15,6 +15,8 @@ import {
 } from '~/tools/lang_list';
 import { copy_plain_object } from '~/tools/kry';
 import { get_image_font_info } from './settings';
+import { client } from '~/api/client';
+import { kANDa_selected, sarga_selected } from '~/state/main_page/main_state';
 
 export let canvas = writable<fabric.Canvas>();
 export let background_image = writable<fabric.FabricImage>();
@@ -55,7 +57,12 @@ export const image_sarga_data = get_derived_query(
         queryKey: QUERY_KEYS.sarga_data($image_kANDa, $image_sarga),
         enabled: browser && $image_kANDa !== 0 && $image_sarga !== 0,
         placeholderData: [],
-        queryFn: () => get_sarga_data($image_kANDa, $image_sarga)
+        queryFn: async () => {
+          return await client.translations.get_sarga_data.query({
+            kANDa_num: get(kANDa_selected),
+            sarga_num: get(sarga_selected)
+          });
+        }
       },
       queryClient
     );

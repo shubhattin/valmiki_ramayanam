@@ -6,6 +6,7 @@ import { and, eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { fetch_post } from '~/tools/fetch';
 import { env } from '$env/dynamic/private';
+import { delay } from '~/tools/delay';
 
 const get_translations_per_sarga_route = publicProcedure
   .input(
@@ -152,9 +153,31 @@ const trigger_translations_update_route = protectedAdminProcedure.mutation(async
   return req.ok;
 });
 
+export async function get_sarga_data(kANDa_num: number, sarga_num: number) {
+  // ^ This is to prevent this to be bundled in edge functions as it a limit of 1mb(gzip)
+  const glob_path = `/data/ramayan/data/*/*.json` as const;
+  const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
+  const data = ((await all_sargas[glob_path.replace('*/*', `${kANDa_num}/${sarga_num}`)]()) as any)
+    .default as string[];
+  await delay(350);
+  return data;
+}
+
+const get_sarga_data_route = publicProcedure
+  .input(
+    z.object({
+      kANDa_num: z.number().int(),
+      sarga_num: z.number().int()
+    })
+  )
+  .query(async ({ input: { kANDa_num, sarga_num } }) => {
+    return await get_sarga_data(kANDa_num, sarga_num);
+  });
+
 export const translations_router = t.router({
   get_translations_per_sarga: get_translations_per_sarga_route,
   edit_translation: edit_translation_route,
   get_all_langs_translations_per_sarga: get_all_langs_translations_per_sarga_route,
-  trigger_translations_update: trigger_translations_update_route
+  trigger_translations_update: trigger_translations_update_route,
+  get_sarga_data: get_sarga_data_route
 });
