@@ -195,7 +195,7 @@ const send_reset_password_otp_route = publicProcedure
         recipient_emails: [user_info.user_email],
         senders_name: env.EMAIL_SENDER_NAME!,
         subject: 'Reset Password OTP for Valmiki Ramayanam',
-        html: `Please reset your password by entering the OTP : <b>${otp}</b> in the reset password page.<br/><br/><b>Praṇāma</b>`
+        html: `Please reset your password by entering the OTP : <b>${otp}</b> in the reset password page.`
       })
     ]);
     return {
