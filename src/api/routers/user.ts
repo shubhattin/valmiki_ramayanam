@@ -132,7 +132,7 @@ const verify_user_route = protectedAdminProcedure
           recipient_emails: [email],
           senders_name: env.EMAIL_SENDER_NAME!,
           subject: 'Your Account has been Approved',
-          html: `Your Account has been approved by the Admin for the Valmiki Ramayanam Project. <i>Your Effort, Time and Contributions are very much appreciated</i>.<br/><br/><b>Praṇāma</b>`
+          html: `Your Account has been approved by the Admin for the Valmiki Ramayanam Project. <i>Your Effort, Time and Contributions are highly appreciated.</i><br/><br/><b>Praṇāma</b><br/>Team Sanskrit Channel`
         })
       ]);
     }
@@ -164,7 +164,7 @@ const update_user_allowed_langs_route = protectedAdminProcedure
           subject: 'Translation Language Alloted for Contribution',
           html:
             `Now you can contribute to the Valmiki Ramayanam Translations for the following languages: <b>${langs_allowed.join(', ')}</b><br/>` +
-            '<i>Your Contributions to the Project are Appreciated.</i><br/><br/><b>Praṇāma</b>'
+            '<i>Your Contributions to the Project are highly Appreciated.</i><br/><br/><b>Praṇāma</b><br>Team Sanskrit Channel'
         }))
     ]);
   });
