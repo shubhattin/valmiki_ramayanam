@@ -8,6 +8,7 @@ node_modules
 build
 
 .netlify
+.vercel
 
 src/tools/converter/resources/dattAMsh/
 

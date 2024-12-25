@@ -3,6 +3,7 @@ node_modules
 # Output
 .output
 .netlify
+.vercel
 /.svelte-kit
 /build
 
