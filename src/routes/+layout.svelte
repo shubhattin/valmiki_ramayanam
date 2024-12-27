@@ -10,6 +10,8 @@
   import { QueryClientProvider } from '@tanstack/svelte-query';
   import { SvelteQueryDevtools } from '@tanstack/svelte-query-devtools';
   import { queryClient } from '~/state/query';
+  import { pwa_event_triggerer, pwa_install_event_fired } from '~/state/main';
+  import { onMount } from 'svelte';
 
   interface Props {
     children?: import('svelte').Snippet;
@@ -19,6 +21,14 @@
 
   initializeStores();
   storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
+
+  onMount(() => {
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault();
+      $pwa_event_triggerer = event;
+      $pwa_install_event_fired = true;
+    });
+  });
 </script>
 
 <svelte:head>

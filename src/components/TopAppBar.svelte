@@ -9,6 +9,8 @@
   import { YoutubeIcon } from '~/components/icons';
   import { page } from '$app/stores';
   import { PAGE_TITLES } from '~/state/page_titles';
+  import { pwa_event_triggerer, pwa_install_event_fired } from '~/state/main';
+  import { OiDownload24 } from 'svelte-icons-pack/oi';
 
   type Props = {
     start?: import('svelte').Snippet;
@@ -109,6 +111,17 @@
         />
         <span>Project's Github Page</span>
       </a>
+      {#if $pwa_install_event_fired}
+        <button
+          class="will-close select-none gap-1 px-2 py-1 text-sm outline-none"
+          onclick={async () => {
+            if ($pwa_install_event_fired) await $pwa_event_triggerer.prompt();
+          }}
+        >
+          <Icon src={OiDownload24} class="-mt-1 text-base" />
+          Install
+        </button>
+      {/if}
       <div class="wont-close flex space-x-3 rounded-md px-2 py-1">
         <span class="mt-1">Set Theme</span>
         <ThemeChanger />
