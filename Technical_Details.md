@@ -29,3 +29,20 @@
   - `make_excel_files.ts`: Processes the JSON data and stores the Excel files in `data/ramaayana/out/`.
   - `run_tests.py`: Runs the tests on the JSON data, and saves the generated test result in `data/ramayan/test_out.md`.
 - [Raw Data Cached Zip of Extarcted HTML](https://github.com/shubhattin/valmiki_ramayanam/releases/download/raw_data/raw_data.7z) on [raw data release](https://github.com/shubhattin/valmiki_ramayanam/releases/tag/raw_data)
+
+### Shloka Image Generation
+
+- These are the images generated for automating the processs of which would have been done manually with photoshop.
+- [FabricJS](https://fabricjs.com/) is used to render the elements on the canvas. Scaling and positioning of the elements is done manually via custom formulas.
+- As the native `Text` object had problems rendering indic text properly on the canvas we had to to use wasm version of [harfbuzz](https://github.com/harfbuzz/harfbuzz).
+- The harfbuzzjs library was not directlt usable in the browser. So I had to modify it from the example in [https://harfbuzz.github.io/harfbuzzjs/](https://harfbuzz.github.io/harfbuzzjs/) to work with vite in browser and also nake it compatible with Web Workers API.
+
+### AI Imaage Generation and AI Shloka Translation
+
+- We are using [OpenAI](https://openai.com/) and [Anthropic](https://www.anthropic.com/) for the AI image generation and translation.
+- **Image**
+  - First we generate the image prompt using shloka text and available english translation. using `gpt-4o` and `claude-3.5-sonnet` model.
+  - Then finally we use `dall-e-3` model to generate the image.
+- **Shloka Translation**
+  - We use `gpt-4o` and `claude-3.5-sonnet` model to translate the text.
+  - The entire shloka text is provided along with the translation to generate English and Indian language translations.

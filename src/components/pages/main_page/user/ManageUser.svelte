@@ -113,7 +113,7 @@
               {@const user = $users_info.data[index]}
               <div>
                 <span class="font-bold">{user.user_name}</span>
-                <span class="text text-sm text-gray-500 dark:text-gray-400">({user.user_id})</span>
+                <span class="text-sm text-gray-500 dark:text-gray-400">({user.user_id})</span>
               </div>
             {/each}
           </div>
