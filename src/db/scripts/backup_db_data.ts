@@ -41,18 +41,30 @@ async function main() {
     });
 
     // Backup using pg_dump
-    execSync(
-      `pg_dump --dbname=${envs.PG_DATABASE_URL} --if-exists --clean --insert --no-owner --rows-per-insert=8000 -f b.sql`
+    function backup(command: string, file_name: string, temp_file_name: string) {
+      execSync(command);
+      const backup_file_data = fs.readFileSync(temp_file_name).toString('utf-8');
+      fs.writeFileSync(`${OUT_FOLDER}/${file_name}`, backup_file_data, {
+        encoding: 'utf-8'
+      });
+      fs.rmSync(temp_file_name);
+    }
+
+    // Backup using pg_dump
+    backup(
+      `pg_dump --dbname=${envs.PG_DATABASE_URL} --if-exists --schema-only --clean --no-owner -f b.sql`,
+      'db_dump_schema.sql',
+      'b.sql'
     );
-    const backup_file_data = fs.readFileSync('b.sql').toString('utf-8');
-    fs.writeFileSync(`${OUT_FOLDER}/db_dump.sql`, backup_file_data, {
-      encoding: 'utf-8'
-    });
-    fs.rmSync('b.sql');
+    backup(
+      `pg_dump --dbname=${envs.PG_DATABASE_URL} --data-only --insert --no-owner --rows-per-insert=8000 -f b.sql`,
+      'db_dump_data.sql',
+      'b.sql'
+    );
 
     // Zipping files
     execSync(
-      `cd backup && zip -P ${envs.BACKUP_ENCRYPTION_KEY}  encrypted.zip db_dump.sql user_data.json && rm db_dump.sql user_data.json`
+      `cd backup && zip -P ${envs.BACKUP_ENCRYPTION_KEY}  encrypted.zip db_dump_data.sql db_dump_schema.sql user_data.json && rm db_dump_data.sql db_dump_schema.sql user_data.json`
     );
   }
 }
