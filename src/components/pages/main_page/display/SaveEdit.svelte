@@ -121,7 +121,7 @@
   class="btn rounded-lg bg-primary-700 px-1 py-1 text-white dark:bg-primary-600"
 >
   <Icon src={FiSave} class="text-2xl" />
-  <span>Save</span>
+  <span class="text-sm sm:text-base">Save</span>
 </button>
 <button
   onclick={cancel_edit_func}
@@ -131,5 +131,5 @@
   class="btn ml-3 rounded-lg bg-error-700 px-1 py-1 text-white dark:bg-error-600"
 >
   <Icon src={AiOutlineClose} class="text-2xl" />
-  <span>Cancel</span>
+  <span class="text-sm sm:text-base">Cancel</span>
 </button>

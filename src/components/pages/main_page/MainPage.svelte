@@ -231,13 +231,13 @@
 </script>
 
 <MetaTags title={PAGE_INFO.title} description={PAGE_INFO.description} />
-<div class="mt-4 space-y-4">
-  <div class="flex justify-between">
-    <label class="space-x-4">
+<div class="mt-2 space-y-2.5 sm:mt-4 sm:space-y-4">
+  <div class="flex items-center justify-between">
+    <label class="space-x-2 text-sm sm:space-x-4 sm:text-base">
       Script
-      <Icon src={LanguageIcon} class="text-4xl" />
+      <Icon src={LanguageIcon} class="text-2xl sm:text-4xl" />
       <select
-        class="select inline-block w-40"
+        class="select inline-block w-32 px-2 py-1 text-sm sm:w-40 sm:p-2 sm:text-base"
         disabled={$viewing_script_mut.isPending}
         bind:value={$viewing_script_selection}
       >
@@ -249,10 +249,10 @@
     <User />
   </div>
   <!-- svelte-ignore a11y_label_has_associated_control -->
-  <label class="space-x-4">
-    <span class="font-bold">Select kANDa</span>
+  <label class="space-x-2 sm:space-x-4">
+    <span class="text-sm font-bold sm:text-base">Select kANDa</span>
     <Select
-      class={`${get_text_font_class($viewing_script)} select w-52`}
+      class={`${get_text_font_class($viewing_script)} select w-44 px-2 py-1 sm:w-52 sm:p-2`}
       zodType={z.coerce.number().int()}
       bind:value={$kANDa_selected}
       options={[{ value: 0, text: 'Select' }].concat(
@@ -265,12 +265,12 @@
     />
   </label>
   {#if $kANDa_selected !== 0}
-    <div class="space-x-8">
+    <div class="space-x-6 sm:space-x-8">
       <!-- svelte-ignore a11y_label_has_associated_control -->
-      <label class="inline-block space-x-4">
-        <span class="font-bold">Select Sarga</span>
+      <label class="inline-block space-x-2 sm:space-x-4">
+        <span class="text-sm font-bold sm:text-base">Select Sarga</span>
         <Select
-          class={`${get_text_font_class($viewing_script)} select w-52`}
+          class={`${get_text_font_class($viewing_script)} select w-44 px-2 py-1 sm:w-52 sm:p-2`}
           zodType={z.coerce.number().int()}
           bind:value={$sarga_selected}
           options={[{ value: 0, text: 'Select' }].concat(
@@ -291,14 +291,14 @@
   {/if}
   {#if $kANDa_selected !== 0 && $sarga_selected !== 0}
     {@const kANDa = rAmAyaNam_map[$kANDa_selected - 1]}
-    <div class="space-x-3">
+    <div class="space-x-1 sm:space-x-3">
       {#if $sarga_selected !== 1}
         <button
           onclick={() => ($sarga_selected -= 1)}
           in:scale
           out:slide
           disabled={$editing_status_on}
-          class="btn rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white"
+          class="btn rounded-lg bg-tertiary-700 px-1 py-1 pt-1.5 text-sm font-bold text-white sm:px-2 sm:py-1 sm:text-base"
         >
           <Icon class="-mt-1 mr-1 text-xl" src={TiArrowBackOutline} />
           Previous
@@ -310,7 +310,7 @@
           in:scale
           out:slide
           disabled={$editing_status_on}
-          class="btn rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white"
+          class="btn rounded-lg bg-tertiary-700 px-1 py-1 pt-1.5 text-sm font-bold text-white sm:px-2 sm:py-1 sm:text-base"
         >
           Next
           <Icon class="-mt-1 ml-1 text-xl" src={TiArrowForwardOutline} />
@@ -322,47 +322,49 @@
             onclick={() => {
               $view_translation_status = true;
             }}
-            class="btn bg-primary-800 px-2 py-1 font-bold text-white dark:bg-primary-700"
+            class="btn bg-primary-800 px-2 py-1 text-sm font-bold text-white sm:text-base dark:bg-primary-700"
             >View Translations</button
           >
         {:else}
-          <label class="mr-3 inline-block space-x-4">
-            Translation
-            <Icon src={LanguageIcon} class="text-2xl" />
-            <select
-              disabled={$editing_status_on ||
-                $trans_lang_mut.isPending ||
-                $viewing_script_mut.isPending}
-              class="select inline-block w-32 px-2 py-1"
-              bind:value={$trans_lang_selection}
-            >
-              <option value="--">-- Select --</option>
-              {#each LANG_LIST as lang (lang)}
-                {#if lang !== 'English'}
-                  <option value={lang}>{lang}</option>
-                {/if}
-              {/each}
-            </select>
-          </label>
-          {#if !$editing_status_on && $user_allowed_langs.isSuccess && $user_info}
-            {#if $trans_lang !== '--' && ($user_info!.user_type === 'admin' || $user_allowed_langs.data.indexOf($trans_lang) !== -1)}
-              <button
-                onclick={() => ($editing_status_on = true)}
-                class="btn my-1 rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white dark:bg-tertiary-600"
+          <div class="mt-2 block space-x-1.5 sm:mt-0 sm:inline-block sm:space-x-0">
+            <label class="mr-1 inline-block space-x-1.5 text-sm sm:mr-3 sm:space-x-4 sm:text-base">
+              Translation
+              <Icon src={LanguageIcon} class="text-xl sm:text-2xl" />
+              <select
+                disabled={$editing_status_on ||
+                  $trans_lang_mut.isPending ||
+                  $viewing_script_mut.isPending}
+                class="select inline-block w-24 px-1 py-1 text-sm sm:w-32 sm:px-2 sm:text-base"
+                bind:value={$trans_lang_selection}
               >
-                <Icon src={BiEdit} class="mr-1 text-2xl" />
-                Edit
-              </button>
-            {:else if $trans_lang === '--' && ($user_info!.user_type === 'admin' || $user_allowed_langs.data.indexOf('English') !== -1)}
-              <button
-                onclick={() => ($editing_status_on = true)}
-                class="btn my-1 rounded-lg bg-tertiary-700 px-2 py-1 font-bold text-white dark:bg-tertiary-600"
-              >
-                <Icon src={BiEdit} class="mr-1 text-2xl" />
-                Edit English
-              </button>
+                <option value="--">-- Select --</option>
+                {#each LANG_LIST as lang (lang)}
+                  {#if lang !== 'English'}
+                    <option value={lang}>{lang}</option>
+                  {/if}
+                {/each}
+              </select>
+            </label>
+            {#if !$editing_status_on && $user_allowed_langs.isSuccess && $user_info}
+              {#if $trans_lang !== '--' && ($user_info!.user_type === 'admin' || $user_allowed_langs.data.indexOf($trans_lang) !== -1)}
+                <button
+                  onclick={() => ($editing_status_on = true)}
+                  class="btn my-1 inline-block rounded-lg bg-tertiary-700 px-1 py-1 text-sm font-bold text-white sm:px-2 sm:text-base dark:bg-tertiary-600"
+                >
+                  <Icon src={BiEdit} class="mr-1 text-xl sm:text-2xl" />
+                  Edit
+                </button>
+              {:else if $trans_lang === '--' && ($user_info!.user_type === 'admin' || $user_allowed_langs.data.indexOf('English') !== -1)}
+                <button
+                  onclick={() => ($editing_status_on = true)}
+                  class="btn my-1 inline-block rounded-lg bg-tertiary-700 px-1 py-1 text-sm font-bold text-white sm:px-2 sm:text-base dark:bg-tertiary-600"
+                >
+                  <Icon src={BiEdit} class="mr-1 text-xl sm:text-2xl" />
+                  Edit English
+                </button>
+              {/if}
             {/if}
-          {/if}
+          </div>
         {/if}
       {/if}
     </div>
@@ -395,7 +397,8 @@
         >
           <Icon src={BiHelpCircle} class="mt-1 text-3xl text-sky-500 dark:text-sky-400" />
         </button>
-        <span class="mt-3 inline-block text-center text-sm text-stone-500 dark:text-stone-400"
+        <span
+          class="mt-3 hidden text-center text-sm text-stone-500 sm:inline-block dark:text-stone-400"
           >Use <span class="font-semibold">Alt+x</span> to toggle</span
         >
       </div>

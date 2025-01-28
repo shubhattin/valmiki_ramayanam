@@ -87,7 +87,8 @@
       >
         <Icon src={BsKeyboard} class="text-4xl" />
       </SlideToggle>
-      <span class="mt-4 inline-block text-center text-sm text-stone-500 dark:text-stone-400"
+      <span
+        class="mt-4 hidden text-center text-sm text-stone-500 sm:inline-block dark:text-stone-400"
         >Use <span class="font-semibold">Alt+x</span> to toggle</span
       >
     </div>
