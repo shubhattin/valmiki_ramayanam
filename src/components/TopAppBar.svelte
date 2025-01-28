@@ -4,13 +4,15 @@
   import ThemeChanger from './ThemeChanger.svelte';
   import Icon from '~/tools/Icon.svelte';
   import { SiGithub } from 'svelte-icons-pack/si';
-  import { SiConvertio } from './icons';
+  import { ContributeIcon, SiConvertio } from './icons';
   import { AiOutlineMenu } from 'svelte-icons-pack/ai';
   import { YoutubeIcon } from '~/components/icons';
   import { page } from '$app/stores';
   import { PAGE_TITLES } from '~/state/page_titles';
   import { pwa_event_triggerer, pwa_install_event_fired } from '~/state/main';
   import { OiDownload24 } from 'svelte-icons-pack/oi';
+  import Modal from './Modal.svelte';
+  import SupportOptions from './pages/main_page/SupportOptions.svelte';
 
   type Props = {
     start?: import('svelte').Snippet;
@@ -21,6 +23,7 @@
   let { start, headline, end }: Props = $props();
 
   let route_id = $derived($page.route.id as keyof typeof PAGE_TITLES);
+  let support_modal_status = $state(false);
 
   const app_menu_popup: PopupSettings = {
     event: 'click',
@@ -53,6 +56,17 @@
 	</svelte:fragment> -->
   {#snippet trail()}
     {@render end?.()}
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <span
+      onclick={() => {
+        support_modal_status = true;
+      }}
+      class="btn m-0 select-none gap-2 rounded-md px-2 py-1 font-semibold outline-none hover:bg-gray-200 dark:hover:bg-gray-700"
+    >
+      <Icon src={ContributeIcon} class="text-3xl" />
+      <span class="hidden text-sm sm:inline">Support Our Projects</span>
+    </span>
     <div class="space-x-2">
       {#if route_id !== '/convert'}
         <a class="text-xl" href="/convert" title="Lipi Parivartak">
@@ -129,3 +143,7 @@
     </div>
   {/snippet}
 </AppBar>
+
+<Modal bind:modal_open={support_modal_status}>
+  <SupportOptions />
+</Modal>
