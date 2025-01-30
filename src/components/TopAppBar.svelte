@@ -67,16 +67,16 @@
       <Icon src={ContributeIcon} class="text-3xl" />
       <span class="hidden text-sm sm:inline">Support Our Projects</span>
     </span>
-    <div class="space-x-2">
-      {#if route_id !== '/convert'}
+    {#if route_id !== '/convert'}
+      <div class="space-x-2">
         <a class="text-xl" href="/convert" title="Lipi Parivartak">
           <Icon
             src={SiConvertio}
             class="text-2xl hover:fill-emerald-600 dark:hover:fill-zinc-400"
           />
         </a>
-      {/if}
-    </div>
+      </div>
+    {/if}
     <button class="btn m-0 p-0" use:popup={app_menu_popup} title="App Menu">
       <Icon
         src={AiOutlineMenu}
