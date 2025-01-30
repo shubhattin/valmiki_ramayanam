@@ -6,6 +6,7 @@ import * as fs from 'fs';
 // @ts-ignore
 import { take_input } from '~/tools/kry.server';
 import chalk from 'chalk';
+import rAmAyanam_map from '../ramayan_map.json';
 
 dotenv.config({
   path: '../../../.env.local'
@@ -18,6 +19,8 @@ const generate_summary = async (kANDa_number: number, sarga_number: number) => {
   const data: string[] = JSON.parse(
     fs.readFileSync(`../data/${kANDa_number}/${sarga_number}.json`, 'utf-8')
   );
+  const kanda_info = rAmAyanam_map[kANDa_number - 1];
+  const sarga_info = kanda_info.sarga_data[sarga_number - 1];
   const response = await generateObject({
     model: {
       'gpt-4o': openai_text_model('gpt-4o')
@@ -28,17 +31,26 @@ const generate_summary = async (kANDa_number: number, sarga_number: number) => {
         content:
           `I will be providing you with Sanskrit shlokas of Valmiki Ramayana for the sarga ${sarga_number} kanda ${kANDa_number}.` +
           `\nGenerate a summary synopsis in points of the sarga in English. Keep the summary consistent. ` +
-          `Use vocabulary which is generally used while translating Ramayana and other such Hindu religious (dharmic) texts to English.` +
+          `Use vocabulary which is generally used while translating Ramayana and other such Hindu religious (dharmic) texts to English.\n` +
+          `Also translate the sarga name ${sarga_info.name_normal} to English.` +
           `\n\n\n` +
           data.join('\n\n')
       }
     ],
     schema: z.object({
+      chapter_name_english: z.string().describe('Translated Chapter name in English'),
       summary_text: z.string()
     })
   });
   if (!fs.existsSync(`summaries/${kANDa_number}`)) fs.mkdirSync(`summaries/${kANDa_number}`);
-  fs.writeFileSync(`summaries/${kANDa_number}/${sarga_number}.md`, response.object.summary_text);
+  const { summary_text, chapter_name_english } = response.object;
+
+  fs.writeFileSync(
+    `summaries/${kANDa_number}/${sarga_number}.md`,
+    `## ${sarga_info.name_devanagari} (${sarga_info.name_normal})\n` +
+      `**Chapter Title** : ${chapter_name_english}` +
+      `\n\n${summary_text}`
+  );
   console.log(chalk.green(`Summary generated for sarga ${sarga_number}, kANDa ${kANDa_number}`));
 };
 
