@@ -75,8 +75,16 @@ const main = async () => {
     const sarga = z.coerce.number().int().array().parse(sarga_range);
     console.log(chalk.green.bold(`Generating summary for sarga ${sarga[0]} to ${sarga[1]}`));
     if (!(await confirm())) return;
-    for (let i = sarga[0]; i <= sarga[1]; i++) {
-      await generate_summary(kanda_number, i);
+    const BATCH_SIZE = 5;
+    for (let i = sarga[0]; i <= sarga[1]; i += BATCH_SIZE) {
+      const promises: Promise<void>[] = [];
+      const batchEnd = Math.min(i + BATCH_SIZE, sarga[1] + 1);
+
+      for (let j = i; j < batchEnd; j++) {
+        promises.push(generate_summary(kanda_number, j));
+      }
+
+      await Promise.allSettled(promises);
     }
   }
   console.log(chalk.green.bold(`Done !!`));
