@@ -53,7 +53,7 @@ const generate_summary = async (kANDa_number: number, sarga_number: number) => {
 
   fs.writeFileSync(
     `summaries/${kANDa_number}/${sarga_number}.md`,
-    `## ${sarga_info.name_devanagari} (${sarga_info.name_normal})\n` +
+    `### ${sarga_info.name_devanagari} (${sarga_info.name_normal})\n` +
       `**Chapter Title** : ${chapter_name_english}` +
       `\n\n${summary_text}`
   );
@@ -91,7 +91,7 @@ const generate_complete_list = (kanda_num: number) => {
     const file = fs.readFileSync(`summaries/${kanda_num}/${i}.md`, 'utf-8');
     const title_trans = file.split('\n')[1].split(' : ')[1].trim();
     const summary = file.split('\n').splice(3).join('\n');
-    o_file += `## ${i}. ${kanda_info.sarga_data[i - 1].name_devanagari.replaceAll('\n', ' ')} <small>(${title_trans})</small>\n${summary}\n\n------------------------------\n\n`;
+    o_file += `### ${i}. ${kanda_info.sarga_data[i - 1].name_devanagari.replaceAll('\n', ' ')} <small>(${title_trans})</small>\n${summary}\n\n------------------------------\n\n`;
   }
   fs.writeFileSync(`summaries/${kanda_num}.md`, o_file);
 };
@@ -135,3 +135,4 @@ const main = async () => {
 
 main();
 generate_readme();
+// Array.from({ length: 7 }).forEach((_, i) => generate_complete_list(i + 1));
