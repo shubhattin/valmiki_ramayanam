@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /_app/
+Disallow: /~partytown/
+Disallow: /img/
+Disallow: /manifest.json
+Crawl-delay: 2
+Sitemap: http://localhost:4173/sitemap.xml
