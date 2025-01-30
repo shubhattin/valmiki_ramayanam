@@ -65,13 +65,15 @@ const generate_readme = () => {
   for (let kanda = 1; kanda <= 7; kanda++) {
     const kanda_info = rAmAyanam_map[kanda - 1];
     const sarga_data = kanda_info.sarga_data;
-    const sarga_list = sarga_data
-      .map((sarga_info) => {
-        return `<li><a href="./${kanda}/${sarga_info.index}.md">${sarga_info.name_devanagari}</a></li>`;
-      })
-      .join('\n');
+    const sarga_list =
+      `<div><b><a href="./${kanda}.md">पूर्णम्<a/></b></div>\n` +
+      sarga_data
+        .map((sarga_info) => {
+          return `<li><a href="./${kanda}/${sarga_info.index}.md">${sarga_info.name_devanagari}</a></li>`;
+        })
+        .join('\n');
     readme += `<details>
-<summary><b>${kanda_info.name_devanagari}</b></summary>
+<summary><b>${kanda_info.name_devanagari.replaceAll('\n', ' ')}</b></summary>
 <ol>
 ${sarga_list}
 </ol>
@@ -80,6 +82,20 @@ ${sarga_list}
   }
   fs.writeFileSync('summaries/README.md', readme);
 };
+
+const generate_complete_list = (kanda_num: number) => {
+  const kanda_info = rAmAyanam_map[kanda_num - 1];
+  let o_file = '';
+  for (let i = 1; i <= kanda_info.sarga_data.length; i++) {
+    if (!fs.existsSync(`summaries/${kanda_num}/${i}.md`)) continue;
+    const file = fs.readFileSync(`summaries/${kanda_num}/${i}.md`, 'utf-8');
+    const title_trans = file.split('\n')[1].split(' : ')[1].trim();
+    const summary = file.split('\n').splice(3).join('\n');
+    o_file += `## ${i}. ${kanda_info.sarga_data[i - 1].name_devanagari.replaceAll('\n', ' ')} <small>(${title_trans})</small>\n${summary}\n\n------------------------------\n\n`;
+  }
+  fs.writeFileSync(`summaries/${kanda_num}.md`, o_file);
+};
+
 const main = async () => {
   const kanda_number = z.coerce
     .number()
@@ -96,6 +112,7 @@ const main = async () => {
     console.log(chalk.blue.bold(`Generating summary for sarga ${sarga}`));
     if (!(await confirm())) return;
     await generate_summary(kanda_number, sarga);
+    generate_complete_list(kanda_number);
   } else if (sarga_range.length == 2) {
     const sarga = z.coerce.number().int().array().parse(sarga_range);
     console.log(chalk.green.bold(`Generating summary for sarga ${sarga[0]} to ${sarga[1]}`));
@@ -111,6 +128,7 @@ const main = async () => {
 
       await Promise.allSettled(promises);
     }
+    generate_complete_list(kanda_number);
   }
   console.log(chalk.green.bold(`Done !!`));
 };
