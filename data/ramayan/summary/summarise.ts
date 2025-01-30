@@ -133,5 +133,5 @@ const main = async () => {
   console.log(chalk.green.bold(`Done !!`));
 };
 
-// main();
+main();
 generate_readme();
