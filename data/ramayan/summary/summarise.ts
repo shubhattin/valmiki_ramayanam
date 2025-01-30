@@ -45,9 +45,8 @@ const generate_summary = async (kANDa_number: number, sarga_number: number) => {
   if (!fs.existsSync(`summaries/${kANDa_number}`)) fs.mkdirSync(`summaries/${kANDa_number}`);
   const { summary_text, chapter_name_english } = response.object;
 
-  const prefixed_sarga_number = sarga_number.toString().padStart(2, '0');
   fs.writeFileSync(
-    `summaries/${kANDa_number}/${prefixed_sarga_number}.md`,
+    `summaries/${kANDa_number}/${sarga_number}.md`,
     `## ${sarga_info.name_devanagari} (${sarga_info.name_normal})\n` +
       `**Chapter Title** : ${chapter_name_english}` +
       `\n\n${summary_text}`
@@ -56,14 +55,24 @@ const generate_summary = async (kANDa_number: number, sarga_number: number) => {
 };
 
 const generate_readme = () => {
+  let readme = '';
   for (let kanda = 1; kanda <= 7; kanda++) {
     const kanda_info = rAmAyanam_map[kanda - 1];
     const sarga_data = kanda_info.sarga_data;
-    const readme_data = sarga_data.map((sarga_info, index) => {
-      const prefixed_sarga_number = index.toString().padStart(2, '0');
-      return `1. [${sarga_info.name_devanagari}](./${kanda}/${prefixed_sarga_number}.md)`;
-    });
+    const sarga_list = sarga_data
+      .map((sarga_info) => {
+        return `<li><a href="./${kanda}/${sarga_info.index}.md">${sarga_info.name_devanagari}</a></li>`;
+      })
+      .join('\n');
+    readme += `<details>
+<summary><b>${kanda_info.name_devanagari}</b></summary>
+<ol>
+${sarga_list}
+</ol>
+</details>
+`;
   }
+  fs.writeFileSync('summaries/README.md', readme);
 };
 const main = async () => {
   const kanda_number = z.coerce
@@ -101,3 +110,4 @@ const main = async () => {
 };
 
 main();
+generate_readme();
