@@ -30,8 +30,9 @@ const generate_summary = async (kANDa_number: number, sarga_number: number) => {
         role: 'user',
         content:
           `I will be providing you with Sanskrit shlokas of Valmiki Ramayana for the sarga ${sarga_number} kanda ${kANDa_number}.` +
-          `\nGenerate a summary synopsis in points of the sarga in English. Keep the summary consistent. ` +
-          `Use vocabulary which is generally used while translating Ramayana and other such Hindu religious (dharmic) texts to English.\n` +
+          `\nGenerate a 5 line summary(synopsis) of the sarga in English. Keep the summary consistent. ` +
+          `Use vocabulary which is generally used while translating Ramayana and other such Hindu religious (dharmic) texts to English.` +
+          `Keep the language simple, don’t use jargon.\n` +
           `Also translate the sarga name ${sarga_info.name_normal} to English.` +
           `\n\n\n` +
           data.join('\n\n')
