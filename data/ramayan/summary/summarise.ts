@@ -66,7 +66,7 @@ const generate_readme = () => {
     const kanda_info = rAmAyanam_map[kanda - 1];
     const sarga_data = kanda_info.sarga_data;
     const sarga_list =
-      `<div><b><a href="./${kanda}.md">पूर्णम्<a/></b></div>\n` +
+      `<h3><b><a href="./${kanda}.md">पूर्णम्<a/></b></h3>\n` +
       sarga_data
         .map((sarga_info) => {
           return `<li><a href="./${kanda}/${sarga_info.index}.md">${sarga_info.name_devanagari}</a></li>`;
@@ -133,5 +133,5 @@ const main = async () => {
   console.log(chalk.green.bold(`Done !!`));
 };
 
-main();
+// main();
 generate_readme();

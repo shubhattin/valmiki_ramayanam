@@ -1,7 +1,7 @@
 <details>
 <summary><b>बालकाण्डः</b></summary>
 <ol>
-<div><b><a href="./1.md">पूर्णम्<a/></b></div>
+<h3><b><a href="./1.md">पूर्णम्<a/></b></h3>
 <li><a href="./1/1.md">नारदवाक्यम्</a></li>
 <li><a href="./1/2.md">ब्रह्मागमनम्</a></li>
 <li><a href="./1/3.md">काव्यसङ्क्षेपः</a></li>
@@ -84,7 +84,7 @@
 <details>
 <summary><b>अयोध्याकाण्डः</b></summary>
 <ol>
-<div><b><a href="./2.md">पूर्णम्<a/></b></div>
+<h3><b><a href="./2.md">पूर्णम्<a/></b></h3>
 <li><a href="./2/1.md">रामाभिषेकव्यवसायः</a></li>
 <li><a href="./2/2.md">परिषदनुमोदनम्</a></li>
 <li><a href="./2/3.md">पुत्रानुशासनम्</a></li>
@@ -209,7 +209,7 @@
 <details>
 <summary><b>अरण्यकाण्डः</b></summary>
 <ol>
-<div><b><a href="./3.md">पूर्णम्<a/></b></div>
+<h3><b><a href="./3.md">पूर्णम्<a/></b></h3>
 <li><a href="./3/1.md">महर्षिसङ्गः</a></li>
 <li><a href="./3/2.md">विराधसंरोधः</a></li>
 <li><a href="./3/3.md">विराधप्रहारः</a></li>
@@ -290,7 +290,7 @@
 <details>
 <summary><b>किष्किन्धाकाण्डः</b></summary>
 <ol>
-<div><b><a href="./4.md">पूर्णम्<a/></b></div>
+<h3><b><a href="./4.md">पूर्णम्<a/></b></h3>
 <li><a href="./4/1.md">रामविप्रलम्भावेशः</a></li>
 <li><a href="./4/2.md">सुग्रीवमन्त्रः</a></li>
 <li><a href="./4/3.md">हनुमत्प्रेषणम्</a></li>
@@ -363,7 +363,7 @@
 <details>
 <summary><b>सुन्दरकाण्डः</b></summary>
 <ol>
-<div><b><a href="./5.md">पूर्णम्<a/></b></div>
+<h3><b><a href="./5.md">पूर्णम्<a/></b></h3>
 <li><a href="./5/1.md">सागरलङ्घनम्</a></li>
 <li><a href="./5/2.md">निशागमप्रतीक्षा</a></li>
 <li><a href="./5/3.md">लङ्काधिदेवताविजयः</a></li>
@@ -437,7 +437,7 @@
 <details>
 <summary><b>युद्धकाण्डः</b></summary>
 <ol>
-<div><b><a href="./6.md">पूर्णम्<a/></b></div>
+<h3><b><a href="./6.md">पूर्णम्<a/></b></h3>
 <li><a href="./6/1.md">हनूमत्प्रशंसनम्</a></li>
 <li><a href="./6/2.md">रामप्रोत्साहनम्</a></li>
 <li><a href="./6/3.md">लङ्कादुर्गादिकथनम्</a></li>
@@ -574,7 +574,7 @@
 <details>
 <summary><b>उत्तरकाण्डः</b></summary>
 <ol>
-<div><b><a href="./7.md">पूर्णम्<a/></b></div>
+<h3><b><a href="./7.md">पूर्णम्<a/></b></h3>
 <li><a href="./7/1.md">रामप्रश्नः</a></li>
 <li><a href="./7/2.md">पौलस्योत्पत्तिः</a></li>
 <li><a href="./7/3.md">वैश्रवणलोकपालपदलङ्कादिप्राप्तिः</a></li>
