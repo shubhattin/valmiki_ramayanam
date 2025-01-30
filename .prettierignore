@@ -24,3 +24,7 @@ data/ramayan/summary/summaries
 src/db/scripts/out/
 src/db/migrations/
 src/db/scripts/backup/
+
+static/~partytown
+static/sitemap.xml
+static/robots.txt
