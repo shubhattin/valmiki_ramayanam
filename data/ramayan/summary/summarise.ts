@@ -45,8 +45,9 @@ const generate_summary = async (kANDa_number: number, sarga_number: number) => {
   if (!fs.existsSync(`summaries/${kANDa_number}`)) fs.mkdirSync(`summaries/${kANDa_number}`);
   const { summary_text, chapter_name_english } = response.object;
 
+  const prefixed_sarga_number = sarga_number.toString().padStart(2, '0');
   fs.writeFileSync(
-    `summaries/${kANDa_number}/${sarga_number}.md`,
+    `summaries/${kANDa_number}/${prefixed_sarga_number}.md`,
     `## ${sarga_info.name_devanagari} (${sarga_info.name_normal})\n` +
       `**Chapter Title** : ${chapter_name_english}` +
       `\n\n${summary_text}`
