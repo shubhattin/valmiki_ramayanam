@@ -55,6 +55,16 @@ const generate_summary = async (kANDa_number: number, sarga_number: number) => {
   console.log(chalk.green(`Summary generated for sarga ${sarga_number}, kANDa ${kANDa_number}`));
 };
 
+const generate_readme = () => {
+  for (let kanda = 1; kanda <= 7; kanda++) {
+    const kanda_info = rAmAyanam_map[kanda - 1];
+    const sarga_data = kanda_info.sarga_data;
+    const readme_data = sarga_data.map((sarga_info, index) => {
+      const prefixed_sarga_number = index.toString().padStart(2, '0');
+      return `1. [${sarga_info.name_devanagari}](./${kanda}/${prefixed_sarga_number}.md)`;
+    });
+  }
+};
 const main = async () => {
   const kanda_number = z.coerce
     .number()
