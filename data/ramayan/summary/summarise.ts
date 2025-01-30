@@ -75,7 +75,7 @@ const main = async () => {
     const sarga = z.coerce.number().int().array().parse(sarga_range);
     console.log(chalk.green.bold(`Generating summary for sarga ${sarga[0]} to ${sarga[1]}`));
     if (!(await confirm())) return;
-    const BATCH_SIZE = 5;
+    const BATCH_SIZE = 8;
     for (let i = sarga[0]; i <= sarga[1]; i += BATCH_SIZE) {
       const promises: Promise<void>[] = [];
       const batchEnd = Math.min(i + BATCH_SIZE, sarga[1] + 1);
