@@ -8,16 +8,9 @@ const config = {
   preprocess: vitePreprocess(),
 
   kit: {
-    adapter:
-      process.env.BUILD_MODE === 'node'
-        ? adapter_node()
-        : process.env.BUILD_MODE === 'vercel'
-          ? adapter_vercel({
-              regions: ['sin1']
-            })
-          : adapter_netlify({
-              edge: true
-            }),
+    adapter: adapter_netlify({
+      edge: true
+    }),
     alias: {
       '~': 'src',
       '@data': './data'
