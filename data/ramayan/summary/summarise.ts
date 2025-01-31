@@ -7,6 +7,9 @@ import * as fs from 'fs';
 import { take_input } from '~/tools/kry.server';
 import chalk from 'chalk';
 import rAmAyanam_map from '../ramayan_map.json';
+import yaml from 'js-yaml';
+import { type CoreMessage } from 'ai';
+import { format_string_text } from '../../../src/tools/kry';
 
 dotenv.config({
   path: '../../../.env.local'
@@ -21,28 +24,18 @@ const generate_summary = async (kANDa_number: number, sarga_number: number) => {
   );
   const kanda_info = rAmAyanam_map[kANDa_number - 1];
   const sarga_info = kanda_info.sarga_data[sarga_number - 1];
+  let messages = yaml.load(fs.readFileSync(`./summary_prompt.yaml`, 'utf-8')) as CoreMessage[];
+  messages[0].content = format_string_text(messages[0].content as string, {
+    text: data.join('\n\n'),
+    kANDa_number,
+    sarga_number,
+    sarga_name_devangari: sarga_info.name_devanagari
+  });
   const response = await generateObject({
     model: {
       'gpt-4o': openai_text_model('gpt-4o')
     }['gpt-4o'],
-    messages: [
-      {
-        role: 'user',
-        // content:
-        //   `I will be providing you with Sanskrit shlokas of Valmiki Ramayana for the sarga ${sarga_number} kanda ${kANDa_number}.` +
-        //   `\nGenerate a 5 line summary(synopsis) of the sarga in English. Keep the summary consistent. ` +
-        //   `Use vocabulary which is generally used while translating Ramayana and other such Hindu religious (dharmic) texts to English.` +
-        //   `Keep the language simple, don’t use jargon.\n` +
-        content:
-          `I will be providing you with Sanskrit shlokas of Valmiki Ramayana for the sarga ${sarga_number} kanda ${kANDa_number}.` +
-          `Generate a summary of the entire sarga within 7 simple sentences. Cover all key aspects of the story.` +
-          `Keep the sentences short and simple. Do not use jargon.` +
-          `Give a short English title to the events of this sarga.` +
-          `Also translate the sarga name ${sarga_info.name_normal} to English.` +
-          `\n\n\n` +
-          data.join('\n\n')
-      }
-    ],
+    messages,
     schema: z.object({
       chapter_name_english: z.string().describe('Translated Chapter name in English'),
       summary_text: z.string()

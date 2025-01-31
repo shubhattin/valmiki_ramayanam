@@ -1,0 +1,10 @@
+- role: user
+  content: >
+    I will be providing you with Sanskrit shlokas of Valmiki Ramayana for the sarga {sarga_number} kanda {kANDa_number}.
+    Generate a summary of the entire sarga within 7 simple sentences. Cover all key aspects of the story.
+    Keep the sentences short and simple. Do not use jargon. Give a short English title to the events of this sarga.
+    Translate the sarga name {sarga_name_devangari} to English.
+
+
+
+    {text}
