@@ -65,7 +65,7 @@
     "@skeletonlabs/tw-plugin": "^0.4.1",
     "@tailwindcss/forms": "^0.5.10",
     "@tanstack/svelte-query": "^5.66.0",
-    "@trigger.dev/sdk": "3.3.6",
+    "@trigger.dev/sdk": "^3.3.12",
     "@trpc/client": "^10.45.2",
     "@trpc/server": "^10.45.2",
     "@types/ms": "^0.7.34",
