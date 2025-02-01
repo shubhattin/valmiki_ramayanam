@@ -96,7 +96,10 @@
     placement: 'left-start'
   }}
 >
-  <Icon class="hover:text-gray-6200 text-3xl dark:hover:text-gray-400" src={VscAccount} />
+  <Icon
+    class="text-2xl hover:text-gray-600 sm:text-3xl dark:hover:text-gray-400"
+    src={VscAccount}
+  />
 </button>
 <div class="card z-40 px-1 py-2 shadow-2xl" data-popup="user_info">
   {#if $user_info}
@@ -123,7 +126,7 @@
         <button
           disabled={$editing_status_on}
           onclick={log_out}
-          class="variant-filled-error btn m-0 rounded-md pb-1 pl-1 pr-2 pt-0 font-bold"
+          class="variant-filled-error btn m-0 rounded-md pb-1 pl-1 pr-2 pt-0 text-sm font-bold sm:text-base"
         >
           <Icon class="text-2xl" src={BiLogOut} />
           <span>Logout</span>
@@ -132,7 +135,7 @@
       <button
         disabled={$editing_status_on}
         onclick={() => ($update_password_modal_status = true)}
-        class="btn m-0 rounded-md bg-secondary-800 pb-1 pl-1 pr-2 pt-0 font-bold text-white dark:bg-secondary-700"
+        class="btn m-0 rounded-md bg-secondary-800 pb-1 pl-1 pr-2 pt-0 text-sm font-bold text-white sm:text-base dark:bg-secondary-700"
       >
         <Icon class="text-2xl" src={BiLock} />
         <span>Update Password</span>

@@ -126,9 +126,9 @@
     target: 'sarga_options',
     placement: 'bottom'
   }}
-  class="btn m-0 rounded-full p-[0.05rem] ring-2 ring-zinc-500 dark:ring-zinc-300"
+  class="btn m-0 rounded-full p-[0.035rem] ring-2 ring-zinc-500 sm:p-[0.05rem] dark:ring-zinc-300"
 >
-  <Icon class="text-2xl" src={BsThreeDots} />
+  <Icon class="mx-[0.17rem] text-lg sm:mx-0 sm:text-2xl" src={BsThreeDots} />
 </button>
 <div class="card z-50 space-y-1 rounded-lg px-1 py-1 shadow-xl" data-popup="sarga_options">
   <button

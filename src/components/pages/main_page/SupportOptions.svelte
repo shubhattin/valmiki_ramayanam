@@ -1,7 +1,6 @@
 <script lang="ts">
   import { PatreonIcon, PayPalIcon, RazorpayIcon, UPIIcon, YoutubeIcon } from '~/components/icons';
   import Icon from '~/tools/Icon.svelte';
-  import QRCode from 'qrcode';
   import { onMount } from 'svelte';
   import ImageSpan from '~/components/ImageSpan.svelte';
 
@@ -16,13 +15,15 @@
   const CANVAS_SIZE = $state(146);
 
   onMount(() => {
-    QRCode.toCanvas(qr_canvas!, UPI_ID_LINK, {
-      width: CANVAS_SIZE,
-      margin: 1.2,
-      color: {
-        dark: darkColor,
-        light: lightColor
-      }
+    import('qrcode').then((qrcode) => {
+      qrcode.default.toCanvas(qr_canvas!, UPI_ID_LINK, {
+        width: CANVAS_SIZE,
+        margin: 1.2,
+        color: {
+          dark: darkColor,
+          light: lightColor
+        }
+      });
     });
   });
 </script>
