@@ -11,7 +11,7 @@ export const translation_out_schema = z
     'This object will contain the translated text and the index of the shloka to be generated.'
   );
 
-export const text_models_enum = z.enum(['gpt-4o', 'claude-3.5-sonnet']);
+export const text_models_enum = z.enum(['gpt-4o', 'claude-3.5-sonnet', 'o3-mini']);
 
 export const sarga_translate_schema = {
   input: z.object({

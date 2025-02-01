@@ -321,7 +321,7 @@
     Generate Image Prompt
   </button>
   <select
-    class="select ml-3 inline-block w-28 px-1 py-1 text-xs outline-none"
+    class="select ml-3 inline-block w-20 px-1 py-1 text-xs outline-none"
     bind:value={selected_text_model}
     title={TEXT_MODEL_LIST[selected_text_model][1]}
   >

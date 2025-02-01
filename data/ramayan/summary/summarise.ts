@@ -32,9 +32,7 @@ const generate_summary = async (kANDa_number: number, sarga_number: number) => {
     sarga_name_devangari: sarga_info.name_devanagari
   });
   const response = await generateObject({
-    model: {
-      'gpt-4o': openai_text_model('gpt-4o')
-    }['gpt-4o'],
+    model: openai_text_model('gpt-4o'),
     messages,
     schema: z.object({
       chapter_name_english: z.string().describe('Translated Chapter name in English'),

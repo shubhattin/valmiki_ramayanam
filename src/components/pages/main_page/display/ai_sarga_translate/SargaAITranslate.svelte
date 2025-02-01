@@ -48,7 +48,7 @@
     }
   });
 
-  let selected_model: keyof typeof TEXT_MODEL_LIST = $state('gpt-4o');
+  let selected_model: keyof typeof TEXT_MODEL_LIST = $state('o3-mini');
 
   const translate_sarga_mut = createMutation({
     mutationFn: async (
@@ -161,7 +161,7 @@
     Translate Sarga with AI
   </button>
   <select
-    class="select ml-3 inline-block w-28 px-1 py-1 text-xs outline-none"
+    class="select ml-3 inline-block w-20 px-1 py-1 text-xs outline-none"
     bind:value={selected_model}
     title={TEXT_MODEL_LIST[selected_model][1]}
   >

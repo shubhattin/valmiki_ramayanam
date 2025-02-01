@@ -18,8 +18,9 @@ export const translate_sarga = task({
     try {
       const response = await generateObject({
         model: {
-          'gpt-4o': openai_text_model('gpt-4o'),
-          'claude-3.5-sonnet': anthropic_text_model('claude-3-5-sonnet-latest')
+          'gpt-4o': openai_text_model('o3-mini'),
+          'claude-3.5-sonnet': anthropic_text_model('claude-3-5-sonnet-latest'),
+          'o3-mini': openai_text_model('o3-mini')
         }[model],
         messages,
         output: 'array',
