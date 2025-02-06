@@ -12,7 +12,6 @@
   import { pwa_event_triggerer, pwa_install_event_fired } from '~/state/main';
   import { OiDownload24 } from 'svelte-icons-pack/oi';
   import Modal from './Modal.svelte';
-  import SupportOptions from './pages/main_page/SupportOptions.svelte';
 
   type Props = {
     start?: import('svelte').Snippet;
@@ -31,6 +30,8 @@
     placement: 'left-end',
     closeQuery: '.will-close'
   };
+
+  const preload_component = () => import('~/components/pages/main_page/SupportOptions.svelte');
 </script>
 
 <AppBar>
@@ -62,6 +63,8 @@
       onclick={() => {
         support_modal_status = true;
       }}
+      onmouseover={preload_component}
+      onfocus={preload_component}
       class="btn m-0 select-none rounded-md px-1 py-1 font-semibold outline-none hover:bg-gray-200 sm:px-2 dark:hover:bg-gray-700"
     >
       <Icon src={ContributeIcon} class="text-3xl" />
@@ -145,5 +148,7 @@
 </AppBar>
 
 <Modal bind:modal_open={support_modal_status}>
-  <SupportOptions />
+  {#await preload_component() then SupportOptions}
+    <SupportOptions.default />
+  {/await}
 </Modal>

@@ -1,7 +1,14 @@
 <script lang="ts">
-  import { PatreonIcon, PayPalIcon, RazorpayIcon, UPIIcon, YoutubeIcon } from '~/components/icons';
+  import {
+    PatreonIcon,
+    PayPalIcon,
+    RazorpayIcon,
+    tsc_icon_24_base64,
+    UPIIcon,
+    YoutubeIcon
+  } from '~/components/icons';
   import Icon from '~/tools/Icon.svelte';
-  import QRCode from 'qrcode';
+  import { toCanvas as QRCodeToCanvas } from 'qrcode';
   import { onMount } from 'svelte';
   import ImageSpan from '~/components/ImageSpan.svelte';
 
@@ -16,7 +23,7 @@
   const CANVAS_SIZE = $state(146);
 
   onMount(() => {
-    QRCode.toCanvas(qr_canvas!, UPI_ID_LINK, {
+    QRCodeToCanvas(qr_canvas!, UPI_ID_LINK, {
       width: CANVAS_SIZE,
       margin: 1.2,
       color: {
@@ -35,7 +42,12 @@
 <div class="text-sm font-semibold underline">One-Time Contributions :</div>
 <div class="mt-2">
   <div class="flex justify-center text-center text-sm">
-    <a href={UPI_ID_LINK} target="_blank" class="ml-1 select-none" rel="noopener noreferrer">
+    <a
+      href={UPI_ID_LINK}
+      target="_blank"
+      class="ml-1 select-none outline-none"
+      rel="noopener noreferrer"
+    >
       <Icon src={UPIIcon} class="-mt-1.5 text-3xl" /> UPI :
       <span
         class="text-sm text-blue-600 outline-none hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
@@ -54,7 +66,10 @@
       style="width: {CANVAS_SIZE}px; height: {CANVAS_SIZE}px;"
       class="absolute flex items-center justify-center"
     >
-      <ImageSpan src="/img/tcs_64.png" class="h-10 w-10 rounded-full bg-white p-1 shadow-md" />
+      <ImageSpan
+        src={`data:image/png;base64,${tsc_icon_24_base64}`}
+        class="h-10 w-10 rounded-full bg-white p-1 shadow-md"
+      />
     </div>
   </div>
   <div class="mt-0 space-y-1">
