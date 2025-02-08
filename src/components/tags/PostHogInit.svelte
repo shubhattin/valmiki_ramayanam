@@ -1,6 +1,5 @@
-<script>
+<script lang="ts">
   import { onMount } from 'svelte';
-  import { pwa_state } from '~/state/main.svelte';
   import { browser } from '$app/environment';
 
   onMount(() => {
