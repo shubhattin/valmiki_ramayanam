@@ -5,8 +5,7 @@
   import TopAppBar from '~/components/TopAppBar.svelte';
   import { initializeStores, Modal, storePopup } from '@skeletonlabs/skeleton';
   import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
-  import PartyTown from '~/components/tags/PartyTown.svelte';
-  import GA from '~/components/tags/GA.svelte';
+  import PostHogInit from '~/components/tags/PostHogInit.svelte';
   import { QueryClientProvider } from '@tanstack/svelte-query';
   import { SvelteQueryDevtools } from '@tanstack/svelte-query-devtools';
   import { queryClient } from '~/state/query';
@@ -46,5 +45,4 @@
   </div>
   <SvelteQueryDevtools initialIsOpen={false} />
 </QueryClientProvider>
-<PartyTown />
-<GA />
+<PostHogInit />

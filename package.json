@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vite dev --host",
-    "build": "partytown copylib static/~partytown --no-debug && vite build && rm -rf build/sample_ai_img",
+    "build": "vite build && rm -rf build/sample_ai_img",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
@@ -57,7 +57,6 @@
   "dependencies": {
     "@ai-sdk/anthropic": "^1.1.6",
     "@ai-sdk/openai": "^1.1.9",
-    "@builder.io/partytown": "^0.10.3",
     "@floating-ui/dom": "^1.6.13",
     "@fontsource/roboto": "^5.1.1",
     "@neondatabase/serverless": "^0.9.5",
@@ -86,6 +85,7 @@
     "openai": "^4.82.0",
     "postcss": "^8.5.1",
     "postcss-load-config": "^6.0.1",
+    "posthog-js": "^1.215.6",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "pretty-ms": "^9.2.0",
     "qrcode": "^1.5.4",
