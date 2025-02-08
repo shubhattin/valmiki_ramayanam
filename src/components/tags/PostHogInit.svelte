@@ -11,7 +11,7 @@
     ) {
       import('posthog-js').then((posthog) => {
         posthog.default.init(import.meta.env.VITE_POSTHOG_ID, {
-          api_host: `${import.meta.env.VITE_SITE_URL}/ingest`,
+          // api_host: `${import.meta.env.VITE_SITE_URL}/ingest`,
           person_profiles: 'identified_only',
           ui_host: 'https://us.posthog.com'
         });
