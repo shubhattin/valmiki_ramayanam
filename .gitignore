@@ -46,8 +46,8 @@ rAmAyaNam.zip
 
 static/~partytown
 src/components/pages/main_page/local_config.yaml
-# static/robots.txt
-# static/sitemap.xml
+static/robots.txt
+static/sitemap.xml
 
 
 temp
