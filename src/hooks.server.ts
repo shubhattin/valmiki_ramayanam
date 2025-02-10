@@ -29,26 +29,30 @@ export const handle: Handle = async ({ event, resolve }) => {
       event.locals.user = payload.user;
     }
   } catch {}
-  // Handle static assets redirect
   if (event.url.pathname.startsWith('/ingest')) {
-    const ASSET_HOST = 'https://us-assets.i.posthog.com';
-    const API_HOST = 'https://us.i.posthog.com';
-    const hostname = event.url.pathname.startsWith('/ingest/static/') ? ASSET_HOST : API_HOST;
-
-    // Create new URL for proxying
-    const newUrl = new URL(event.url);
-    newUrl.protocol = 'https';
-    newUrl.hostname = hostname;
-    newUrl.port = '443';
-    newUrl.pathname = event.url.pathname.replace(/^\/ingest/, '');
-
-    // Forward the original headers
-    const headers = new Headers(event.request.headers);
-    headers.set('host', hostname);
-
     try {
+      const ASSET_HOST = 'us-assets.i.posthog.com';
+      const API_HOST = 'us.i.posthog.com';
+      const hostname = event.url.pathname.startsWith('/ingest/static/') ? ASSET_HOST : API_HOST;
+
+      // Get the original URL components
+      const originalUrl = new URL(event.request.url);
+
+      // Construct the new URL properly
+      const newUrl = new URL(
+        `https://${hostname}${event.url.pathname.replace(/^\/ingest/, '')}${originalUrl.search}`
+      );
+
+      // Forward the original headers
+      const headers = new Headers(event.request.headers);
+      headers.set('host', hostname);
+
+      // Remove any problematic headers
+      headers.delete('connection');
+      headers.delete('content-length');
+
       // Proxy the request
-      const response = await fetch(newUrl, {
+      const response = await fetch(newUrl.toString(), {
         method: event.request.method,
         headers,
         body:
@@ -63,9 +67,14 @@ export const handle: Handle = async ({ event, resolve }) => {
         statusText: response.statusText,
         headers: response.headers
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Proxy error:', error);
-      return new Response('Proxy error', { status: 500 });
+      return new Response(`Proxy error: ${error.message}`, {
+        status: 500,
+        headers: {
+          'Content-Type': 'text/plain'
+        }
+      });
     }
   }
   if (event.url.pathname.startsWith('/trpc')) {
