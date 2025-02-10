@@ -3,6 +3,7 @@ import { resolve } from 'path';
 import { SitemapStream, streamToPromise } from 'sitemap';
 import { Readable } from 'stream';
 import type { PluginOption } from 'vite';
+import * as fs from 'fs';
 // @ts-ignore
 import robotstxt from 'generate-robotstxt';
 
@@ -13,7 +14,7 @@ const make_robots_txt = async () => {
     policy: [
       {
         userAgent: '*',
-        disallow: ['/_app/', '/~partytown/', '/img/', '/manifest.json'],
+        disallow: ['/_app/', '/img/', '/manifest.json'],
         crawlDelay: 2
       }
     ],
@@ -41,6 +42,16 @@ export function generateRobotsTxtSitemap() {
     name: 'generate-robots-txt-sitemap-xml',
     async buildStart() {
       await Promise.all([make_robots_txt(), make_sitemap()]);
+    },
+    async closeBundle() {
+      // Update the manifest to exclude robots.txt and sitemap.xml from edge functions
+      const manifest_path = '.netlify/edge-functions/manifest.json';
+      const manifest = JSON.parse(fs.readFileSync(manifest_path, 'utf-8'));
+      for (let to_add of ['robots.txt', 'sitemap.xml']) {
+        if (!manifest.functions[0].excludedPath.includes(`/${to_add}`))
+          manifest.functions[0].excludedPath.push(`/${to_add}`);
+      }
+      writeFileSync(manifest_path, JSON.stringify(manifest));
     }
   } as PluginOption;
 }
