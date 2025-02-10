@@ -4,14 +4,14 @@
 
   onMount(() => {
     if (
+      browser &&
       import.meta.env.PROD &&
-      import.meta.env.VITE_POSTHOG_ID &&
-      import.meta.env.VITE_SITE_URL &&
-      browser
+      import.meta.env.VITE_POSTHOG_KEY &&
+      import.meta.env.VITE_POSTHOG_URL
     ) {
       import('posthog-js').then((posthog) => {
-        posthog.default.init(import.meta.env.VITE_POSTHOG_ID, {
-          api_host: `${import.meta.env.VITE_SITE_URL}/ingest`,
+        posthog.default.init(import.meta.env.VITE_POSTHOG_KEY, {
+          api_host: `${import.meta.env.VITE_POSTHOG_URL}/ingest`,
           person_profiles: 'identified_only',
           ui_host: 'https://us.posthog.com'
         });
