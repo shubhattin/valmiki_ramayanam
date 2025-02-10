@@ -29,26 +29,44 @@ export const handle: Handle = async ({ event, resolve }) => {
       event.locals.user = payload.user;
     }
   } catch {}
-
-  const pathname = event.url.pathname;
   // Handle static assets redirect
-  if (pathname.startsWith('/ingest/static/')) {
-    const splat = pathname.replace('/ingest/static/', '');
-    return new Response(null, {
-      status: 200,
-      headers: {
-        Location: `https://us-assets.i.posthog.com/static/${splat}`
-      }
-    });
-  }
-  if (pathname.startsWith('/ingest/')) {
-    const splat = pathname.replace('/ingest/', '');
-    return new Response(null, {
-      status: 200,
-      headers: {
-        Location: `https://us.i.posthog.com/${splat}`
-      }
-    });
+  if (event.url.pathname.startsWith('/ingest')) {
+    const ASSET_HOST = 'https://us-assets.i.posthog.com';
+    const API_HOST = 'https://us.i.posthog.com';
+    const hostname = event.url.pathname.startsWith('/ingest/static/') ? ASSET_HOST : API_HOST;
+
+    // Create new URL for proxying
+    const newUrl = new URL(event.url);
+    newUrl.protocol = 'https';
+    newUrl.hostname = hostname;
+    newUrl.port = '443';
+    newUrl.pathname = event.url.pathname.replace(/^\/ingest/, '');
+
+    // Forward the original headers
+    const headers = new Headers(event.request.headers);
+    headers.set('host', hostname);
+
+    try {
+      // Proxy the request
+      const response = await fetch(newUrl, {
+        method: event.request.method,
+        headers,
+        body:
+          event.request.method !== 'GET' && event.request.method !== 'HEAD'
+            ? await event.request.blob()
+            : undefined
+      });
+
+      // Return the proxied response
+      return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: response.headers
+      });
+    } catch (error) {
+      console.error('Proxy error:', error);
+      return new Response('Proxy error', { status: 500 });
+    }
   }
   if (event.url.pathname.startsWith('/trpc')) {
     return handle_trpc({ event, resolve });
