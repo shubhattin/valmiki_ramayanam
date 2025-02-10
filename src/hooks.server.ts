@@ -29,6 +29,27 @@ export const handle: Handle = async ({ event, resolve }) => {
       event.locals.user = payload.user;
     }
   } catch {}
+
+  const pathname = event.url.pathname;
+  // Handle static assets redirect
+  if (pathname.startsWith('/ingest/static/')) {
+    const splat = pathname.replace('/ingest/static/', '');
+    return new Response(null, {
+      status: 200,
+      headers: {
+        Location: `https://us-assets.i.posthog.com/static/${splat}`
+      }
+    });
+  }
+  if (pathname.startsWith('/ingest/')) {
+    const splat = pathname.replace('/ingest/', '');
+    return new Response(null, {
+      status: 200,
+      headers: {
+        Location: `https://us.i.posthog.com/${splat}`
+      }
+    });
+  }
   if (event.url.pathname.startsWith('/trpc')) {
     return handle_trpc({ event, resolve });
   }
