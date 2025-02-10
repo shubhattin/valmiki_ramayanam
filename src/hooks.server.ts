@@ -34,8 +34,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     // p => q
     (!(import.meta.env.VITE_SITE_URL && import.meta.env.VITE_POSTHOG_URL) ||
       import.meta.env.VITE_SITE_URL === import.meta.env.VITE_POSTHOG_URL) &&
-    event.url.pathname.startsWith('/ingest') &&
-    event.request.method === 'GET'
+    event.url.pathname.startsWith('/ingest')
   )
     return await handle_posthog_proxy(event);
   if (event.url.pathname.startsWith('/trpc')) return await handle_trpc({ event, resolve });
