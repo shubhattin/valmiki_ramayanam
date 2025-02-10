@@ -43,7 +43,7 @@ export function generateRobotsTxtSitemap() {
     async buildStart() {
       await Promise.all([make_robots_txt(), make_sitemap()]);
     },
-    async closeBundle() {
+    buildEnd() {
       // Update the manifest to exclude robots.txt and sitemap.xml from edge functions
       const manifest_path = '.netlify/edge-functions/manifest.json';
       const manifest = JSON.parse(fs.readFileSync(manifest_path, 'utf-8'));
