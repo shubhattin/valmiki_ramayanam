@@ -12,6 +12,7 @@
   import { pwa_event_triggerer, pwa_install_event_fired } from '~/state/main';
   import { OiDownload24 } from 'svelte-icons-pack/oi';
   import Modal from './Modal.svelte';
+  import { BiArrowBack } from 'svelte-icons-pack/bi';
 
   type Props = {
     start?: import('svelte').Snippet;
@@ -37,14 +38,14 @@
 <AppBar>
   {#snippet lead()}
     {@render start?.()}
-    <!-- {#if page_url !== '/'}
-        <a class="mr-2 text-xl" href="/" title="श्रीरामायणम्">
-          <Icon
-            src={BiArrowBack}
-            class="-mt-1 mr-1 text-2xl hover:fill-blue-600 dark:hover:fill-sky-500"
-          />
-        </a>
-      {/if} -->
+    {#if route_id !== '/(main)/[[kANDa]]/[[sarga]]'}
+      <a class="mr-2 text-xl" href="/" title="श्रीरामायणम्">
+        <Icon
+          src={BiArrowBack}
+          class="-mt-1 mr-1 text-2xl hover:fill-blue-600 dark:hover:fill-sky-500"
+        />
+      </a>
+    {/if}
     {@render headline?.()}
     {#if route_id in PAGE_TITLES}
       <span class={PAGE_TITLES[route_id as keyof typeof PAGE_TITLES][1]}>
