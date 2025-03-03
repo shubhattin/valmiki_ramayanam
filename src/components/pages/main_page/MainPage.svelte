@@ -7,13 +7,11 @@
   import { LANG_LIST, SCRIPT_LIST, type script_list_type } from '~/tools/lang_list';
   import { load_parivartak_lang_data, lipi_parivartak, get_sa_mode } from '~/tools/converter';
   import { LanguageIcon } from '~/components/icons';
-  import { ensure_auth_access_status, get_id_token_info } from '~/tools/auth_tools';
   import { browser } from '$app/environment';
   import SargaDisplay from './display/SargaDisplay.svelte';
   import { BiEdit, BiHelpCircle } from 'svelte-icons-pack/bi';
   import { scale, slide } from 'svelte/transition';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
-  import { user_info } from '~/state/main_page/user';
   import { goto } from '$app/navigation';
   import Select from '~/components/Select.svelte';
   import { z } from 'zod';
@@ -32,7 +30,6 @@
     image_tool_opened,
     ai_tool_opened
   } from '~/state/main_page/main_state';
-  import { user_allowed_langs } from '~/state/main_page/user';
   import { SlideToggle } from '@skeletonlabs/skeleton';
   import { BsKeyboard } from 'svelte-icons-pack/bs';
   import User from './user/User.svelte';
@@ -40,15 +37,16 @@
   import { rAmAyaNam_map, get_kANDa_names, get_sarga_names } from '~/state/main_page/data';
   import MetaTags from '~/components/tags/MetaTags.svelte';
   import { loadLocalConfig } from './load_local_config';
+  import { useSession } from '~/lib/auth-clinet';
+  import { user_verified_info } from '~/state/main_page/user.svelte';
 
   const query_client = useQueryClient();
 
+  const session = useSession();
+  let user_info = $derived($session.data?.user);
+
   let mounted = $state(false);
   onMount(async () => {
-    if (browser) await ensure_auth_access_status();
-    try {
-      $user_info = get_id_token_info().user;
-    } catch {}
     if (import.meta.env.DEV) {
       (async () => {
         const conf = await loadLocalConfig();
@@ -316,7 +314,7 @@
           <Icon class="-mt-1 ml-1 text-xl" src={TiArrowForwardOutline} />
         </button>
       {/if}
-      {#if !($ai_tool_opened && $user_info && $user_info.user_type === 'admin')}
+      {#if !($ai_tool_opened && user_info && user_info.role === 'admin')}
         {#if !$view_translation_status}
           <button
             onclick={() => {
@@ -345,8 +343,9 @@
                 {/each}
               </select>
             </label>
-            {#if !$editing_status_on && $user_allowed_langs.isSuccess && $user_info}
-              {#if $trans_lang !== '--' && ($user_info!.user_type === 'admin' || $user_allowed_langs.data.indexOf($trans_lang) !== -1)}
+            {#if !$editing_status_on && $user_verified_info.isSuccess && user_info && $user_verified_info.data.is_approved}
+              {@const languages = $user_verified_info.data.langugaes.map((l) => l.lang_name)}
+              {#if $trans_lang !== '--' && (user_info.role === 'admin' || languages.indexOf($trans_lang) !== -1)}
                 <button
                   onclick={() => ($editing_status_on = true)}
                   class="btn my-1 inline-block rounded-lg bg-tertiary-700 px-1 py-1 text-sm font-bold text-white sm:px-2 sm:text-base dark:bg-tertiary-600"
@@ -354,7 +353,7 @@
                   <Icon src={BiEdit} class="mr-1 text-xl sm:text-2xl" />
                   Edit
                 </button>
-              {:else if $trans_lang === '--' && ($user_info!.user_type === 'admin' || $user_allowed_langs.data.indexOf('English') !== -1)}
+              {:else if $trans_lang === '--' && (user_info.role === 'admin' || languages.indexOf('English') !== -1)}
                 <button
                   onclick={() => ($editing_status_on = true)}
                   class="btn my-1 inline-block rounded-lg bg-tertiary-700 px-1 py-1 text-sm font-bold text-white sm:px-2 sm:text-base dark:bg-tertiary-600"
@@ -369,7 +368,7 @@
       {/if}
     </div>
     <!-- !== --, as we dont need it for english -->
-    {#if $trans_lang !== '--' && $editing_status_on && !($ai_tool_opened && $user_info && $user_info.user_type === 'admin')}
+    {#if $trans_lang !== '--' && $editing_status_on && !($ai_tool_opened && user_info && user_info.role === 'admin')}
       <div class="flex space-x-4">
         <SlideToggle
           name="edit_lang"
@@ -405,7 +404,7 @@
     {/if}
     {#if !$ai_tool_opened}
       <SargaDisplay />
-    {:else if $user_info && $user_info.user_type === 'admin'}
+    {:else if user_info && user_info.role === 'admin'}
       {#await import('./ai_image_tool/AIImageGenerator.svelte') then AIImageGenerator}
         <AIImageGenerator.default />
       {/await}

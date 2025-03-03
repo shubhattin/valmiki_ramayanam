@@ -16,7 +16,8 @@ import {
   trans_lang,
   view_translation_status
 } from './main_state';
-import { user_allowed_langs, user_info } from './user';
+import { user_verified_info } from './user.svelte';
+import { useSession } from '~/lib/auth-clinet';
 
 export { rAmAyaNam_map };
 export const QUERY_KEYS = {
@@ -137,11 +138,13 @@ export async function get_translations(kanda: number, sarga: number, lang: strin
 }
 
 export let english_edit_status = derived(
-  [trans_lang, user_info, user_allowed_langs],
-  ([$trans_lang, $user_info, $user_allowed_langs]) =>
+  [trans_lang, user_verified_info],
+  ([$trans_lang, $user_verified_info]) =>
     $trans_lang === '--' &&
-    (($user_info && $user_info.user_type === 'admin') ||
-      ($user_allowed_langs.isSuccess && $user_allowed_langs.data.includes('English')))
+    (useSession().get().data?.user.role === 'admin' ||
+      ($user_verified_info.isSuccess &&
+        $user_verified_info.data.is_approved &&
+        $user_verified_info.data.langugaes.map((l) => l.lang_name).includes('English')))
 );
 
 export let bulk_text_edit_status = writable(false);

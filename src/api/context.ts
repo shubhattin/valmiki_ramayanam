@@ -1,33 +1,56 @@
-import { UsersSchemaZod } from '~/db/schema_zod';
-import { jwtVerify } from 'jose';
-import { JWT_SECRET } from '~/tools/jwt.server';
 import type { RequestEvent } from '@sveltejs/kit';
 import type { inferAsyncReturnType } from '@trpc/server';
 import { z } from 'zod';
+import ky from 'ky';
+import { PUBLIC_BETTER_AUTH_URL } from '$env/static/public';
 
-const access_token_payload_schema = z.object({
-  user: UsersSchemaZod.pick({
-    id: true,
-    user_type: true
+const sessionSchema = z.object({
+  session: z.object({
+    ipAddress: z.string(),
+    userAgent: z.string(),
+    expiresAt: z.string(),
+    userId: z.string(),
+    token: z.string(),
+    createdAt: z.string(),
+    updatedAt: z.string()
   }),
-  type: z.literal('api')
+  user: z.object({
+    id: z.string(),
+    name: z.string(),
+    email: z.string(),
+    emailVerified: z.boolean(),
+    image: z.string().nullable(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    role: z.string().nullable(),
+    banned: z.string().nullable(),
+    banReason: z.string().nullable(),
+    banExpires: z.string().nullable()
+  })
 });
 
-export async function get_user_from_header(headers: Request['headers']) {
-  try {
-    const aceess_token = headers.get('Authorization')?.split(' ')[1]!;
-    const jwt_data = await jwtVerify(aceess_token, JWT_SECRET, {
-      algorithms: ['HS256']
-    });
-    const payload = access_token_payload_schema.parse(jwt_data.payload);
-    return payload.user;
-  } catch {}
-  return null;
-}
 export async function createContext(event: RequestEvent) {
   const { request } = event;
 
-  const user = await get_user_from_header(request.headers);
+  const get_seesion = async () => {
+    try {
+      const session = sessionSchema.parse(
+        await ky
+          .get(`${PUBLIC_BETTER_AUTH_URL}/api/auth/get-session`, {
+            headers: {
+              Cookie: request.headers.get('Cookie')!
+            }
+          })
+          .json()
+      );
+      return session;
+    } catch (e) {
+      return null;
+    }
+  };
+  const session = await get_seesion();
+
+  const user = session?.user;
   return {
     user
   };

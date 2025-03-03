@@ -24,8 +24,11 @@
   import { TrOutlineFileTypeTxt } from 'svelte-icons-pack/tr';
   import { download_file_in_browser } from '~/tools/download_file_browser';
   import { lipi_parivartak } from '~/tools/converter';
-  import { user_info } from '~/state/main_page/user';
   import { RiUserFacesRobot2Line } from 'svelte-icons-pack/ri';
+  import { useSession } from '~/lib/auth-clinet';
+
+  const session = useSession();
+  let user_info = $derived($session.data?.user);
 
   let current_workbook = $state<Workbook>(null!);
   let current_file_name = $state<string>(null!);
@@ -148,7 +151,7 @@
     <Icon src={BiImage} class="-mt-1 fill-sky-500 text-2xl dark:fill-sky-400" />
     Image Tool
   </button>
-  {#if $user_info && $user_info.user_type === 'admin'}
+  {#if user_info && user_info.role === 'admin'}
     <button
       onclick={() => {
         $ai_tool_opened = true;
