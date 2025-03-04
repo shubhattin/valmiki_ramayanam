@@ -98,8 +98,8 @@
           <span>Logout</span>
         </button>
       </div>
-      {#if user_info.role !== 'admin' && $user_verified_info.isSuccess && $user_verified_info.data.is_approved}
-        {@const langs = $user_verified_info.data.langugaes}
+      {#if user_info.role !== 'admin' && $user_verified_info.isSuccess}
+        {@const langs = $user_verified_info.data.langugaes!}
         {#if langs.length > 0}
           <div>
             <Icon class="text-xl" src={LanguageIcon} /> :

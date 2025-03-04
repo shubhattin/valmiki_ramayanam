@@ -144,7 +144,7 @@ export let english_edit_status = derived(
     (useSession().get().data?.user.role === 'admin' ||
       ($user_verified_info.isSuccess &&
         $user_verified_info.data.is_approved &&
-        $user_verified_info.data.langugaes.map((l) => l.lang_name).includes('English')))
+        $user_verified_info.data.langugaes!.map((l) => l.lang_name).includes('English')))
 );
 
 export let bulk_text_edit_status = writable(false);

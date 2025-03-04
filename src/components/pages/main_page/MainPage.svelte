@@ -343,8 +343,11 @@
                 {/each}
               </select>
             </label>
-            {#if !$editing_status_on && $user_verified_info.isSuccess && user_info && $user_verified_info.data.is_approved}
-              {@const languages = $user_verified_info.data.langugaes.map((l) => l.lang_name)}
+            {#if !$editing_status_on && $user_verified_info.isSuccess && user_info}
+              {@const languages =
+                user_info.role !== 'admin'
+                  ? $user_verified_info.data.langugaes!.map((l) => l.lang_name)
+                  : []}
               {#if $trans_lang !== '--' && (user_info.role === 'admin' || languages.indexOf($trans_lang) !== -1)}
                 <button
                   onclick={() => ($editing_status_on = true)}

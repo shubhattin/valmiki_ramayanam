@@ -4,8 +4,7 @@ import { protectedProcedure, t } from '~/api/trpc_init';
 import { tasks, auth, runs } from '@trigger.dev/sdk/v3';
 import { sarga_translate_schema } from '~/api/routers/ai/ai_types';
 import type { lang_list_type } from '~/tools/lang_list';
-import { type user_verfied_info_type, AUTH_INFO_URL, PROJECT_ID } from '~/lib/auth-info';
-import ky from 'ky';
+import { get_user_project_info } from '~/lib/auth-info';
 
 auth.configure({
   secretKey: env.TRIGGER_SECRET_KEY
@@ -13,11 +12,9 @@ auth.configure({
 
 const translate_sarga_route = protectedProcedure
   .input(sarga_translate_schema.input)
-  .mutation(async ({ ctx: { user }, input: { lang, messages, model } }) => {
+  .mutation(async ({ ctx: { user, cookie }, input: { lang, messages, model } }) => {
     if (user.role !== 'admin') {
-      const data = await ky
-        .get<user_verfied_info_type>(`${AUTH_INFO_URL}/user/${user.id}/${PROJECT_ID}`)
-        .json();
+      const data = await get_user_project_info(user.id, cookie);
       if (!data.is_approved) return { success: false };
       const allowed_langs = data.langugaes.map((lang) => lang.lang_name);
       if (!allowed_langs || !allowed_langs.includes(lang as lang_list_type))

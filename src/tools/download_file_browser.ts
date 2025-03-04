@@ -18,10 +18,6 @@ export const download_external_file_in_browser = async (link: string, name: stri
   const req = await fetch_get('/api/stream_file', {
     params: {
       file_url: link
-    },
-    headers: {
-      // @ts-ignore
-      // Authorization: 'Bearer ' + localStorage.getItem(ACCESS_ID)
     }
   });
   const blob = await req.blob();

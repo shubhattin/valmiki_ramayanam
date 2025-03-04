@@ -48,11 +48,13 @@ export const get_seesion_from_cookie = async (cookie: string) => {
 export async function createContext(event: RequestEvent) {
   const { request } = event;
 
-  const session = await get_seesion_from_cookie(request.headers.get('Cookie')!);
+  const cookie = request.headers.get('Cookie');
+  const session = await get_seesion_from_cookie(cookie!);
 
   const user = session?.user;
   return {
-    user
+    user,
+    cookie
   };
 }
 
