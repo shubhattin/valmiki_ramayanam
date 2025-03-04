@@ -12,16 +12,15 @@ auth.configure({
 
 const translate_sarga_route = protectedProcedure
   .input(sarga_translate_schema.input)
-  .mutation(async ({ ctx: { user, cookie }, input: { lang, messages, model } }) => {
+  .mutation(async ({ ctx: { user, cookie }, input: { lang_id, messages, model } }) => {
     if (user.role !== 'admin') {
       const data = await get_user_project_info(user.id, cookie);
       if (!data.is_approved) return { success: false };
-      const allowed_langs = data.langugaes.map((lang) => lang.lang_name);
-      if (!allowed_langs || !allowed_langs.includes(lang as lang_list_type))
-        return { success: false };
+      const allowed_langs = data.langugaes.map((lang) => lang.lang_id);
+      if (!allowed_langs || !allowed_langs.includes(lang_id)) return { success: false };
     }
     const handle = await tasks.trigger('ai_translate_sarga', {
-      lang,
+      lang_id,
       messages,
       model
     });

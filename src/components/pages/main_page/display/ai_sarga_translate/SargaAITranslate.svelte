@@ -26,6 +26,7 @@
   import pretty_ms from 'pretty-ms';
   import { OiStopwatch16 } from 'svelte-icons-pack/oi';
   import { onDestroy } from 'svelte';
+  import { LANG_LIST, LANG_LIST_IDS } from '~/tools/lang_list';
 
   const query_client = useQueryClient();
   const modal_store = getModalStore();
@@ -64,18 +65,17 @@
       if (!response.success) return;
       const translations = response.translations;
 
-      const new_data = new Map($trans_lang !== '--' ? $trans_lang_data.data : $trans_en_data.data);
+      const new_data = new Map($trans_lang !== 0 ? $trans_lang_data.data : $trans_en_data.data);
       translations.forEach((translation) => {
         if (new_data.has(translation.shloka_num)) return;
         new_data.set(translation.shloka_num, translation.text);
         $added_translations_indexes.push(translation.shloka_num);
       });
       $added_translations_indexes = $added_translations_indexes;
-      if ($trans_lang !== '--')
-        await query_client.setQueryData($trans_lang_data_query_key, new_data);
+      if ($trans_lang !== 0) await query_client.setQueryData($trans_lang_data_query_key, new_data);
       else
         await query_client.setQueryData(
-          QUERY_KEYS.trans_lang_data('English', $kANDa_selected, $sarga_selected),
+          QUERY_KEYS.trans_lang_data(1, $kANDa_selected, $sarga_selected),
           new_data
         );
       show_time_status = true;
@@ -97,7 +97,7 @@
           const trans_index = $sarga_data.data!.length - 1 === i ? -1 : i;
           let txt = `${shloka_lines}`;
           // let txt = `${shloka_lines}\n${normal_shloka}`;
-          if ($trans_lang !== '--') {
+          if ($trans_lang !== 0) {
             const lang_data = $trans_en_data.data;
             if (lang_data && lang_data.has(trans_index)) txt += `\n\n${lang_data.get(trans_index)}`;
           }
@@ -106,18 +106,18 @@
       );
       const text = texts.join('\n\n\n');
       await $translate_sarga_mut.mutateAsync({
-        lang: $trans_lang,
+        lang_id: $trans_lang,
         model: selected_model,
         messages: [
           {
             role: 'user',
             content: format_string_text(
-              $trans_lang !== '--'
+              $trans_lang !== 0
                 ? trans_prompts.prompts[0].content
                 : trans_prompts.prompts_english[0].content,
               {
                 text,
-                lang: $trans_lang !== '--' ? $trans_lang : 'English',
+                lang: $trans_lang !== 0 ? LANG_LIST[LANG_LIST_IDS.indexOf($trans_lang)] : 'English',
                 sarga_name: sarga_info.name_normal,
                 sarga_num: sarga_info.index,
                 kANDa_name: kANDa_info.name_normal,
@@ -131,7 +131,7 @@
     modal_store.trigger({
       type: 'confirm',
       title: 'Are you sure to translate the sarga ?',
-      body: `This will translate the untranslated shlokas to ${$trans_lang !== '--' ? $trans_lang : 'English'} which you can edit and then save.`,
+      body: `This will translate the untranslated shlokas to ${$trans_lang !== 0 ? LANG_LIST[LANG_LIST_IDS.indexOf($trans_lang)] : 'English'} which you can edit and then save.`,
       response(r: boolean) {
         if (!r) return;
         func();
@@ -140,12 +140,12 @@
   }
 
   let other_lang_allow_translate = $derived(
-    $trans_lang !== '--' &&
+    $trans_lang !== 0 &&
       ($trans_lang_data.data?.size ?? 0) < shloka_count + 2 && // atleast 1 untranslated shlokas should be there
       ($trans_en_data.data?.size ?? 0) >= shloka_count * 0.7 // atleast 70% of the translations should be there
   );
   let english_allow_translate = $derived(
-    $trans_lang === '--' && ($trans_en_data.data?.size ?? 0) !== shloka_count + 2
+    $trans_lang === 0 && ($trans_en_data.data?.size ?? 0) !== shloka_count + 2
     // all english translations should not be there, anyway we wont be sending it as context to the API anyway
   );
 </script>

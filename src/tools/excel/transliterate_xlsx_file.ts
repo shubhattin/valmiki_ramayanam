@@ -1,5 +1,6 @@
 import type ExcelJS from 'exceljs';
 import { normalize_lang_code, lipi_parivartak, load_parivartak_lang_data } from '~/tools/converter';
+import { LANG_LIST, LANG_LIST_IDS } from '../lang_list';
 
 /**
  * To transliterate text in a given Excel file
@@ -19,7 +20,7 @@ export const transliterate_xlxs_file = async (
   text_row_start_index: number = 2,
   base_lang_code: string = 'Sanskrit',
   base_folder_path_lipi_parivartak: string | null = null!,
-  translations: Map<string, Map<number, string>> = new Map(),
+  translations: Map<number, Map<number, string>> = new Map(),
   shloka_count = 0
 ) => {
   const TOTAL_SHEETS = workbook.worksheets.length;
@@ -41,6 +42,7 @@ export const transliterate_xlxs_file = async (
     lang_row.eachCell((cell, col_i) => {
       const promise = (async () => {
         const lang_split = cell.value!.toLocaleString().trim().split(' ');
+        const lang_split_index = lang_split.map((lang) => LANG_LIST_IDS[LANG_LIST.indexOf(lang)]);
         const script_name = cell.value!.toLocaleString().trim().replaceAll(' ', ''); // trimming white spaces and
         const script_code = normalize_lang_code(script_name);
         if (script_code && script_code !== base_lang_code) {
@@ -55,10 +57,10 @@ export const transliterate_xlxs_file = async (
         if (
           lang_split.length === 2 &&
           lang_split[1] === 'Meaning' &&
-          translations.has(lang_split[0])
+          translations.has(lang_split_index[0])
         ) {
-          const lang_code = lang_split[0];
-          const texts = translations.get(lang_code)!;
+          const lang_code_id = lang_split_index[0];
+          const texts = translations.get(lang_code_id)!;
           for (let val_pair of texts) {
             const text = val_pair[1];
             let i = val_pair[0];

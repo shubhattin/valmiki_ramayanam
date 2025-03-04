@@ -19,7 +19,7 @@
   import Signup from './Signup.svelte';
   import { get_user_verified_info } from '~/state/main_page/user.svelte';
 
-  const user_verified_info = $derived(get_user_verified_info());
+  const user_verified_info = $derived.by(get_user_verified_info);
   const modalStore = getModalStore();
 
   const session = useSession();

@@ -49,7 +49,7 @@
         },
         sarga_num: $sarga_selected,
         kANDa_num: $kANDa_selected,
-        lang: $trans_lang !== '--' ? $trans_lang : 'English'
+        lang_id: $trans_lang !== 0 ? $trans_lang : 1
       });
       if (res.success) {
         $added_translations_indexes = [];
@@ -83,7 +83,7 @@
       await query_client.invalidateQueries({
         queryKey: !$english_edit_status
           ? $trans_lang_data_query_key
-          : QUERY_KEYS.trans_lang_data('English', $kANDa_selected, $sarga_selected)
+          : QUERY_KEYS.trans_lang_data(1, $kANDa_selected, $sarga_selected)
       });
       $added_translations_indexes = [];
       $edited_translations_indexes = new Set();

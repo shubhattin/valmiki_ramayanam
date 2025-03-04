@@ -13,7 +13,7 @@ export const get_user_verified_info = () => {
         const data = await get_user_project_info(user_id);
         return data;
       },
-      enabled: user_info && user_info?.role !== 'admin'
+      enabled: !!(user_info && user_info.role !== 'admin')
     },
     queryClient
   );

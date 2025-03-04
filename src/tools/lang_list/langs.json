@@ -14,15 +14,15 @@
     "Romanized": ""
   },
   "lang_list": {
-    "English": "",
-    "Hindi": "",
-    "Telugu": "",
-    "Tamil": "",
-    "Bengali": "",
-    "Kannada": "",
-    "Gujarati": "",
-    "Malayalam": "",
-    "Odia": "",
-    "Sinhala": ""
+    "English": 1,
+    "Hindi": 3,
+    "Telugu": 4,
+    "Tamil": 5,
+    "Bengali": 6,
+    "Kannada": 7,
+    "Gujarati": 8,
+    "Malayalam": 9,
+    "Odia": 10,
+    "Sinhala": 11
   }
 }

@@ -16,13 +16,14 @@ import {
   trans_lang,
   view_translation_status
 } from './main_state';
+import ms from 'ms';
 
 export { rAmAyaNam_map };
 export const QUERY_KEYS = {
-  trans_lang_data: (lang: string, kANDa_num: number, sarga_num: number) => [
+  trans_lang_data: (lang_id: number, kANDa_num: number, sarga_num: number) => [
     'sarga',
     'trans',
-    lang,
+    lang_id,
     kANDa_num,
     sarga_num
   ],
@@ -77,7 +78,7 @@ export const trans_en_data = get_derived_query(
   ([$kANDa_selected, $sarga_selected, $view_translation_status, $editing_status_on]) =>
     createQuery(
       {
-        queryKey: QUERY_KEYS.trans_lang_data('English', $kANDa_selected, $sarga_selected),
+        queryKey: QUERY_KEYS.trans_lang_data(1, $kANDa_selected, $sarga_selected),
         // by also adding the kanda and sarga they are auto invalidated
         // so we dont have to manually invalidate it if were only sarga,trans,English
         enabled:
@@ -88,7 +89,7 @@ export const trans_en_data = get_derived_query(
               // while editing the data should not go stale, else it would refetch lead to data loss
             }
           : {}),
-        queryFn: () => get_translations($kANDa_selected, $sarga_selected, 'English')
+        queryFn: () => get_translations($kANDa_selected, $sarga_selected, 1) // 1 -> English
       },
       queryClient
     )
@@ -112,7 +113,7 @@ export const trans_lang_data = get_derived_query(
     createQuery(
       {
         queryKey: $trans_lang_data_query_key,
-        enabled: browser && $trans_lang !== '--' && $kANDa_selected !== 0 && $sarga_selected !== 0,
+        enabled: browser && $trans_lang !== 0 && $kANDa_selected !== 0 && $sarga_selected !== 0,
         ...($editing_status_on
           ? {
               staleTime: Infinity
@@ -124,11 +125,11 @@ export const trans_lang_data = get_derived_query(
       queryClient
     )
 );
-export async function get_translations(kanda: number, sarga: number, lang: string) {
+export async function get_translations(kanda: number, sarga: number, lang_id: number) {
   await delay(400);
 
   const data_map = await client.translations.get_translations_per_sarga.query({
-    lang: lang,
+    lang_id: lang_id,
     kANDa_num: kanda,
     sarga_num: sarga
   });

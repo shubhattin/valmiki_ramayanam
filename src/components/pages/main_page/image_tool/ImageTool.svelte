@@ -45,7 +45,7 @@
   $image_kANDa = $kANDa_selected;
   $image_sarga = $sarga_selected;
   $image_script = $viewing_script;
-  if ($trans_lang !== '--') $image_lang = $trans_lang;
+  if ($trans_lang !== 0) $image_lang = $trans_lang;
 
   onMount(() => {
     update_scaling_factor();

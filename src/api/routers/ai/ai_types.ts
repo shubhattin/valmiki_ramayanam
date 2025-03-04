@@ -15,7 +15,7 @@ export const text_models_enum = z.enum(['gpt-4o', 'claude-3.5-sonnet', 'o3-mini'
 
 export const sarga_translate_schema = {
   input: z.object({
-    lang: z.string(),
+    lang_id: z.number().int(),
     model: text_models_enum,
     messages: z
       .object({

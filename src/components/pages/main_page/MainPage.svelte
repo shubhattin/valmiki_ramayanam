@@ -4,7 +4,7 @@
   import { onMount } from 'svelte';
   import { delay } from '~/tools/delay';
   import { writable } from 'svelte/store';
-  import { LANG_LIST, SCRIPT_LIST, type script_list_type } from '~/tools/lang_list';
+  import { LANG_LIST, LANG_LIST_IDS, SCRIPT_LIST, type script_list_type } from '~/tools/lang_list';
   import { load_parivartak_lang_data, lipi_parivartak, get_sa_mode } from '~/tools/converter';
   import { LanguageIcon } from '~/components/icons';
   import { browser } from '$app/environment';
@@ -45,7 +45,7 @@
   import { useSession } from '~/lib/auth-client';
   import { get_user_verified_info } from '~/state/main_page/user.svelte';
 
-  const user_verified_info = $derived(get_user_verified_info());
+  const user_verified_info = $derived.by(get_user_verified_info);
   const query_client = useQueryClient();
 
   const session = useSession();
@@ -55,7 +55,7 @@
 
   $effect(() => {
     $english_edit_status =
-      $trans_lang === '--' &&
+      $trans_lang === 0 &&
       (user_info?.role === 'admin' ||
         ($user_verified_info.isSuccess &&
           $user_verified_info.data.is_approved &&
@@ -68,7 +68,8 @@
         const conf = await loadLocalConfig();
         if (conf.view_translation_status) $view_translation_status = true;
         if (conf.trans_lang)
-          $trans_lang_mut.mutateAsync('Hindi').then(() => {
+          $trans_lang_mut.mutateAsync(3).then(() => {
+            // 3 -> Hindi
             editing_status_on.set(true);
           });
         if (conf.editing_status_on) $editing_status_on = true;
@@ -118,29 +119,29 @@
     });
   });
 
-  let trans_lang_selection = writable<typeof $trans_lang>('--');
+  let trans_lang_selection = writable(0);
   $trans_lang = $trans_lang_selection;
   const trans_lang_mut = createMutation({
     mutationKey: ['trans_lang'],
-    mutationFn: async (lang: typeof $trans_lang) => {
-      if (!mounted || !browser || lang === '--') return lang;
+    mutationFn: async (lang_id: number) => {
+      if (!mounted || !browser || lang_id === 0) return lang_id;
       // loading trnaslation lang data for typing support
       await delay(300);
-      let script = get_script_for_lang(lang);
+      let script = get_script_for_lang(lang_id);
       await Promise.all([
         $viewing_script_mut.mutateAsync({ script, update_viewing_script_selection: true })
       ]);
-      return lang;
+      return lang_id;
     },
-    onSuccess(lang) {
-      $trans_lang_selection = lang;
-      $trans_lang = lang;
+    onSuccess(lang_id) {
+      $trans_lang_selection = lang_id;
+      $trans_lang = lang_id;
       query_client.invalidateQueries({ queryKey: ['sanskrit_mode_texts'] });
     }
   });
   $effect(() => {
-    if ($editing_status_on && $trans_lang !== '--')
-      load_parivartak_lang_data($trans_lang, 'src', true);
+    if ($editing_status_on && $trans_lang !== 0)
+      load_parivartak_lang_data(LANG_LIST[LANG_LIST_IDS.indexOf($trans_lang)], 'src', true);
   });
   $effect(() => {
     const _trans_lang_mut = untrack(() => $trans_lang_mut);
@@ -200,8 +201,13 @@
   let sanskrit_mode_texts = $derived(
     createQuery({
       queryKey: ['sanskrit_mode_texts'],
-      enabled: browser && $editing_status_on && $trans_lang !== '--',
-      queryFn: () => lipi_parivartak(['राम्', 'राम'], BASE_SCRIPT, $trans_lang),
+      enabled: browser && $editing_status_on && $trans_lang !== 0,
+      queryFn: () =>
+        lipi_parivartak(
+          ['राम्', 'राम'],
+          BASE_SCRIPT,
+          LANG_LIST[LANG_LIST_IDS.indexOf($trans_lang)]
+        ),
       placeholderData: ['राम्', 'राम']
     })
   );
@@ -209,8 +215,10 @@
     (async () => {
       if (!$editing_status_on || $sanskrit_mode_texts.isFetching || !$sanskrit_mode_texts.isSuccess)
         return;
-      if ($trans_lang === '--') return;
-      $sanskrit_mode = await get_sa_mode(untrack(() => $trans_lang));
+      if ($trans_lang === 0) return;
+      $sanskrit_mode = await get_sa_mode(
+        untrack(() => LANG_LIST[LANG_LIST_IDS.indexOf($trans_lang)])
+      );
     })();
   });
 
@@ -351,20 +359,20 @@
                 class="select inline-block w-24 px-1 py-1 text-sm sm:w-32 sm:px-2 sm:text-base"
                 bind:value={$trans_lang_selection}
               >
-                <option value="--">-- Select --</option>
-                {#each LANG_LIST as lang (lang)}
+                <option value={0}>-- Select --</option>
+                {#each LANG_LIST as lang, i (lang)}
                   {#if lang !== 'English'}
-                    <option value={lang}>{lang}</option>
+                    <option value={LANG_LIST_IDS[i]}>{lang}</option>
                   {/if}
                 {/each}
               </select>
             </label>
-            {#if !$editing_status_on && $user_verified_info.isSuccess && user_info}
+            {#if !$editing_status_on && user_info}
               {@const languages =
-                user_info.role !== 'admin'
-                  ? $user_verified_info.data.langugaes!.map((l) => l.lang_name)
+                user_info.role !== 'admin' && $user_verified_info.isSuccess
+                  ? $user_verified_info.data.langugaes!.map((l) => l.lang_id)
                   : []}
-              {#if $trans_lang !== '--' && (user_info.role === 'admin' || languages.indexOf($trans_lang) !== -1)}
+              {#if $trans_lang !== 0 && (user_info.role === 'admin' || languages.indexOf($trans_lang) !== -1)}
                 <button
                   onclick={() => ($editing_status_on = true)}
                   class="btn my-1 inline-block rounded-lg bg-tertiary-700 px-1 py-1 text-sm font-bold text-white sm:px-2 sm:text-base dark:bg-tertiary-600"
@@ -372,7 +380,8 @@
                   <Icon src={BiEdit} class="mr-1 text-xl sm:text-2xl" />
                   Edit
                 </button>
-              {:else if $trans_lang === '--' && (user_info.role === 'admin' || languages.indexOf('English') !== -1)}
+              {:else if $trans_lang === 0 && (user_info.role === 'admin' || languages.indexOf(1) !== -1)}
+                <!-- 1 -> English -->
                 <button
                   onclick={() => ($editing_status_on = true)}
                   class="btn my-1 inline-block rounded-lg bg-tertiary-700 px-1 py-1 text-sm font-bold text-white sm:px-2 sm:text-base dark:bg-tertiary-600"
@@ -387,7 +396,7 @@
       {/if}
     </div>
     <!-- !== --, as we dont need it for english -->
-    {#if $trans_lang !== '--' && $editing_status_on && !($ai_tool_opened && user_info && user_info.role === 'admin')}
+    {#if $trans_lang !== 0 && $editing_status_on && !($ai_tool_opened && user_info && user_info.role === 'admin')}
       <div class="flex space-x-4">
         <SlideToggle
           name="edit_lang"
