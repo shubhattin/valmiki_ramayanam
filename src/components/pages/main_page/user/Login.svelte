@@ -9,7 +9,7 @@
     onclick={async () => {
       await signIn.social({
         provider: 'google',
-        callbackURL: "/"
+        callbackURL: window.location.href
       });
     }}
     class="variant-outline-primary btn flex gap-2 rounded-lg font-semibold"
