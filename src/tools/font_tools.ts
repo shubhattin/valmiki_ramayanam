@@ -1,5 +1,11 @@
 import { browser } from '$app/environment';
-import type { script_and_lang_list_type, script_list_type } from './lang_list';
+import {
+  LANG_LIST,
+  LANG_LIST_IDS,
+  lang_list_obj,
+  type script_and_lang_list_type,
+  type script_list_type
+} from './lang_list';
 
 export const LATIN_BASED_SCRIPTS = ['English', 'Romanized', 'Normal'];
 
@@ -9,12 +15,12 @@ export function get_text_font_class(lang: script_and_lang_list_type | '') {
   return 'indic-font';
 }
 
-export function get_script_for_lang(lang: script_and_lang_list_type): script_list_type {
-  if (lang === 'Hindi' || lang === 'English') return 'Devanagari';
+export function get_script_for_lang(lang_id: number): script_list_type {
+  if (lang_id === lang_list_obj.Hindi || lang_id === lang_list_obj.English) return 'Devanagari';
   // ^ Name for Sanskrit value in the dropdown is Devanagari
-  else if (lang === 'Tamil') return 'Tamil-Extended';
+  else if (lang_id === lang_list_obj.Tamil) return 'Tamil-Extended';
   // Add a default return value to satisfy the return type
-  return lang;
+  return LANG_LIST[LANG_LIST_IDS.indexOf(lang_id)] as script_list_type;
 }
 
 /**

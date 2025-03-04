@@ -1,13 +1,13 @@
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { get_user_from_header } from '~/api/context';
+import { get_seesion_from_cookie } from '~/api/context';
 import { z } from 'zod';
 import ms from 'ms';
 
 export const GET: RequestHandler = async ({ url, request }) => {
-  const user = await get_user_from_header(request.headers);
-  //   console.log(user);
-  if (!user || user.user_type !== 'admin') {
+  const session = await get_seesion_from_cookie(request.headers.get('Cookie')!);
+  const user = session?.user;
+  if (!user || user.role !== 'admin') {
     throw error(401, 'UNAUTHORIZED');
   }
 

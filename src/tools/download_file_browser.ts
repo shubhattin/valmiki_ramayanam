@@ -1,4 +1,3 @@
-import { ACCESS_ID } from './auth_tools';
 import { fetch_get } from './fetch';
 
 export const download_file_in_browser = (
@@ -19,9 +18,6 @@ export const download_external_file_in_browser = async (link: string, name: stri
   const req = await fetch_get('/api/stream_file', {
     params: {
       file_url: link
-    },
-    headers: {
-      Authorization: 'Bearer ' + localStorage.getItem(ACCESS_ID)
     }
   });
   const blob = await req.blob();

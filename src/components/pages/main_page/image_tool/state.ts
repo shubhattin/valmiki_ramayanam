@@ -9,6 +9,7 @@ import background_image_url from './img/background_vr.png';
 import background_image_template_url from './img/background_vr_template.jpg';
 import {
   LANG_LIST,
+  lang_list_obj,
   SCRIPT_LIST,
   type lang_list_type,
   type script_list_type
@@ -40,7 +41,7 @@ export async function set_background_image_type(shaded_image: boolean) {
 }
 
 export let image_script = writable<script_list_type>();
-export let image_lang = writable<lang_list_type>('English');
+export let image_lang = writable<number>(lang_list_obj.English);
 export let image_kANDa = writable<number>(0);
 export let image_sarga = writable<number>(0);
 // ^ kanda and sarga will be inherited from the main during mount

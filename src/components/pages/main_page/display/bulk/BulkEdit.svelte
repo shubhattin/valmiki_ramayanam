@@ -23,7 +23,7 @@
   } from '~/state/main_page/data';
   import { trans_map_to_text, text_to_trans_map } from './trans_bulk_funcs';
   import { get_font_family_and_size } from '~/tools/font_tools';
-  import type { lang_list_type } from '~/tools/lang_list';
+  import { LANG_LIST, LANG_LIST_IDS, type lang_list_type } from '~/tools/lang_list';
   import { lekhika_typing_tool } from '~/tools/converter';
   import { OiSync16 } from 'svelte-icons-pack/oi';
   import { useQueryClient } from '@tanstack/svelte-query';
@@ -40,7 +40,7 @@
   let trans_text_font_info = $derived(
     $english_edit_status
       ? get_font_family_and_size('English')
-      : get_font_family_and_size($trans_lang as lang_list_type)
+      : get_font_family_and_size(LANG_LIST[LANG_LIST_IDS.indexOf($trans_lang)] as lang_list_type)
   );
   $effect(() => {
     if (!$bulk_text_edit_status) {
@@ -58,7 +58,7 @@
         e.target,
         // @ts-ignore
         e.data,
-        $trans_lang,
+        LANG_LIST[LANG_LIST_IDS.indexOf($trans_lang)],
         true,
         // @ts-ignore
         (val) => {
@@ -101,7 +101,7 @@
         await query_client.setQueryData($trans_lang_data_query_key, trans_data);
       } else {
         await query_client.setQueryData(
-          QUERY_KEYS.trans_lang_data('English', $kANDa_selected, $sarga_selected),
+          QUERY_KEYS.trans_lang_data(1, $kANDa_selected, $sarga_selected),
           trans_data
         );
       }

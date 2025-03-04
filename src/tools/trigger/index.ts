@@ -3,7 +3,7 @@ import { client } from '~/api/client';
 /**
  * @param time_interval  Dwfault 3 seconds
  */
-export const get_result_from_trigger_run_id = async <T>(run_token: string, time_interval = 3) => {
+export const get_result_from_trigger_run_id = async <T>(run_id: string, time_interval = 3) => {
   return await new Promise<
     T & {
       time_taken: number;
@@ -11,7 +11,7 @@ export const get_result_from_trigger_run_id = async <T>(run_token: string, time_
   >((resolve, reject) => {
     const get_info = async () => {
       const out = await client.ai.trigger_funcs.retrive_run_info.query({
-        run_token: run_token!
+        run_id: run_id!
       });
       if ('error_code' in out) {
         reject(out.error_code);

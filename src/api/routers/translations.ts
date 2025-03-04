@@ -7,17 +7,17 @@ import { z } from 'zod';
 import { fetch_post } from '~/tools/fetch';
 import { env } from '$env/dynamic/private';
 import { delay } from '~/tools/delay';
+import { get_user_project_info } from '~/lib/auth-info';
 
 const get_translations_per_sarga_route = publicProcedure
   .input(
     z.object({
-      lang: z.string(),
+      lang_id: z.number().int(),
       kANDa_num: z.number().int(),
       sarga_num: z.number().int()
     })
   )
-  .query(async ({ input: { lang, kANDa_num, sarga_num } }) => {
-    const lang_typed = lang as lang_list_type;
+  .query(async ({ input: { lang_id, kANDa_num, sarga_num } }) => {
     const data = await db.query.translations.findMany({
       columns: {
         text: true,
@@ -25,7 +25,7 @@ const get_translations_per_sarga_route = publicProcedure
       },
       where: (struct, { eq, and }) =>
         and(
-          eq(struct.lang, lang_typed),
+          eq(struct.lang_id, lang_id),
           eq(struct.kANDa_num, kANDa_num),
           eq(struct.sarga_num, sarga_num)
         )
@@ -45,16 +45,16 @@ const get_all_langs_translations_per_sarga_route = publicProcedure
   .query(async ({ input: { kANDa_num, sarga_num } }) => {
     const data = await db.query.translations.findMany({
       columns: {
-        lang: true,
+        lang_id: true,
         text: true,
         shloka_num: true
       },
       where: (struct, { eq }) => eq(struct.kANDa_num, kANDa_num) && eq(struct.sarga_num, sarga_num)
     });
-    const data_map = new Map<(typeof data)[0]['lang'], Map<number, string>>();
+    const data_map = new Map<number, Map<number, string>>();
     for (let i = 0; i < data.length; i++) {
-      if (!data_map.has(data[i].lang)) data_map.set(data[i].lang, new Map());
-      data_map.get(data[i].lang)!.set(data[i].shloka_num, data[i].text);
+      if (!data_map.has(data[i].lang_id)) data_map.set(data[i].lang_id, new Map());
+      data_map.get(data[i].lang_id)!.set(data[i].shloka_num, data[i].text);
     }
     return data_map;
   });
@@ -62,7 +62,7 @@ const get_all_langs_translations_per_sarga_route = publicProcedure
 const edit_translation_route = protectedProcedure
   .input(
     z.object({
-      lang: z.string(),
+      lang_id: z.number().int(),
       kANDa_num: z.number().int(),
       sarga_num: z.number().int(),
       data: z.object({
@@ -75,30 +75,26 @@ const edit_translation_route = protectedProcedure
   )
   .mutation(
     async ({
-      ctx: { user },
+      ctx: { user, cookie },
       input: {
-        lang,
+        lang_id,
         kANDa_num,
         sarga_num,
         data: { add_data, edit_data, to_add_indexed, to_edit_indexed }
       }
     }) => {
       // authorization check to edit or add lang records
-      if (user.user_type !== 'admin') {
-        const { allowed_langs } = (await db.query.users.findFirst({
-          columns: {
-            allowed_langs: true
-          },
-          where: ({ id }, { eq }) => eq(id, user.id)
-        }))!;
-        if (!allowed_langs || !allowed_langs.includes(lang as lang_list_type))
-          return { success: false };
+      if (user.role !== 'admin') {
+        const data = await get_user_project_info(user.id, cookie);
+        if (!data.is_approved) return { success: false };
+        const allowed_langs = data.langugaes.map((lang) => lang.lang_id);
+        if (!allowed_langs || !allowed_langs.includes(lang_id)) return { success: false };
       }
 
       // add new records
       if (to_add_indexed.length > 0) {
         const data_to_add = to_add_indexed.map((index, i) => ({
-          lang: lang as lang_list_type,
+          lang_id: lang_id,
           kANDa_num,
           sarga_num,
           shloka_num: index,
@@ -118,7 +114,7 @@ const edit_translation_route = protectedProcedure
             .set({ text })
             .where(
               and(
-                eq(translations.lang, lang as lang_list_type),
+                eq(translations.lang_id, lang_id),
                 eq(translations.kANDa_num, kANDa_num),
                 eq(translations.sarga_num, sarga_num),
                 eq(translations.shloka_num, index)

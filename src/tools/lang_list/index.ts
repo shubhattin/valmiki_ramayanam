@@ -4,6 +4,7 @@ export const SCRIPT_LIST = Object.keys(script_list);
 export type script_list_type = keyof typeof script_list;
 
 export const LANG_LIST = Object.keys(lang_list);
+export const LANG_LIST_IDS = Object.values(lang_list);
 export type lang_list_type = keyof typeof lang_list;
 // the langs enum in schema.ts has to be updated manually
 

@@ -15,7 +15,7 @@
     shaded_background_image_status,
     trans_text_font_configs
   } from './state';
-  import { LANG_LIST } from '~/tools/lang_list';
+  import { LANG_LIST, LANG_LIST_IDS, type lang_list_type } from '~/tools/lang_list';
   import Icon from '~/tools/Icon.svelte';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import { LanguageIcon } from '~/components/icons';
@@ -84,8 +84,8 @@
       bind:value={$image_lang}
       disabled={$image_trans_data.isFetching || !$image_trans_data.isSuccess}
     >
-      {#each LANG_LIST as lang (lang)}
-        <option value={lang}>{lang}</option>
+      {#each LANG_LIST as lang, i (lang)}
+        <option value={LANG_LIST_IDS[i]}>{lang}</option>
       {/each}
     </select>
   </label>
@@ -143,8 +143,9 @@
                       <input
                         type="number"
                         class="input w-12 rounded-md px-1 py-0 text-sm"
-                        bind:value={$main_text_font_configs[$image_script]
-                          .space_between_main_and_normal}
+                        bind:value={
+                          $main_text_font_configs[$image_script].space_between_main_and_normal
+                        }
                         min={0}
                         max={20}
                       />
@@ -184,7 +185,11 @@
                         <input
                           type="number"
                           class="input w-16 rounded-md px-1 py-0 text-sm"
-                          bind:value={$trans_text_font_configs[$image_lang].size}
+                          bind:value={
+                            $trans_text_font_configs[
+                              LANG_LIST[LANG_LIST_IDS.indexOf($image_lang)] as lang_list_type
+                            ].size
+                          }
                           min={0}
                           max={10}
                           step={0.05}
@@ -195,7 +200,11 @@
                         <input
                           type="number"
                           class="input w-16 rounded-md px-1 py-0 text-sm"
-                          bind:value={$trans_text_font_configs[$image_lang].new_line_spacing}
+                          bind:value={
+                            $trans_text_font_configs[
+                              LANG_LIST[LANG_LIST_IDS.indexOf($image_lang)] as lang_list_type
+                            ].new_line_spacing
+                          }
                           min={0}
                           max={10}
                           step={0.05}

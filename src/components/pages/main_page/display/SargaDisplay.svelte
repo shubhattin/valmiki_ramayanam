@@ -33,7 +33,7 @@
   import { copy_text_to_clipboard } from '~/tools/kry';
   import { OiCopy16 } from 'svelte-icons-pack/oi';
   import { get_font_family_and_size } from '~/tools/font_tools';
-  import type { lang_list_type } from '~/tools/lang_list';
+  import { LANG_LIST, LANG_LIST_IDS, type lang_list_type } from '~/tools/lang_list';
   import { RiSystemAddLargeLine } from 'svelte-icons-pack/ri';
   import { popup } from '@skeletonlabs/skeleton';
   import SargaAiTranslate from './ai_sarga_translate/SargaAITranslate.svelte';
@@ -61,7 +61,7 @@
       const new_data = new Map($trans_en_data.data);
       new_data.set(index, text);
       await query_client.setQueryData(
-        QUERY_KEYS.trans_lang_data('English', $kANDa_selected, $sarga_selected),
+        QUERY_KEYS.trans_lang_data(1, $kANDa_selected, $sarga_selected),
         new_data
       );
     }
@@ -90,7 +90,7 @@
         const normal_shloka = await lipi_parivartak($sarga_data.data![i], BASE_SCRIPT, 'Normal');
         const trans_index = transliterated_sarga_data.length - 1 === i ? -1 : i;
         let txt = `${shloka_lines}\n${normal_shloka}`;
-        const lang_data = $trans_lang === '--' ? $trans_en_data.data : $trans_lang_data.data;
+        const lang_data = $trans_lang === 0 ? $trans_en_data.data : $trans_lang_data.data;
         if (lang_data && lang_data.has(trans_index)) txt += `\n\n${lang_data.get(trans_index)}`;
         return txt;
       })
@@ -99,7 +99,9 @@
   };
 
   let main_text_font_info = $derived(get_font_family_and_size($viewing_script));
-  let trans_text_font_info = $derived(get_font_family_and_size($trans_lang as lang_list_type));
+  let trans_text_font_info = $derived(
+    get_font_family_and_size(LANG_LIST[LANG_LIST_IDS.indexOf($trans_lang)] as lang_list_type)
+  );
   const en_trans_text_font_info = get_font_family_and_size('English');
   const input_func = async (e: any, trans_index: number) => {
     if (!$added_translations_indexes.includes(trans_index)) {
@@ -112,7 +114,7 @@
         e.target,
         // @ts-ignore
         e.data,
-        $trans_lang,
+        LANG_LIST[LANG_LIST_IDS.indexOf($trans_lang)] as lang_list_type,
         true,
         // @ts-ignore
         (val) => {
@@ -262,7 +264,7 @@
 {#if $typing_assistance_modal_opened}
   {#await import('~/components/TypingAssistance.svelte') then TypingAssistance}
     <TypingAssistance.default
-      sync_lang_script={$trans_lang}
+      sync_lang_script={LANG_LIST[LANG_LIST_IDS.indexOf($trans_lang)]}
       bind:modal_opened={$typing_assistance_modal_opened}
     />
   {/await}
@@ -323,7 +325,7 @@
           {@render edit_textarea_elm($trans_lang_data.data, trans_text_font_info)}
         {/if}
       </div>
-    {:else if $trans_lang !== '--' && $trans_lang_data.data.size !== 0}
+    {:else if $trans_lang !== 0 && $trans_lang_data.data.size !== 0}
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <div
         transition:slide
