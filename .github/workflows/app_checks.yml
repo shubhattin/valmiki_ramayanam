@@ -3,6 +3,8 @@ name: App Checks
 on:
   - push
 
+env:
+  PUBLIC_BETTER_AUTH_URL: http://localhost:3000
 jobs:
   tests:
     runs-on: ubuntu-latest

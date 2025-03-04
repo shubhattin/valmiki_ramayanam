@@ -18,7 +18,6 @@ async function main() {
     console.error(envs_parsed.error);
     return;
   }
-  const envs = envs_parsed.data;
 
   const trans_data = {
     translations: await db.query.translations.findMany()
