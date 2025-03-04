@@ -55,10 +55,9 @@
       input: Parameters<typeof client.ai.trigger_funcs.translate_sarga.mutate>[0]
     ) => {
       show_time_status = false;
-      const { run_token, output_type } =
-        await client.ai.trigger_funcs.translate_sarga.mutate(input);
+      const { run_id, output_type } = await client.ai.trigger_funcs.translate_sarga.mutate(input);
 
-      return await get_result_from_trigger_run_id<typeof output_type>(run_token!);
+      return await get_result_from_trigger_run_id<typeof output_type>(run_id!);
     },
     async onSuccess(response) {
       response = response!;

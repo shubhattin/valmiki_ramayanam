@@ -1,7 +1,7 @@
 import { createQuery } from '@tanstack/svelte-query';
 import { queryClient } from '../query';
 import { PUBLIC_BETTER_AUTH_URL } from '$env/static/public';
-import { useSession } from '~/lib/auth-clinet';
+import { useSession } from '~/lib/auth-client';
 import ky from 'ky';
 
 export const PROJECT_ID = 1; // as defined in tsc_user database

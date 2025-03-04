@@ -7,6 +7,8 @@ import { z } from 'zod';
 import { fetch_post } from '~/tools/fetch';
 import { env } from '$env/dynamic/private';
 import { delay } from '~/tools/delay';
+import ky from 'ky';
+import { type user_verfied_info_type, AUTH_INFO_URL, PROJECT_ID } from '~/lib/auth-info';
 
 const get_translations_per_sarga_route = publicProcedure
   .input(
@@ -84,13 +86,12 @@ const edit_translation_route = protectedProcedure
       }
     }) => {
       // authorization check to edit or add lang records
-      if (user.user_type !== 'admin') {
-        const { allowed_langs } = (await db.query.users.findFirst({
-          columns: {
-            allowed_langs: true
-          },
-          where: ({ id }, { eq }) => eq(id, user.id)
-        }))!;
+      if (user.role !== 'admin') {
+        const data = await ky
+          .get<user_verfied_info_type>(`${AUTH_INFO_URL}/user/${user.id}/${PROJECT_ID}`)
+          .json();
+        if (!data.is_approved) return { success: false };
+        const allowed_langs = data.langugaes.map((lang) => lang.lang_name);
         if (!allowed_langs || !allowed_langs.includes(lang as lang_list_type))
           return { success: false };
       }

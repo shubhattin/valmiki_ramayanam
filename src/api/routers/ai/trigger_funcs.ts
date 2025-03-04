@@ -1,30 +1,25 @@
 import { z } from 'zod';
 import { env } from '$env/dynamic/private';
 import { protectedProcedure, t } from '~/api/trpc_init';
-import { db } from '~/db/db';
 import { tasks, auth, runs } from '@trigger.dev/sdk/v3';
 import { sarga_translate_schema } from '~/api/routers/ai/ai_types';
 import type { lang_list_type } from '~/tools/lang_list';
+import { type user_verfied_info_type, AUTH_INFO_URL, PROJECT_ID } from '~/lib/auth-info';
+import ky from 'ky';
 
 auth.configure({
   secretKey: env.TRIGGER_SECRET_KEY
 });
 
-const run_info_token_schema = z.object({
-  run_id: z.string()
-});
-const RUN_TOKEN_EXPIRE = '10mins';
-
 const translate_sarga_route = protectedProcedure
   .input(sarga_translate_schema.input)
   .mutation(async ({ ctx: { user }, input: { lang, messages, model } }) => {
-    if (user.user_type !== 'admin') {
-      const { allowed_langs } = (await db.query.users.findFirst({
-        columns: {
-          allowed_langs: true
-        },
-        where: ({ id }, { eq }) => eq(id, user.id)
-      }))!;
+    if (user.role !== 'admin') {
+      const data = await ky
+        .get<user_verfied_info_type>(`${AUTH_INFO_URL}/user/${user.id}/${PROJECT_ID}`)
+        .json();
+      if (!data.is_approved) return { success: false };
+      const allowed_langs = data.langugaes.map((lang) => lang.lang_name);
       if (!allowed_langs || !allowed_langs.includes(lang as lang_list_type))
         return { success: false };
     }
@@ -34,13 +29,13 @@ const translate_sarga_route = protectedProcedure
       model
     });
 
-    const run_token = 'ghjkkl';
+    const run_id = handle.id;
 
-    return { run_token, output_type: null! as z.infer<typeof sarga_translate_schema.output> };
+    return { run_id, output_type: null! as z.infer<typeof sarga_translate_schema.output> };
   });
 
 const retrive_run_info_route = protectedProcedure
-  .input(z.object({ run_token: z.string() }))
+  .input(z.object({ run_id: z.string() }))
   .output(
     z.union([
       z.object({ completed: z.literal(false) }),
@@ -54,14 +49,7 @@ const retrive_run_info_route = protectedProcedure
       })
     ])
   )
-  .query(async ({ input: { run_token } }) => {
-    let run_id: string | null = null;
-    try {
-      const jwt_data = null!;
-      // @ts-ignore
-      const payload = run_info_token_schema.parse(jwt_data.payload);
-      run_id = payload.run_id;
-    } catch {}
+  .query(async ({ input: { run_id } }) => {
     if (!run_id) return { error_code: 'UNAUTHORIZED' };
     const run_info = await runs.retrieve(run_id);
     if (run_info.status !== 'COMPLETED') return { completed: false };

@@ -17,7 +17,7 @@ import {
   view_translation_status
 } from './main_state';
 import { user_verified_info } from './user.svelte';
-import { useSession } from '~/lib/auth-clinet';
+import { useSession } from '~/lib/auth-client';
 
 export { rAmAyaNam_map };
 export const QUERY_KEYS = {

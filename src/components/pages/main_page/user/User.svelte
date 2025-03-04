@@ -14,7 +14,7 @@
   import { VscAccount } from 'svelte-icons-pack/vsc';
   import { client } from '~/api/client';
   import { OiSync16 } from 'svelte-icons-pack/oi';
-  import { signOut, useSession } from '~/lib/auth-clinet';
+  import { signOut, useSession } from '~/lib/auth-client';
   import { user_verified_info } from '~/state/main_page/user.svelte';
   import Login from '~/components/pages/main_page/user/Login.svelte';
   import Signup from './Signup.svelte';

@@ -29,26 +29,26 @@ const sessionSchema = z.object({
   })
 });
 
+export const get_seesion_from_cookie = async (cookie: string) => {
+  try {
+    const session = sessionSchema.parse(
+      await ky
+        .get(`${PUBLIC_BETTER_AUTH_URL}/api/auth/get-session`, {
+          headers: {
+            Cookie: cookie
+          }
+        })
+        .json()
+    );
+    return session;
+  } catch (e) {
+    return null;
+  }
+};
 export async function createContext(event: RequestEvent) {
   const { request } = event;
 
-  const get_seesion = async () => {
-    try {
-      const session = sessionSchema.parse(
-        await ky
-          .get(`${PUBLIC_BETTER_AUTH_URL}/api/auth/get-session`, {
-            headers: {
-              Cookie: request.headers.get('Cookie')!
-            }
-          })
-          .json()
-      );
-      return session;
-    } catch (e) {
-      return null;
-    }
-  };
-  const session = await get_seesion();
+  const session = await get_seesion_from_cookie(request.headers.get('Cookie')!);
 
   const user = session?.user;
   return {

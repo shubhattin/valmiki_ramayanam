@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { signIn } from '$lib/auth-clinet';
+  import { signIn } from '~/lib/auth-client';
   import Icon from '~/tools/Icon.svelte';
   import { GoogleIcon } from '~/components/icons';
 </script>

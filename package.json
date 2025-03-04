@@ -78,8 +78,6 @@
     "drizzle-zod": "^0.5.1",
     "exceljs": "^4.4.0",
     "fabric": "^6.6.1",
-    "hash-wasm": "^4.12.0",
-    "jose": "^5.10.0",
     "jszip": "^3.10.1",
     "ky": "^1.7.5",
     "mode-watcher": "^0.4.1",

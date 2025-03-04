@@ -37,7 +37,7 @@
   import { rAmAyaNam_map, get_kANDa_names, get_sarga_names } from '~/state/main_page/data';
   import MetaTags from '~/components/tags/MetaTags.svelte';
   import { loadLocalConfig } from './load_local_config';
-  import { useSession } from '~/lib/auth-clinet';
+  import { useSession } from '~/lib/auth-client';
   import { user_verified_info } from '~/state/main_page/user.svelte';
 
   const query_client = useQueryClient();

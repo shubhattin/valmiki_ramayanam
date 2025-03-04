@@ -25,7 +25,7 @@
   import { download_file_in_browser } from '~/tools/download_file_browser';
   import { lipi_parivartak } from '~/tools/converter';
   import { RiUserFacesRobot2Line } from 'svelte-icons-pack/ri';
-  import { useSession } from '~/lib/auth-clinet';
+  import { useSession } from '~/lib/auth-client';
 
   const session = useSession();
   let user_info = $derived($session.data?.user);
