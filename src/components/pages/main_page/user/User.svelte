@@ -13,11 +13,12 @@
   import { editing_status_on } from '~/state/main_page/main_state';
   import { VscAccount } from 'svelte-icons-pack/vsc';
   import { client } from '~/api/client';
-  import { OiSync16 } from 'svelte-icons-pack/oi';
+  import { OiLinkExternal16, OiSync16 } from 'svelte-icons-pack/oi';
   import { signOut, useSession } from '~/lib/auth-client';
   import Login from '~/components/pages/main_page/user/Login.svelte';
   import Signup from './Signup.svelte';
   import { get_user_verified_info } from '~/state/main_page/user.svelte';
+  import { PUBLIC_BETTER_AUTH_URL } from '$env/static/public';
 
   const user_verified_info = $derived.by(get_user_verified_info);
   const modalStore = getModalStore();
@@ -82,12 +83,24 @@
 <div class="card z-40 px-1 py-2 shadow-2xl" data-popup="user_info">
   {#if user_info}
     <div class="select-none space-y-2 p-1">
-      <div class="text-center text-base font-bold">
-        {#if user_info.role === 'admin'}
-          <Icon class="-mt-1 text-2xl" src={RiUserFacesAdminLine} />
-        {:else}
-          <Icon class="-mt-1 text-2xl" src={AiOutlineUser} />
-        {/if}{user_info.name}
+      <div class="space-x-1.5 sm:space-x-2">
+        <span class="text-center text-base font-bold">
+          {#if user_info.role === 'admin'}
+            <Icon class="-mt-1 text-2xl" src={RiUserFacesAdminLine} />
+          {:else}
+            <Icon class="-mt-1 text-2xl" src={AiOutlineUser} />
+          {/if}
+          {user_info.name}
+        </span>
+        <a
+          class="btn m-0 p-0 hover:text-blue-600 dark:hover:text-blue-500"
+          href={PUBLIC_BETTER_AUTH_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Account Settings"
+        >
+          <Icon src={OiLinkExternal16} class="text-xl" />
+        </a>
       </div>
       <div class="space-x-4">
         <button
@@ -122,7 +135,7 @@
         <button
           onclick={trigger_translations_update}
           disabled={$editing_status_on}
-          class="btn m-0 block rounded-md bg-primary-900 px-1 py-0 font-bold text-white dark:bg-primary-900"
+          class="btn m-0 block rounded-md bg-primary-800 px-1 py-0 font-bold text-white dark:bg-primary-900"
         >
           <Icon src={OiSync16} class="my-1 mb-1 text-xl" />
           <span class="text-sm">Sync Translations from DB</span>

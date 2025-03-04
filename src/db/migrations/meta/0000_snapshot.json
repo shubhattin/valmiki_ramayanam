@@ -1,0 +1,73 @@
+{
+  "id": "dfe82985-4494-473e-abeb-a5bd950d1637",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.translations": {
+      "name": "translations",
+      "schema": "",
+      "columns": {
+        "lang_id": {
+          "name": "lang_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kANDa_num": {
+          "name": "kANDa_num",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sarga_num": {
+          "name": "sarga_num",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "shloka_num": {
+          "name": "shloka_num",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "translations_lang_id_kANDa_num_sarga_num_shloka_num_pk": {
+          "name": "translations_lang_id_kANDa_num_sarga_num_shloka_num_pk",
+          "columns": [
+            "lang_id",
+            "kANDa_num",
+            "sarga_num",
+            "shloka_num"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
