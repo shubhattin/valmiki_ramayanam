@@ -16,8 +16,6 @@ import {
   trans_lang,
   view_translation_status
 } from './main_state';
-import { user_verified_info } from './user.svelte';
-import { useSession } from '~/lib/auth-client';
 
 export { rAmAyaNam_map };
 export const QUERY_KEYS = {
@@ -137,15 +135,7 @@ export async function get_translations(kanda: number, sarga: number, lang: strin
   return data_map;
 }
 
-export let english_edit_status = derived(
-  [trans_lang, user_verified_info],
-  ([$trans_lang, $user_verified_info]) =>
-    $trans_lang === '--' &&
-    (useSession().get().data?.user.role === 'admin' ||
-      ($user_verified_info.isSuccess &&
-        $user_verified_info.data.is_approved &&
-        $user_verified_info.data.langugaes!.map((l) => l.lang_name).includes('English')))
-);
+export let english_edit_status = writable(false);
 
 export let bulk_text_edit_status = writable(false);
 export let bulk_text_data = writable('');

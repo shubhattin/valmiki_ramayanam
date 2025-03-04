@@ -9,12 +9,12 @@ export type user_verfied_info_type = {
   }[];
 };
 
-export const AUTH_INFO_URL = `${PUBLIC_BETTER_AUTH_URL}/hono`;
+export const AUTH_INFO_URL = `${PUBLIC_BETTER_AUTH_URL}/api/ext`;
 export const PROJECT_ID = 1; // as defined in tsc_user database
 
 export const get_user_project_info = async (user_id: string, cookie?: string | null) => {
   const data = await ky
-    .get<user_verfied_info_type>(`${AUTH_INFO_URL}/user/user_info_project`, {
+    .get<user_verfied_info_type>(`${AUTH_INFO_URL}/user_info_project`, {
       searchParams: {
         user_id: user_id,
         project_id: PROJECT_ID

@@ -34,18 +34,34 @@
   import { BsKeyboard } from 'svelte-icons-pack/bs';
   import User from './user/User.svelte';
   import { get_script_for_lang, get_text_font_class } from '~/tools/font_tools';
-  import { rAmAyaNam_map, get_kANDa_names, get_sarga_names } from '~/state/main_page/data';
+  import {
+    rAmAyaNam_map,
+    get_kANDa_names,
+    get_sarga_names,
+    english_edit_status
+  } from '~/state/main_page/data';
   import MetaTags from '~/components/tags/MetaTags.svelte';
   import { loadLocalConfig } from './load_local_config';
   import { useSession } from '~/lib/auth-client';
-  import { user_verified_info } from '~/state/main_page/user.svelte';
+  import { get_user_verified_info } from '~/state/main_page/user.svelte';
 
+  const user_verified_info = $derived(get_user_verified_info());
   const query_client = useQueryClient();
 
   const session = useSession();
   let user_info = $derived($session.data?.user);
 
   let mounted = $state(false);
+
+  $effect(() => {
+    $english_edit_status =
+      $trans_lang === '--' &&
+      (user_info?.role === 'admin' ||
+        ($user_verified_info.isSuccess &&
+          $user_verified_info.data.is_approved &&
+          $user_verified_info.data.langugaes!.map((l) => l.lang_name).includes('English')));
+  });
+
   onMount(async () => {
     if (import.meta.env.DEV) {
       (async () => {

@@ -15,10 +15,11 @@
   import { client } from '~/api/client';
   import { OiSync16 } from 'svelte-icons-pack/oi';
   import { signOut, useSession } from '~/lib/auth-client';
-  import { user_verified_info } from '~/state/main_page/user.svelte';
   import Login from '~/components/pages/main_page/user/Login.svelte';
   import Signup from './Signup.svelte';
+  import { get_user_verified_info } from '~/state/main_page/user.svelte';
 
+  const user_verified_info = $derived(get_user_verified_info());
   const modalStore = getModalStore();
 
   const session = useSession();
