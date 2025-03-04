@@ -13,6 +13,6 @@
       });
     }}
     class="variant-outline-primary btn flex gap-2 rounded-lg font-semibold"
-    ><Icon src={GoogleIcon} class="inline-block text-[1.25rem]" />Login with Google</button
+    ><Icon src={GoogleIcon} class="inline-block text-[1.25rem]" />Signin with Google</button
   >
 </div>

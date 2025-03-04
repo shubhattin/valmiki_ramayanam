@@ -100,13 +100,21 @@
         </button>
       </div>
       {#if user_info.role !== 'admin' && $user_verified_info.isSuccess}
-        {@const langs = $user_verified_info.data.langugaes!}
-        {#if langs.length > 0}
-          <div>
-            <Icon class="text-xl" src={LanguageIcon} /> :
-            <span class="text-sm text-gray-500 dark:text-gray-300">
-              {langs.map((l) => l.lang_name).join(', ')}
-            </span>
+        {#if $user_verified_info.data.is_approved}
+          {@const langs = $user_verified_info.data.langugaes!}
+          {#if langs && langs.length > 0}
+            <div>
+              <Icon class="text-xl" src={LanguageIcon} /> :
+              <span class="text-sm text-gray-500 dark:text-gray-300">
+                {langs.map((l) => l.lang_name).join(', ')}
+              </span>
+            </div>
+          {:else}
+            <div class="text-sm text-warning-600 dark:text-warning-500">No languages assigned</div>
+          {/if}
+        {:else}
+          <div class="text-sm text-warning-600 dark:text-warning-500">
+            You account is not approved by Admin
           </div>
         {/if}
       {/if}
@@ -119,13 +127,6 @@
           <Icon src={OiSync16} class="my-1 mb-1 text-xl" />
           <span class="text-sm">Sync Translations from DB</span>
         </button>
-      {/if}
-      {#if user_info.role !== 'admin' && !$user_verified_info.isFetching && $user_verified_info.isSuccess}
-        {#if !$user_verified_info.data.is_approved}
-          <div class="text-sm text-error-600 dark:text-error-400">
-            Your account is not approved by the Admin.
-          </div>
-        {/if}
       {/if}
     </div>
   {:else}

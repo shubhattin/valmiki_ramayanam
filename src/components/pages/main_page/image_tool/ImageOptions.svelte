@@ -84,8 +84,8 @@
       bind:value={$image_lang}
       disabled={$image_trans_data.isFetching || !$image_trans_data.isSuccess}
     >
-      {#each LANG_LIST as lang (lang)}
-        <option value={lang}>{lang}</option>
+      {#each LANG_LIST as lang, i (lang)}
+        <option value={LANG_LIST_IDS[i]}>{lang}</option>
       {/each}
     </select>
   </label>
