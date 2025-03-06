@@ -4,7 +4,7 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { dbMode } from '~/tools/kry.server';
 
-dotenv.config({ path: '../../../.env.local' });
+dotenv.config({ path: '../../../.env' });
 
 const DB_URL = {
   LOCAL: process.env.PG_DATABASE_URL!,

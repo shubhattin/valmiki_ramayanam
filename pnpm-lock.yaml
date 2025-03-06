@@ -36,8 +36,8 @@ importers:
         specifier: ^5.67.1
         version: 5.67.1(svelte@5.21.0)
       '@trigger.dev/sdk':
-        specifier: ^3.3.16
-        version: 3.3.16(zod@3.24.2)
+        specifier: ^3.3.17
+        version: 3.3.17(zod@3.24.2)
       '@trpc/client':
         specifier: ^10.45.2
         version: 10.45.2(@trpc/server@10.45.2)
@@ -148,8 +148,8 @@ importers:
         specifier: ^5.67.1
         version: 5.67.1(@tanstack/svelte-query@5.67.1(svelte@5.21.0))(svelte@5.21.0)
       '@trigger.dev/build':
-        specifier: ^3.3.16
-        version: 3.3.16(typescript@5.8.2)
+        specifier: ^3.3.17
+        version: 3.3.17(typescript@5.8.2)
       '@types/cli-progress':
         specifier: ^3.11.6
         version: 3.11.6
@@ -1524,16 +1524,16 @@ packages:
     resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}
     engines: {node: '>= 10'}
 
-  '@trigger.dev/build@3.3.16':
-    resolution: {integrity: sha512-PATGwN8bvDlOESmOgJO3mofulxActkSClBCdlsTT3NYzT6umFFXOieWzq5fLrPpaHsujrkazTERSiHOEdxEXxw==}
+  '@trigger.dev/build@3.3.17':
+    resolution: {integrity: sha512-dfreMuVeLAcZypS3kkUA9nWNviiuOPIQ3ldy2ywPCmwmbHyd0BE8tI5D3A4kmVq/f53TdRMls4c+cYafxlwubQ==}
     engines: {node: '>=18.20.0'}
 
-  '@trigger.dev/core@3.3.16':
-    resolution: {integrity: sha512-OCxl9A7QvqLnGlnl195p8lw0pTY7hJQyaY35Sdy2GuYcm28ktwzx3F2Iu3ulgcmDlKQTpf1VZsSA5wP/enRRpQ==}
+  '@trigger.dev/core@3.3.17':
+    resolution: {integrity: sha512-KjnRxCuHq4R+MnE0zPvIQ7EIz4QSpJL+1Yn74n2cCGjyHYgQ/g8rcARn0Nxf2s8jzE38CnyRufjUrwG8k+DJrw==}
     engines: {node: '>=18.20.0'}
 
-  '@trigger.dev/sdk@3.3.16':
-    resolution: {integrity: sha512-vObHP0P5ugyZNKiAOLTD1rWeHKiX97K82aj06HaOceRZxwztbBnuhD3AXAODISvroKguySUcrLDCMOSTpXUung==}
+  '@trigger.dev/sdk@3.3.17':
+    resolution: {integrity: sha512-wjIjlQWKybYWw/J7LxFIOO1pXzxXoj9lxbFMvjb51JtfebxnQnh6aExN47nOGhVhV38wHYstfBI/8ClWwBnFYw==}
     engines: {node: '>=18.20.0'}
     peerDependencies:
       zod: ^3.0.0
@@ -5141,9 +5141,9 @@ snapshots:
   '@tootallnate/once@2.0.0':
     optional: true
 
-  '@trigger.dev/build@3.3.16(typescript@5.8.2)':
+  '@trigger.dev/build@3.3.17(typescript@5.8.2)':
     dependencies:
-      '@trigger.dev/core': 3.3.16
+      '@trigger.dev/core': 3.3.17
       pkg-types: 1.3.1
       tinyglobby: 0.2.12
       tsconfck: 3.1.3(typescript@5.8.2)
@@ -5153,7 +5153,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@trigger.dev/core@3.3.16':
+  '@trigger.dev/core@3.3.17':
     dependencies:
       '@electric-sql/client': 1.0.0-beta.1
       '@google-cloud/precise-date': 4.0.0
@@ -5186,12 +5186,12 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@trigger.dev/sdk@3.3.16(zod@3.24.2)':
+  '@trigger.dev/sdk@3.3.17(zod@3.24.2)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/api-logs': 0.52.1
       '@opentelemetry/semantic-conventions': 1.25.1
-      '@trigger.dev/core': 3.3.16
+      '@trigger.dev/core': 3.3.17
       chalk: 5.4.1
       cronstrue: 2.56.0
       debug: 4.4.0

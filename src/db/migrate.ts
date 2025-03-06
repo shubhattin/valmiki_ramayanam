@@ -4,7 +4,7 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { get_db_url } from './db_utils';
 
-dotenv.config({ path: '../../.env.local' });
+dotenv.config({ path: '../../.env' });
 
 export const migrationClient = postgres(get_db_url(process.env), { max: 1 });
 

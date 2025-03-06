@@ -12,7 +12,7 @@ import { type CoreMessage } from 'ai';
 import { format_string_text } from '../../../src/tools/kry';
 
 dotenv.config({
-  path: '../../../.env.local'
+  path: '../../../.env'
 });
 
 const openai_text_model = createOpenAI({ apiKey: process.env.OPENAI_API_KEY });

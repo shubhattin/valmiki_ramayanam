@@ -10,6 +10,7 @@ const anthropic_text_model = createAnthropic({ apiKey: process.env.ANTHROPIC_API
 
 export const translate_sarga = task({
   id: 'ai_translate_sarga',
+  maxDuration: 12 * 60, // 12 minutes
   run: async (payload: z.infer<typeof sarga_translate_schema.input>) => {
     payload = sarga_translate_schema.input.parse(payload);
     const { messages, model } = payload;
