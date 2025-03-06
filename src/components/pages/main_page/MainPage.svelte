@@ -58,7 +58,7 @@
       $trans_lang === 0 &&
       (user_info?.role === 'admin' ||
         ($user_verified_info.isSuccess &&
-          $user_verified_info.data.is_approved &&
+          !!user_info?.is_approved! &&
           $user_verified_info.data.langugaes!.map((l) => l.lang_name).includes('English')));
   });
 
@@ -367,7 +367,7 @@
                 {/each}
               </select>
             </label>
-            {#if !$editing_status_on && user_info}
+            {#if !$editing_status_on && user_info && user_info.is_approved}
               {@const languages =
                 user_info.role !== 'admin' && $user_verified_info.isSuccess
                   ? $user_verified_info.data.langugaes!.map((l) => l.lang_id)

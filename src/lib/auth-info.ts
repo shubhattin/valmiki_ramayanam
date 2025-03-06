@@ -2,7 +2,6 @@ import { PUBLIC_BETTER_AUTH_URL } from '$env/static/public';
 import ky from 'ky';
 
 export type user_verfied_info_type = {
-  is_approved: boolean;
   langugaes: {
     lang_id: number;
     lang_name: string;

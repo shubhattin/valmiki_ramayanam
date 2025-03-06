@@ -1,45 +1,18 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import type { inferAsyncReturnType } from '@trpc/server';
-import { z } from 'zod';
 import ky from 'ky';
+import type { authClient } from '$lib/auth-client';
 import { PUBLIC_BETTER_AUTH_URL } from '$env/static/public';
-
-const sessionSchema = z.object({
-  session: z.object({
-    ipAddress: z.string(),
-    userAgent: z.string(),
-    expiresAt: z.string(),
-    userId: z.string(),
-    token: z.string(),
-    createdAt: z.string(),
-    updatedAt: z.string()
-  }),
-  user: z.object({
-    id: z.string(),
-    name: z.string(),
-    email: z.string(),
-    emailVerified: z.boolean(),
-    image: z.string().nullable(),
-    createdAt: z.string(),
-    updatedAt: z.string(),
-    role: z.string().nullable(),
-    banned: z.string().nullable(),
-    banReason: z.string().nullable(),
-    banExpires: z.string().nullable()
-  })
-});
 
 export const get_seesion_from_cookie = async (cookie: string) => {
   try {
-    const session = sessionSchema.parse(
-      await ky
-        .get(`${PUBLIC_BETTER_AUTH_URL}/api/auth/get-session`, {
-          headers: {
-            Cookie: cookie
-          }
-        })
-        .json()
-    );
+    const session = await ky
+      .get<typeof authClient.$Infer.Session>(`${PUBLIC_BETTER_AUTH_URL}/api/auth/get-session`, {
+        headers: {
+          Cookie: cookie
+        }
+      })
+      .json();
     return session;
   } catch (e) {
     return null;

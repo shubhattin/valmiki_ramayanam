@@ -3,7 +3,6 @@ import { env } from '$env/dynamic/private';
 import { protectedProcedure, t } from '~/api/trpc_init';
 import { tasks, auth, runs } from '@trigger.dev/sdk/v3';
 import { sarga_translate_schema } from '~/api/routers/ai/ai_types';
-import type { lang_list_type } from '~/tools/lang_list';
 import { get_user_project_info } from '~/lib/auth-info';
 
 auth.configure({
@@ -15,7 +14,7 @@ const translate_sarga_route = protectedProcedure
   .mutation(async ({ ctx: { user, cookie }, input: { lang_id, messages, model } }) => {
     if (user.role !== 'admin') {
       const data = await get_user_project_info(user.id, cookie);
-      if (!data.is_approved) return { success: false };
+      if (!user.is_approved) return { success: false };
       const allowed_langs = data.langugaes.map((lang) => lang.lang_id);
       if (!allowed_langs || !allowed_langs.includes(lang_id)) return { success: false };
     }
