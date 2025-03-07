@@ -143,7 +143,7 @@
       {/if}
     </div>
   {:else}
-    <div class="space-y-2">
+    <div class="space-y-1 sm:space-y-2">
       <button
         onclick={() => {
           $pass_enterer_status = true;
@@ -155,9 +155,9 @@
       >
         <Icon
           src={TrOutlineLogin2}
-          class="-ml-1 -mt-1 text-3xl group-hover:text-gray-600 dark:group-hover:text-stone-400"
+          class="-ml-1 -mt-1 text-2xl group-hover:text-gray-600 sm:text-3xl dark:group-hover:text-stone-400"
         />
-        <span>Login</span>
+        <span class="text-sm sm:text-base">Login</span>
       </button>
       <button
         onclick={() => {
@@ -170,9 +170,9 @@
       >
         <Icon
           src={LuUserPlus}
-          class="text-2xl group-hover:text-gray-600 dark:group-hover:text-stone-400"
+          class="text-xl group-hover:text-gray-600 sm:text-2xl dark:group-hover:text-stone-400"
         />
-        <span>Signup</span>
+        <span class="text-sm sm:text-base">Signup</span>
       </button>
     </div>
   {/if}
