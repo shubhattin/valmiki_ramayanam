@@ -1,6 +1,6 @@
 <script lang="ts">
   import Icon from '~/tools/Icon.svelte';
-  import { SlideToggle } from '@skeletonlabs/skeleton';
+  import { Switch } from '@skeletonlabs/skeleton-svelte';
   import { SCRIPT_LIST, type script_list_type } from '~/tools/lang_list';
   import {
     load_parivartak_lang_data,
@@ -73,20 +73,18 @@
       </select>
       <button
         title="Copy Text"
-        class="btn m-0 select-none p-0 outline-hidden dark:hover:text-gray-400"
+        class="btn m-0 p-0 outline-hidden select-none dark:hover:text-gray-400"
         onclick={() => copy_text_to_clipboard($from_text)}
       >
         <Icon src={OiCopy16} class="text-xl" />
       </button>
-      <SlideToggle
+      <Switch
         name="from_text_type"
-        active="bg-primary-500"
-        class="mt-1 hover:text-gray-500 dark:hover:text-gray-400"
-        bind:checked={from_text_type_enabled}
-        size="sm"
+        checked={from_text_type_enabled}
+        onCheckedChange={(e) => (from_text_type_enabled = e.checked)}
       >
         <Icon src={BsKeyboard} class="text-4xl" />
-      </SlideToggle>
+      </Switch>
       <span
         class="mt-4 hidden text-center text-sm text-stone-500 sm:inline-block dark:text-stone-400"
         >Use <span class="font-semibold">Alt+x</span> to toggle</span
@@ -144,20 +142,18 @@
       </select>
       <button
         title="Copy Text"
-        class="btn m-0 select-none p-0 outline-hidden dark:hover:text-gray-400"
+        class="btn m-0 p-0 outline-hidden select-none dark:hover:text-gray-400"
         onclick={() => copy_text_to_clipboard($to_text)}
       >
         <Icon src={OiCopy16} class="text-xl" />
       </button>
-      <SlideToggle
+      <Switch
         name="to_text_type"
-        active="bg-primary-500"
-        class="mt-1 hover:text-gray-500 dark:hover:text-gray-400"
-        bind:checked={to_text_type_enabled}
-        size="sm"
+        checked={to_text_type_enabled}
+        onCheckedChange={(e) => (to_text_type_enabled = e.checked)}
       >
         <Icon src={BsKeyboard} class="text-4xl" />
-      </SlideToggle>
+      </Switch>
     </div>
     <textarea
       bind:value={$to_text}
@@ -178,7 +174,7 @@
     ></textarea>
   </div>
 </div>
-<div class="mb-2 mt-4 text-sm text-stone-500 dark:text-stone-400">
+<div class="mt-4 mb-2 text-sm text-stone-500 dark:text-stone-400">
   You should also refer
   <a
     href="https://app-lipilekhika.pages.dev/parivartak"

@@ -30,7 +30,7 @@
     image_tool_opened,
     ai_tool_opened
   } from '~/state/main_page/main_state';
-  import { SlideToggle } from '@skeletonlabs/skeleton';
+  import { Switch } from '@skeletonlabs/skeleton-svelte';
   import { BsKeyboard } from 'svelte-icons-pack/bs';
   import User from './user/User.svelte';
   import { get_script_for_lang, get_text_font_class } from '~/tools/font_tools';
@@ -320,7 +320,7 @@
           in:scale
           out:slide
           disabled={$editing_status_on}
-          class="btn rounded-lg bg-tertiary-700 px-1 py-1 pt-1.5 text-sm font-bold text-white sm:px-2 sm:py-1 sm:text-base"
+          class="btn bg-tertiary-700 rounded-lg px-1 py-1 pt-1.5 text-sm font-bold text-white sm:px-2 sm:py-1 sm:text-base"
         >
           <Icon class="-mt-1 mr-1 text-xl" src={TiArrowBackOutline} />
           Previous
@@ -332,7 +332,7 @@
           in:scale
           out:slide
           disabled={$editing_status_on}
-          class="btn rounded-lg bg-tertiary-700 px-1 py-1 pt-1.5 text-sm font-bold text-white sm:px-2 sm:py-1 sm:text-base"
+          class="btn bg-tertiary-700 rounded-lg px-1 py-1 pt-1.5 text-sm font-bold text-white sm:px-2 sm:py-1 sm:text-base"
         >
           Next
           <Icon class="-mt-1 ml-1 text-xl" src={TiArrowForwardOutline} />
@@ -344,7 +344,7 @@
             onclick={() => {
               $view_translation_status = true;
             }}
-            class="btn bg-primary-800 px-2 py-1 text-sm font-bold text-white sm:text-base dark:bg-primary-700"
+            class="btn bg-primary-800 dark:bg-primary-700 px-2 py-1 text-sm font-bold text-white sm:text-base"
             >View Translations</button
           >
         {:else}
@@ -375,7 +375,7 @@
               {#if $trans_lang !== 0 && (user_info.role === 'admin' || languages.indexOf($trans_lang) !== -1)}
                 <button
                   onclick={() => ($editing_status_on = true)}
-                  class="btn my-1 inline-block rounded-lg bg-tertiary-700 px-1 py-1 text-sm font-bold text-white sm:px-2 sm:text-base dark:bg-tertiary-600"
+                  class="btn bg-tertiary-700 dark:bg-tertiary-600 my-1 inline-block rounded-lg px-1 py-1 text-sm font-bold text-white sm:px-2 sm:text-base"
                 >
                   <Icon src={BiEdit} class="mr-1 text-xl sm:text-2xl" />
                   Edit
@@ -384,7 +384,7 @@
                 <!-- 1 -> English -->
                 <button
                   onclick={() => ($editing_status_on = true)}
-                  class="btn my-1 inline-block rounded-lg bg-tertiary-700 px-1 py-1 text-sm font-bold text-white sm:px-2 sm:text-base dark:bg-tertiary-600"
+                  class="btn bg-tertiary-700 dark:bg-tertiary-600 my-1 inline-block rounded-lg px-1 py-1 text-sm font-bold text-white sm:px-2 sm:text-base"
                 >
                   <Icon src={BiEdit} class="mr-1 text-xl sm:text-2xl" />
                   Edit English
@@ -398,20 +398,19 @@
     <!-- !== --, as we dont need it for english -->
     {#if $trans_lang !== 0 && $editing_status_on && !($ai_tool_opened && user_info && user_info.role === 'admin')}
       <div class="flex space-x-4">
-        <SlideToggle
+        <Switch
           name="edit_lang"
-          active="bg-primary-500"
-          class="hover:text-gray-500 dark:hover:text-gray-400"
-          bind:checked={$edit_language_typer_status}
-          size="sm"
+          checked={$edit_language_typer_status}
+          stateFocused="outline-hidden select-none"
+          onCheckedChange={(e) => ($edit_language_typer_status = e.checked)}
         >
           <Icon src={BsKeyboard} class="text-4xl" />
-        </SlideToggle>
+        </Switch>
         {#if $sanskrit_mode_texts.isSuccess && !$sanskrit_mode_texts.isFetching}
           <select
             disabled={!$edit_language_typer_status}
             bind:value={$sanskrit_mode}
-            class="select m-0 w-28 text-clip px-1 py-1 text-sm"
+            class="select m-0 w-28 px-1 py-1 text-sm text-clip"
           >
             <option value={1}>rAm ➔ {$sanskrit_mode_texts.data[0]}</option>
             <option value={0}>rAm ➔ {$sanskrit_mode_texts.data[1]}</option>

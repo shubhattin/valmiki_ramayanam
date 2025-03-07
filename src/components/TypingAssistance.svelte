@@ -3,9 +3,9 @@
   import { lipi_parivartak, load_parivartak_lang_data } from '~/tools/converter';
   import { delay } from '~/tools/delay';
   import { ALL_LANG_SCRIPT_LIST } from '~/tools/lang_list';
-  import Modal from '~/components/Modal.svelte';
   import { cl_join } from '~/tools/cl_join';
   import { onDestroy } from 'svelte';
+  import { Modal } from '@skeletonlabs/skeleton-svelte';
 
   interface Props {
     sync_lang_script: string;
@@ -63,52 +63,60 @@
 </script>
 
 <div>
-  <Modal bind:modal_open={modal_opened} outterClass="mt-0">
-    <select class="select w-40" bind:value={typing_assistance_lang}>
-      {#each ALL_LANG_SCRIPT_LIST.filter((src) => src !== 'English') as lang_script}
-        <option value={lang_script}>{lang_script}</option>
-      {/each}
-    </select>
-    <div
-      class={cl_join(
-        'mt-4 max-w-full',
-        !$usage_table.isFetching ? 'min-h-[580px] min-w-[560px]' : 'h-[580px] w-[560px]'
-      )}
-      style="
+  <Modal
+    open={modal_opened}
+    onOpenChange={(e) => (modal_opened = e.open)}
+    contentBase="card p-2 dark:bg-slate-900 bg-slate-200  space-y-4 shadow-xl max-w-(--breakpoint-sm) mx-3 mt-0 max-h-[97%] max-w-[97%] overflow-scroll"
+    backdropClasses="backdrop-blur-xs"
+    triggerBase="outline-hidden select-none"
+  >
+    {#snippet content()}
+      <select class="select w-40" bind:value={typing_assistance_lang}>
+        {#each ALL_LANG_SCRIPT_LIST.filter((src) => src !== 'English') as lang_script}
+          <option value={lang_script}>{lang_script}</option>
+        {/each}
+      </select>
+      <div
+        class={cl_join(
+          'mt-4 max-w-full',
+          !$usage_table.isFetching ? 'min-h-[580px] min-w-[560px]' : 'h-[580px] w-[560px]'
+        )}
+        style="
     min-height: {!$usage_table.isFetching ? `${HEIGHT}px` : 'auto'};
     min-width: {!$usage_table.isFetching ? `${WIDTH}px` : 'auto'};
     height: {$usage_table.isFetching ? `${HEIGHT}px` : 'auto'};
     width: {$usage_table.isFetching ? `${WIDTH}px` : 'auto'};
     "
-    >
-      {#if $usage_table.isFetching}
-        <div class="h-full w-full space-y-1">
-          <div class="placeholder h-full w-full animate-pulse rounded-lg"></div>
-          <div class="placeholder animate-pulse rounded-md"></div>
-        </div>
-      {:else if $usage_table.isSuccess}
-        {@const { url, height, width } = $usage_table.data}
-        <img
-          style:height={`${height}px`}
-          style:width={`${width}px`}
-          alt={`${typing_assistance_lang} Usage Table`}
-          src={url}
-          class="block"
-        />
-        {#if !['Romanized'].includes(typing_assistance_lang)}
-          {@render extra_info()}
+      >
+        {#if $usage_table.isFetching}
+          <div class="h-full w-full space-y-1">
+            <div class="placeholder h-full w-full animate-pulse rounded-lg"></div>
+            <div class="placeholder animate-pulse rounded-md"></div>
+          </div>
+        {:else if $usage_table.isSuccess}
+          {@const { url, height, width } = $usage_table.data}
+          <img
+            style:height={`${height}px`}
+            style:width={`${width}px`}
+            alt={`${typing_assistance_lang} Usage Table`}
+            src={url}
+            class="block"
+          />
+          {#if !['Romanized'].includes(typing_assistance_lang)}
+            {@render extra_info()}
+          {/if}
+          <div class="text-sm text-wrap text-stone-500 dark:text-stone-400">
+            Also use <span class="font-semibold">Lekhan Sahayika</span> in
+            <a
+              href="https://app-lipilekhika.pages.dev"
+              target="_blank"
+              class="text-blue-500 underline dark:text-blue-400">Lipi Lekhika</a
+            >
+            to familiarise yourself with the typing tool.
+          </div>
         {/if}
-        <div class="text-wrap text-sm text-stone-500 dark:text-stone-400">
-          Also use <span class="font-semibold">Lekhan Sahayika</span> in
-          <a
-            href="https://app-lipilekhika.pages.dev"
-            target="_blank"
-            class="text-blue-500 underline dark:text-blue-400">Lipi Lekhika</a
-          >
-          to familiarise yourself with the typing tool.
-        </div>
-      {/if}
-    </div>
+      </div>
+    {/snippet}
   </Modal>
 </div>
 

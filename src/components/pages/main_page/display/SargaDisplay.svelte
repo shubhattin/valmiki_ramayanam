@@ -35,9 +35,8 @@
   import { get_font_family_and_size } from '~/tools/font_tools';
   import { LANG_LIST, LANG_LIST_IDS, type lang_list_type } from '~/tools/lang_list';
   import { RiSystemAddLargeLine } from 'svelte-icons-pack/ri';
-  import { popup } from '@skeletonlabs/skeleton';
   import SargaAiTranslate from './ai_sarga_translate/SargaAITranslate.svelte';
-  import { Tab, TabGroup } from '@skeletonlabs/skeleton';
+  import { Popover, Tabs } from '@skeletonlabs/skeleton-svelte';
   import BulkEdit from './bulk/BulkEdit.svelte';
 
   const query_client = useQueryClient();
@@ -150,7 +149,7 @@
 <SargaAiTranslate />
 {#if copied_text_status}
   <div
-    class="fixed bottom-2 right-2 z-50 cursor-default select-none font-bold text-green-700 dark:text-green-300"
+    class="fixed right-2 bottom-2 z-50 cursor-default font-bold text-green-700 select-none dark:text-green-300"
   >
     <Icon src={BsClipboard2Check} />
     Copied to Clipboard
@@ -158,58 +157,64 @@
 {/if}
 <div class="relative w-full">
   {#if sarga_hovered}
-    <button
-      transition:fade={{ duration: 150 }}
-      title="Copy Sarga Text"
-      class={cl_join('btn absolute right-5 top-2 z-20 select-none p-0 outline-hidden')}
-      use:popup={{
-        event: 'click',
-        target: 'sarga_copy',
-        placement: 'bottom'
-      }}
-      onmouseenter={() => (sarga_hovered = true)}
+    <Popover
+      positioning={{ placement: 'bottom' }}
+      arrow={false}
+      contentBase={cl_join(
+        'card z-70 space-y-2 p-2 rounded-lg shadow-xl dark:bg-surface-900 bg-slate-100'
+      )}
+      triggerBase={'btn absolute top-2 right-5 z-20 p-0 outline-hidden select-none'}
     >
-      <!-- onclick={copy_sarga} -->
-      <Icon src={OiCopy16} class="text-lg" />
-    </button>
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div
-      onmouseenter={() => (sarga_hovered = true)}
-      class="card z-50 space-y-1 rounded-lg px-1 py-1 shadow-xl"
-      data-popup="sarga_copy"
-    >
-      <button
-        onclick={copy_sarga_shlokas_only}
-        class="btn block w-full rounded-md px-2 py-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
-      >
-        Copy Shlokas
-      </button>
-      <button
-        onclick={copy_sarga_with_transliteration_and_translation}
-        class="btn block w-full text-wrap rounded-md px-2 py-1 text-xs hover:bg-gray-200 dark:hover:bg-gray-700"
-      >
-        Copy Shlokas with Tranlsiteration and Translation
-      </button>
-    </div>
+      {#snippet trigger()}
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <span
+          transition:fade={{ duration: 150 }}
+          title="Copy Sarga Text"
+          onmouseenter={() => (sarga_hovered = true)}
+        >
+          <Icon src={OiCopy16} class="text-lg" />
+        </span>
+      {/snippet}
+      {#snippet content()}
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <div onmouseenter={() => (sarga_hovered = true)}>
+          <button
+            onclick={copy_sarga_shlokas_only}
+            class="btn block w-full rounded-md px-2 py-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
+          >
+            Copy Shlokas
+          </button>
+          <button
+            onclick={copy_sarga_with_transliteration_and_translation}
+            class="btn block w-full rounded-md px-2 py-1 text-xs text-wrap hover:bg-gray-200 dark:hover:bg-gray-700"
+          >
+            Copy Shlokas with Tranlsiteration and Translation
+          </button>
+        </div>
+      {/snippet}
+    </Popover>
   {/if}
 </div>
 
 {#if !$editing_status_on}
   {@render main()}
 {:else}
-  <TabGroup>
-    <Tab bind:group={tab_edit_name} name="tab1" value={'main'}>Main</Tab>
-    <Tab bind:group={tab_edit_name} name="tab2" value={'bulk'}
-      ><span class="text-sm">Batch Edit</span></Tab
-    >
-    <svelte:fragment slot="panel">
+  <Tabs
+    value={tab_edit_name}
+    onValueChange={(e) => (tab_edit_name = e.value as typeof tab_edit_name)}
+  >
+    {#snippet list()}
+      <Tabs.Control value={'bulk'}><span class="text-sm">Batch Edit</span></Tabs.Control>
+      <Tabs.Control value={'main'}>Main</Tabs.Control>
+    {/snippet}
+    {#snippet content()}
       {#if tab_edit_name === 'main'}
         {@render main()}
       {:else}
         <BulkEdit bind:tab_edit_name />
       {/if}
-    </svelte:fragment>
-  </TabGroup>
+    {/snippet}
+  </Tabs>
 {/if}
 {#snippet main()}
   <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -232,7 +237,7 @@
             <div class="flex space-x-2">
               {#if i !== 0 && i !== transliterated_sarga_data.length - 1}
                 <div
-                  class="flex select-none items-center align-top text-[0.75rem] leading-[1.5rem] text-gray-500 dark:text-gray-300"
+                  class="flex items-center align-top text-[0.75rem] leading-[1.5rem] text-gray-500 select-none dark:text-gray-300"
                 >
                   {i}
                 </div>
@@ -281,7 +286,7 @@
               $added_translations_indexes.push(trans_index);
               $added_translations_indexes = $added_translations_indexes;
             }}
-            class="btn m-0 rounded-md bg-surface-500 px-1 py-0 font-bold text-white dark:bg-surface-500"
+            class="btn bg-surface-500 dark:bg-surface-500 m-0 rounded-md px-1 py-0 font-bold text-white"
           >
             <Icon src={RiSystemAddLargeLine} />
           </button>
@@ -317,7 +322,7 @@
               $added_translations_indexes.push(trans_index);
               $added_translations_indexes = $added_translations_indexes;
             }}
-            class="btn m-0 rounded-md bg-surface-500 px-1 py-0 font-bold text-white dark:bg-surface-500"
+            class="btn bg-surface-500 dark:bg-surface-500 m-0 rounded-md px-1 py-0 font-bold text-white"
           >
             <Icon src={RiSystemAddLargeLine} />
           </button>

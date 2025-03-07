@@ -97,8 +97,8 @@
   transition:slide
   bind:this={modalElement}
   class={cl_join(
-    'duration-400 fixed inset-0  z-50 flex max-h-full max-w-full items-center justify-center bg-black bg-opacity-50 transition-all',
-    !opened && 'hidden bg-opacity-0',
+    'bg-opacity-50 fixed inset-0  z-50 flex max-h-full max-w-full items-center justify-center bg-black transition-all duration-400',
+    !opened && 'bg-opacity-0 hidden',
     outterClass ?? ''
   )}
 >

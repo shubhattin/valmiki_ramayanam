@@ -4,8 +4,6 @@
   import '../app.scss';
   import { ModeWatcher } from 'mode-watcher';
   import TopAppBar from '~/components/TopAppBar.svelte';
-  import { initializeStores, Modal, storePopup } from '@skeletonlabs/skeleton';
-  import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
   import PostHogInit from '~/components/tags/PostHogInit.svelte';
   import { QueryClientProvider } from '@tanstack/svelte-query';
   import { SvelteQueryDevtools } from '@tanstack/svelte-query-devtools';
@@ -18,9 +16,6 @@
   }
 
   let { children }: Props = $props();
-
-  initializeStores();
-  storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 
   onMount(() => {
     window.addEventListener('beforeinstallprompt', (event) => {
@@ -37,7 +32,6 @@
 
 <QueryClientProvider client={queryClient}>
   <ModeWatcher />
-  <Modal />
   <div class="contaiiner mx-auto mb-1 max-w-(--breakpoint-lg)">
     <TopAppBar />
     <div class="mx-2">

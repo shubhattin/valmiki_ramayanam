@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { AppBar, popup } from '@skeletonlabs/skeleton';
-  import type { PopupSettings } from '@skeletonlabs/skeleton';
+  import { AppBar, Popover } from '@skeletonlabs/skeleton-svelte';
   import ThemeChanger from './ThemeChanger.svelte';
   import Icon from '~/tools/Icon.svelte';
   import { SiGithub } from 'svelte-icons-pack/si';
@@ -11,7 +10,6 @@
   import { PAGE_TITLES } from '~/state/page_titles';
   import { pwa_event_triggerer, pwa_install_event_fired } from '~/state/main';
   import { OiDownload24 } from 'svelte-icons-pack/oi';
-  import Modal from './Modal.svelte';
   import { BiArrowBack } from 'svelte-icons-pack/bi';
 
   type Props = {
@@ -25,12 +23,7 @@
   let route_id = $derived($page.route.id as keyof typeof PAGE_TITLES);
   let support_modal_status = $state(false);
 
-  const app_menu_popup: PopupSettings = {
-    event: 'click',
-    target: 'app_bar_menu',
-    placement: 'left-end',
-    closeQuery: '.will-close'
-  };
+  let app_bar_popover_status = $state(false);
 
   const preload_component = () => import('~/components/pages/main_page/SupportOptions.svelte');
 </script>
@@ -66,7 +59,7 @@
       }}
       onmouseover={preload_component}
       onfocus={preload_component}
-      class="btn m-0 select-none rounded-md px-1 py-1 font-semibold outline-hidden hover:bg-gray-200 sm:px-2 dark:hover:bg-gray-700"
+      class="btn m-0 rounded-md px-1 py-1 font-semibold outline-hidden select-none hover:bg-gray-200 sm:px-2 dark:hover:bg-gray-700"
     >
       <Icon src={ContributeIcon} class="text-3xl" />
       <span class="hidden text-sm sm:inline">Support Our Projects</span>
@@ -81,26 +74,34 @@
         </a>
       </div>
     {/if}
-    <button class="btn m-0 p-0" use:popup={app_menu_popup} title="App Menu">
-      <Icon
-        src={AiOutlineMenu}
-        class="text-3xl hover:text-gray-500 active:text-blue-600 dark:hover:text-gray-400 dark:active:text-blue-400"
-      />
-    </button>
-    <div class="card z-50 space-y-2 rounded-lg px-3 py-2 shadow-xl" data-popup="app_bar_menu">
-      <a
-        href="/convert"
-        class="will-close group flex space-x-2 rounded-md px-2 py-1 font-bold hover:bg-gray-200 dark:hover:bg-gray-700"
-      >
+    <Popover
+      open={app_bar_popover_status}
+      onOpenChange={(e) => (app_bar_popover_status = e.open)}
+      positioning={{ placement: 'bottom' }}
+      arrow={false}
+      contentBase="card z-50 space-y-2 rounded-lg px-3 py-2 shadow-xl bg-surface-100-900"
+      triggerBase="btn m-0 p-0 gap-0 outline-hidden select-none"
+    >
+      {#snippet trigger()}
         <Icon
-          src={SiConvertio}
-          class="text-2xl group-hover:fill-emerald-600 dark:group-hover:fill-zinc-400"
+          src={AiOutlineMenu}
+          class="text-3xl hover:text-gray-500 active:text-blue-600 dark:hover:text-gray-400 dark:active:text-blue-400"
         />
-        <span>Lipi Parivartak</span>
-      </a>
-      <!-- <a
+      {/snippet}
+      {#snippet content()}
+        <a
+          href="/convert"
+          class="group flex space-x-2 rounded-md px-2 py-1 font-bold hover:bg-gray-200 dark:hover:bg-gray-700"
+        >
+          <Icon
+            src={SiConvertio}
+            class="text-2xl group-hover:fill-emerald-600 dark:group-hover:fill-zinc-400"
+          />
+          <span>Lipi Parivartak</span>
+        </a>
+        <!-- <a
         href="/excel_tool"
-        class="will-close flex space-x-1 rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
+        class="flex space-x-1 rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
       >
         <Icon
           src={RiDocumentFileExcel2Line}
@@ -108,48 +109,50 @@
         />
         <span>Excel File Transliterator</span>
       </a> -->
-      <a
-        href="https://www.youtube.com/c/thesanskritchannel"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="will-close flex space-x-1 rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
-      >
-        <Icon src={YoutubeIcon} class="mt-0 text-2xl text-[red]" />
-        <span>The Sanskrit Channel</span>
-      </a>
-      <a
-        href="https://github.com/shubhattin/valmiki_ramayanam"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="will-close group flex space-x-1 rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
-      >
-        <Icon
-          src={SiGithub}
-          class="-mt-1 mr-1 text-2xl group-hover:fill-indigo-700 dark:group-hover:fill-zinc-400"
-        />
-        <span>Project's Github Page</span>
-      </a>
-      {#if $pwa_install_event_fired}
-        <button
-          class="will-close select-none gap-1 px-2 py-1 text-sm outline-hidden"
-          onclick={async () => {
-            if ($pwa_install_event_fired) await $pwa_event_triggerer.prompt();
-          }}
+        <a
+          href="https://www.youtube.com/c/thesanskritchannel"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex space-x-1 rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
+          onclick={() => (app_bar_popover_status = false)}
         >
-          <Icon src={OiDownload24} class="-mt-1 text-base" />
-          Install
-        </button>
-      {/if}
-      <div class="wont-close flex space-x-3 rounded-md px-2 py-1">
-        <span class="mt-1">Set Theme</span>
-        <ThemeChanger />
-      </div>
-    </div>
+          <Icon src={YoutubeIcon} class="mt-0 text-2xl text-[red]" />
+          <span>The Sanskrit Channel</span>
+        </a>
+        <a
+          href="https://github.com/shubhattin/valmiki_ramayanam"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="will-close group flex space-x-1 rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
+        >
+          <Icon
+            src={SiGithub}
+            class="-mt-1 mr-1 text-2xl group-hover:fill-indigo-700 dark:group-hover:fill-zinc-400"
+          />
+          <span>Project's Github Page</span>
+        </a>
+        {#if $pwa_install_event_fired}
+          <button
+            class="will-close gap-1 px-2 py-1 text-sm outline-hidden select-none"
+            onclick={async () => {
+              if ($pwa_install_event_fired) await $pwa_event_triggerer.prompt();
+            }}
+          >
+            <Icon src={OiDownload24} class="-mt-1 text-base" />
+            Install
+          </button>
+        {/if}
+        <div class="wont-close flex space-x-3 rounded-md px-2 py-1">
+          <span class="mt-1">Set Theme</span>
+          <ThemeChanger />
+        </div>
+      {/snippet}
+    </Popover>
   {/snippet}
 </AppBar>
 
-<Modal bind:modal_open={support_modal_status}>
+<!-- <Modal bind:modal_open={support_modal_status}>
   {#await preload_component() then SupportOptions}
     <SupportOptions.default />
   {/await}
-</Modal>
+</Modal> -->

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Accordion, AccordionItem, getModalStore } from '@skeletonlabs/skeleton';
+  import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { TrOutlineHelpSquare } from 'svelte-icons-pack/tr';
   import Icon from '~/tools/Icon.svelte';
   import {
@@ -27,9 +27,9 @@
   import { lekhika_typing_tool } from '~/tools/converter';
   import { OiSync16 } from 'svelte-icons-pack/oi';
   import { useQueryClient } from '@tanstack/svelte-query';
+  import ConfirmModal from '~/components/PopoverModals/ConfirmModal.svelte';
 
   const query_client = useQueryClient();
-  const modal_store = getModalStore();
 
   let { tab_edit_name = $bindable() }: { tab_edit_name: 'main' | 'bulk' } = $props();
 
@@ -73,52 +73,50 @@
     }
   };
 
-  const sync_text_data_to_main = () => {
-    const on_confirm = async () => {
-      const trans_text_map = text_to_trans_map($bulk_text_data, shloka_count);
-      const trans_data = new Map(
-        $english_edit_status ? $trans_en_data.data! : $trans_lang_data.data!
-      );
-      trans_text_map.forEach((text, index) => {
-        const prev_text = trans_data.get(index)!;
-        if (!trans_data.has(index)) $added_translations_indexes.push(index);
-        else if (
-          prev_text != text &&
-          !(
-            prev_text.substring(0, prev_text.length - 1) === text &&
-            prev_text[prev_text.length - 1] === '\n'
-          ) // if the text is the same but ends with a new line, then ignore
-        ) {
-          $edited_translations_indexes.add(index);
-          // console.log([index, prev_text, text]);
-        }
-        trans_data.set(index, text);
-      });
-      $added_translations_indexes = $added_translations_indexes;
-      $edited_translations_indexes = $edited_translations_indexes;
-      // updating query data
-      if (!$english_edit_status) {
-        await query_client.setQueryData($trans_lang_data_query_key, trans_data);
-      } else {
-        await query_client.setQueryData(
-          QUERY_KEYS.trans_lang_data(1, $kANDa_selected, $sarga_selected),
-          trans_data
-        );
+  const sync_text_data_to_main = async () => {
+    const trans_text_map = text_to_trans_map($bulk_text_data, shloka_count);
+    const trans_data = new Map(
+      $english_edit_status ? $trans_en_data.data! : $trans_lang_data.data!
+    );
+    trans_text_map.forEach((text, index) => {
+      const prev_text = trans_data.get(index)!;
+      if (!trans_data.has(index)) $added_translations_indexes.push(index);
+      else if (
+        prev_text != text &&
+        !(
+          prev_text.substring(0, prev_text.length - 1) === text &&
+          prev_text[prev_text.length - 1] === '\n'
+        ) // if the text is the same but ends with a new line, then ignore
+      ) {
+        $edited_translations_indexes.add(index);
+        // console.log([index, prev_text, text]);
       }
-      $bulk_text_edit_status = false;
-      tab_edit_name = 'main';
-    };
-    modal_store.trigger({
-      type: 'confirm',
-      title: 'Sure to sync the text to Main Tab ?',
-      body:
-        'This will write the shloka contents to the main tab text which can then be verified and saved from there.' +
-        '\nAlso be sure to verify for any sorts of distortions, it sometimes adds spaces or new lines on its own (nothing too serious). ' +
-        'If you are adding to an empty non translated shloka it should be fine.',
-      response: (r: boolean) => {
-        if (r) on_confirm();
-      }
+      trans_data.set(index, text);
     });
+    $added_translations_indexes = $added_translations_indexes;
+    $edited_translations_indexes = $edited_translations_indexes;
+    // updating query data
+    if (!$english_edit_status) {
+      await query_client.setQueryData($trans_lang_data_query_key, trans_data);
+    } else {
+      await query_client.setQueryData(
+        QUERY_KEYS.trans_lang_data(1, $kANDa_selected, $sarga_selected),
+        trans_data
+      );
+    }
+    $bulk_text_edit_status = false;
+    tab_edit_name = 'main';
+    // modal_store.trigger({
+    //   type: 'confirm',
+    //   title: 'Sure to sync the text to Main Tab ?',
+    //   body:
+    //     'This will write the shloka contents to the main tab text which can then be verified and saved from there.' +
+    //     '\nAlso be sure to verify for any sorts of distortions, it sometimes adds spaces or new lines on its own (nothing too serious). ' +
+    //     'If you are adding to an empty non translated shloka it should be fine.',
+    //   response: (r: boolean) => {
+    //     if (r) on_confirm();
+    //   }
+    // });
   };
 
   const detect_shortcut_pressed = (event: KeyboardEvent) => {
@@ -129,13 +127,15 @@
   };
 </script>
 
-<Accordion>
-  <AccordionItem open={false}>
-    <svelte:fragment slot="lead">
+<Accordion value={[]}>
+  <Accordion.Item value="help">
+    {#snippet lead()}
       <Icon src={TrOutlineHelpSquare} class="-m-1.5  -mt-2 text-2xl" />
-    </svelte:fragment>
-    <span slot="summary" class="text-base font-bold">Instructions</span>
-    <svelte:fragment slot="content">
+    {/snippet}
+    {#snippet control()}
+      <span class="text-base font-bold">Instructions</span>
+    {/snippet}
+    {#snippet panel()}
       <ul class="list-disc">
         <li>Each shloka should be separated by two or more blank lines</li>
         <li>
@@ -166,8 +166,8 @@
           </ul>
         </li>
       </ul>
-    </svelte:fragment>
-  </AccordionItem>
+    {/snippet}
+  </Accordion.Item>
 </Accordion>
 
 <div class="mt-3 p-1">
@@ -177,13 +177,19 @@
   {:else}
     {@const trans_map = text_to_trans_map($bulk_text_data, shloka_count)}
     <div class="space-x-2">
-      <button
-        class="btn rounded-lg bg-tertiary-700 px-1 py-1 font-bold text-white dark:bg-tertiary-600"
-        onclick={sync_text_data_to_main}
+      <ConfirmModal
+        popup_state={false}
+        close_on_confirm={true}
+        confirm_func={sync_text_data_to_main}
+        description={'Sure to sync the text to Main Tab ?'}
       >
-        <Icon src={OiSync16} class="-my-1 mr-1 text-lg" />
-        Sync to Main
-      </button>
+        <button
+          class="btn bg-tertiary-700 dark:bg-tertiary-600 rounded-lg px-1 py-1 font-bold text-white"
+        >
+          <Icon src={OiSync16} class="-my-1 mr-1 text-lg" />
+          Sync to Main
+        </button>
+      </ConfirmModal>
       <span class="text-xs font-bold">Shlokas Found: {trans_map.size}</span>
       <span class="text-xs font-semibold">Total Shlokas: {shloka_count + 2}</span>
     </div>

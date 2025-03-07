@@ -19,7 +19,7 @@
   import Icon from '~/tools/Icon.svelte';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import { LanguageIcon } from '~/components/icons';
-  import { SlideToggle, TabGroup, Tab, Accordion, AccordionItem } from '@skeletonlabs/skeleton';
+  import { Tabs, Accordion, Switch } from '@skeletonlabs/skeleton-svelte';
   import ImageDownloader from './ImageDownloader.svelte';
   import { DEFAULT_SHLOKA_CONFIG_SHARED, get_image_font_info } from './settings';
   import { IoOptions } from 'svelte-icons-pack/io';
@@ -91,38 +91,40 @@
   </label>
   <ImageDownloader />
   <span class="inline-flex flex-col">
-    <SlideToggle
+    <Switch
       name="from_text_type"
-      active="bg-primary-500"
-      class="mt-1 hover:text-gray-500 dark:hover:text-gray-400"
-      bind:checked={$shaded_background_image_status}
-      size="sm"
+      checked={$shaded_background_image_status}
+      onCheckedChange={(e) => ($shaded_background_image_status = e.checked)}
     />
+    <!-- class="mt-1 hover:text-gray-500 dark:hover:text-gray-400" -->
   </span>
   <span class="flex flex-col items-center justify-center">
     <button
       onclick={reset_func}
-      class="btn m-0 rounded-md bg-surface-700 px-1 py-1 text-xs font-bold text-white dark:bg-surface-500"
+      class="btn bg-surface-700 dark:bg-surface-500 m-0 rounded-md px-1 py-1 text-xs font-bold text-white"
       >Reset</button
     >
   </span>
 </div>
-<Accordion>
-  <AccordionItem open={false}>
+<Accordion value={[]}>
+  <Accordion.Item value="options">
     {#snippet lead()}
       <Icon src={IoOptions} class="text-2xl" />
     {/snippet}
-    {#snippet summary()}
+    {#snippet control()}
       <span class="text-sm font-bold">Change Default Options</span>
     {/snippet}
-    {#snippet content()}
+    {#snippet panel()}
       <div class="space-y-2">
-        <TabGroup>
-          <Tab bind:group={settings_tab} name="tab1" value={'non-depend'}
-            >Shloka Type Independent</Tab
-          >
-          <Tab bind:group={settings_tab} name="tab2" value={'depend'}>Shloka Type Dependent</Tab>
-          <svelte:fragment slot="panel">
+        <Tabs
+          value={settings_tab}
+          onValueChange={(e) => (settings_tab = e.value as typeof settings_tab)}
+        >
+          {#snippet list()}
+            <Tabs.Control value={'non-depend'}>Shloka Type Independent</Tabs.Control>
+            <Tabs.Control value={'depend'}>Shloka Type Dependent</Tabs.Control>
+          {/snippet}
+          {#snippet content()}
             {#if settings_tab === 'non-depend'}
               <div class="flex justify-center space-x-16">
                 <div class=" flex flex-col justify-center space-y-1">
@@ -306,9 +308,9 @@
                 </div>
               </div>
             {/if}
-          </svelte:fragment>
-        </TabGroup>
+          {/snippet}
+        </Tabs>
       </div>
     {/snippet}
-  </AccordionItem>
+  </Accordion.Item>
 </Accordion>

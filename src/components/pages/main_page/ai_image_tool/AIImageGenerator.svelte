@@ -10,7 +10,7 @@
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import { writable } from 'svelte/store';
   import image_tool_prompts from './image_tool_prompts.yaml';
-  import { SlideToggle, ProgressRadial } from '@skeletonlabs/skeleton';
+  import { Switch, ProgressRing } from '@skeletonlabs/skeleton-svelte';
   import { client } from '~/api/client';
   import { lipi_parivartak } from '~/tools/converter';
   import { copy_text_to_clipboard, format_string_text, get_permutations } from '~/tools/kry';
@@ -273,7 +273,7 @@
 
 {#if copied_text_status}
   <div
-    class="fixed bottom-2 right-2 z-50 cursor-default select-none font-bold text-green-700 dark:text-green-300"
+    class="fixed right-2 bottom-2 z-50 cursor-default font-bold text-green-700 select-none dark:text-green-300"
   >
     <Icon src={BsClipboard2Check} />
     Copied to Clipboard
@@ -316,7 +316,7 @@
       // ^ this regetch is not a reliable alternative to onSuccess
     }}
     disabled={$image_prompt_q.isFetching}
-    class="btn rounded-md bg-surface-600 px-2 py-1 font-bold text-white dark:bg-surface-600"
+    class="btn bg-surface-600 dark:bg-surface-600 rounded-md px-2 py-1 font-bold text-white"
   >
     Generate Image Prompt
   </button>
@@ -330,7 +330,7 @@
     {/each}
   </select>
   {#if show_prompt_time_status && $image_prompt_q.isSuccess && $image_prompt_q.data.image_prompt}
-    <span class="ml-4 select-none text-xs text-stone-500 dark:text-stone-300">
+    <span class="ml-4 text-xs text-stone-500 select-none dark:text-stone-300">
       <Icon src={OiStopwatch16} class="text-base" />
       {pretty_ms($image_prompt_q.data.time_taken)}
     </span>
@@ -364,7 +364,7 @@
       bind:value={$base_user_prompt}
     ></textarea>
   </div>
-  <div class="break-words text-xs text-stone-500 dark:text-stone-400">
+  <div class="text-xs break-words text-stone-500 dark:text-stone-400">
     {additional_prompt_info}
   </div>
   <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -389,12 +389,11 @@
       <option class="text-sm" value={option[0]} title={option[1][1]}>{option[1][0]}</option>
     {/each}
   </select>
-  <SlideToggle
+  <Switch
     name="auto_image"
-    size="sm"
-    class="mt-1 outline-hidden"
-    active="bg-primary-500"
-    bind:checked={$auto_gen_image}>Auto Generate Image</SlideToggle
+    stateFocused="outline-hidden select-none"
+    checked={$auto_gen_image}
+    onCheckedChange={(e) => ($auto_gen_image = e.checked)}>Auto Generate Image</Switch
   >
 </div>
 {#if $image_prompt_q.data !== undefined || $image_prompt_q.isFetching}
@@ -406,7 +405,7 @@
       <button
         disabled={$image_q.isFetching}
         onclick={generate_image}
-        class="btn rounded-md bg-tertiary-800 px-1 py-0 font-bold text-white dark:bg-tertiary-700"
+        class="btn bg-tertiary-800 dark:bg-tertiary-700 rounded-md px-1 py-0 font-bold text-white"
         >Generate Image</button
       >
       <button
@@ -417,17 +416,12 @@
         <Icon src={BsCopy} class="text-lg" />
       </button>
       {#if $image_q.isFetching}
-        <ProgressRadial
+        <ProgressRing
           value={(image_gen_time_taken / IMAGE_MODELS[image_model][2]) * 100}
-          stroke={100}
-          width="w-6"
-          class="-mb-2 inline-block"
-          meter="stroke-primary-500"
-          track="stroke-primary-500/30"
-          strokeLinecap="butt"
+          max={100}
         />
       {:else if show_image_time_status && $image_q.isSuccess}
-        <span class="ml-4 select-none text-xs text-stone-500 dark:text-stone-300">
+        <span class="ml-4 text-xs text-stone-500 select-none dark:text-stone-300">
           <Icon src={OiStopwatch16} class="text-base" />
           {pretty_ms($image_q.data.time_taken)}
         </span>
@@ -461,7 +455,7 @@
                   <div class="flex items-center justify-center space-x-3">
                     <button
                       onclick={() => download_image(image)}
-                      class="btn rounded-md bg-surface-600 px-1 py-1 outline-hidden dark:bg-surface-500"
+                      class="btn bg-surface-600 dark:bg-surface-500 rounded-md px-1 py-1 outline-hidden"
                     >
                       <Icon src={BsDownload} class="text-xl text-white" />
                     </button>
