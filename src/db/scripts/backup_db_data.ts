@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import { z } from 'zod';
-import { dbClient_ext as db, queryClient } from '~/db/scripts/client';
+import { dbClient_ext as db, queryClient } from './client';
 import { json2csv } from 'json-2-csv';
 
 const OUT_FOLDER = './backup';
