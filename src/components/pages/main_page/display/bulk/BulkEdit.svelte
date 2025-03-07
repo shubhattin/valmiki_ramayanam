@@ -204,9 +204,3 @@
   oninput={(e) => ($bulk_text_edit_status = true) && input_func(e)}
   onkeyup={detect_shortcut_pressed}
 ></textarea>
-
-<style lang="postcss">
-  code {
-    @apply text-xs;
-  }
-</style>
