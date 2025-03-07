@@ -160,7 +160,7 @@
     Translate Sarga with AI
   </button>
   <select
-    class="select ml-3 inline-block w-20 px-1 py-1 text-xs outline-none"
+    class="select ml-3 inline-block w-20 px-1 py-1 text-xs outline-hidden"
     bind:value={selected_model}
     title={TEXT_MODEL_LIST[selected_model][1]}
   >

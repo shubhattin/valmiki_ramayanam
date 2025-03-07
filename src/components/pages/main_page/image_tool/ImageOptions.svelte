@@ -254,7 +254,7 @@
                   <div class="text-sm font-semibold">Boundaries</div>
                   <input
                     type="number"
-                    class="input block w-14 rounded-sm px-1 py-0 text-sm"
+                    class="input block w-14 rounded-xs px-1 py-0 text-sm"
                     bind:value={$shloka_configs[$current_shloka_type].bounding_coords.top}
                     min={0}
                     max={1080}
@@ -262,14 +262,14 @@
                   <div class="space-x-6">
                     <input
                       type="number"
-                      class="input w-16 rounded-sm px-1 py-0 text-sm"
+                      class="input w-16 rounded-xs px-1 py-0 text-sm"
                       bind:value={$shloka_configs[$current_shloka_type].bounding_coords.left}
                       min={0}
                       max={1920}
                     />
                     <input
                       type="number"
-                      class="input w-16 rounded-sm px-1 py-0 text-sm"
+                      class="input w-16 rounded-xs px-1 py-0 text-sm"
                       bind:value={$shloka_configs[$current_shloka_type].bounding_coords.right}
                       min={0}
                       max={1920}
@@ -277,7 +277,7 @@
                   </div>
                   <input
                     type="number"
-                    class="input w-16 rounded-sm px-1 py-0 text-sm"
+                    class="input w-16 rounded-xs px-1 py-0 text-sm"
                     bind:value={$shloka_configs[$current_shloka_type].bounding_coords.bottom}
                     min={0}
                     max={1080}

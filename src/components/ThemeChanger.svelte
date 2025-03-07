@@ -6,7 +6,7 @@
 </script>
 
 <button
-  class="group btn-xl -mb-1 ml-0 mr-0 inline-flex items-center p-0 outline-none"
+  class="group btn-xl -mb-1 ml-0 mr-0 inline-flex items-center p-0 outline-hidden"
   onclick={() => setMode('system')}
 >
   <Icon
@@ -15,13 +15,13 @@
   />
 </button>
 <button
-  class="group btn-xl -mb-1 ml-0 mr-0 inline-flex items-center p-0 outline-none"
+  class="group btn-xl -mb-1 ml-0 mr-0 inline-flex items-center p-0 outline-hidden"
   onclick={() => setMode('light')}
 >
   <Icon src={LuSun} class="h-5 w-5 rotate-0 scale-100 dark:group-hover:text-yellow-300" />
 </button>
 <button
-  class="group btn-xl -mb-1 ml-0 mr-0 inline-flex items-center p-0 outline-none"
+  class="group btn-xl -mb-1 ml-0 mr-0 inline-flex items-center p-0 outline-hidden"
   onclick={() => setMode('dark')}
 >
   <Icon

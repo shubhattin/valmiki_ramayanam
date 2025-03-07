@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { ModeWatcher } from 'mode-watcher';
   import '@fontsource/roboto/latin.css';
+  import '../app.css';
   import '../app.scss';
+  import { ModeWatcher } from 'mode-watcher';
   import TopAppBar from '~/components/TopAppBar.svelte';
   import { initializeStores, Modal, storePopup } from '@skeletonlabs/skeleton';
   import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
@@ -37,7 +38,7 @@
 <QueryClientProvider client={queryClient}>
   <ModeWatcher />
   <Modal />
-  <div class="contaiiner mx-auto mb-1 max-w-screen-lg">
+  <div class="contaiiner mx-auto mb-1 max-w-(--breakpoint-lg)">
     <TopAppBar />
     <div class="mx-2">
       {@render children?.()}

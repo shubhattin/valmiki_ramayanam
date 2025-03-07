@@ -73,7 +73,7 @@
       </select>
       <button
         title="Copy Text"
-        class="btn m-0 select-none p-0 outline-none dark:hover:text-gray-400"
+        class="btn m-0 select-none p-0 outline-hidden dark:hover:text-gray-400"
         onclick={() => copy_text_to_clipboard($from_text)}
       >
         <Icon src={OiCopy16} class="text-xl" />
@@ -112,7 +112,7 @@
   </div>
   <div class="my-3 flex justify-center space-x-3">
     <button
-      class="btn m-0 p-0 outline-none"
+      class="btn m-0 p-0 outline-hidden"
       onclick={() => convert_text($to_text, from_text, $to_lang, $from_lang)}
       ><Icon
         src={FaCircleUp}
@@ -120,7 +120,7 @@
       /></button
     >
     <button
-      class="btn m-0 p-0 outline-none"
+      class="btn m-0 p-0 outline-hidden"
       onclick={() => convert_text($from_text, to_text, $from_lang, $to_lang)}
       ><Icon
         src={FaCircleDown}
@@ -128,7 +128,7 @@
       /></button
     >
     <button
-      class="btn rounded-md p-0 text-sm outline-none"
+      class="btn rounded-md p-0 text-sm outline-hidden"
       title={'Language Typing Assistance'}
       onclick={() => ($typing_assistance_modal_opened = true)}
     >
@@ -144,7 +144,7 @@
       </select>
       <button
         title="Copy Text"
-        class="btn m-0 select-none p-0 outline-none dark:hover:text-gray-400"
+        class="btn m-0 select-none p-0 outline-hidden dark:hover:text-gray-400"
         onclick={() => copy_text_to_clipboard($to_text)}
       >
         <Icon src={OiCopy16} class="text-xl" />

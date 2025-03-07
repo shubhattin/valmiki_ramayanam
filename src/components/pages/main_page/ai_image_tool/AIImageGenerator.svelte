@@ -321,7 +321,7 @@
     Generate Image Prompt
   </button>
   <select
-    class="select ml-3 inline-block w-20 px-1 py-1 text-xs outline-none"
+    class="select ml-3 inline-block w-20 px-1 py-1 text-xs outline-hidden"
     bind:value={selected_text_model}
     title={TEXT_MODEL_LIST[selected_text_model][1]}
   >
@@ -341,14 +341,14 @@
     <div class="space-x-2">
       <span class="font-bold">Base Prompt</span>
       <button
-        class="btn m-0 p-0 outline-none"
+        class="btn m-0 p-0 outline-hidden"
         onclick={() => copy_text_to_clipboard($base_user_prompt + additional_prompt_info)}
         title="Copy Base Prompt"
       >
         <Icon src={LuCopy} />
       </button>
       <button
-        class="btn m-0 p-0 outline-none"
+        class="btn m-0 p-0 outline-hidden"
         title="Copy Full Prompt"
         onclick={() =>
           copy_text_to_clipboard(
@@ -392,7 +392,7 @@
   <SlideToggle
     name="auto_image"
     size="sm"
-    class="mt-1 outline-none"
+    class="mt-1 outline-hidden"
     active="bg-primary-500"
     bind:checked={$auto_gen_image}>Auto Generate Image</SlideToggle
   >
@@ -410,7 +410,7 @@
         >Generate Image</button
       >
       <button
-        class="btn m-0 p-0 outline-none"
+        class="btn m-0 p-0 outline-hidden"
         title="Copy Image Prompt"
         onclick={() => copy_text_to_clipboard($image_prompt)}
       >
@@ -461,7 +461,7 @@
                   <div class="flex items-center justify-center space-x-3">
                     <button
                       onclick={() => download_image(image)}
-                      class="btn rounded-md bg-surface-600 px-1 py-1 outline-none dark:bg-surface-500"
+                      class="btn rounded-md bg-surface-600 px-1 py-1 outline-hidden dark:bg-surface-500"
                     >
                       <Icon src={BsDownload} class="text-xl text-white" />
                     </button>

@@ -1,0 +1,4 @@
+/* Write your global styles here, in PostCSS syntax */
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));

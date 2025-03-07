@@ -66,7 +66,7 @@
       }}
       onmouseover={preload_component}
       onfocus={preload_component}
-      class="btn m-0 select-none rounded-md px-1 py-1 font-semibold outline-none hover:bg-gray-200 sm:px-2 dark:hover:bg-gray-700"
+      class="btn m-0 select-none rounded-md px-1 py-1 font-semibold outline-hidden hover:bg-gray-200 sm:px-2 dark:hover:bg-gray-700"
     >
       <Icon src={ContributeIcon} class="text-3xl" />
       <span class="hidden text-sm sm:inline">Support Our Projects</span>
@@ -131,7 +131,7 @@
       </a>
       {#if $pwa_install_event_fired}
         <button
-          class="will-close select-none gap-1 px-2 py-1 text-sm outline-none"
+          class="will-close select-none gap-1 px-2 py-1 text-sm outline-hidden"
           onclick={async () => {
             if ($pwa_install_event_fired) await $pwa_event_triggerer.prompt();
           }}

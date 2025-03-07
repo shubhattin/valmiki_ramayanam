@@ -161,7 +161,7 @@
     <button
       transition:fade={{ duration: 150 }}
       title="Copy Sarga Text"
-      class={cl_join('btn absolute right-5 top-2 z-20 select-none p-0 outline-none')}
+      class={cl_join('btn absolute right-5 top-2 z-20 select-none p-0 outline-hidden')}
       use:popup={{
         event: 'click',
         target: 'sarga_copy',
