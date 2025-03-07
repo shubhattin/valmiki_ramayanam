@@ -5,6 +5,7 @@ on:
 
 env:
   PUBLIC_BETTER_AUTH_URL: http://localhost:3000
+  PUBLIC_TURNSTILE_SITE_KEY: key
 jobs:
   tests:
     runs-on: ubuntu-latest
