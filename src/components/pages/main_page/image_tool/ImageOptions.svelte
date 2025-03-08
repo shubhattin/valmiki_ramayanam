@@ -118,8 +118,12 @@
           onValueChange={(e) => (settings_tab = e.value as typeof settings_tab)}
         >
           {#snippet list()}
-            <Tabs.Control value={'non-depend'}>Shloka Type Independent</Tabs.Control>
-            <Tabs.Control value={'depend'}>Shloka Type Dependent</Tabs.Control>
+            <Tabs.Control value={'non-depend'}
+              ><span class="text-sm">Shloka Type Independent</span></Tabs.Control
+            >
+            <Tabs.Control value={'depend'}
+              ><span class="text-sm">Shloka Type Dependent</span></Tabs.Control
+            >
           {/snippet}
           {#snippet content()}
             {#if settings_tab === 'non-depend'}
@@ -127,21 +131,21 @@
                 <div class=" flex flex-col justify-center space-y-1">
                   <div class="text-center text-sm font-semibold">Spaces</div>
                   <div class="space-y-1 text-center">
-                    <label>
+                    <label class="block space-x-1">
                       <span class="text-sm">Above Reference Line</span>
                       <input
                         type="number"
-                        class="input w-12 rounded-md px-1 py-0 text-sm"
+                        class="input inline-block w-12 rounded-md px-1 py-0 text-sm ring-2"
                         bind:value={$SPACE_ABOVE_REFERENCE_LINE}
                         min={0}
                         max={40}
                       />
                     </label>
-                    <label>
+                    <label class="block space-x-1">
                       <span class="text-sm">Between Main and Normal</span>
                       <input
                         type="number"
-                        class="input w-12 rounded-md px-1 py-0 text-sm"
+                        class="input inline-block w-12 rounded-md px-1 py-0 text-sm ring-2"
                         bind:value={
                           $main_text_font_configs[$image_script].space_between_main_and_normal
                         }
@@ -155,22 +159,22 @@
                   <div class="text-center text-sm font-semibold">Text Scaling factors</div>
                   <div class="flex justify-center space-x-3 text-center">
                     <div class="flex flex-col justify-center space-y-1">
-                      <label class="space-x-1">
+                      <label class="block space-x-1">
                         <span class="text-sm">Main</span>
                         <input
                           type="number"
-                          class="input w-16 rounded-md px-1 py-0 text-sm"
+                          class="input inline-block w-16 rounded-md px-1 py-0 text-sm ring-2"
                           bind:value={$main_text_font_configs[$image_script].size}
                           min={0}
                           max={10}
                           step={0.05}
                         />
                       </label>
-                      <label class="space-x-1">
+                      <label class="block space-x-1">
                         <span class="text-sm">Normal</span>
                         <input
                           type="number"
-                          class="input w-16 rounded-md px-1 py-0 text-sm"
+                          class="input inline-block w-16 rounded-md px-1 py-0 text-sm ring-2"
                           bind:value={$normal_text_font_config.size}
                           min={0}
                           max={10}
@@ -183,7 +187,7 @@
                         <span class="text-sm">Translation</span>
                         <input
                           type="number"
-                          class="input w-16 rounded-md px-1 py-0 text-sm"
+                          class="input inline-block w-16 rounded-md px-1 py-0 text-sm ring-2"
                           bind:value={
                             $trans_text_font_configs[
                               LANG_LIST[LANG_LIST_IDS.indexOf($image_lang)] as lang_list_type
@@ -198,7 +202,7 @@
                         <span class="text-sm">Line Spacing</span>
                         <input
                           type="number"
-                          class="input w-16 rounded-md px-1 py-0 text-sm"
+                          class="input inline-block w-16 rounded-md px-1 py-0 text-sm ring-2"
                           bind:value={
                             $trans_text_font_configs[
                               LANG_LIST[LANG_LIST_IDS.indexOf($image_lang)] as lang_list_type
@@ -225,7 +229,7 @@
                     <span class="text-sm">Main Text</span>
                     <input
                       type="number"
-                      class="input w-16 rounded-md px-1 py-0 text-sm"
+                      class="input inline-block w-16 rounded-md px-1 py-0 text-sm ring-2"
                       bind:value={$shloka_configs[$current_shloka_type].main_text_font_size}
                       min={10}
                     />
@@ -234,7 +238,7 @@
                     <span class="text-sm">Normal Text</span>
                     <input
                       type="number"
-                      class="input w-16 rounded-md px-1 py-0 text-sm"
+                      class="input inline-block w-16 rounded-md px-1 py-0 text-sm ring-2"
                       bind:value={$shloka_configs[$current_shloka_type].norm_text_font_size}
                       min={10}
                     />
@@ -243,7 +247,7 @@
                     <span class="text-sm">Translation Text</span>
                     <input
                       type="number"
-                      class="input w-16 rounded-md px-1 py-0 text-sm"
+                      class="input inline-block w-16 rounded-md px-1 py-0 text-sm ring-2"
                       bind:value={$shloka_configs[$current_shloka_type].trans_text_font_size}
                       min={10}
                     />
@@ -253,7 +257,7 @@
                   <div class="text-sm font-semibold">Boundaries</div>
                   <input
                     type="number"
-                    class="input block w-14 rounded-xs px-1 py-0 text-sm"
+                    class="input block w-14 rounded-xs px-1 py-0 text-sm ring-2"
                     bind:value={$shloka_configs[$current_shloka_type].bounding_coords.top}
                     min={0}
                     max={1080}
@@ -261,14 +265,14 @@
                   <div class="space-x-6">
                     <input
                       type="number"
-                      class="input w-16 rounded-xs px-1 py-0 text-sm"
+                      class="input inline-block w-16 rounded-xs px-1 py-0 text-sm ring-2"
                       bind:value={$shloka_configs[$current_shloka_type].bounding_coords.left}
                       min={0}
                       max={1920}
                     />
                     <input
                       type="number"
-                      class="input w-16 rounded-xs px-1 py-0 text-sm"
+                      class="input inline-block w-16 rounded-xs px-1 py-0 text-sm ring-2"
                       bind:value={$shloka_configs[$current_shloka_type].bounding_coords.right}
                       min={0}
                       max={1920}
@@ -276,7 +280,7 @@
                   </div>
                   <input
                     type="number"
-                    class="input w-16 rounded-xs px-1 py-0 text-sm"
+                    class="input inline-block w-16 rounded-xs px-1 py-0 text-sm ring-2"
                     bind:value={$shloka_configs[$current_shloka_type].bounding_coords.bottom}
                     min={0}
                     max={1080}
@@ -288,7 +292,7 @@
                     <span class="text-sm">Top Start</span>
                     <input
                       type="number"
-                      class="input w-16 rounded-md px-1 py-0 text-sm"
+                      class="input inline-block w-16 rounded-md px-1 py-0 text-sm ring-2"
                       bind:value={$shloka_configs[$current_shloka_type].reference_lines.top}
                       min={10}
                     />
@@ -297,7 +301,7 @@
                     <span class="text-sm">Spacing</span>
                     <input
                       type="number"
-                      class="input w-16 rounded-md px-1 py-0 text-sm"
+                      class="input inline-block w-16 rounded-md px-1 py-0 text-sm ring-2"
                       bind:value={$shloka_configs[$current_shloka_type].reference_lines.spacing}
                       min={10}
                     />
