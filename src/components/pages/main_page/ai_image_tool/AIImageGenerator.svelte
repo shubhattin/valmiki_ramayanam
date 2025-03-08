@@ -283,7 +283,7 @@
   <span class="space-x-1">
     <span class="font-semibold">Shloka No.</span>
     <button
-      class="m-0 btn p-0"
+      class="btn-hover"
       disabled={$shloka_numb === 0}
       onclick={() => {
         if ($shloka_numb !== -1) $shloka_numb -= 1;
@@ -292,7 +292,7 @@
     >
       <Icon src={TiArrowBackOutline} class="-mt-1 text-lg" />
     </button>
-    <select class="select inline-block w-14 p-1 text-sm" bind:value={$shloka_numb}>
+    <select class="select inline-block w-14 px-1 text-sm ring-2" bind:value={$shloka_numb}>
       <option value={0}>0</option>
       {#each Array(shloka_count) as _, index}
         <option value={index + 1}>{index + 1}</option>
@@ -300,7 +300,7 @@
       <option value={-1}>-1</option>
     </select>
     <button
-      class="m-0 btn p-0"
+      class="btn-hover"
       onclick={() => {
         if ($shloka_numb !== shloka_count) $shloka_numb += 1;
         else $shloka_numb = -1;
@@ -321,7 +321,7 @@
     Generate Image Prompt
   </button>
   <select
-    class="select ml-3 inline-block w-20 px-1 py-1 text-xs outline-hidden"
+    class="select ml-2.5 inline-block w-20 px-1 py-1 text-xs ring-2 outline-hidden"
     bind:value={selected_text_model}
     title={TEXT_MODEL_LIST[selected_text_model][1]}
   >
@@ -336,19 +336,19 @@
     </span>
   {/if}
 </div>
-<div>
+<div class="space-y-1">
   <div class="block space-y-1.5">
     <div class="space-x-2">
       <span class="font-bold">Base Prompt</span>
       <button
-        class="m-0 btn p-0 outline-hidden"
+        class="btn-hover p-0 outline-hidden"
         onclick={() => copy_text_to_clipboard($base_user_prompt + additional_prompt_info)}
         title="Copy Base Prompt"
       >
         <Icon src={LuCopy} />
       </button>
       <button
-        class="m-0 btn p-0 outline-hidden"
+        class="btn-hover p-0 outline-hidden"
         title="Copy Full Prompt"
         onclick={() =>
           copy_text_to_clipboard(
@@ -381,7 +381,7 @@
 </div>
 <div class="flex space-x-3">
   <select
-    class="select w-24 px-1 py-1 text-sm"
+    class="select w-24 px-1 py-1 text-sm ring-2"
     bind:value={image_model}
     title={IMAGE_MODELS[image_model][1]}
   >
@@ -405,11 +405,11 @@
       <button
         disabled={$image_q.isFetching}
         onclick={generate_image}
-        class="btn rounded-md bg-tertiary-800 px-1 py-0 font-bold text-white dark:bg-tertiary-700"
+        class="btn-hover rounded-md bg-tertiary-800 px-1.5 py-0 font-bold text-white dark:bg-tertiary-800"
         >Generate Image</button
       >
       <button
-        class="m-0 btn p-0 outline-hidden"
+        class="btn-hover p-0 outline-hidden"
         title="Copy Image Prompt"
         onclick={() => copy_text_to_clipboard($image_prompt)}
       >
@@ -419,6 +419,12 @@
         <ProgressRing
           value={(image_gen_time_taken / IMAGE_MODELS[image_model][2]) * 100}
           max={100}
+          size="size-6"
+          strokeLinecap="butt"
+          classes="inline-block -mb-2"
+          meterBase="stroke-primary-500"
+          trackBase="stroke-primary-500/30"
+          strokeWidth="5px"
         />
       {:else if show_image_time_status && $image_q.isSuccess}
         <span class="ml-4 text-xs text-stone-500 select-none dark:text-stone-300">
