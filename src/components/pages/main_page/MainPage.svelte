@@ -362,7 +362,7 @@
                 class="select inline-block w-24 px-1 py-1 text-sm sm:w-32 sm:px-2 sm:text-base"
                 bind:value={$trans_lang_selection}
               >
-                <option value={0}>-- Select --</option>
+                <option value={0}>English</option>
                 {#each LANG_LIST as lang, i (lang)}
                   {#if lang !== 'English'}
                     <option value={LANG_LIST_IDS[i]}>{lang}</option>
@@ -427,7 +427,7 @@
           <Icon src={BiHelpCircle} class="mt-1 text-3xl text-sky-500 dark:text-sky-400" />
         </button>
         <span
-          class="mt-3 hidden text-center text-sm text-stone-500 sm:inline-block dark:text-stone-400"
+          class="mt-2 hidden text-center text-sm text-stone-500 sm:inline-block dark:text-stone-400"
           >Use <span class="font-semibold">Alt+x</span> to toggle</span
         >
       </div>
