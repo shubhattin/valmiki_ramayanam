@@ -181,10 +181,10 @@
         popup_state={false}
         close_on_confirm={true}
         confirm_func={sync_text_data_to_main}
-        description={'Sure to sync the text to Main Tab ?'}
+        title={'Sure to sync the text to Main Tab ?'}
       >
         <button
-          class="btn bg-tertiary-700 dark:bg-tertiary-600 rounded-lg px-1 py-1 font-bold text-white"
+          class="btn rounded-lg bg-tertiary-700 px-1 py-1 font-bold text-white dark:bg-tertiary-600"
         >
           <Icon src={OiSync16} class="-my-1 mr-1 text-lg" />
           Sync to Main
@@ -199,7 +199,7 @@
 <textarea
   style:font-size={`${trans_text_font_info.size}rem`}
   style:font-family={trans_text_font_info.family}
-  class="textarea mt-2.5 h-[60vh]"
+  class="mt-2.5 textarea h-[60vh] border-2"
   value={$bulk_text_data}
   oninput={(e) => ($bulk_text_edit_status = true) && input_func(e)}
   onkeyup={detect_shortcut_pressed}

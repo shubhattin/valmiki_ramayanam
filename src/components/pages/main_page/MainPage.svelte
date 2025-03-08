@@ -259,7 +259,7 @@
       Script
       <Icon src={LanguageIcon} class="text-2xl sm:text-4xl" />
       <select
-        class="select inline-block w-32 px-2 py-1 text-sm sm:w-40 sm:text-base"
+        class="select inline-block h-10 w-32 px-2 py-1 text-sm sm:h-12 sm:w-40 sm:text-base"
         disabled={$viewing_script_mut.isPending}
         bind:value={$viewing_script_selection}
       >
@@ -276,7 +276,7 @@
   <label class="block space-x-2 sm:space-x-3">
     <span class="text-sm font-bold sm:text-base">Select kANDa</span>
     <Select
-      class={`${get_text_font_class($viewing_script)} select w-44 px-2 py-1 sm:w-52`}
+      class={`${get_text_font_class($viewing_script)} select h-10 w-44 px-2 py-1 sm:h-12 sm:w-52`}
       zodType={z.coerce.number().int()}
       bind:value={$kANDa_selected}
       options={[{ value: 0, text: 'Select' }].concat(
@@ -294,7 +294,7 @@
       <label class="inline-block space-x-2 sm:space-x-4">
         <span class="text-sm font-bold sm:text-base">Select Sarga</span>
         <Select
-          class={`select w-44 px-2 py-1 sm:w-52`}
+          class={`select h-10 w-44 px-2 py-1 sm:h-12 sm:w-52`}
           zodType={z.coerce.number().int()}
           bind:value={$sarga_selected}
           options={[{ value: 0, text: 'Select' }].concat(
@@ -324,7 +324,7 @@
           disabled={$editing_status_on}
           class={'btn-hover rounded-lg bg-tertiary-800 px-1 py-1 pt-1.5 text-sm font-bold text-white sm:px-2 sm:py-1 sm:text-sm'}
         >
-          <Icon class="-mt-1 mr-1 text-xl" src={TiArrowBackOutline} />
+          <Icon class="-mt-1 text-xl" src={TiArrowBackOutline} />
           Previous
         </button>
       {/if}
@@ -337,7 +337,7 @@
           class={'btn-hover rounded-lg bg-tertiary-800 px-1 py-1 pt-1.5 text-sm font-bold text-white sm:px-2 sm:py-1 sm:text-sm'}
         >
           Next
-          <Icon class="-mt-1 ml-1 text-xl" src={TiArrowForwardOutline} />
+          <Icon class="-mt-1 text-xl" src={TiArrowForwardOutline} />
         </button>
       {/if}
       {#if !($ai_tool_opened && user_info && user_info.role === 'admin')}
@@ -377,18 +377,18 @@
               {#if $trans_lang !== 0 && (user_info.role === 'admin' || languages.indexOf($trans_lang) !== -1)}
                 <button
                   onclick={() => ($editing_status_on = true)}
-                  class="my-1 btn inline-block rounded-lg bg-tertiary-700 px-1 py-1 text-sm font-bold text-white sm:px-2 sm:text-base dark:bg-tertiary-600"
+                  class="btn-hover my-1 inline-block rounded-lg bg-secondary-700 px-1 py-1 text-sm font-bold text-white sm:px-2 sm:text-base dark:bg-secondary-800"
                 >
-                  <Icon src={BiEdit} class="mr-1 text-xl sm:text-2xl" />
+                  <Icon src={BiEdit} class="text-xl sm:text-2xl" />
                   Edit
                 </button>
               {:else if $trans_lang === 0 && (user_info.role === 'admin' || languages.indexOf(1) !== -1)}
                 <!-- 1 -> English -->
                 <button
                   onclick={() => ($editing_status_on = true)}
-                  class="my-1 btn inline-block rounded-lg bg-tertiary-700 px-1 py-1 text-sm font-bold text-white sm:px-2 sm:text-base dark:bg-tertiary-600"
+                  class="btn-hover my-1 inline-block rounded-lg bg-secondary-700 px-1 py-1 text-sm font-bold text-white sm:px-2 sm:text-base dark:bg-secondary-800"
                 >
-                  <Icon src={BiEdit} class="mr-1 text-xl sm:text-2xl" />
+                  <Icon src={BiEdit} class="text-xl sm:text-2xl" />
                   Edit English
                 </button>
               {/if}

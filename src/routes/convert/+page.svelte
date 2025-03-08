@@ -73,7 +73,7 @@
       </select>
       <button
         title="Copy Text"
-        class="btn m-0 p-0 outline-hidden select-none dark:hover:text-gray-400"
+        class="m-0 btn p-0 outline-hidden select-none dark:hover:text-gray-400"
         onclick={() => copy_text_to_clipboard($from_text)}
       >
         <Icon src={OiCopy16} class="text-xl" />
@@ -91,7 +91,7 @@
       >
     </div>
     <textarea
-      class="textarea h-56"
+      class="textarea h-56 border-2"
       placeholder={`Enter text in ${$from_lang}`}
       bind:value={$from_text}
       style:font-size={`${from_text_font_info.size}rem`}
@@ -110,7 +110,7 @@
   </div>
   <div class="my-3 flex justify-center space-x-3">
     <button
-      class="btn m-0 p-0 outline-hidden"
+      class="m-0 btn p-0 outline-hidden"
       onclick={() => convert_text($to_text, from_text, $to_lang, $from_lang)}
       ><Icon
         src={FaCircleUp}
@@ -118,7 +118,7 @@
       /></button
     >
     <button
-      class="btn m-0 p-0 outline-hidden"
+      class="m-0 btn p-0 outline-hidden"
       onclick={() => convert_text($from_text, to_text, $from_lang, $to_lang)}
       ><Icon
         src={FaCircleDown}
@@ -142,7 +142,7 @@
       </select>
       <button
         title="Copy Text"
-        class="btn m-0 p-0 outline-hidden select-none dark:hover:text-gray-400"
+        class="m-0 btn p-0 outline-hidden select-none dark:hover:text-gray-400"
         onclick={() => copy_text_to_clipboard($to_text)}
       >
         <Icon src={OiCopy16} class="text-xl" />
@@ -157,7 +157,7 @@
     </div>
     <textarea
       bind:value={$to_text}
-      class="textarea h-56"
+      class="textarea h-56 border-2"
       style:font-size={`${to_text_font_info.size}rem`}
       style:font-family={to_text_font_info.family}
       placeholder={`Enter text in ${$to_lang}`}

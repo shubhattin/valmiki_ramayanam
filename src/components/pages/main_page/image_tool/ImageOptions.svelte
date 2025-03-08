@@ -50,7 +50,7 @@
 <div class="flex space-x-2 text-sm">
   <div class="inline-block space-x-1">
     <button
-      class="btn m-0 p-0"
+      class="m-0 btn p-0"
       disabled={$image_shloka === 0 || $image_rendering_state}
       onclick={() => {
         if ($image_shloka !== -1) $image_shloka--;
@@ -67,7 +67,7 @@
       <option value={-1}>-1</option>
     </select>
     <button
-      class="btn m-0 p-0"
+      class="m-0 btn p-0"
       onclick={() => {
         if ($image_shloka !== shloka_count) $image_shloka++;
         else $image_shloka = -1;
@@ -101,7 +101,7 @@
   <span class="flex flex-col items-center justify-center">
     <button
       onclick={reset_func}
-      class="btn bg-surface-700 dark:bg-surface-500 m-0 rounded-md px-1 py-1 text-xs font-bold text-white"
+      class="m-0 btn rounded-md bg-surface-700 px-1 py-1 text-xs font-bold text-white dark:bg-surface-500"
       >Reset</button
     >
   </span>

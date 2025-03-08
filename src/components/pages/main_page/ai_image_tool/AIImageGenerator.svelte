@@ -283,7 +283,7 @@
   <span class="space-x-1">
     <span class="font-semibold">Shloka No.</span>
     <button
-      class="btn m-0 p-0"
+      class="m-0 btn p-0"
       disabled={$shloka_numb === 0}
       onclick={() => {
         if ($shloka_numb !== -1) $shloka_numb -= 1;
@@ -300,7 +300,7 @@
       <option value={-1}>-1</option>
     </select>
     <button
-      class="btn m-0 p-0"
+      class="m-0 btn p-0"
       onclick={() => {
         if ($shloka_numb !== shloka_count) $shloka_numb += 1;
         else $shloka_numb = -1;
@@ -316,7 +316,7 @@
       // ^ this regetch is not a reliable alternative to onSuccess
     }}
     disabled={$image_prompt_q.isFetching}
-    class="btn bg-surface-600 dark:bg-surface-600 rounded-md px-2 py-1 font-bold text-white"
+    class="btn rounded-md bg-surface-600 px-2 py-1 font-bold text-white dark:bg-surface-600"
   >
     Generate Image Prompt
   </button>
@@ -341,14 +341,14 @@
     <div class="space-x-2">
       <span class="font-bold">Base Prompt</span>
       <button
-        class="btn m-0 p-0 outline-hidden"
+        class="m-0 btn p-0 outline-hidden"
         onclick={() => copy_text_to_clipboard($base_user_prompt + additional_prompt_info)}
         title="Copy Base Prompt"
       >
         <Icon src={LuCopy} />
       </button>
       <button
-        class="btn m-0 p-0 outline-hidden"
+        class="m-0 btn p-0 outline-hidden"
         title="Copy Full Prompt"
         onclick={() =>
           copy_text_to_clipboard(
@@ -359,7 +359,7 @@
       </button>
     </div>
     <textarea
-      class="textarea h-24 px-1 py-0 text-sm"
+      class="textarea h-24 border-2 px-1 py-0 text-sm"
       spellcheck="false"
       bind:value={$base_user_prompt}
     ></textarea>
@@ -398,18 +398,18 @@
 </div>
 {#if $image_prompt_q.data !== undefined || $image_prompt_q.isFetching}
   {#if $image_prompt_q.isFetching || !$image_prompt_q.isSuccess}
-    <div class="placeholder h-80 animate-pulse rounded-md"></div>
+    <div class="h-80 placeholder animate-pulse rounded-md"></div>
   {:else}
     <div class="space-x-3">
       <span class="font-bold">Image Prompt</span>
       <button
         disabled={$image_q.isFetching}
         onclick={generate_image}
-        class="btn bg-tertiary-800 dark:bg-tertiary-700 rounded-md px-1 py-0 font-bold text-white"
+        class="btn rounded-md bg-tertiary-800 px-1 py-0 font-bold text-white dark:bg-tertiary-700"
         >Generate Image</button
       >
       <button
-        class="btn m-0 p-0 outline-hidden"
+        class="m-0 btn p-0 outline-hidden"
         title="Copy Image Prompt"
         onclick={() => copy_text_to_clipboard($image_prompt)}
       >
@@ -429,7 +429,7 @@
     </div>
     <textarea
       class={cl_join(
-        'textarea h-36 px-1 py-0 text-sm',
+        'textarea h-36 border-2 px-1 py-0 text-sm',
         image_prompt_request_error && 'input-error'
       )}
       spellcheck="false"
@@ -437,7 +437,7 @@
     ></textarea>
     {#if $image_q.data}
       {#if $image_q.isFetching || !$image_q.isSuccess}
-        <div class="placeholder h-96 animate-pulse rounded-md"></div>
+        <div class="h-96 placeholder animate-pulse rounded-md"></div>
       {:else}
         <div>
           <section class="mb-10 grid grid-cols-2 gap-3">
@@ -455,7 +455,7 @@
                   <div class="flex items-center justify-center space-x-3">
                     <button
                       onclick={() => download_image(image)}
-                      class="btn bg-surface-600 dark:bg-surface-500 rounded-md px-1 py-1 outline-hidden"
+                      class="btn rounded-md bg-surface-600 px-1 py-1 outline-hidden dark:bg-surface-500"
                     >
                       <Icon src={BsDownload} class="text-xl text-white" />
                     </button>

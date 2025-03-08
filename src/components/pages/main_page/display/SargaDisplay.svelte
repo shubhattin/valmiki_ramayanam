@@ -204,8 +204,8 @@
     onValueChange={(e) => (tab_edit_name = e.value as typeof tab_edit_name)}
   >
     {#snippet list()}
-      <Tabs.Control value={'bulk'}><span class="text-sm">Batch Edit</span></Tabs.Control>
       <Tabs.Control value={'main'}>Main</Tabs.Control>
+      <Tabs.Control value={'bulk'}><span class="text-sm">Batch Edit</span></Tabs.Control>
     {/snippet}
     {#snippet content()}
       {#if tab_edit_name === 'main'}
@@ -286,7 +286,7 @@
               $added_translations_indexes.push(trans_index);
               $added_translations_indexes = $added_translations_indexes;
             }}
-            class="btn bg-surface-500 dark:bg-surface-500 m-0 rounded-md px-1 py-0 font-bold text-white"
+            class="btn-hover m-0 rounded-md bg-surface-500 px-1 py-[0.05rem] font-bold text-white dark:bg-surface-500"
           >
             <Icon src={RiSystemAddLargeLine} />
           </button>
@@ -322,7 +322,7 @@
               $added_translations_indexes.push(trans_index);
               $added_translations_indexes = $added_translations_indexes;
             }}
-            class="btn bg-surface-500 dark:bg-surface-500 m-0 rounded-md px-1 py-0 font-bold text-white"
+            class="m-0 btn rounded-md bg-surface-500 px-1 py-0 font-bold text-white dark:bg-surface-500"
           >
             <Icon src={RiSystemAddLargeLine} />
           </button>
@@ -356,7 +356,7 @@
   )}
     <textarea
       oninput={(e) => input_func(e, trans_index)}
-      class="textarea h-28 w-full md:h-24"
+      class="textarea h-28 w-full border-[2.5px] md:h-24"
       value={lang_data?.get(trans_index)}
       style:font-size={`${font_info.size}rem`}
       style:font-family={font_info.family}

@@ -186,9 +186,9 @@
       popup_state={false}
       close_on_confirm={true}
       confirm_func={clear_file_list}
-      description="Are you sure to clear all loaded files ?"
+      title="Are you sure to clear all loaded files ?"
     >
-      <button class="preset-filled-error-500 btn flex">
+      <button class="btn flex preset-filled-error-500">
         <Icon src={AiOutlineDelete} class="mr-1 text-2xl" />
         Clear File List
       </button>
@@ -210,7 +210,7 @@
             {#if $excel_transliteration.isSuccess}
               <span in:fly>
                 <button
-                  class="btn m-0 p-0"
+                  class="m-0 btn p-0"
                   disabled={$excel_transliteration.isPending}
                   onclick={() => download_file(file_index)}
                   ><Icon
@@ -219,7 +219,7 @@
                   /></button
                 >
                 <button
-                  class="btn m-0 p-0"
+                  class="m-0 btn p-0"
                   disabled={$excel_transliteration.isPending}
                   onclick={() => {
                     current_workbook = file_workbooks[file_index];

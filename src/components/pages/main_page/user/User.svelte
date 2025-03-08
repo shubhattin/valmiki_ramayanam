@@ -97,7 +97,7 @@
             popup_state={false}
             close_on_confirm={true}
             confirm_func={log_out}
-            description="Are you Sure to Log Out ?"
+            title="Are you Sure to Log Out ?"
           >
             <button
               disabled={$editing_status_on}
@@ -134,7 +134,7 @@
             popup_state={false}
             close_on_confirm={true}
             confirm_func={trigger_translations_update}
-            description="Are you sure to Sync Database Translations to Main Repository ?"
+            title="Are you sure to Sync Database Translations to Main Repository ?"
           >
             <button
               disabled={$editing_status_on}

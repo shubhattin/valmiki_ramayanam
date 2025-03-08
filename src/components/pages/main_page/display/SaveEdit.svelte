@@ -90,40 +90,60 @@
     // const edited_indexes = Array.from($edited_translations_indexes).map((index) => index);
     $cancel_edit_data.mutate();
   };
+
+  let cancel_popup_state = $state(false);
+  let save_popup_state = $state(false);
 </script>
 
 <ConfirmModal
-  popup_state={false}
+  bind:popup_state={save_popup_state}
   close_on_confirm={true}
   confirm_func={save_data_func}
-  description="Sure to save Changes ?"
+  title="Sure to save Changes ?"
+  body={() => {
+    const added_indexes = $added_translations_indexes.map((index) => index);
+    const edited_indexes = Array.from($edited_translations_indexes).map((index) => index);
+    return `Edits ➔ ${edited_indexes.length} ${edited_indexes.length > 0 ? '{ ' + edited_indexes.join(', ') + ' }' : ''}
+    <br/>Additions ➔ ${added_indexes.length} ${added_indexes.length > 0 ? '{ ' + added_indexes.join(', ') + ' }' : ''}`;
+  }}
+></ConfirmModal>
+<button
+  in:slide
+  out:scale
+  disabled={$save_data.isPending ||
+    $added_translations_indexes.length + $edited_translations_indexes.size === 0}
+  class="btn-hover rounded-lg bg-primary-700 px-1 py-1 text-white dark:bg-primary-700"
+  onclick={() => (save_popup_state = true)}
 >
-  <button
-    onclick={save_data_func}
-    in:slide
-    out:scale
-    disabled={$save_data.isPending ||
-      $added_translations_indexes.length + $edited_translations_indexes.size === 0}
-    class="btn bg-primary-700 dark:bg-primary-600 rounded-lg px-1 py-1 text-white"
-  >
-    <Icon src={FiSave} class="text-2xl" />
-    <span class="text-sm sm:text-base">Save</span>
-  </button>
-</ConfirmModal>
+  <Icon src={FiSave} class="text-2xl" />
+  <span class="text-sm font-semibold sm:text-base">Save</span>
+</button>
 
 <ConfirmModal
-  popup_state={false}
+  bind:popup_state={cancel_popup_state}
   close_on_confirm={true}
   confirm_func={cancel_edit_func}
-  description="Sure to save Changes ?"
+  title="Sure to discard Changes ?"
+  body={() => {
+    const added_indexes = $added_translations_indexes.map((index) => index);
+    const edited_indexes = Array.from($edited_translations_indexes).map((index) => index);
+    return `Edits ➔ ${edited_indexes.length} ${edited_indexes.length > 0 ? '{ ' + edited_indexes.join(', ') + ' }' : ''}
+          <br/>Additions ➔ ${added_indexes.length} ${added_indexes.length > 0 ? '{ ' + added_indexes.join(', ') + ' }' : ''}`;
+  }}
+></ConfirmModal>
+<button
+  in:slide
+  out:scale
+  disabled={$cancel_edit_data.isPending}
+  class="btn-hover ml-3 rounded-lg bg-error-700 px-1 py-1 font-semibold text-white dark:bg-error-600"
+  onclick={() => {
+    if ($edited_translations_indexes.size + $added_translations_indexes.length === 0) {
+      $cancel_edit_data.mutate();
+      return;
+    }
+    cancel_popup_state = true;
+  }}
 >
-  <button
-    in:slide
-    out:scale
-    disabled={$cancel_edit_data.isPending}
-    class="btn bg-error-700 dark:bg-error-600 ml-3 rounded-lg px-1 py-1 text-white"
-  >
-    <Icon src={AiOutlineClose} class="text-2xl" />
-    <span class="text-sm sm:text-base">Cancel</span>
-  </button>
-</ConfirmModal>
+  <Icon src={AiOutlineClose} class="text-2xl" />
+  <span class="text-sm sm:text-base">Cancel</span>
+</button>

@@ -6,7 +6,8 @@
   let {
     children,
     popup_state = $bindable(),
-    description,
+    title,
+    body,
     cancel_func,
     confirm_func,
     close_on_confirm = false,
@@ -14,16 +15,19 @@
     class: className,
     triggerBase
   }: {
-    children: Snippet;
+    children?: Snippet;
     confirm_func?: () => void;
     cancel_func?: () => void;
-    description: string;
+    title: string;
+    body?: () => string;
     popup_state: boolean;
     contentBase?: string;
     close_on_confirm?: boolean;
     class?: string;
     triggerBase?: string;
   } = $props();
+
+  let body_text = $derived(body ? body() : null);
 </script>
 
 <Modal
@@ -39,10 +43,15 @@
   triggerBase={cl_join(triggerBase)}
 >
   {#snippet trigger()}
-    {@render children()}
+    {@render children?.()}
   {/snippet}
   {#snippet content()}
-    <div class={cl_join('text-lg font-bold', className)}>{description}</div>
+    <div class={cl_join('text-lg font-bold', className)}>{title}</div>
+    {#if body_text}
+      <div class="my-2 mb-3">
+        {@html body_text}
+      </div>
+    {/if}
     <div class="space-x-2">
       <button
         class={cl_join(
