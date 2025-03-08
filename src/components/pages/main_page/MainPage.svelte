@@ -399,7 +399,7 @@
     </div>
     <!-- !== --, as we dont need it for english -->
     {#if $trans_lang !== 0 && $editing_status_on && !($ai_tool_opened && user_info && user_info.role === 'admin')}
-      <div class="flex space-x-4">
+      <div class="flex space-x-2.5 sm:space-x-4">
         <Switch
           name="edit_lang"
           checked={$edit_language_typer_status}
@@ -412,7 +412,7 @@
           <select
             disabled={!$edit_language_typer_status}
             bind:value={$sanskrit_mode}
-            class="m-0 select w-28 px-1 py-1 text-sm text-clip"
+            class="select w-28 px-1 py-1 text-sm text-clip"
           >
             <option value={1}>rAm ➔ {$sanskrit_mode_texts.data[0]}</option>
             <option value={0}>rAm ➔ {$sanskrit_mode_texts.data[1]}</option>

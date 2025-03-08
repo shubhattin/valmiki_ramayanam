@@ -13,7 +13,8 @@
     close_on_confirm = false,
     contentBase,
     class: className,
-    triggerBase
+    triggerBase,
+    button_pos = 'center'
   }: {
     children?: Snippet;
     confirm_func?: () => void;
@@ -25,6 +26,7 @@
     close_on_confirm?: boolean;
     class?: string;
     triggerBase?: string;
+    button_pos?: 'left' | 'center' | 'right';
   } = $props();
 
   let body_text = $derived(body ? body() : null);
@@ -52,7 +54,13 @@
         {@html body_text}
       </div>
     {/if}
-    <div class="space-x-2">
+    <div
+      class={cl_join(
+        'flex  space-x-2',
+        button_pos === 'center' && 'items-center justify-center',
+        button_pos === 'right' && 'justify-end'
+      )}
+    >
       <button
         class={cl_join(
           'btn-hover btn rounded-lg bg-zinc-500 font-semibold text-white dark:bg-surface-700',

@@ -144,11 +144,14 @@
     close_on_confirm={true}
     confirm_func={translate_sarga_func}
     title={'Are You Sure to translate the sarga ?'}
+    body={() => {
+      return `This will translate the untranslated shlokas to ${$trans_lang !== 0 ? LANG_LIST[LANG_LIST_IDS.indexOf($trans_lang)] : 'English'} which you can edit and then save.`;
+    }}
   >
     <!-- description={`This will translate the untranslated shlokas to ${$trans_lang !== 0 ? LANG_LIST[LANG_LIST_IDS.indexOf($trans_lang)] : 'English'} which you can edit and then save.`} -->
     <button
       disabled={$translate_sarga_mut.isPending}
-      class="ml-3 btn inline-block rounded-lg bg-surface-600 px-2 py-1 text-white dark:bg-surface-600"
+      class="btn-hover ml-3 inline-block rounded-lg bg-surface-600 px-2 py-1 text-white dark:bg-surface-600"
     >
       <Icon src={AIIcon} class="-mt-1 mr-1 text-2xl" />
       Translate Sarga with AI

@@ -141,6 +141,8 @@
     $bulk_text_data = '';
     $bulk_text_edit_status = false;
   });
+
+  let copy_btn_popup_state = $state(false);
 </script>
 
 {#if $editing_status_on}
@@ -155,46 +157,55 @@
     Copied to Clipboard
   </div>
 {/if}
-<div class="relative w-full">
-  {#if sarga_hovered}
-    <Popover
-      positioning={{ placement: 'bottom' }}
-      arrow={false}
-      contentBase={cl_join(
-        'card z-70 space-y-2 p-2 rounded-lg shadow-xl dark:bg-surface-900 bg-slate-100'
-      )}
-      triggerBase={'btn absolute top-2 right-5 z-20 p-0 outline-hidden select-none'}
-    >
-      {#snippet trigger()}
-        <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <span
-          transition:fade={{ duration: 150 }}
-          title="Copy Sarga Text"
-          onmouseenter={() => (sarga_hovered = true)}
-        >
-          <Icon src={OiCopy16} class="text-lg" />
-        </span>
-      {/snippet}
-      {#snippet content()}
-        <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <div onmouseenter={() => (sarga_hovered = true)}>
+{#if !$editing_status_on}
+  <div class="relative w-full">
+    {#if sarga_hovered}
+      <Popover
+        open={copy_btn_popup_state}
+        onOpenChange={(e) => (copy_btn_popup_state = e.open)}
+        positioning={{ placement: 'bottom-end' }}
+        arrow={false}
+        triggerBase={'btn absolute top-2 right-5 z-20 p-0 outline-hidden select-none'}
+      >
+        {#snippet trigger()}
           <button
-            onclick={copy_sarga_shlokas_only}
-            class="btn block w-full rounded-md px-2 py-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
+            transition:fade={{ duration: 150 }}
+            title="Copy Sarga Text"
+            onmouseenter={() => (sarga_hovered = true)}
           >
-            Copy Shlokas
+            <Icon src={OiCopy16} class="text-lg" />
           </button>
-          <button
-            onclick={copy_sarga_with_transliteration_and_translation}
-            class="btn block w-full rounded-md px-2 py-1 text-xs text-wrap hover:bg-gray-200 dark:hover:bg-gray-700"
+        {/snippet}
+        {#snippet content()}
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
+          <div
+            class="z-70 space-y-1 card rounded-lg bg-slate-100 p-1 shadow-xl dark:bg-surface-900"
+            onmouseenter={() => (sarga_hovered = true)}
+            onmouseleave={() => {
+              copy_btn_popup_state = false;
+            }}
           >
-            Copy Shlokas with Tranlsiteration and Translation
-          </button>
-        </div>
-      {/snippet}
-    </Popover>
-  {/if}
-</div>
+            <button
+              onclick={copy_sarga_shlokas_only}
+              class="btn-hover block w-full rounded-md px-2 py-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
+            >
+              Copy Shlokas
+            </button>
+            <button
+              onclick={copy_sarga_with_transliteration_and_translation}
+              class="btn-hover block w-full rounded-md px-2 py-1 text-xs hover:bg-gray-200 dark:hover:bg-gray-700"
+            >
+              <div>Copy Shlokas</div>
+              <div>with</div>
+              <div>Transliteratin</div>
+              <div>and Translation</div>
+            </button>
+          </div>
+        {/snippet}
+      </Popover>
+    {/if}
+  </div>
+{/if}
 
 {#if !$editing_status_on}
   {@render main()}
@@ -226,7 +237,9 @@
       $editing_status_on && 'h-[100vh]'
     )}
     onmouseenter={() => (sarga_hovered = true)}
-    onmouseleave={() => (sarga_hovered = false)}
+    onmouseleave={() => {
+      if (!copy_btn_popup_state) sarga_hovered = false;
+    }}
   >
     {#if !$sarga_data.isFetching}
       <div transition:fade={{ duration: 250 }} class="space-y-[0.15rem]">
@@ -322,7 +335,7 @@
               $added_translations_indexes.push(trans_index);
               $added_translations_indexes = $added_translations_indexes;
             }}
-            class="m-0 btn rounded-md bg-surface-500 px-1 py-0 font-bold text-white dark:bg-surface-500"
+            class="btn-hover m-0 my-[0.05rem] rounded-md bg-surface-500 px-1 py-0 font-bold text-white dark:bg-surface-500"
           >
             <Icon src={RiSystemAddLargeLine} />
           </button>
