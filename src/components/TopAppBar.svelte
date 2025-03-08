@@ -59,13 +59,13 @@
       }}
       onmouseover={preload_component}
       onfocus={preload_component}
-      class="btn m-0 rounded-md px-1 py-1 font-semibold outline-hidden select-none hover:bg-gray-200 sm:px-2 dark:hover:bg-gray-700"
+      class="m-0 btn rounded-md px-1 py-1 font-semibold outline-hidden select-none hover:bg-gray-200 sm:px-2 dark:hover:bg-gray-700"
     >
       <Icon src={ContributeIcon} class="text-3xl" />
       <span class="hidden text-sm sm:inline">Support Our Projects</span>
     </span>
     {#if route_id !== '/convert'}
-      <div class="space-x-2">
+      <div class="ml-1 space-x-2">
         <a class="text-xl" href="/convert" title="Lipi Parivartak">
           <Icon
             src={SiConvertio}

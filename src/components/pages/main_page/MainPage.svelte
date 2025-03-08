@@ -254,12 +254,12 @@
 
 <MetaTags title={PAGE_INFO.title} description={PAGE_INFO.description} />
 <div class="mt-2 space-y-2.5 sm:mt-4 sm:space-y-4">
-  <div class="flex items-center justify-between">
-    <label class="space-x-2 text-sm sm:space-x-4 sm:text-base">
+  <div class="flex items-start justify-between">
+    <label class="space-x-2 text-sm sm:space-x-2 sm:text-base">
       Script
       <Icon src={LanguageIcon} class="text-2xl sm:text-4xl" />
       <select
-        class="select inline-block w-32 px-2 py-1 text-sm sm:w-40 sm:p-2 sm:text-base"
+        class="select inline-block w-32 px-2 py-1 text-sm sm:w-40 sm:text-base"
         disabled={$viewing_script_mut.isPending}
         bind:value={$viewing_script_selection}
       >
@@ -268,13 +268,15 @@
         {/each}
       </select>
     </label>
-    <User />
+    <div>
+      <User />
+    </div>
   </div>
   <!-- svelte-ignore a11y_label_has_associated_control -->
-  <label class="space-x-2 sm:space-x-4">
+  <label class="block space-x-2 sm:space-x-3">
     <span class="text-sm font-bold sm:text-base">Select kANDa</span>
     <Select
-      class={`${get_text_font_class($viewing_script)} select w-44 px-2 py-1 sm:w-52 sm:p-2`}
+      class={`${get_text_font_class($viewing_script)} select w-44 px-2 py-1 sm:w-52`}
       zodType={z.coerce.number().int()}
       bind:value={$kANDa_selected}
       options={[{ value: 0, text: 'Select' }].concat(
@@ -292,7 +294,7 @@
       <label class="inline-block space-x-2 sm:space-x-4">
         <span class="text-sm font-bold sm:text-base">Select Sarga</span>
         <Select
-          class={`${get_text_font_class($viewing_script)} select w-44 px-2 py-1 sm:w-52 sm:p-2`}
+          class={`select w-44 px-2 py-1 sm:w-52`}
           zodType={z.coerce.number().int()}
           bind:value={$sarga_selected}
           options={[{ value: 0, text: 'Select' }].concat(
@@ -320,7 +322,7 @@
           in:scale
           out:slide
           disabled={$editing_status_on}
-          class="btn bg-tertiary-700 rounded-lg px-1 py-1 pt-1.5 text-sm font-bold text-white sm:px-2 sm:py-1 sm:text-base"
+          class={'btn-hover rounded-lg bg-tertiary-800 px-1 py-1 pt-1.5 text-sm font-bold text-white sm:px-2 sm:py-1 sm:text-sm'}
         >
           <Icon class="-mt-1 mr-1 text-xl" src={TiArrowBackOutline} />
           Previous
@@ -332,7 +334,7 @@
           in:scale
           out:slide
           disabled={$editing_status_on}
-          class="btn bg-tertiary-700 rounded-lg px-1 py-1 pt-1.5 text-sm font-bold text-white sm:px-2 sm:py-1 sm:text-base"
+          class={'btn-hover rounded-lg bg-tertiary-800 px-1 py-1 pt-1.5 text-sm font-bold text-white sm:px-2 sm:py-1 sm:text-sm'}
         >
           Next
           <Icon class="-mt-1 ml-1 text-xl" src={TiArrowForwardOutline} />
@@ -344,7 +346,7 @@
             onclick={() => {
               $view_translation_status = true;
             }}
-            class="btn bg-primary-800 dark:bg-primary-700 px-2 py-1 text-sm font-bold text-white sm:text-base"
+            class="btn-hover rounded-lg bg-primary-800 px-2 py-1 text-sm font-bold text-white sm:text-sm dark:bg-primary-700"
             >View Translations</button
           >
         {:else}
@@ -375,7 +377,7 @@
               {#if $trans_lang !== 0 && (user_info.role === 'admin' || languages.indexOf($trans_lang) !== -1)}
                 <button
                   onclick={() => ($editing_status_on = true)}
-                  class="btn bg-tertiary-700 dark:bg-tertiary-600 my-1 inline-block rounded-lg px-1 py-1 text-sm font-bold text-white sm:px-2 sm:text-base"
+                  class="my-1 btn inline-block rounded-lg bg-tertiary-700 px-1 py-1 text-sm font-bold text-white sm:px-2 sm:text-base dark:bg-tertiary-600"
                 >
                   <Icon src={BiEdit} class="mr-1 text-xl sm:text-2xl" />
                   Edit
@@ -384,7 +386,7 @@
                 <!-- 1 -> English -->
                 <button
                   onclick={() => ($editing_status_on = true)}
-                  class="btn bg-tertiary-700 dark:bg-tertiary-600 my-1 inline-block rounded-lg px-1 py-1 text-sm font-bold text-white sm:px-2 sm:text-base"
+                  class="my-1 btn inline-block rounded-lg bg-tertiary-700 px-1 py-1 text-sm font-bold text-white sm:px-2 sm:text-base dark:bg-tertiary-600"
                 >
                   <Icon src={BiEdit} class="mr-1 text-xl sm:text-2xl" />
                   Edit English
@@ -410,7 +412,7 @@
           <select
             disabled={!$edit_language_typer_status}
             bind:value={$sanskrit_mode}
-            class="select m-0 w-28 px-1 py-1 text-sm text-clip"
+            class="m-0 select w-28 px-1 py-1 text-sm text-clip"
           >
             <option value={1}>rAm ➔ {$sanskrit_mode_texts.data[0]}</option>
             <option value={0}>rAm ➔ {$sanskrit_mode_texts.data[1]}</option>

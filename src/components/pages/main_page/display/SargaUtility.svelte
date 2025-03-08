@@ -11,11 +11,9 @@
     view_translation_status
   } from '~/state/main_page/main_state';
   import { createMutation } from '@tanstack/svelte-query';
-  import { BsThreeDots } from 'svelte-icons-pack/bs';
   import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
   import { transliterate_xlxs_file } from '~/tools/excel/transliterate_xlsx_file';
   import { client } from '~/api/client';
-  import { scale } from 'svelte/transition';
   import Icon from '~/tools/Icon.svelte';
   import { BiImage } from 'svelte-icons-pack/bi';
   import type { Workbook } from 'exceljs';
@@ -26,6 +24,8 @@
   import { useSession } from '~/lib/auth-client';
   import { Modal, Popover } from '@skeletonlabs/skeleton-svelte';
   import { cl_join } from '~/tools/cl_join';
+  import { BsThreeDots } from 'svelte-icons-pack/bs';
+  import { fade } from 'svelte/transition';
 
   const session = useSession();
   let user_info = $derived($session.data?.user);
@@ -125,19 +125,18 @@
   positioning={{ placement: 'bottom' }}
   arrow={false}
   contentBase={cl_join(
-    'card z-70 space-y-2 p-2 rounded-lg shadow-xl dark:bg-surface-900 bg-surface-100'
+    'card z-70 space-y-1.5 p-1 rounded-lg shadow-xl dark:bg-surface-900 bg-surface-100 text-sm'
   )}
-  triggerBase={'btn m-0 rounded-full p-[0.035rem] ring-2 ring-zinc-500 sm:p-[0.05rem] dark:ring-zinc-300'}
 >
   {#snippet trigger()}
-    <span title="Extra Options" transition:scale>
+    <span class="btn-hover m-0" title="Extra Options" transition:fade>
       <Icon class="mx-[0.17rem] text-lg sm:mx-0 sm:text-2xl" src={BsThreeDots} />
     </span>
   {/snippet}
   {#snippet content()}
     <button
       onclick={() => $download_excel_file.mutate()}
-      class="btn block w-full rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
+      class="btn block w-full rounded-md px-2 py-1 pt-0 hover:bg-gray-200 dark:hover:bg-gray-700"
     >
       <Icon
         class="-mt-1 mr-1 text-2xl text-green-600 dark:text-green-400"
@@ -147,7 +146,7 @@
     </button>
     <button
       onclick={() => image_tool_opened.set(true)}
-      class="btn block w-full rounded-md px-2 py-1 text-start hover:bg-gray-200 dark:hover:bg-gray-700"
+      class="btn block w-full rounded-md px-2 py-1 pt-0 text-start hover:bg-gray-200 dark:hover:bg-gray-700"
     >
       <Icon src={BiImage} class="-mt-1 fill-sky-500 text-2xl dark:fill-sky-400" />
       Image Tool
@@ -158,7 +157,7 @@
           $ai_tool_opened = true;
           $view_translation_status = true;
         }}
-        class="btn block w-full rounded-md px-2 py-1 text-start hover:bg-gray-200 dark:hover:bg-gray-700"
+        class="btn block w-full rounded-md px-2 py-1 pt-0 text-start hover:bg-gray-200 dark:hover:bg-gray-700"
       >
         <Icon
           src={RiUserFacesRobot2Line}
@@ -168,7 +167,7 @@
       </button>
     {/if}
     <button
-      class="btn block w-full rounded-md px-2 py-1 text-start hover:bg-gray-200 dark:hover:bg-gray-700"
+      class="btn block w-full rounded-md px-2 py-1 pt-0 text-start hover:bg-gray-200 dark:hover:bg-gray-700"
       onclick={() => $download_text_file.mutate()}
     >
       <Icon src={TrOutlineFileTypeTxt} class=" mr-1 text-2xl" />

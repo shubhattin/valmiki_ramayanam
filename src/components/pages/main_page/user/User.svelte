@@ -63,7 +63,7 @@
   contentBase={'card z-50 space-y-2 p-2 rounded-lg shadow-xl bg-zinc-100 dark:bg-surface-900'}
 >
   {#snippet trigger()}
-    <span class="btn m-2 p-0">
+    <span class="m-2 btn p-0">
       <Icon
         class="text-2xl hover:text-gray-600 sm:text-3xl dark:hover:text-gray-400"
         src={VscAccount}
@@ -83,7 +83,7 @@
             {user_info.name}
           </span>
           <a
-            class="btn m-0 p-0 hover:text-blue-600 dark:hover:text-blue-500"
+            class="m-0 btn p-0 hover:text-blue-600 dark:hover:text-blue-500"
             href={PUBLIC_BETTER_AUTH_URL}
             target="_blank"
             rel="noopener noreferrer"
@@ -101,7 +101,7 @@
           >
             <button
               disabled={$editing_status_on}
-              class="preset-filled-error-500 btn m-0 rounded-md pt-0 pr-2 pb-1 pl-1 text-sm font-bold sm:text-base"
+              class="m-0 btn rounded-md preset-filled-error-500 pt-0 pr-2 pb-1 pl-1 text-sm font-bold sm:text-base"
             >
               <Icon class="text-2xl" src={BiLogOut} />
               <span>Logout</span>
@@ -119,12 +119,12 @@
                 </span>
               </div>
             {:else}
-              <div class="text-warning-600 dark:text-warning-500 text-sm">
+              <div class="text-sm text-warning-600 dark:text-warning-500">
                 No languages assigned
               </div>
             {/if}
           {:else}
-            <div class="text-warning-600 dark:text-warning-500 text-sm">
+            <div class="text-sm text-warning-600 dark:text-warning-500">
               You account is not approved by Admin
             </div>
           {/if}
@@ -138,7 +138,7 @@
           >
             <button
               disabled={$editing_status_on}
-              class="btn bg-primary-800 dark:bg-primary-900 m-0 block rounded-md px-1 py-0 font-bold text-white"
+              class="m-0 btn block rounded-md bg-primary-800 px-1 py-0 font-bold text-white dark:bg-primary-900"
             >
               <Icon src={OiSync16} class="my-1 mb-1 text-xl" />
               <span class="text-sm">Sync Translations from DB</span>
@@ -188,7 +188,7 @@
   onOpenChange={(e) => ($pass_enterer_status = e.open)}
 >
   {#snippet content()}
-    <div class="min-h-30 p-2">
+    <div class="m-2 mb-3">
       <Login />
     </div>
   {/snippet}
@@ -199,7 +199,7 @@
   onOpenChange={(e) => ($user_create_modal_status = e.open)}
 >
   {#snippet content()}
-    <div class="min-h-30 p-2">
+    <div class="m-2 mb-3">
       <Signup />
     </div>
   {/snippet}

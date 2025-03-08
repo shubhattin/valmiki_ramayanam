@@ -9,3 +9,13 @@
 @import '@skeletonlabs/skeleton/themes/wintry';
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  .btn-hover {
+    @apply transition-colors duration-200;
+  }
+
+  .btn-hover:hover {
+    @apply brightness-90;
+  }
+}
