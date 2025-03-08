@@ -272,22 +272,23 @@
       <User />
     </div>
   </div>
-  <!-- svelte-ignore a11y_label_has_associated_control -->
-  <label class="block space-x-2 sm:space-x-3">
-    <span class="text-sm font-bold sm:text-base">Select kANDa</span>
-    <Select
-      class={`${get_text_font_class($viewing_script)} select h-10 w-44 px-2 py-1 sm:h-12 sm:w-52`}
-      zodType={z.coerce.number().int()}
-      bind:value={$kANDa_selected}
-      options={[{ value: 0, text: 'Select' }].concat(
-        kANDa_names.map((name, index) => ({
-          value: index + 1,
-          text: `${index + 1} ${name}`
-        }))
-      )}
-      disabled={$editing_status_on}
-    />
-  </label>
+  <div>
+    <label class="space-x-2 sm:space-x-3">
+      <span class="text-sm font-bold sm:text-base">Select kANDa</span>
+      <Select
+        class={`${get_text_font_class($viewing_script)} select h-10 w-44 px-2 py-1 sm:h-12 sm:w-52`}
+        zodType={z.coerce.number().int()}
+        bind:value={$kANDa_selected}
+        options={[{ value: 0, text: 'Select' }].concat(
+          kANDa_names.map((name, index) => ({
+            value: index + 1,
+            text: `${index + 1} ${name}`
+          }))
+        )}
+        disabled={$editing_status_on}
+      />
+    </label>
+  </div>
   {#if $kANDa_selected !== 0}
     <div class="space-x-6 sm:space-x-8">
       <!-- svelte-ignore a11y_label_has_associated_control -->

@@ -182,6 +182,10 @@
         close_on_confirm={true}
         confirm_func={sync_text_data_to_main}
         title={'Sure to sync the text to Main Tab ?'}
+        body={() =>
+          'This will write the shloka contents to the main tab text which can then be verified and saved from there.' +
+          '\nAlso be sure to verify for any sorts of distortions, it sometimes adds spaces or new lines on its own (nothing too serious). ' +
+          'If you are adding to an empty non translated shloka it should be fine.'}
       >
         <button
           class="btn rounded-lg bg-tertiary-700 px-1 py-1 font-bold text-white dark:bg-tertiary-600"

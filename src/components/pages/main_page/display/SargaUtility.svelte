@@ -132,6 +132,7 @@
   contentBase={cl_join(
     'card z-70 space-y-1 p-1 rounded-lg shadow-xl dark:bg-surface-900 bg-slate-200 text-sm'
   )}
+  triggerBase="outline-hidden select-none"
 >
   {#snippet trigger()}
     <span class="btn-hover m-0" title="Extra Options" transition:fade>
@@ -195,7 +196,7 @@
   onOpenChange={(e) => ($image_tool_opened = e.open)}
   closeOnInteractOutside={true}
   contentBase="z-10 mx-3 max-h-[97%] max-w-[97%] overflow-scroll rounded-md p-2 card rounded-lg bg-slate-100 p-1 shadow-2xl dark:bg-surface-900"
-  backdropBackground="backdrop-blur-sm"
+  backdropBackground="backdrop-blur-xs"
 >
   {#snippet content()}
     {#await import('../image_tool/ImageTool.svelte') then ImageTool}

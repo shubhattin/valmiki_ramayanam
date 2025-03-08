@@ -35,6 +35,7 @@
     open={file_preview_opened}
     onOpenChange={(e) => (file_preview_opened = e.open)}
     closeOnInteractOutside={false}
+    backdropBackground="backdrop-blur-xs"
     contentBase="z-50 mx-3 max-h-[97%] max-w-[97%] overflow-scroll card rounded-lg bg-stone-100 p-1 shadow-2xl dark:bg-surface-900"
   >
     {#snippet content()}
