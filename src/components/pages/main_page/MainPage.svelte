@@ -254,7 +254,7 @@
 
 <MetaTags title={PAGE_INFO.title} description={PAGE_INFO.description} />
 <div class="mt-2 space-y-2.5 sm:mt-4 sm:space-y-4">
-  <div class="flex items-start justify-between">
+  <div class="mb-0 flex items-start justify-between sm:mb-2.5">
     <label class="space-x-2 text-sm sm:space-x-2 sm:text-base">
       Script
       <Icon src={LanguageIcon} class="text-2xl sm:text-4xl" />

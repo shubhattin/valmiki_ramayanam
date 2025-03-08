@@ -59,7 +59,7 @@
     >
       <Icon src={TiArrowBackOutline} class="-mt-1 text-lg" />
     </button>
-    <select class="select inline-block w-14 p-1 text-sm" bind:value={$image_shloka}>
+    <select class="select inline-block w-14 p-1 text-sm ring-2" bind:value={$image_shloka}>
       <option value={0}>0</option>
       {#each Array(shloka_count) as _, index}
         <option value={index + 1}>{index + 1}</option>
@@ -80,7 +80,7 @@
   <label class="inline-block space-x-1">
     <Icon src={LanguageIcon} class="text-xl" />
     <select
-      class="select inline-block w-24 p-1 text-sm"
+      class="select inline-block w-24 p-1 text-sm ring-2"
       bind:value={$image_lang}
       disabled={$image_trans_data.isFetching || !$image_trans_data.isSuccess}
     >
@@ -90,23 +90,20 @@
     </select>
   </label>
   <ImageDownloader />
-  <span class="inline-flex flex-col">
-    <Switch
-      name="from_text_type"
-      checked={$shaded_background_image_status}
-      onCheckedChange={(e) => ($shaded_background_image_status = e.checked)}
-    />
-    <!-- class="mt-1 hover:text-gray-500 dark:hover:text-gray-400" -->
-  </span>
+  <Switch
+    name="from_text_type"
+    checked={$shaded_background_image_status}
+    onCheckedChange={(e) => ($shaded_background_image_status = e.checked)}
+  />
   <span class="flex flex-col items-center justify-center">
     <button
       onclick={reset_func}
-      class="m-0 btn rounded-md bg-surface-700 px-1 py-1 text-xs font-bold text-white dark:bg-surface-500"
+      class="btn-hover m-0 rounded-md bg-surface-700 px-1.5 py-1 text-xs font-bold text-white dark:bg-surface-500"
       >Reset</button
     >
   </span>
 </div>
-<Accordion value={[]}>
+<Accordion collapsible>
   <Accordion.Item value="options">
     {#snippet lead()}
       <Icon src={IoOptions} class="text-2xl" />

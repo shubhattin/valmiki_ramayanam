@@ -319,7 +319,9 @@
         {#if $trans_en_data.data.has(trans_index)}
           <!-- Usually translations are single but still... -->
           {#each $trans_en_data.data.get(trans_index)!.split('\n') as line_trans}
-            <div>{line_trans !== '' ? line_trans : '\u200c'}</div>
+            {#if line_trans !== ''}
+              <div>{line_trans}</div>
+            {/if}
           {/each}
         {/if}
       </div>
@@ -355,9 +357,9 @@
         {#if $trans_lang_data.data?.has(trans_index)}
           <!-- Usually translations are single but still... -->
           {#each $trans_lang_data.data?.get(trans_index)!.split('\n') as line_trans}
-            <div>
-              {line_trans !== '' ? line_trans : '\u200c'}
-            </div>
+            {#if line_trans !== ''}
+              <div>{line_trans}</div>
+            {/if}
           {/each}
         {/if}
       </div>

@@ -235,7 +235,7 @@
 
 <div class="space-y-2">
   <div class="space-x-2 text-sm">
-    <select class="select inline-block w-36 p-1 text-sm" bind:value={$image_script}>
+    <select class="select inline-block w-36 p-1 text-sm ring-2" bind:value={$image_script}>
       {#each SCRIPT_LIST as lang (lang)}
         {#if !['Normal'].includes(lang)}
           <option value={lang}>{lang}</option>
@@ -243,7 +243,7 @@
       {/each}
     </select>
     <Select
-      class={`${get_text_font_class($image_script)} select inline-block w-36 p-1 text-sm`}
+      class={`${get_text_font_class($image_script)} select inline-block w-36 p-1 text-sm ring-2`}
       disabled={sarga_loading}
       zodType={z.coerce.number().int()}
       bind:value={$image_kANDa}
@@ -261,7 +261,7 @@
         <Icon src={TiArrowBackOutline} class="-mt-1 text-lg" />
       </button>
       <Select
-        class={`${get_text_font_class($image_script)} select inline-block w-40 p-1 text-sm`}
+        class={`${get_text_font_class($image_script)} select inline-block w-40 p-1 text-sm ring-2`}
         zodType={z.coerce.number().int()}
         disabled={sarga_loading}
         bind:value={$image_sarga}
@@ -281,6 +281,6 @@
   </div>
   <ImageOptions />
 </div>
-<div class="mt-1 space-y-2">
+<div class="mt-2 space-y-2">
   <canvas bind:this={canvas_element}></canvas>
 </div>

@@ -26,6 +26,7 @@
   import { cl_join } from '~/tools/cl_join';
   import { BsThreeDots } from 'svelte-icons-pack/bs';
   import { fade } from 'svelte/transition';
+  import { AiOutlineClose } from 'svelte-icons-pack/ai';
 
   const session = useSession();
   let user_info = $derived($session.data?.user);
@@ -189,19 +190,26 @@
     </button>
   {/snippet}
 </Popover>
-<div>
-  <Modal
-    open={$image_tool_opened}
-    onOpenChange={(e) => ($image_tool_opened = e.open)}
-    closeOnInteractOutside={false}
-  >
-    {#snippet content()}
-      {#await import('../image_tool/ImageTool.svelte') then ImageTool}
-        <ImageTool.default />
-      {/await}
-    {/snippet}
-  </Modal>
-</div>
+<Modal
+  open={$image_tool_opened}
+  onOpenChange={(e) => ($image_tool_opened = e.open)}
+  closeOnInteractOutside={true}
+  contentBase="z-10 mx-3 max-h-[97%] max-w-[97%] overflow-scroll rounded-md p-2 card rounded-lg bg-slate-100 p-1 shadow-2xl dark:bg-surface-900"
+  backdropBackground="backdrop-blur-sm"
+>
+  {#snippet content()}
+    {#await import('../image_tool/ImageTool.svelte') then ImageTool}
+      <div class="flex w-[98%] justify-end">
+        <button
+          aria-label="Close"
+          class="absolute cursor-pointer text-gray-500 hover:text-gray-700"
+          onclick={() => ($image_tool_opened = false)}><Icon src={AiOutlineClose} /></button
+        >
+      </div>
+      <ImageTool.default />
+    {/await}
+  {/snippet}
+</Modal>
 {#if excel_preview_opened}
   {#await import('~/components/PreviewExcel.svelte') then PreviewExcel}
     <PreviewExcel.default
