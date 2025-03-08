@@ -119,13 +119,17 @@
       );
     }
   });
+
+  let file_preview_opened = $state(false);
 </script>
 
 <Popover
+  open={file_preview_opened}
+  onOpenChange={(e) => (file_preview_opened = e.open)}
   positioning={{ placement: 'bottom' }}
   arrow={false}
   contentBase={cl_join(
-    'card z-70 space-y-1 p-1 rounded-lg shadow-xl dark:bg-surface-900 bg-surface-100 text-sm'
+    'card z-70 space-y-1 p-1 rounded-lg shadow-xl dark:bg-surface-900 bg-slate-200 text-sm'
   )}
 >
   {#snippet trigger()}
@@ -135,7 +139,10 @@
   {/snippet}
   {#snippet content()}
     <button
-      onclick={() => $download_excel_file.mutate()}
+      onclick={() => {
+        $download_excel_file.mutate();
+        file_preview_opened = false;
+      }}
       class="btn block w-full rounded-md px-2 py-1 pt-0 hover:bg-gray-200 dark:hover:bg-gray-700"
     >
       <Icon
@@ -145,7 +152,10 @@
       Download Excel File
     </button>
     <button
-      onclick={() => image_tool_opened.set(true)}
+      onclick={() => {
+        file_preview_opened = false;
+        image_tool_opened.set(true);
+      }}
       class="btn block w-full rounded-md px-2 py-1 pt-0 text-start hover:bg-gray-200 dark:hover:bg-gray-700"
     >
       <Icon src={BiImage} class="-mt-1 fill-sky-500 text-2xl dark:fill-sky-400" />
@@ -154,6 +164,7 @@
     {#if user_info && user_info.role === 'admin'}
       <button
         onclick={() => {
+          file_preview_opened = false;
           $ai_tool_opened = true;
           $view_translation_status = true;
         }}
@@ -168,7 +179,10 @@
     {/if}
     <button
       class="btn block w-full rounded-md px-2 py-1 pt-0 text-start hover:bg-gray-200 dark:hover:bg-gray-700"
-      onclick={() => $download_text_file.mutate()}
+      onclick={() => {
+        file_preview_opened = false;
+        $download_text_file.mutate();
+      }}
     >
       <Icon src={TrOutlineFileTypeTxt} class=" mr-1 text-2xl" />
       Download Text File

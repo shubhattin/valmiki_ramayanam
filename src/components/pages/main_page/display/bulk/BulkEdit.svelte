@@ -127,7 +127,7 @@
   };
 </script>
 
-<Accordion value={[]}>
+<Accordion collapsible>
   <Accordion.Item value="help">
     {#snippet lead()}
       <Icon src={TrOutlineHelpSquare} class="-m-1.5  -mt-2 text-2xl" />
