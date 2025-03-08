@@ -6,7 +6,7 @@
   import { ContributeIcon, SiConvertio } from './icons';
   import { AiOutlineMenu } from 'svelte-icons-pack/ai';
   import { YoutubeIcon } from '~/components/icons';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { PAGE_TITLES } from '~/state/page_titles';
   import { pwa_event_triggerer, pwa_install_event_fired } from '~/state/main';
   import { OiDownload24 } from 'svelte-icons-pack/oi';
@@ -21,7 +21,7 @@
 
   let { start, headline, end }: Props = $props();
 
-  let route_id = $derived($page.route.id as keyof typeof PAGE_TITLES);
+  let route_id = $derived(page.route.id as keyof typeof PAGE_TITLES);
   let support_modal_status = $state(false);
 
   let app_bar_popover_status = $state(false);
@@ -32,7 +32,7 @@
 <AppBar>
   {#snippet lead()}
     {@render start?.()}
-    {#if route_id !== '/(main)/[[kANDa]]/[[sarga]]'}
+    {#if route_id !== '/(main)/[[kANDa]]/[[sarga]]' || page.error}
       <a class="mr-2 text-xl" href="/" title="श्रीरामायणम्">
         <Icon
           src={BiArrowBack}
@@ -59,8 +59,8 @@
       onmouseover={preload_component}
       onfocus={preload_component}
       class={cl_join(
-        'm-0 btn rounded-md px-1 py-1 font-semibold outline-hidden select-none hover:bg-gray-200 sm:px-2 dark:hover:bg-gray-700',
-        'mr-2 sm:mr-2.5'
+        'btn rounded-md px-1 py-1 font-semibold outline-hidden select-none hover:bg-gray-200 sm:px-2 dark:hover:bg-gray-700',
+        'mr-3 sm:mr-3'
       )}
     >
       <Icon src={ContributeIcon} class="text-3xl" />
