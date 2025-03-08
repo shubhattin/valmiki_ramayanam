@@ -153,8 +153,9 @@
   <Popover
     positioning={{ placement: 'bottom' }}
     arrow={false}
+    zIndex={'999'}
     contentBase={cl_join(
-      'card z-50 space-y-0 rounded-md p-1 shadow-xl bg-zinc-100 dark:bg-surface-900'
+      'card space-y-0 rounded-md p-1 shadow-xl bg-stone-200 dark:bg-surface-900'
     )}
   >
     {#snippet trigger()}
@@ -210,5 +211,13 @@
     {/snippet}
   </Popover>
 {:else if $zip_download_state}
-  <ProgressRing value={($zip_download_state[0] / $zip_download_state[1]) * 100} max={100} />
+  <ProgressRing
+    value={($zip_download_state[0] / $zip_download_state[1]) * 100}
+    max={100}
+    size="size-8"
+    strokeLinecap="butt"
+    meterBase="stroke-primary-500"
+    trackBase="stroke-primary-500/30"
+    strokeWidth="6px"
+  />
 {/if}
