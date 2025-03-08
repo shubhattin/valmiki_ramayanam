@@ -49,7 +49,10 @@
     <div class={cl_join('text-lg font-bold', className)}>{description}</div>
     <div class="space-x-2">
       <button
-        class={cl_join('btn dark:bg-surface-700 rounded-lg bg-slate-200 font-semibold', className)}
+        class={cl_join(
+          'btn-hover btn rounded-lg bg-zinc-500 font-semibold text-white dark:bg-surface-700',
+          className
+        )}
         onclick={() => {
           if (close_on_confirm) popup_state = false;
           confirm_func && confirm_func();
@@ -62,7 +65,10 @@
           popup_state = false;
           cancel_func && cancel_func();
         }}
-        class={cl_join('btn preset-outline-surface-800-200 rounded-lg font-semibold', className)}
+        class={cl_join(
+          'btn-hover btn rounded-lg preset-outlined-surface-800-200 font-semibold',
+          className
+        )}
       >
         Cancel
       </button>

@@ -72,7 +72,7 @@
   {/snippet}
   {#snippet content()}
     {#if user_info}
-      <div class="space-y-2 p-1 select-none">
+      <div class="space-y-1 p-1 select-none sm:space-y-1">
         <div class="space-x-1.5 sm:space-x-2">
           <span class="text-center text-base font-bold">
             {#if user_info.role === 'admin'}
@@ -92,7 +92,7 @@
             <Icon src={OiLinkExternal16} class="text-xl" />
           </a>
         </div>
-        <div class="space-x-4">
+        <div class="mb-2">
           <ConfirmModal
             popup_state={false}
             close_on_confirm={true}
@@ -101,7 +101,7 @@
           >
             <button
               disabled={$editing_status_on}
-              class="m-0 btn rounded-md preset-filled-error-500 pt-0 pr-2 pb-1 pl-1 text-sm font-bold sm:text-base"
+              class="btn-hover m-0 rounded-md bg-error-600 px-2 py-1 pl-1 text-sm font-bold text-white sm:text-base"
             >
               <Icon class="text-2xl" src={BiLogOut} />
               <span>Logout</span>
@@ -138,7 +138,7 @@
           >
             <button
               disabled={$editing_status_on}
-              class="m-0 btn block rounded-md bg-primary-800 px-1 py-0 font-bold text-white dark:bg-primary-900"
+              class="btn-hover m-0 block rounded-md bg-primary-800 px-1.5 py-0 font-bold text-white dark:bg-primary-900"
             >
               <Icon src={OiSync16} class="my-1 mb-1 text-xl" />
               <span class="text-sm">Sync Translations from DB</span>

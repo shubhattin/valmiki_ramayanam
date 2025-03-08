@@ -125,7 +125,7 @@
   positioning={{ placement: 'bottom' }}
   arrow={false}
   contentBase={cl_join(
-    'card z-70 space-y-1.5 p-1 rounded-lg shadow-xl dark:bg-surface-900 bg-surface-100 text-sm'
+    'card z-70 space-y-1 p-1 rounded-lg shadow-xl dark:bg-surface-900 bg-surface-100 text-sm'
   )}
 >
   {#snippet trigger()}

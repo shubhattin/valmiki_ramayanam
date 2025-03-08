@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AppBar, Popover } from '@skeletonlabs/skeleton-svelte';
+  import { AppBar, Modal, Popover } from '@skeletonlabs/skeleton-svelte';
   import ThemeChanger from './ThemeChanger.svelte';
   import Icon from '~/tools/Icon.svelte';
   import { SiGithub } from 'svelte-icons-pack/si';
@@ -11,6 +11,7 @@
   import { pwa_event_triggerer, pwa_install_event_fired } from '~/state/main';
   import { OiDownload24 } from 'svelte-icons-pack/oi';
   import { BiArrowBack } from 'svelte-icons-pack/bi';
+  import { cl_join } from '~/tools/cl_join';
 
   type Props = {
     start?: import('svelte').Snippet;
@@ -51,35 +52,31 @@
 	</svelte:fragment> -->
   {#snippet trail()}
     {@render end?.()}
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <span
+    <button
       onclick={() => {
         support_modal_status = true;
       }}
       onmouseover={preload_component}
       onfocus={preload_component}
-      class="m-0 btn rounded-md px-1 py-1 font-semibold outline-hidden select-none hover:bg-gray-200 sm:px-2 dark:hover:bg-gray-700"
+      class={cl_join(
+        'm-0 btn rounded-md px-1 py-1 font-semibold outline-hidden select-none hover:bg-gray-200 sm:px-2 dark:hover:bg-gray-700',
+        'mr-2 sm:mr-2.5'
+      )}
     >
       <Icon src={ContributeIcon} class="text-3xl" />
       <span class="hidden text-sm sm:inline">Support Our Projects</span>
-    </span>
+    </button>
     {#if route_id !== '/convert'}
-      <div class="ml-1 space-x-2">
-        <a class="text-xl" href="/convert" title="Lipi Parivartak">
-          <Icon
-            src={SiConvertio}
-            class="text-2xl hover:fill-emerald-600 dark:hover:fill-zinc-400"
-          />
-        </a>
-      </div>
+      <a class="text-xl" href="/convert" title="Lipi Parivartak">
+        <Icon src={SiConvertio} class="text-2xl hover:fill-emerald-600 dark:hover:fill-zinc-400" />
+      </a>
     {/if}
     <Popover
       open={app_bar_popover_status}
       onOpenChange={(e) => (app_bar_popover_status = e.open)}
       positioning={{ placement: 'bottom' }}
       arrow={false}
-      contentBase="card z-50 space-y-2 rounded-lg px-3 py-2 shadow-xl bg-surface-100-900"
+      contentBase="card z-50 space-y-1 rounded-lg px-3 py-2 shadow-xl bg-surface-100-900"
       triggerBase="btn m-0 p-0 gap-0 outline-hidden select-none"
     >
       {#snippet trigger()}
@@ -151,8 +148,15 @@
   {/snippet}
 </AppBar>
 
-<!-- <Modal bind:modal_open={support_modal_status}>
-  {#await preload_component() then SupportOptions}
-    <SupportOptions.default />
-  {/await}
-</Modal> -->
+<Modal
+  open={support_modal_status}
+  onOpenChange={(e) => (support_modal_status = e.open)}
+  contentBase="card z-40 px-3 py-2 shadow-xl rounded-md select-none outline-none bg-slate-100 dark:bg-surface-900"
+  backdropBackground="backdrop-blur-sm"
+>
+  {#snippet content()}
+    {#await preload_component() then SupportOptions}
+      <SupportOptions.default />
+    {/await}
+  {/snippet}
+</Modal>
