@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { z } from 'zod';
+  import { cl_join } from '~/tools/cl_join';
 
   type Props = {
     zodType?: any;
@@ -75,7 +76,7 @@
   bind:this={elm}
   {disabled}
   onchange={on_change_func}
-  class={className}
+  class={cl_join(className, 'inline-block')}
   style:width={resize && mounted ? `${width}px` : null}
 >
   {#each options as item (item.value)}

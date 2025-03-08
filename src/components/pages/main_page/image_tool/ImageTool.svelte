@@ -235,7 +235,7 @@
 
 <div class="space-y-2">
   <div class="space-x-2 text-sm">
-    <select class="select inline-block w-36 p-1 text-sm" bind:value={$image_script}>
+    <select class="select inline-block w-36 p-1 text-sm ring-2" bind:value={$image_script}>
       {#each SCRIPT_LIST as lang (lang)}
         {#if !['Normal'].includes(lang)}
           <option value={lang}>{lang}</option>
@@ -243,7 +243,7 @@
       {/each}
     </select>
     <Select
-      class={`${get_text_font_class($image_script)} select inline-block w-36 p-1 text-sm`}
+      class={`${get_text_font_class($image_script)} select inline-block w-36 p-1 text-sm ring-2`}
       disabled={sarga_loading}
       zodType={z.coerce.number().int()}
       bind:value={$image_kANDa}
@@ -254,14 +254,14 @@
     />
     <div class="inline-block space-x-1">
       <button
-        class="btn m-0 p-0"
+        class="m-0 btn p-0"
         disabled={$image_sarga === 1 || sarga_loading}
         onclick={() => ($image_sarga -= 1)}
       >
         <Icon src={TiArrowBackOutline} class="-mt-1 text-lg" />
       </button>
       <Select
-        class={`${get_text_font_class($image_script)} select inline-block w-40 p-1 text-sm`}
+        class={`${get_text_font_class($image_script)} select inline-block w-40 p-1 text-sm ring-2`}
         zodType={z.coerce.number().int()}
         disabled={sarga_loading}
         bind:value={$image_sarga}
@@ -271,7 +271,7 @@
         }))}
       />
       <button
-        class="btn m-0 p-0"
+        class="m-0 btn p-0"
         onclick={() => ($image_sarga += 1)}
         disabled={$image_sarga === rAmAyaNam_map[$image_kANDa - 1].sarga_count || sarga_loading}
       >
@@ -281,6 +281,6 @@
   </div>
   <ImageOptions />
 </div>
-<div class="mt-1 space-y-2">
+<div class="mt-2 space-y-2">
   <canvas bind:this={canvas_element}></canvas>
 </div>

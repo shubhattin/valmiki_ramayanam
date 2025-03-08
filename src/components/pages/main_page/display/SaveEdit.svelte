@@ -17,14 +17,13 @@
   } from '~/state/main_page/data';
   import { delay } from '~/tools/delay';
   import { client } from '~/api/client';
-  import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
   import { scale, slide } from 'svelte/transition';
   import { FiSave } from 'svelte-icons-pack/fi';
   import Icon from '~/tools/Icon.svelte';
   import { AiOutlineClose } from 'svelte-icons-pack/ai';
+  import ConfirmModal from '~/components/PopoverModals/ConfirmModal.svelte';
 
   const query_client = useQueryClient();
-  const modal_store = getModalStore();
 
   const save_data = createMutation({
     mutationKey: ['sarga', 'save_edited_data'],
@@ -62,17 +61,7 @@
     if ($edited_translations_indexes.size + $added_translations_indexes.length === 0) return;
     const added_indexes = $added_translations_indexes.map((index) => index);
     const edited_indexes = Array.from($edited_translations_indexes).map((index) => index);
-    const modal_options: ModalSettings = {
-      title: 'Sure to save Changes ?',
-      type: 'confirm',
-      body: `Edits ➔ ${edited_indexes.length} ${edited_indexes.length > 0 ? '{ ' + edited_indexes.join(', ') + ' }' : ''}
-      <br/>Additions ➔ ${added_indexes.length} ${added_indexes.length > 0 ? '{ ' + added_indexes.join(', ') + ' }' : ''}`,
-      response(r: boolean) {
-        if (!r) return;
-        $save_data.mutate({ added_indexes, edited_indexes });
-      }
-    };
-    modal_store.trigger(modal_options);
+    $save_data.mutate({ added_indexes, edited_indexes });
   };
 
   const cancel_edit_data = createMutation({
@@ -91,44 +80,69 @@
       // ^ reset the data
     }
   });
+
   const cancel_edit_func = () => {
     if ($edited_translations_indexes.size + $added_translations_indexes.length === 0) {
       $cancel_edit_data.mutate();
       return;
     }
-    const added_indexes = $added_translations_indexes.map((index) => index);
-    const edited_indexes = Array.from($edited_translations_indexes).map((index) => index);
-    const modal_options: ModalSettings = {
-      title: 'Sure to discard Changes ?',
-      type: 'confirm',
-      body: `Edits ➔ ${edited_indexes.length} ${edited_indexes.length > 0 ? '{ ' + edited_indexes.join(', ') + ' }' : ''}
-      <br/>Additions ➔ ${added_indexes.length} ${added_indexes.length > 0 ? '{ ' + added_indexes.join(', ') + ' }' : ''}`,
-      response(r: boolean) {
-        if (!r) return;
-        $cancel_edit_data.mutate();
-      }
-    };
-    modal_store.trigger(modal_options);
+    // const added_indexes = $added_translations_indexes.map((index) => index);
+    // const edited_indexes = Array.from($edited_translations_indexes).map((index) => index);
+    $cancel_edit_data.mutate();
   };
+
+  let cancel_popup_state = $state(false);
+  let save_popup_state = $state(false);
 </script>
 
+<ConfirmModal
+  bind:popup_state={save_popup_state}
+  close_on_confirm={true}
+  confirm_func={save_data_func}
+  title="Sure to save Changes ?"
+  body={() => {
+    const added_indexes = $added_translations_indexes.map((index) => index);
+    const edited_indexes = Array.from($edited_translations_indexes).map((index) => index);
+    return `Edits ➔ ${edited_indexes.length} ${edited_indexes.length > 0 ? '{ ' + edited_indexes.join(', ') + ' }' : ''}
+    <br/>Additions ➔ ${added_indexes.length} ${added_indexes.length > 0 ? '{ ' + added_indexes.join(', ') + ' }' : ''}`;
+  }}
+></ConfirmModal>
 <button
-  onclick={save_data_func}
   in:slide
   out:scale
   disabled={$save_data.isPending ||
     $added_translations_indexes.length + $edited_translations_indexes.size === 0}
-  class="btn rounded-lg bg-primary-700 px-1 py-1 text-white dark:bg-primary-600"
+  class="btn-hover rounded-lg bg-primary-700 px-1 py-1 text-white dark:bg-primary-700"
+  onclick={() => (save_popup_state = true)}
 >
   <Icon src={FiSave} class="text-2xl" />
-  <span class="text-sm sm:text-base">Save</span>
+  <span class="text-sm font-semibold sm:text-base">Save</span>
 </button>
+
+<ConfirmModal
+  bind:popup_state={cancel_popup_state}
+  close_on_confirm={true}
+  confirm_func={cancel_edit_func}
+  title="Sure to discard Changes ?"
+  body={() => {
+    const added_indexes = $added_translations_indexes.map((index) => index);
+    const edited_indexes = Array.from($edited_translations_indexes).map((index) => index);
+    return `Edits ➔ ${edited_indexes.length} ${edited_indexes.length > 0 ? '{ ' + edited_indexes.join(', ') + ' }' : ''}
+          <br/>Additions ➔ ${added_indexes.length} ${added_indexes.length > 0 ? '{ ' + added_indexes.join(', ') + ' }' : ''}`;
+  }}
+></ConfirmModal>
 <button
-  onclick={cancel_edit_func}
   in:slide
   out:scale
   disabled={$cancel_edit_data.isPending}
-  class="btn ml-3 rounded-lg bg-error-700 px-1 py-1 text-white dark:bg-error-600"
+  class="btn-hover ml-3 rounded-lg bg-error-700 px-1 py-1 font-semibold text-white dark:bg-error-600"
+  onclick={() => {
+    if ($edited_translations_indexes.size + $added_translations_indexes.length === 0) {
+      $cancel_edit_data.mutate();
+      return;
+    }
+    cancel_popup_state = true;
+  }}
 >
   <Icon src={AiOutlineClose} class="text-2xl" />
   <span class="text-sm sm:text-base">Cancel</span>

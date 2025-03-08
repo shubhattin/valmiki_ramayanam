@@ -3,9 +3,11 @@
   import { lipi_parivartak, load_parivartak_lang_data } from '~/tools/converter';
   import { delay } from '~/tools/delay';
   import { ALL_LANG_SCRIPT_LIST } from '~/tools/lang_list';
-  import Modal from '~/components/Modal.svelte';
   import { cl_join } from '~/tools/cl_join';
   import { onDestroy } from 'svelte';
+  import { Modal } from '@skeletonlabs/skeleton-svelte';
+  import Icon from '~/tools/Icon.svelte';
+  import { AiOutlineClose } from 'svelte-icons-pack/ai';
 
   interface Props {
     sync_lang_script: string;
@@ -62,8 +64,20 @@
   });
 </script>
 
-<div>
-  <Modal bind:modal_open={modal_opened} outterClass="mt-0">
+<Modal
+  open={modal_opened}
+  onOpenChange={(e) => (modal_opened = e.open)}
+  contentBase="card p-1 dark:bg-slate-900 bg-slate-200  space-y-4 shadow-xl max-w-(--breakpoint-sm) mx-3 mt-0 max-h-[97%] max-w-[97%] overflow-scroll"
+  backdropClasses="backdrop-blur-xs"
+>
+  {#snippet content()}
+    <div class="flex w-[97%] justify-end">
+      <button
+        aria-label="Close"
+        class="absolute cursor-pointer text-gray-500 outline-none select-none hover:text-gray-700"
+        onclick={() => (modal_opened = false)}><Icon src={AiOutlineClose} /></button
+      >
+    </div>
     <select class="select w-40" bind:value={typing_assistance_lang}>
       {#each ALL_LANG_SCRIPT_LIST.filter((src) => src !== 'English') as lang_script}
         <option value={lang_script}>{lang_script}</option>
@@ -83,7 +97,7 @@
     >
       {#if $usage_table.isFetching}
         <div class="h-full w-full space-y-1">
-          <div class="placeholder h-full w-full animate-pulse rounded-lg"></div>
+          <div class="h-full placeholder w-full animate-pulse rounded-lg"></div>
           <div class="placeholder animate-pulse rounded-md"></div>
         </div>
       {:else if $usage_table.isSuccess}
@@ -98,7 +112,7 @@
         {#if !['Romanized'].includes(typing_assistance_lang)}
           {@render extra_info()}
         {/if}
-        <div class="text-wrap text-sm text-stone-500 dark:text-stone-400">
+        <div class="text-sm text-wrap text-stone-500 dark:text-stone-400">
           Also use <span class="font-semibold">Lekhan Sahayika</span> in
           <a
             href="https://app-lipilekhika.pages.dev"
@@ -109,8 +123,8 @@
         </div>
       {/if}
     </div>
-  </Modal>
-</div>
+  {/snippet}
+</Modal>
 
 {#snippet extra_info()}
   <div class="mb-2">

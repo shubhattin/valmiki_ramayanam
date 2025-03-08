@@ -11,14 +11,10 @@
     view_translation_status
   } from '~/state/main_page/main_state';
   import { createMutation } from '@tanstack/svelte-query';
-  import { BsThreeDots } from 'svelte-icons-pack/bs';
-  import { popup } from '@skeletonlabs/skeleton';
   import { RiDocumentFileExcel2Line } from 'svelte-icons-pack/ri';
   import { transliterate_xlxs_file } from '~/tools/excel/transliterate_xlsx_file';
   import { client } from '~/api/client';
-  import { scale } from 'svelte/transition';
   import Icon from '~/tools/Icon.svelte';
-  import Modal from '~/components/Modal.svelte';
   import { BiImage } from 'svelte-icons-pack/bi';
   import type { Workbook } from 'exceljs';
   import { TrOutlineFileTypeTxt } from 'svelte-icons-pack/tr';
@@ -26,6 +22,11 @@
   import { lipi_parivartak } from '~/tools/converter';
   import { RiUserFacesRobot2Line } from 'svelte-icons-pack/ri';
   import { useSession } from '~/lib/auth-client';
+  import { Modal, Popover } from '@skeletonlabs/skeleton-svelte';
+  import { cl_join } from '~/tools/cl_join';
+  import { BsThreeDots } from 'svelte-icons-pack/bs';
+  import { fade } from 'svelte/transition';
+  import { AiOutlineClose } from 'svelte-icons-pack/ai';
 
   const session = useSession();
   let user_info = $derived($session.data?.user);
@@ -119,68 +120,97 @@
       );
     }
   });
+
+  let file_preview_opened = $state(false);
 </script>
 
-<button
-  title="Extra Options"
-  transition:scale
-  use:popup={{
-    event: 'click',
-    target: 'sarga_options',
-    placement: 'bottom'
-  }}
-  class="btn m-0 rounded-full p-[0.035rem] ring-2 ring-zinc-500 sm:p-[0.05rem] dark:ring-zinc-300"
+<Popover
+  open={file_preview_opened}
+  onOpenChange={(e) => (file_preview_opened = e.open)}
+  positioning={{ placement: 'bottom' }}
+  arrow={false}
+  contentBase={cl_join(
+    'card z-70 space-y-1 p-1 rounded-lg shadow-xl dark:bg-surface-900 bg-slate-200 text-sm'
+  )}
+  triggerBase="outline-hidden select-none"
 >
-  <Icon class="mx-[0.17rem] text-lg sm:mx-0 sm:text-2xl" src={BsThreeDots} />
-</button>
-<div class="card z-50 space-y-1 rounded-lg px-1 py-1 shadow-xl" data-popup="sarga_options">
-  <button
-    onclick={() => $download_excel_file.mutate()}
-    class="btn block w-full rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
-  >
-    <Icon
-      class="-mt-1 mr-1 text-2xl text-green-600 dark:text-green-400"
-      src={RiDocumentFileExcel2Line}
-    />
-    Download Excel File
-  </button>
-  <button
-    onclick={() => image_tool_opened.set(true)}
-    class="btn block w-full rounded-md px-2 py-1 text-start hover:bg-gray-200 dark:hover:bg-gray-700"
-  >
-    <Icon src={BiImage} class="-mt-1 fill-sky-500 text-2xl dark:fill-sky-400" />
-    Image Tool
-  </button>
-  {#if user_info && user_info.role === 'admin'}
+  {#snippet trigger()}
+    <span class="btn-hover m-0" title="Extra Options" transition:fade>
+      <Icon class="mx-[0.17rem] text-lg sm:mx-0 sm:text-2xl" src={BsThreeDots} />
+    </span>
+  {/snippet}
+  {#snippet content()}
     <button
       onclick={() => {
-        $ai_tool_opened = true;
-        $view_translation_status = true;
+        $download_excel_file.mutate();
+        file_preview_opened = false;
       }}
-      class="btn block w-full rounded-md px-2 py-1 text-start hover:bg-gray-200 dark:hover:bg-gray-700"
+      class="btn block w-full rounded-md px-2 py-1 pt-0 hover:bg-gray-200 dark:hover:bg-gray-700"
     >
       <Icon
-        src={RiUserFacesRobot2Line}
-        class="-mt-1 mr-1 fill-blue-500 text-2xl dark:fill-blue-400"
+        class="-mt-1 mr-1 text-2xl text-green-600 dark:text-green-400"
+        src={RiDocumentFileExcel2Line}
       />
-      AI Image Generator
+      Download Excel File
     </button>
-  {/if}
-  <button
-    class="btn block w-full rounded-md px-2 py-1 text-start hover:bg-gray-200 dark:hover:bg-gray-700"
-    onclick={() => $download_text_file.mutate()}
-  >
-    <Icon src={TrOutlineFileTypeTxt} class=" mr-1 text-2xl" />
-    Download Text File
-  </button>
-</div>
-<div>
-  <Modal bind:modal_open={$image_tool_opened} close_on_click_outside={false}>
+    <button
+      onclick={() => {
+        file_preview_opened = false;
+        image_tool_opened.set(true);
+      }}
+      class="btn block w-full rounded-md px-2 py-1 pt-0 text-start hover:bg-gray-200 dark:hover:bg-gray-700"
+    >
+      <Icon src={BiImage} class="-mt-1 fill-sky-500 text-2xl dark:fill-sky-400" />
+      Image Tool
+    </button>
+    {#if user_info && user_info.role === 'admin'}
+      <button
+        onclick={() => {
+          file_preview_opened = false;
+          $ai_tool_opened = true;
+          $view_translation_status = true;
+        }}
+        class="btn block w-full rounded-md px-2 py-1 pt-0 text-start hover:bg-gray-200 dark:hover:bg-gray-700"
+      >
+        <Icon
+          src={RiUserFacesRobot2Line}
+          class="-mt-1 mr-1 fill-blue-500 text-2xl dark:fill-blue-400"
+        />
+        AI Image Generator
+      </button>
+    {/if}
+    <button
+      class="btn block w-full rounded-md px-2 py-1 pt-0 text-start hover:bg-gray-200 dark:hover:bg-gray-700"
+      onclick={() => {
+        file_preview_opened = false;
+        $download_text_file.mutate();
+      }}
+    >
+      <Icon src={TrOutlineFileTypeTxt} class=" mr-1 text-2xl" />
+      Download Text File
+    </button>
+  {/snippet}
+</Popover>
+<Modal
+  open={$image_tool_opened}
+  onOpenChange={(e) => ($image_tool_opened = e.open)}
+  closeOnInteractOutside={true}
+  contentBase="z-10 mx-3 max-h-[97%] max-w-[97%] overflow-scroll rounded-md p-2 card rounded-lg bg-slate-100 p-1 shadow-2xl dark:bg-surface-900"
+  backdropBackground="backdrop-blur-xs"
+>
+  {#snippet content()}
     {#await import('../image_tool/ImageTool.svelte') then ImageTool}
+      <div class="flex w-[98%] justify-end">
+        <button
+          aria-label="Close"
+          class="absolute cursor-pointer text-gray-500 hover:text-gray-700"
+          onclick={() => ($image_tool_opened = false)}><Icon src={AiOutlineClose} /></button
+        >
+      </div>
       <ImageTool.default />
     {/await}
-  </Modal>
-</div>
+  {/snippet}
+</Modal>
 {#if excel_preview_opened}
   {#await import('~/components/PreviewExcel.svelte') then PreviewExcel}
     <PreviewExcel.default

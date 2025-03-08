@@ -10,7 +10,7 @@
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import { writable } from 'svelte/store';
   import image_tool_prompts from './image_tool_prompts.yaml';
-  import { SlideToggle, ProgressRadial } from '@skeletonlabs/skeleton';
+  import { Switch, ProgressRing } from '@skeletonlabs/skeleton-svelte';
   import { client } from '~/api/client';
   import { lipi_parivartak } from '~/tools/converter';
   import { copy_text_to_clipboard, format_string_text, get_permutations } from '~/tools/kry';
@@ -273,7 +273,7 @@
 
 {#if copied_text_status}
   <div
-    class="fixed bottom-2 right-2 z-50 cursor-default select-none font-bold text-green-700 dark:text-green-300"
+    class="fixed right-2 bottom-2 z-50 cursor-default font-bold text-green-700 select-none dark:text-green-300"
   >
     <Icon src={BsClipboard2Check} />
     Copied to Clipboard
@@ -283,7 +283,7 @@
   <span class="space-x-1">
     <span class="font-semibold">Shloka No.</span>
     <button
-      class="btn m-0 p-0"
+      class="btn-hover"
       disabled={$shloka_numb === 0}
       onclick={() => {
         if ($shloka_numb !== -1) $shloka_numb -= 1;
@@ -292,7 +292,7 @@
     >
       <Icon src={TiArrowBackOutline} class="-mt-1 text-lg" />
     </button>
-    <select class="select inline-block w-14 p-1 text-sm" bind:value={$shloka_numb}>
+    <select class="select inline-block w-14 px-1 text-sm ring-2" bind:value={$shloka_numb}>
       <option value={0}>0</option>
       {#each Array(shloka_count) as _, index}
         <option value={index + 1}>{index + 1}</option>
@@ -300,7 +300,7 @@
       <option value={-1}>-1</option>
     </select>
     <button
-      class="btn m-0 p-0"
+      class="btn-hover"
       onclick={() => {
         if ($shloka_numb !== shloka_count) $shloka_numb += 1;
         else $shloka_numb = -1;
@@ -321,7 +321,7 @@
     Generate Image Prompt
   </button>
   <select
-    class="select ml-3 inline-block w-20 px-1 py-1 text-xs outline-none"
+    class="select ml-2.5 inline-block w-20 px-1 py-1 text-xs ring-2 outline-hidden"
     bind:value={selected_text_model}
     title={TEXT_MODEL_LIST[selected_text_model][1]}
   >
@@ -330,25 +330,25 @@
     {/each}
   </select>
   {#if show_prompt_time_status && $image_prompt_q.isSuccess && $image_prompt_q.data.image_prompt}
-    <span class="ml-4 select-none text-xs text-stone-500 dark:text-stone-300">
+    <span class="ml-4 text-xs text-stone-500 select-none dark:text-stone-300">
       <Icon src={OiStopwatch16} class="text-base" />
       {pretty_ms($image_prompt_q.data.time_taken)}
     </span>
   {/if}
 </div>
-<div>
+<div class="space-y-1">
   <div class="block space-y-1.5">
     <div class="space-x-2">
       <span class="font-bold">Base Prompt</span>
       <button
-        class="btn m-0 p-0 outline-none"
+        class="btn-hover p-0 outline-hidden"
         onclick={() => copy_text_to_clipboard($base_user_prompt + additional_prompt_info)}
         title="Copy Base Prompt"
       >
         <Icon src={LuCopy} />
       </button>
       <button
-        class="btn m-0 p-0 outline-none"
+        class="btn-hover p-0 outline-hidden"
         title="Copy Full Prompt"
         onclick={() =>
           copy_text_to_clipboard(
@@ -359,12 +359,12 @@
       </button>
     </div>
     <textarea
-      class="textarea h-24 px-1 py-0 text-sm"
+      class="textarea h-24 border-2 px-1 py-0 text-sm"
       spellcheck="false"
       bind:value={$base_user_prompt}
     ></textarea>
   </div>
-  <div class="break-words text-xs text-stone-500 dark:text-stone-400">
+  <div class="text-xs break-words text-stone-500 dark:text-stone-400">
     {additional_prompt_info}
   </div>
   <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -381,7 +381,7 @@
 </div>
 <div class="flex space-x-3">
   <select
-    class="select w-24 px-1 py-1 text-sm"
+    class="select w-24 px-1 py-1 text-sm ring-2"
     bind:value={image_model}
     title={IMAGE_MODELS[image_model][1]}
   >
@@ -389,45 +389,45 @@
       <option class="text-sm" value={option[0]} title={option[1][1]}>{option[1][0]}</option>
     {/each}
   </select>
-  <SlideToggle
+  <Switch
     name="auto_image"
-    size="sm"
-    class="mt-1 outline-none"
-    active="bg-primary-500"
-    bind:checked={$auto_gen_image}>Auto Generate Image</SlideToggle
+    stateFocused="outline-hidden select-none"
+    checked={$auto_gen_image}
+    onCheckedChange={(e) => ($auto_gen_image = e.checked)}>Auto Generate Image</Switch
   >
 </div>
 {#if $image_prompt_q.data !== undefined || $image_prompt_q.isFetching}
   {#if $image_prompt_q.isFetching || !$image_prompt_q.isSuccess}
-    <div class="placeholder h-80 animate-pulse rounded-md"></div>
+    <div class="h-80 placeholder animate-pulse rounded-md"></div>
   {:else}
     <div class="space-x-3">
       <span class="font-bold">Image Prompt</span>
       <button
         disabled={$image_q.isFetching}
         onclick={generate_image}
-        class="btn rounded-md bg-tertiary-800 px-1 py-0 font-bold text-white dark:bg-tertiary-700"
+        class="btn-hover rounded-md bg-tertiary-800 px-1.5 py-0 font-bold text-white dark:bg-tertiary-800"
         >Generate Image</button
       >
       <button
-        class="btn m-0 p-0 outline-none"
+        class="btn-hover p-0 outline-hidden"
         title="Copy Image Prompt"
         onclick={() => copy_text_to_clipboard($image_prompt)}
       >
         <Icon src={BsCopy} class="text-lg" />
       </button>
       {#if $image_q.isFetching}
-        <ProgressRadial
+        <ProgressRing
           value={(image_gen_time_taken / IMAGE_MODELS[image_model][2]) * 100}
-          stroke={100}
-          width="w-6"
-          class="-mb-2 inline-block"
-          meter="stroke-primary-500"
-          track="stroke-primary-500/30"
+          max={100}
+          size="size-6"
           strokeLinecap="butt"
+          classes="inline-block -mb-2"
+          meterBase="stroke-primary-500"
+          trackBase="stroke-primary-500/30"
+          strokeWidth="5px"
         />
       {:else if show_image_time_status && $image_q.isSuccess}
-        <span class="ml-4 select-none text-xs text-stone-500 dark:text-stone-300">
+        <span class="ml-4 text-xs text-stone-500 select-none dark:text-stone-300">
           <Icon src={OiStopwatch16} class="text-base" />
           {pretty_ms($image_q.data.time_taken)}
         </span>
@@ -435,7 +435,7 @@
     </div>
     <textarea
       class={cl_join(
-        'textarea h-36 px-1 py-0 text-sm',
+        'textarea h-36 border-2 px-1 py-0 text-sm',
         image_prompt_request_error && 'input-error'
       )}
       spellcheck="false"
@@ -443,7 +443,7 @@
     ></textarea>
     {#if $image_q.data}
       {#if $image_q.isFetching || !$image_q.isSuccess}
-        <div class="placeholder h-96 animate-pulse rounded-md"></div>
+        <div class="h-96 placeholder animate-pulse rounded-md"></div>
       {:else}
         <div>
           <section class="mb-10 grid grid-cols-2 gap-3">
@@ -461,7 +461,7 @@
                   <div class="flex items-center justify-center space-x-3">
                     <button
                       onclick={() => download_image(image)}
-                      class="btn rounded-md bg-surface-600 px-1 py-1 outline-none dark:bg-surface-500"
+                      class="btn rounded-md bg-surface-600 px-1 py-1 outline-hidden dark:bg-surface-500"
                     >
                       <Icon src={BsDownload} class="text-xl text-white" />
                     </button>
