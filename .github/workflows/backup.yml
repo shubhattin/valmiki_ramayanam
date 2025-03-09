@@ -3,6 +3,7 @@ name: Data Backup
 on:
   schedule:
     - cron: '30 17 */2 * *' # Run every days at 11:00 PM IST every 2 days
+  workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
   backup_db_data:
