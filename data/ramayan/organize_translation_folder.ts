@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import js_yaml from 'js-yaml';
+import { LANG_LIST, LANG_LIST_IDS } from '../../src/tools/lang_list';
 
 // this file should be called from root dir
 async function main() {
@@ -8,7 +9,7 @@ async function main() {
   const translations = JSON.parse(
     fs.readFileSync('./src/db/scripts/backup/translations.json', 'utf8')
   )['translations'] as {
-    lang: string;
+    lang_id: number;
     kANDa_num: number;
     sarga_num: number;
     shloka_num: number;
@@ -29,17 +30,18 @@ async function main() {
   } = {};
 
   for (let trans of translations) {
-    if (!data[trans.lang]) {
-      fs.mkdirSync(`./data/ramayan/translations/${trans.lang}`);
-      data[trans.lang] = {};
+    const lang_nm = LANG_LIST[LANG_LIST_IDS.indexOf(trans.lang_id)];
+    if (!data[lang_nm]) {
+      fs.mkdirSync(`./data/ramayan/translations/${lang_nm}`);
+      data[lang_nm] = {};
     }
-    if (!data[trans.lang][trans.kANDa_num]) {
-      fs.mkdirSync(`./data/ramayan/translations/${trans.lang}/${trans.kANDa_num}`);
-      data[trans.lang][trans.kANDa_num] = {};
+    if (!data[lang_nm][trans.kANDa_num]) {
+      fs.mkdirSync(`./data/ramayan/translations/${lang_nm}/${trans.kANDa_num}`);
+      data[lang_nm][trans.kANDa_num] = {};
     }
-    if (!data[trans.lang][trans.kANDa_num][trans.sarga_num])
-      data[trans.lang][trans.kANDa_num][trans.sarga_num] = new Map();
-    data[trans.lang][trans.kANDa_num][trans.sarga_num].set(trans.shloka_num, trans.text);
+    if (!data[lang_nm][trans.kANDa_num][trans.sarga_num])
+      data[lang_nm][trans.kANDa_num][trans.sarga_num] = new Map();
+    data[lang_nm][trans.kANDa_num][trans.sarga_num].set(trans.shloka_num, trans.text);
   }
 
   for (let lang in data) {
