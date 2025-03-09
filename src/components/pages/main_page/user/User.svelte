@@ -26,13 +26,11 @@
   let user_info = $derived($session.data?.user);
 
   let pass_enterer_status = writable(false);
-  let user_input_elmnt_login = writable<HTMLInputElement>(null!);
-
   let user_create_modal_status = writable(false);
-  let name_input_elmnt_new_user = writable<HTMLInputElement>(null!);
 
   const log_out = () => {
     signOut();
+    user_popover_status = false;
   };
 
   const trigger_translations_update = async () => {
@@ -55,9 +53,13 @@
     // };
     // modalStore.trigger(modal);
   };
+
+  let user_popover_status = $state(false);
 </script>
 
 <Popover
+  open={user_popover_status}
+  onOpenChange={(e) => (user_popover_status = e.open)}
   positioning={{ placement: 'left-start' }}
   arrow={false}
   contentBase={'card z-50 space-y-2 p-2 rounded-lg shadow-xl bg-zinc-100 dark:bg-surface-900'}
@@ -154,9 +156,6 @@
         <button
           onclick={() => {
             $pass_enterer_status = true;
-            setTimeout(() => {
-              $user_input_elmnt_login.focus();
-            }, 500);
           }}
           class="group flex w-full space-x-2 rounded-md px-2 py-1 font-bold hover:bg-gray-200 dark:hover:bg-gray-700"
         >
@@ -169,9 +168,6 @@
         <button
           onclick={() => {
             $user_create_modal_status = true;
-            setTimeout(() => {
-              $name_input_elmnt_new_user.focus();
-            }, 500);
           }}
           class="group flex w-full space-x-2 rounded-md px-2 py-1 font-bold hover:bg-gray-200 dark:hover:bg-gray-700"
         >
@@ -186,6 +182,7 @@
   {/snippet}
 </Popover>
 <Modal
+  backdropBackground="backdrop-blur-xs"
   contentBase={'card z-50 space-y-2 p-2 rounded-lg shadow-xl bg-zinc-100 dark:bg-surface-900'}
   open={$pass_enterer_status}
   onOpenChange={(e) => ($pass_enterer_status = e.open)}
@@ -197,6 +194,7 @@
   {/snippet}
 </Modal>
 <Modal
+  backdropBackground="backdrop-blur-sm"
   contentBase={'card z-50 space-y-2 p-2 rounded-lg shadow-xl bg-zinc-100 dark:bg-surface-900'}
   open={$user_create_modal_status}
   onOpenChange={(e) => ($user_create_modal_status = e.open)}
