@@ -29,7 +29,7 @@ export const TEXT_MODEL_LIST = {
     'O3 Mini',
     '200K token context window\n$1.10/1M Input tokens & $4.40/1M Output tokens'
   ],
-  'claude-3.5-sonnet': [
+  'claude-3.7-sonnet': [
     'Sonnet',
     '200K token context window\n$3/1M Input tokens & $15/1M Output tokens'
   ]

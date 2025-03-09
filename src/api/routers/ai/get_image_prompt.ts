@@ -27,7 +27,7 @@ export const get_image_prompt_route = protectedAdminProcedure
       const result = await generateObject({
         model: {
           'gpt-4o': openai_text_model('gpt-4o'),
-          'claude-3.5-sonnet': anthropic_text_model('claude-3-5-sonnet-latest'),
+          'claude-3.7-sonnet': anthropic_text_model('claude-3-7-sonnet-latest'),
           'o3-mini': openai_text_model('o3-mini')
         }[model],
         messages,

@@ -41,8 +41,8 @@
 
 - We are using [OpenAI](https://openai.com/) and [Anthropic](https://www.anthropic.com/) for the AI image generation and translation.
 - **Image**
-  - First we generate the image prompt using shloka text and available english translation. using `gpt-4o` and `claude-3.5-sonnet` model.
+  - First we generate the image prompt using shloka text and available english translation. using `gpt-4o` and `claude-3.7-sonnet` model.
   - Then finally we use `dall-e-3` model to generate the image.
 - **Shloka Translation**
-  - We use `gpt-4o` and `claude-3.5-sonnet` model to translate the text.
+  - We use `gpt-4o` and `claude-3.7-sonnet` model to translate the text.
   - The entire shloka text is provided along with the translation to generate English and Indian language translations.
