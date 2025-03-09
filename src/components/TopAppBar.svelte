@@ -76,7 +76,7 @@
       onOpenChange={(e) => (app_bar_popover_status = e.open)}
       positioning={{ placement: 'bottom' }}
       arrow={false}
-      contentBase="card z-50 space-y-1 rounded-lg px-3 py-2 shadow-xl bg-surface-100-900"
+      contentBase="card z-50 space-y-1 sm:space-y-1.5 rounded-lg px-3 py-2 shadow-xl bg-surface-100-900"
       triggerBase="btn m-0 p-0 gap-0 outline-hidden select-none"
     >
       {#snippet trigger()}
@@ -88,7 +88,7 @@
       {#snippet content()}
         <a
           href="/convert"
-          class="group flex space-x-2 rounded-md px-2 py-1 font-bold hover:bg-gray-200 dark:hover:bg-gray-700"
+          class="group flex space-x-2 rounded-md px-2 py-1 text-sm font-bold hover:bg-gray-200 sm:text-base dark:hover:bg-gray-700"
         >
           <Icon
             src={SiConvertio}
@@ -98,7 +98,7 @@
         </a>
         <!-- <a
         href="/excel_tool"
-        class="flex space-x-1 rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
+        class="flex space-x-1  text-sm sm:text-base rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
       >
         <Icon
           src={RiDocumentFileExcel2Line}
@@ -110,7 +110,7 @@
           href="https://www.youtube.com/c/thesanskritchannel"
           target="_blank"
           rel="noopener noreferrer"
-          class="flex space-x-1 rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
+          class="flex space-x-1 rounded-md px-2 py-1 text-sm hover:bg-gray-200 sm:text-base dark:hover:bg-gray-700"
           onclick={() => (app_bar_popover_status = false)}
         >
           <Icon src={YoutubeIcon} class="mt-0 text-2xl text-[red]" />
@@ -120,7 +120,7 @@
           href="https://github.com/shubhattin/valmiki_ramayanam"
           target="_blank"
           rel="noopener noreferrer"
-          class="will-close group flex space-x-1 rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
+          class="group flex space-x-1 rounded-md px-2 py-1 text-sm hover:bg-gray-200 sm:text-base dark:hover:bg-gray-700"
         >
           <Icon
             src={SiGithub}

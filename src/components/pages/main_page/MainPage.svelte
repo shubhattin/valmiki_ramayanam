@@ -259,7 +259,7 @@
       Script
       <Icon src={LanguageIcon} class="text-2xl sm:text-4xl" />
       <select
-        class="select inline-block h-10 w-32 px-2 py-1 text-sm sm:h-12 sm:w-40 sm:text-base"
+        class="select inline-block h-10 w-32 px-2 py-1 text-sm sm:h-12 sm:w-40 sm:py-0 sm:text-base"
         disabled={$viewing_script_mut.isPending}
         bind:value={$viewing_script_selection}
       >
@@ -378,7 +378,7 @@
               {#if $trans_lang !== 0 && (user_info.role === 'admin' || languages.indexOf($trans_lang) !== -1)}
                 <button
                   onclick={() => ($editing_status_on = true)}
-                  class="btn-hover my-1 inline-block rounded-lg bg-secondary-700 px-1 py-1 text-sm font-bold text-white sm:px-2 sm:text-base dark:bg-secondary-800"
+                  class="btn-hover my-1 inline-block rounded-lg bg-secondary-700 px-1 py-1 text-sm font-bold text-white sm:px-2 sm:text-sm dark:bg-secondary-800"
                 >
                   <Icon src={BiEdit} class="text-xl sm:text-2xl" />
                   Edit
@@ -387,7 +387,7 @@
                 <!-- 1 -> English -->
                 <button
                   onclick={() => ($editing_status_on = true)}
-                  class="btn-hover my-1 inline-block rounded-lg bg-secondary-700 px-1 py-1 text-sm font-bold text-white sm:px-2 sm:text-base dark:bg-secondary-800"
+                  class="btn-hover my-1 inline-block rounded-lg bg-secondary-700 px-1 py-1 text-sm font-bold text-white sm:px-2 sm:text-sm dark:bg-secondary-800"
                 >
                   <Icon src={BiEdit} class="text-xl sm:text-2xl" />
                   Edit English
