@@ -100,13 +100,24 @@
   close_on_confirm={true}
   confirm_func={save_data_func}
   title="Sure to save Changes ?"
-  body={() => {
-    const added_indexes = $added_translations_indexes.map((index) => index);
-    const edited_indexes = Array.from($edited_translations_indexes).map((index) => index);
-    return `Edits ➔ ${edited_indexes.length} ${edited_indexes.length > 0 ? '{ ' + edited_indexes.join(', ') + ' }' : ''}
-    <br/>Additions ➔ ${added_indexes.length} ${added_indexes.length > 0 ? '{ ' + added_indexes.join(', ') + ' }' : ''}`;
-  }}
-></ConfirmModal>
+>
+  {#snippet body()}
+    {@const added_indexes = $added_translations_indexes.map((index) => index)}
+    {@const edited_indexes = Array.from($edited_translations_indexes).map((index) => index)}
+    <div>
+      <span class="font-semibold">Edits ➔ {edited_indexes.length}</span>
+      {#if edited_indexes.length > 0}
+        <span>{`{ ${edited_indexes.join(', ')} }`}</span>
+      {/if}
+    </div>
+    <div>
+      <span class="font-semibold">Additions ➔ {added_indexes.length}</span>
+      {#if added_indexes.length > 0}
+        <span>{`{ ${added_indexes.join(', ')} }`}</span>
+      {/if}
+    </div>
+  {/snippet}
+</ConfirmModal>
 <button
   in:slide
   out:scale
@@ -124,13 +135,24 @@
   close_on_confirm={true}
   confirm_func={cancel_edit_func}
   title="Sure to discard Changes ?"
-  body={() => {
-    const added_indexes = $added_translations_indexes.map((index) => index);
-    const edited_indexes = Array.from($edited_translations_indexes).map((index) => index);
-    return `Edits ➔ ${edited_indexes.length} ${edited_indexes.length > 0 ? '{ ' + edited_indexes.join(', ') + ' }' : ''}
-          <br/>Additions ➔ ${added_indexes.length} ${added_indexes.length > 0 ? '{ ' + added_indexes.join(', ') + ' }' : ''}`;
-  }}
-></ConfirmModal>
+>
+  {#snippet body()}
+    {@const added_indexes = $added_translations_indexes.map((index) => index)}
+    {@const edited_indexes = Array.from($edited_translations_indexes).map((index) => index)}
+    <div>
+      <span class="font-semibold">Edits ➔ {edited_indexes.length}</span>
+      {#if edited_indexes.length > 0}
+        <span>{`{ ${edited_indexes.join(', ')} }`}</span>
+      {/if}
+    </div>
+    <div>
+      <span class="font-semibold">Additions ➔ {added_indexes.length}</span>
+      {#if added_indexes.length > 0}
+        <span>{`{ ${added_indexes.join(', ')} }`}</span>
+      {/if}
+    </div>
+  {/snippet}
+</ConfirmModal>
 <button
   in:slide
   out:scale

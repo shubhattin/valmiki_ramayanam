@@ -138,7 +138,7 @@
             close_on_confirm={true}
             confirm_func={trigger_translations_update}
             title="Are you sure to Sync Database Translations to Main Repository ?"
-            body={() =>
+            body_text={() =>
               'This will commit the translations stored in the database to the main repository.'}
           >
             <button

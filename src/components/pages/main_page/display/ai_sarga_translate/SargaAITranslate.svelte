@@ -144,7 +144,7 @@
     close_on_confirm={true}
     confirm_func={translate_sarga_func}
     title={'Are You Sure to translate the sarga ?'}
-    body={() => {
+    body_text={() => {
       return `This will translate the untranslated shlokas to ${$trans_lang !== 0 ? LANG_LIST[LANG_LIST_IDS.indexOf($trans_lang)] : 'English'} which you can edit and then save.`;
     }}
   >

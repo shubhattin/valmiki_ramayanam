@@ -7,6 +7,7 @@
     children,
     popup_state = $bindable(),
     title,
+    body_text,
     body,
     cancel_func,
     confirm_func,
@@ -20,7 +21,8 @@
     confirm_func?: () => void;
     cancel_func?: () => void;
     title: string;
-    body?: () => string;
+    body_text?: () => string;
+    body?: Snippet;
     popup_state: boolean;
     contentBase?: string;
     close_on_confirm?: boolean;
@@ -28,8 +30,6 @@
     triggerBase?: string;
     button_pos?: 'left' | 'center' | 'right';
   } = $props();
-
-  let body_text = $derived(body ? body() : null);
 </script>
 
 <Modal
@@ -49,9 +49,13 @@
   {/snippet}
   {#snippet content()}
     <div class={cl_join('text-lg font-bold', className)}>{title}</div>
-    {#if body_text}
+    {#if body}
       <div class="my-2 mb-3">
-        {@html body_text}
+        {@render body()}
+      </div>
+    {:else if body_text}
+      <div class="my-2 mb-3">
+        {@html body_text()}
       </div>
     {/if}
     <div
