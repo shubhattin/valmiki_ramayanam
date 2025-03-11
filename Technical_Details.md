@@ -16,7 +16,7 @@
 - **API**: [trpc](https://trpc.io/) for API
 - **Database** : [PostgreSQL](https://www.postgresql.org/) hosted on [NeonDB](https://neon.tech/) and with [Drizzle](https://orm.drizzle.team/) for ORM.
 - **Authentication** : Using Auth Server of [BetterAuth](https://www.better-auth.com/) in [tsc_users](https://github.com/shubhattin/tsc-users) repository.
-- **Hosting Provider** : [Vercel](https://vercel.com/) for hosting our website and API. As currently our backend is Edge Compatible so we are using Vercel Edge Functions for API.
+- **Hosting Provider** : [Netlify](https://www.netlify.com/) for hosting our website and API. As currently our backend is Edge Compatible so we are using Netlift Edge Functions for API.
 
 ## Data Processing
 
