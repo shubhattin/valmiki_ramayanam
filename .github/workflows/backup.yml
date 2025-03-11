@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PG_DATABASE_URL: ${{ secrets.PG_DATABASE_URL }}
-      BACKUP_ENCRYPTION_KEY: ${{ secrets.BACKUP_ENCRYPTION_KEY }}
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js
