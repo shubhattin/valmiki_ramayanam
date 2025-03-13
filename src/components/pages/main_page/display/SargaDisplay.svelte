@@ -299,7 +299,7 @@
               $added_translations_indexes.push(trans_index);
               $added_translations_indexes = $added_translations_indexes;
             }}
-            class="btn-hover m-0 rounded-md bg-surface-500 px-1 py-[0.05rem] font-bold text-white dark:bg-surface-500"
+            class="btn-hover rounded-md bg-surface-500 px-1 py-[0.05rem] font-bold text-white dark:bg-surface-500"
           >
             <Icon src={RiSystemAddLargeLine} />
           </button>
@@ -337,7 +337,7 @@
               $added_translations_indexes.push(trans_index);
               $added_translations_indexes = $added_translations_indexes;
             }}
-            class="btn-hover m-0 my-[0.05rem] rounded-md bg-surface-500 px-1 py-0 font-bold text-white dark:bg-surface-500"
+            class="btn-hover my-[0.05rem] rounded-md bg-surface-500 px-1 py-0 font-bold text-white dark:bg-surface-500"
           >
             <Icon src={RiSystemAddLargeLine} />
           </button>

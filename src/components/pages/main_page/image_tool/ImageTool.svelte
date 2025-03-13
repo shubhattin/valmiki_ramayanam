@@ -254,7 +254,7 @@
     />
     <div class="inline-block space-x-1">
       <button
-        class="m-0 btn p-0"
+        class="btn p-0"
         disabled={$image_sarga === 1 || sarga_loading}
         onclick={() => ($image_sarga -= 1)}
       >
@@ -271,7 +271,7 @@
         }))}
       />
       <button
-        class="m-0 btn p-0"
+        class="btn p-0"
         onclick={() => ($image_sarga += 1)}
         disabled={$image_sarga === rAmAyaNam_map[$image_kANDa - 1].sarga_count || sarga_loading}
       >

@@ -239,7 +239,7 @@
             {#if $excel_transliteration.isSuccess}
               <span in:fly>
                 <button
-                  class="m-0 btn p-0"
+                  class="btn p-0"
                   disabled={$excel_transliteration.isPending}
                   onclick={() => download_file(file_index)}
                   ><Icon
@@ -248,7 +248,7 @@
                   /></button
                 >
                 <button
-                  class="m-0 btn p-0"
+                  class="btn p-0"
                   disabled={$excel_transliteration.isPending}
                   onclick={() => {
                     current_workbook = file_workbooks[file_index];

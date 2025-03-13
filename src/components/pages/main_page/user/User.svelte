@@ -85,7 +85,7 @@
             {user_info.name}
           </span>
           <a
-            class="m-0 btn p-0 hover:text-blue-600 dark:hover:text-blue-500"
+            class="btn p-0 hover:text-blue-600 dark:hover:text-blue-500"
             href={PUBLIC_BETTER_AUTH_URL}
             target="_blank"
             rel="noopener noreferrer"
@@ -104,7 +104,7 @@
           >
             <button
               disabled={$editing_status_on}
-              class="btn-hover m-0 rounded-md bg-error-600 px-2 py-1 pl-1 text-sm font-bold text-white sm:text-base"
+              class="btn-hover rounded-md bg-error-600 px-2 py-1 pl-1 text-sm font-bold text-white sm:text-base"
             >
               <Icon class="text-2xl" src={BiLogOut} />
               <span>Logout</span>
@@ -143,7 +143,7 @@
           >
             <button
               disabled={$editing_status_on}
-              class="btn-hover m-0 block rounded-md bg-primary-800 px-1.5 py-0 font-bold text-white dark:bg-primary-900"
+              class="btn-hover block rounded-md bg-primary-800 px-1.5 py-0 font-bold text-white dark:bg-primary-900"
             >
               <Icon src={OiSync16} class="my-1 mb-1 text-xl" />
               <span class="text-sm">Sync Translations from DB</span>

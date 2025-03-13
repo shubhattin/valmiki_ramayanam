@@ -135,7 +135,7 @@
   triggerBase="outline-hidden select-none"
 >
   {#snippet trigger()}
-    <span class="btn-hover m-0" title="Extra Options" transition:fade>
+    <span class="btn-hover" title="Extra Options" transition:fade>
       <Icon class="mx-[0.17rem] text-lg sm:mx-0 sm:text-2xl" src={BsThreeDots} />
     </span>
   {/snippet}

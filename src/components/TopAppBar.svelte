@@ -77,7 +77,7 @@
       positioning={{ placement: 'bottom' }}
       arrow={false}
       contentBase="card z-50 space-y-1 sm:space-y-1.5 rounded-lg px-3 py-2 shadow-xl bg-surface-100-900"
-      triggerBase="btn m-0 p-0 gap-0 outline-hidden select-none"
+      triggerBase="btn p-0 gap-0 outline-hidden select-none"
     >
       {#snippet trigger()}
         <Icon
