@@ -159,51 +159,52 @@
 {/if}
 {#if !$editing_status_on}
   <div class="relative w-full">
-    {#if sarga_hovered}
-      <Popover
-        open={copy_btn_popup_state}
-        onOpenChange={(e) => (copy_btn_popup_state = e.open)}
-        positioning={{ placement: 'bottom-end' }}
-        arrow={false}
-        triggerBase={'btn absolute top-2 right-5 z-20 p-0 outline-hidden select-none'}
-      >
-        {#snippet trigger()}
-          <button
+    <Popover
+      open={copy_btn_popup_state}
+      onOpenChange={(e) => (copy_btn_popup_state = e.open)}
+      positioning={{ placement: 'bottom-end' }}
+      arrow={false}
+      triggerBase={'btn absolute top-2 right-5 z-20 p-0 outline-hidden select-none'}
+    >
+      {#snippet trigger()}
+        {#if sarga_hovered}
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
+          <span
             transition:fade={{ duration: 150 }}
             title="Copy Sarga Text"
             onmouseenter={() => (sarga_hovered = true)}
           >
             <Icon src={OiCopy16} class="text-lg" />
-          </button>
-        {/snippet}
-        {#snippet content()}
-          <!-- svelte-ignore a11y_no_static_element_interactions -->
-          <div
-            class="z-70 space-y-1 card rounded-lg bg-slate-100 p-1 shadow-xl dark:bg-surface-900"
-            onmouseenter={() => (sarga_hovered = true)}
-            onmouseleave={() => {
-              copy_btn_popup_state = false;
-            }}
+          </span>
+        {/if}
+      {/snippet}
+      {#snippet content()}
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <div
+          class="z-70 space-y-1 card rounded-lg bg-slate-100 p-1 shadow-xl dark:bg-surface-900"
+          onmouseenter={() => (sarga_hovered = true)}
+          onmouseleave={() => {
+            copy_btn_popup_state = false;
+          }}
+        >
+          <button
+            onclick={copy_sarga_shlokas_only}
+            class="btn-hover block w-full rounded-md px-2 py-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
           >
-            <button
-              onclick={copy_sarga_shlokas_only}
-              class="btn-hover block w-full rounded-md px-2 py-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
-            >
-              Copy Shlokas
-            </button>
-            <button
-              onclick={copy_sarga_with_transliteration_and_translation}
-              class="btn-hover block w-full rounded-md px-2 py-1 text-xs hover:bg-gray-200 dark:hover:bg-gray-700"
-            >
-              <div>Copy Shlokas</div>
-              <div>with</div>
-              <div>Transliteratin</div>
-              <div>and Translation</div>
-            </button>
-          </div>
-        {/snippet}
-      </Popover>
-    {/if}
+            Copy Shlokas
+          </button>
+          <button
+            onclick={copy_sarga_with_transliteration_and_translation}
+            class="btn-hover block w-full rounded-md px-2 py-1 text-xs hover:bg-gray-200 dark:hover:bg-gray-700"
+          >
+            <div>Copy Shlokas</div>
+            <div>with</div>
+            <div>Transliteratin</div>
+            <div>and Translation</div>
+          </button>
+        </div>
+      {/snippet}
+    </Popover>
   </div>
 {/if}
 
