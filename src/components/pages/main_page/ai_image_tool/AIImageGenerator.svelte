@@ -424,7 +424,7 @@
           classes="inline-block -mb-2"
           meterBase="stroke-primary-500"
           trackBase="stroke-primary-500/30"
-          strokeWidth="5px"
+          strokeWidth="15px"
         />
       {:else if show_image_time_status && $image_q.isSuccess}
         <span class="ml-4 text-xs text-stone-500 select-none dark:text-stone-300">

@@ -218,6 +218,6 @@
     strokeLinecap="butt"
     meterBase="stroke-primary-500"
     trackBase="stroke-primary-500/30"
-    strokeWidth="6px"
+    strokeWidth="17px"
   />
 {/if}
