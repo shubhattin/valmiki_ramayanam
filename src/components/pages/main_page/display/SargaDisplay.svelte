@@ -247,7 +247,7 @@
         {#each transliterated_sarga_data as shloka_lines, i (i)}
           <!-- with 0 and -1 index -->
           {@const trans_index = transliterated_sarga_data.length - 1 === i ? -1 : i}
-          <div class="rounded-lg px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-800">
+          <div class="rounded-lg px-2 py-0.5 hover:bg-gray-200 dark:hover:bg-gray-800">
             <div class="flex space-x-2">
               {#if i !== 0 && i !== transliterated_sarga_data.length - 1}
                 <div
