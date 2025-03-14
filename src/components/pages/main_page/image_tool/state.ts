@@ -60,8 +60,8 @@ export const image_sarga_data = get_derived_query(
         placeholderData: [],
         queryFn: async () => {
           return await client.translations.get_sarga_data.query({
-            kANDa_num: get(kANDa_selected),
-            sarga_num: get(sarga_selected)
+            kANDa_num: get(image_kANDa),
+            sarga_num: get(image_sarga)
           });
         }
       },
