@@ -16,6 +16,6 @@
   }
 
   .btn-hover:hover {
-    @apply brightness-90;
+    @apply brightness-80;
   }
 }

@@ -48,7 +48,7 @@
     }
   });
 
-  let selected_model: keyof typeof TEXT_MODEL_LIST = $state('gpt-4o');
+  let selected_model: keyof typeof TEXT_MODEL_LIST = $state('o3-mini');
 
   const translate_sarga_mut = createMutation({
     mutationFn: async (
