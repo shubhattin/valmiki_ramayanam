@@ -10,8 +10,7 @@ async function main() {
 
   const envs_parsed = z
     .object({
-      PG_DATABASE_URL: z.string(),
-      BACKUP_ENCRYPTION_KEY: z.string()
+      PG_DATABASE_URL: z.string()
     })
     .safeParse(process.env);
   if (!envs_parsed.success) {
