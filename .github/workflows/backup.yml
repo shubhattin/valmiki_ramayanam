@@ -36,25 +36,25 @@ jobs:
           name: db_backup
           path: src/db/scripts/backup/
           retention-days: 60
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-        # set working directory to data/ramayan
-        # Install dependencies
-      - name: Install dependencies
-        working-directory: data/ramayan
-        run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
-      - name: Generate Excel Files
-        working-directory: data/ramayan
-        run: |
-          python3 get_json.py --no-run-test
-      - run: |
-          npx vite-node data/ramayan/make_excel_files.ts --no-zip
-      - uses: actions/upload-artifact@v4
-        with:
-          name: excel_files
-          path: data/ramayan/out/
-          retention-days: 60
+      # - name: Set up Python 3.10
+      #   uses: actions/setup-python@v5
+      #   with:
+      #     python-version: '3.10'
+      #   # set working directory to data/ramayan
+      #   # Install dependencies
+      # - name: Install dependencies
+      #   working-directory: data/ramayan
+      #   run: |
+      #     pip install --upgrade pip
+      #     pip install -r requirements.txt
+      # - name: Generate Excel Files
+      #   working-directory: data/ramayan
+      #   run: |
+      #     python3 get_json.py --no-run-test
+      # - run: |
+      #     npx vite-node data/ramayan/make_excel_files.ts --no-zip
+      # - uses: actions/upload-artifact@v4
+      #   with:
+      #     name: excel_files
+      #     path: data/ramayan/out/
+      #     retention-days: 60
